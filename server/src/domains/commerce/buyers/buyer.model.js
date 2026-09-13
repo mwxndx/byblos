@@ -1,5 +1,6 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
+import { AppError } from '../../../shared/utils/errorHandler.js';
 
 // Convert snake_case to camelCase function
 import { toCamelCase } from '../../../shared/utils/caseUtils.js';
@@ -177,6 +178,23 @@ class Buyer {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+      // Lock the row and refuse deletion while refund money is still attached —
+      // mirrors softDeleteSeller's balance guard. `refunds` is the withdrawable
+      // refund balance and `refund_withdrawal_reserved_balance` is money already
+      // reserved against an in-flight refund withdrawal. Tombstoning the row nulls
+      // the M-Pesa number and deactivates the user, so deleting while either is > 0
+      // would strand that money with no recovery path short of manual DB surgery.
+      const balRes = await client.query(
+        'SELECT refunds, refund_withdrawal_reserved_balance FROM buyers WHERE id = $1 FOR UPDATE',
+        [buyerId]
+      );
+      if (!balRes.rows.length) {
+        throw new AppError('Buyer account not found.', 404);
+      }
+      const { refunds, refund_withdrawal_reserved_balance: reserved } = balRes.rows[0];
+      if (Number(refunds || 0) > 0 || Number(reserved || 0) > 0) {
+        throw new AppError('Please withdraw your pending refund balance before deleting your account.', 400);
+      }
       const tombstone = `deleted_buyer_${userId || buyerId}_${Date.now()}@deleted.byblos`;
       await client.query(
         `UPDATE buyers SET full_name = 'Deleted user', email = $1, mobile_payment = 'deleted',
@@ -194,7 +212,9 @@ class Buyer {
       return true;
     } catch (error) {
       await client.query('ROLLBACK');
-      logger.error('Buyer.softDeleteAccount failed', { buyerId, userId, error: error.message });
+      if (!(error instanceof AppError)) {
+        logger.error('Buyer.softDeleteAccount failed', { buyerId, userId, error: error.message });
+      }
       throw error;
     } finally {
       client.release();
