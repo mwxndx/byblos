@@ -31,6 +31,34 @@ setInterval(() => {
 }, 15 * 1000).unref();
 
 /**
+ * Cache-hit re-authorization gate. The auth cache (AUTH_CACHE_TTL_MS) can serve a
+ * user record up to 5s stale, so on every cache hit we must re-apply the same
+ * revocation checks the fresh-path auth queries enforce
+ * (userRepository.find*AuthProfile). An account is revoked the moment:
+ *   - its user row is deactivated (is_active = false), matching `u.is_active = true`;
+ *   - its profile status is set to anything other than 'active' — for buyers,
+ *     sellers, and creators, matching `COALESCE(status, 'active') = 'active'`, which
+ *     covers 'inactive', 'suspended', and 'deleted' alike; or
+ *   - its logistics partner is deactivated (partner_active = false), matching
+ *     `lp.active = true OR lp.id IS NULL`.
+ * A missing status (admin/marketing/logistics carry no profile status; a null
+ * partner is left as null) is treated as allowed, matching the COALESCE / IS NULL
+ * allowances in those queries. Previously this gate only caught status === 'suspended',
+ * so a just-deactivated seller/creator ('inactive' or 'deleted') kept access for the
+ * rest of the cache window while the fresh path would already have rejected them.
+ *
+ * @param {{ is_active?: boolean, status?: string, partner_active?: boolean }} user
+ * @returns {boolean} true when the cached account must no longer be trusted
+ */
+export function isCachedAccountRevoked(user) {
+  if (!user) return true;
+  if (user.is_active === false) return true;
+  if (user.status && user.status !== 'active') return true;
+  if (user.partner_active === false) return true;
+  return false;
+}
+
+/**
  * Middleware to restrict access based on permissions
  * @param  {...string} permissions 
  */
@@ -105,8 +133,11 @@ export const protect = async (req, res, next) => {
     if (userType !== 'admin') {
       const cached = _authCache.get(token);
       if (cached && cached.expiresAt > Date.now()) {
-        // SECURITY FIX (FIX-11): Even on cache hit, check if user was suspended/deactivated
-        if (cached.user.is_active === false || (cached.user.status && cached.user.status === 'suspended')) {
+        // SECURITY FIX (FIX-11): Even on cache hit, re-check that the account is still
+        // allowed. The cached record can be up to AUTH_CACHE_TTL_MS stale, so mirror the
+        // fresh-path auth queries exactly via isCachedAccountRevoked — this now catches
+        // any non-'active' profile status ('inactive'/'deleted'), not just 'suspended'.
+        if (isCachedAccountRevoked(cached.user)) {
           _authCache.delete(token); // Clear bad entry
           return next(new AppError('Your account has been deactivated or suspended.', 401));
         }
