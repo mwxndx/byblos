@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useFlaggedEarningsQuery, useResolveFlaggedEarningMutation } from '@/features/admin/hooks/mutations/useAdminDetections';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { FlaggedEarning } from '../types/detections';
 
 export function useDetections() {
@@ -41,8 +42,8 @@ export function useDetections() {
       setSelectedEarning(null);
       await fetchFlaggedEarnings();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(err.response?.data?.message || err.message || `Failed to ${action} earning`);
+      console.error(`Error resolving flagged earning (${action}):`, error);
+      toast.error(classifyApiError(error, `Failed to ${action} earning`).message);
     } finally {
       setIsProcessing(false);
     }

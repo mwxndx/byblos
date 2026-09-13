@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAdminRefundRequestsQuery, useConfirmRefundMutation, useRejectRefundMutation } from '@/features/admin/hooks/mutations/useAdminRefunds';
 import { toast } from 'sonner';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { RefundRequest } from '../types/refunds';
 
 export function useRefundRequests() {
@@ -48,9 +49,8 @@ export function useRefundRequests() {
       setSelectedRequest(null);
       fetchRefundRequests();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } }; message?: string };
       console.error('Error confirming refund:', error);
-      toast.error(err.response?.data?.message || err.message || 'Failed to confirm refund');
+      toast.error(classifyApiError(error, 'Failed to confirm refund').message);
     } finally {
       setIsProcessing(false);
     }
@@ -75,9 +75,8 @@ export function useRefundRequests() {
       setSelectedRequest(null);
       fetchRefundRequests();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } }; message?: string };
       console.error('Error rejecting refund:', error);
-      toast.error(err.response?.data?.message || err.message || 'Failed to reject refund');
+      toast.error(classifyApiError(error, 'Failed to reject refund').message);
     } finally {
       setIsProcessing(false);
     }

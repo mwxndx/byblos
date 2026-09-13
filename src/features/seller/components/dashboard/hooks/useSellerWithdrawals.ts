@@ -5,6 +5,7 @@ import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
 import { getWithdrawalFee, MIN_WITHDRAWAL_AMOUNT } from '../dashboardUtils';
 import { sellerDashboardQueryKeys } from '../queryKeys';
 import { sellerApi } from '@/features/seller/api';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 
 interface UseSellerWithdrawalsArgs {
   balance: number;
@@ -144,11 +145,9 @@ export function useSellerWithdrawals({ balance, enabled = true, toast }: UseSell
         ]);
       } catch (error) {
         console.error('Error requesting withdrawal:', error);
-        const errorMessage = error.response?.data?.message || 'Failed to submit withdrawal request. Please try again.';
-
         toast({
           title: 'Withdrawal Failed',
-          description: errorMessage,
+          description: classifyApiError(error, 'Failed to submit withdrawal request. Please try again.').message,
           variant: 'destructive',
         });
       }
