@@ -16,6 +16,7 @@ export interface OrdersSectionViewProps {
   downloadingOrderId: string | null;
   downloadProgress: Record<string, number>;
   isConfirming: string | null;
+  isCancelling: string | null;
   onConfirmReceiptClick: (orderId: string) => void;
   onCancelOrder: (orderId: string) => Promise<void>;
   onConfirmReceipt: (orderId: string) => Promise<void>;
@@ -30,6 +31,7 @@ export function OrdersSectionView({
   downloadingOrderId,
   downloadProgress,
   isConfirming,
+  isCancelling,
   onConfirmReceiptClick,
   onCancelOrder,
   onConfirmReceipt,
@@ -50,8 +52,10 @@ export function OrdersSectionView({
 
   const handleCancelSubmit = async () => {
     if (!currentOrderId) return;
-    setShowCancelDialog(false);
+    // Keep the dialog open during the request so the button's disabled/spinner
+    // state (gated on isCancelling) is visible; close once it resolves.
     await onCancelOrder(currentOrderId);
+    setShowCancelDialog(false);
   };
 
   const handleReceiptSubmit = async () => {
@@ -138,6 +142,7 @@ export function OrdersSectionView({
         orders={filteredOrders}
         currentOrderId={currentOrderId}
         isConfirming={isConfirming}
+        isCancelling={isCancelling}
         showCancelDialog={showCancelDialog}
         showReceiptDialog={showReceiptDialog}
         selectedOrderForDetails={selectedOrderForDetails}

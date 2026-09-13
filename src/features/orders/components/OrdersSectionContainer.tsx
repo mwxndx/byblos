@@ -17,6 +17,7 @@ export function OrdersSectionContainer() {
   const { runWithLock } = useAsyncLock();
 
   const [isConfirming, setIsConfirming] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState<string | null>(null);
   const [downloadingOrderId, setDownloadingOrderId] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
   const [currentConfirmOrderId, setCurrentConfirmOrderId] = useState<string | null>(null);
@@ -64,11 +65,20 @@ export function OrdersSectionContainer() {
   };
 
   const handleCancelOrder = async (orderId: string) => {
-    try {
-      await cancelOrderMutation.mutateAsync(orderId);
-    } catch {
-      // Error handled in mutation's onError
-    }
+    if (!orderId) return;
+
+    // runWithLock provides a synchronous ref guard, so a second click can't
+    // fire a duplicate cancel (and duplicate refund) before the first resolves.
+    await runWithLock(async () => {
+      setIsCancelling(orderId);
+      try {
+        await cancelOrderMutation.mutateAsync(orderId);
+      } catch {
+        // Error handled in mutation's onError
+      } finally {
+        setIsCancelling(null);
+      }
+    });
   };
 
   const handleConfirmReceipt = async (orderId: string) => {
@@ -103,6 +113,7 @@ export function OrdersSectionContainer() {
       downloadingOrderId={downloadingOrderId}
       downloadProgress={downloadProgress}
       isConfirming={isConfirming}
+      isCancelling={isCancelling}
       onConfirmReceiptClick={handleConfirmReceiptClick}
       onCancelOrder={handleCancelOrder}
       onConfirmReceipt={handleConfirmReceipt}

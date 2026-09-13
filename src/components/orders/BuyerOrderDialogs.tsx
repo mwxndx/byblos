@@ -10,6 +10,7 @@ interface BuyerOrderDialogsProps {
   orders: ApiOrder[];
   currentOrderId: string | null;
   isConfirming: string | null;
+  isCancelling: string | null;
   showCancelDialog: boolean;
   showReceiptDialog: boolean;
   selectedOrderForDetails: ApiOrder | null;
@@ -27,6 +28,7 @@ export function BuyerOrderDialogs({
   orders,
   currentOrderId,
   isConfirming,
+  isCancelling,
   showCancelDialog,
   showReceiptDialog,
   selectedOrderForDetails,
@@ -93,17 +95,17 @@ export function BuyerOrderDialogs({
             <Button
               variant="outline"
               onClick={() => onCancelDialogChange(false)}
-              disabled={isConfirming === currentOrderId}
+              disabled={isCancelling === currentOrderId}
               className="border-slate-300 dark:border-white/20 bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
             >
               No, Keep Order
             </Button>
             <Button
               onClick={onCancelOrder}
-              disabled={isConfirming === currentOrderId}
+              disabled={isCancelling === currentOrderId}
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold shadow-sm hover:shadow-md transition-all duration-200"
             >
-              {isConfirming === currentOrderId ? (
+              {isCancelling === currentOrderId ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                   Cancelling...
