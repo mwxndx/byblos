@@ -372,12 +372,30 @@ export const softDeleteSeller = async (sellerId, userId) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const balRes = await client.query('SELECT balance FROM sellers WHERE id = $1 FOR UPDATE', [sellerId]);
+    // Refuse deletion while ANY money is still attached to the account, not just
+    // the immediately-available `balance`. Tombstoning sets status='deleted' and
+    // deactivates the users row, so a deleted seller can no longer authenticate to
+    // withdraw. `pending_settlement_balance` is escrow already earned but still in
+    // the T+2 clearing hold (it becomes withdrawable `balance` once the settlement
+    // job runs), and `withdrawal_reserved_balance` is money reserved against a
+    // withdrawal already in flight — deleting mid-payout risks the funds being
+    // refunded to a `balance` the seller can never reach. All three are money owed
+    // to the seller that deletion would strand.
+    // (refund_reserved_balance is deliberately excluded: it funds a buyer-refund
+    // obligation, processed against the tombstoned row without the seller needing
+    // to authenticate, so it is not stranded by deletion.)
+    const balRes = await client.query(
+      `SELECT balance, pending_settlement_balance, withdrawal_reserved_balance
+       FROM sellers WHERE id = $1 FOR UPDATE`,
+      [sellerId]
+    );
     if (!balRes.rows.length) {
       throw new AppError('Seller account not found.', 404);
     }
-    if (Number(balRes.rows[0].balance || 0) > 0) {
-      throw new AppError('Please withdraw your available balance before deleting your account.', 400);
+    const { balance, pending_settlement_balance: pending, withdrawal_reserved_balance: reserved } = balRes.rows[0];
+    const totalHeld = Number(balance || 0) + Number(pending || 0) + Number(reserved || 0);
+    if (totalHeld > 0) {
+      throw new AppError('Your account still has funds — available, clearing, or a withdrawal in progress. Please withdraw your balance and wait for any pending settlement or withdrawal to complete before deleting your account.', 400);
     }
     const tag = `${userId || sellerId}_${Date.now()}`;
     const tombstone = `deleted_seller_${tag}@deleted.byblos`;
