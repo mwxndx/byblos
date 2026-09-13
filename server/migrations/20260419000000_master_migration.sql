@@ -8,7 +8,7 @@
 -- executes in any supported path.
 --
 -- Two production-audit findings live in this file and are harmless ONLY because
--- of the above; do not copy these patterns (see migrations/CONVENTIONS.md):
+-- of the above; do not copy these patterns (see server/MIGRATIONS.md):
 --   * schema-of-record DRIFT: the CREATE TABLE IF NOT EXISTS blocks re-declare
 --     core tables with types that no longer match test/schema.sql (e.g.
 --     sellers.total_sales INTEGER vs numeric(15,2); product_orders.status
