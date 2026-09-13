@@ -316,112 +316,152 @@ class ReferralService {
 
         let processed = 0;
         let totalCredited = 0;
+        let failed = 0;
         const rewardEventIds = [];
 
+        // Process each referral in its OWN transaction. A single batch-wide
+        // transaction meant one bad row rolled back every seller's reward for the
+        // whole run and held a write lock on every credited seller row until the
+        // final COMMIT. Committing per row localises a failure to that one row (the
+        // loop logs it and moves on) and releases each seller lock immediately; the
+        // ON CONFLICT DO NOTHING idempotency key makes a re-run skip rows already
+        // credited, which is exactly what per-row commits rely on.
         const client = await pool.connect();
         try {
-            await client.query('BEGIN');
-
             for (/** @type {any} */ const row of activeReferrals.rows) {
-                const { referred_seller_id, referred_shop_name, referrer_seller_id, referrer_whatsapp } = row;
+                try {
+                    const outcome = await ReferralService._creditOneReferral(
+                        client, row, { year, month, periodStart, periodEnd }
+                    );
+                    if (!outcome) continue; // no qualifying sales, or already credited
 
-                // 1. Count products sold by the referred seller in the target month/year.
-                const salesResult = await client.query(
-                    `WITH qualifying_orders AS (
-               SELECT id, seller_payout_amount, COALESCE(total_quantity, 1) AS total_quantity
-               FROM product_orders
-               WHERE seller_id = $1
-                 AND payment_status = 'completed'
-                 AND paid_at >= $2
-                 AND paid_at < $3
-                 AND paid_at <= (
-                   SELECT referral_active_until
-                   FROM sellers
-                   WHERE id = $1
-                 )
-             ),
-             order_units AS (
-               SELECT
-                 qo.id,
-                 qo.seller_payout_amount,
-                 COALESCE(SUM(oi.quantity), qo.total_quantity, 1) AS units_sold
-               FROM qualifying_orders qo
-               LEFT JOIN order_items oi ON oi.order_id = qo.id
-               GROUP BY qo.id, qo.seller_payout_amount, qo.total_quantity
-             )
-             SELECT
-               COALESCE(SUM(seller_payout_amount), 0) AS referred_gmv,
-               COALESCE(SUM(units_sold), 0) AS units_sold
-             FROM order_units`,
-                    [referred_seller_id, periodStart, periodEnd]
-                );
-
-                const referredGmv = Number.parseFloat(salesResult.rows[0].referred_gmv || 0);
-                const unitsSold = Number.parseInt(salesResult.rows[0].units_sold || 0, 10);
-                logger.info(`[REFERRAL-CRON] Seller ${referred_seller_id} products sold for ${year}-${month}: ${unitsSold}`);
-                if (unitsSold <= 0) continue;
-
-                // 2. Calculate reward: flat KES 3 per product sold by the referred seller.
-                const reward = Number.parseFloat((unitsSold * Fees.REFERRAL_REWARD_PER_PRODUCT).toFixed(2));
-
-                // 3. Insert log row (idempotent)
-                const insertResult = await client.query(
-                    `INSERT INTO referral_earnings_log
-             (referrer_seller_id, referred_seller_id, period_month, period_year, referred_gmv, referred_units_sold, reward_amount)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)
-           ON CONFLICT (referrer_seller_id, referred_seller_id, period_month, period_year) DO NOTHING`,
-                    [referrer_seller_id, referred_seller_id, month, year, referredGmv, unitsSold, reward]
-                );
-
-                if (insertResult.rowCount === 0) {
-                    logger.info(`[REFERRAL-CRON] Already processed referrer ${referrer_seller_id} / referred ${referred_seller_id} for ${year}-${month} — skipping`);
-                    continue;
+                    processed++;
+                    totalCredited = Number.parseFloat((totalCredited + outcome.reward).toFixed(2));
+                    rewardEventIds.push(outcome.eventId);
+                } catch (rowErr) {
+                    failed++;
+                    logger.error(
+                        `[REFERRAL-CRON] Failed to credit referrer ${row.referrer_seller_id} from referred ${row.referred_seller_id} for ${year}-${month}; skipping this row and continuing`,
+                        rowErr
+                    );
                 }
-
-                // 4. Credit referrer's balance with FOR UPDATE lock
-                await client.query(
-                    `UPDATE sellers
-                     SET balance = balance + $1,
-                         total_referral_earnings = total_referral_earnings + $1
-                     WHERE id = $2`,
-                    [reward, referrer_seller_id]
-                );
-
-                processed++;
-                totalCredited = Number.parseFloat((totalCredited + reward).toFixed(2));
-
-                logger.info(`[REFERRAL-CRON] SUCCESS: Credited KES ${reward} to referrer ${referrer_seller_id} from referred ${referred_seller_id} (products sold: ${unitsSold})`);
-
-                const rewardEvent = await eventBus.enqueueInTransaction(client, AppEvents.REFERRAL.REWARD_CREATED, {
-                    eventId: `referral.reward_created:${referrer_seller_id}:${referred_seller_id}:${year}:${month}`,
-                    seller: {
-                        id: referrer_seller_id,
-                        whatsapp_number: referrer_whatsapp
-                    },
-                    reward: {
-                        amount: reward,
-                        referredShopName: referred_shop_name,
-                        referredSellerId: referred_seller_id,
-                        unitsSold,
-                        periodMonth: month,
-                        periodYear: year
-                    }
-                });
-                rewardEventIds.push(rewardEvent.eventId);
             }
-
-            await client.query('COMMIT');
-        } catch (err) {
-            await client.query('ROLLBACK');
-            logger.error('[REFERRAL-CRON] Transaction failed, rolled back:', err);
-            throw err;
         } finally {
             client.release();
         }
 
-        logger.info(`[REFERRAL-CRON] ✅ Done — processed: ${processed}, total credited: KES ${totalCredited}`);
+        logger.info(`[REFERRAL-CRON] ✅ Done — processed: ${processed}, failed: ${failed}, total credited: KES ${totalCredited}`);
         eventBus.dispatchManyAfterCommit(rewardEventIds, 'ReferralService.processMonthlyRewards');
-        return { processed, totalCredited };
+        return { processed, totalCredited, failed };
+    }
+
+    /**
+     * Credit a single referral reward inside its own transaction. Returns
+     * { reward, eventId } when a reward was credited, or null when the row had no
+     * qualifying sales or was already credited (an idempotent skip). Throws on a
+     * real error so the caller can log that one row and continue with the rest.
+     * @param {import('pg').PoolClient} client
+     * @param {any} row
+     * @param {{ year: number, month: number, periodStart: Date, periodEnd: Date }} ctx
+     * @returns {Promise<{ reward: number, eventId: string }|null>}
+     */
+    static async _creditOneReferral(client, row, { year, month, periodStart, periodEnd }) {
+        const { referred_seller_id, referred_shop_name, referrer_seller_id, referrer_whatsapp } = row;
+        try {
+            await client.query('BEGIN');
+
+            // 1. Count products sold by the referred seller in the target month/year.
+            const salesResult = await client.query(
+                `WITH qualifying_orders AS (
+                   SELECT id, seller_payout_amount, COALESCE(total_quantity, 1) AS total_quantity
+                   FROM product_orders
+                   WHERE seller_id = $1
+                     AND payment_status = 'completed'
+                     AND paid_at >= $2
+                     AND paid_at < $3
+                     AND paid_at <= (
+                       SELECT referral_active_until
+                       FROM sellers
+                       WHERE id = $1
+                     )
+                 ),
+                 order_units AS (
+                   SELECT
+                     qo.id,
+                     qo.seller_payout_amount,
+                     COALESCE(SUM(oi.quantity), qo.total_quantity, 1) AS units_sold
+                   FROM qualifying_orders qo
+                   LEFT JOIN order_items oi ON oi.order_id = qo.id
+                   GROUP BY qo.id, qo.seller_payout_amount, qo.total_quantity
+                 )
+                 SELECT
+                   COALESCE(SUM(seller_payout_amount), 0) AS referred_gmv,
+                   COALESCE(SUM(units_sold), 0) AS units_sold
+                 FROM order_units`,
+                [referred_seller_id, periodStart, periodEnd]
+            );
+
+            const referredGmv = Number.parseFloat(salesResult.rows[0].referred_gmv || 0);
+            const unitsSold = Number.parseInt(salesResult.rows[0].units_sold || 0, 10);
+            logger.info(`[REFERRAL-CRON] Seller ${referred_seller_id} products sold for ${year}-${month}: ${unitsSold}`);
+            if (unitsSold <= 0) {
+                await client.query('ROLLBACK');
+                return null;
+            }
+
+            // 2. Calculate reward: flat KES 3 per product sold by the referred seller.
+            const reward = Number.parseFloat((unitsSold * Fees.REFERRAL_REWARD_PER_PRODUCT).toFixed(2));
+
+            // 3. Insert log row (idempotent)
+            const insertResult = await client.query(
+                `INSERT INTO referral_earnings_log
+                   (referrer_seller_id, referred_seller_id, period_month, period_year, referred_gmv, referred_units_sold, reward_amount)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)
+                 ON CONFLICT (referrer_seller_id, referred_seller_id, period_month, period_year) DO NOTHING`,
+                [referrer_seller_id, referred_seller_id, month, year, referredGmv, unitsSold, reward]
+            );
+
+            if (insertResult.rowCount === 0) {
+                await client.query('ROLLBACK');
+                logger.info(`[REFERRAL-CRON] Already processed referrer ${referrer_seller_id} / referred ${referred_seller_id} for ${year}-${month} — skipping`);
+                return null;
+            }
+
+            // 4. Credit referrer's balance (atomic single-row UPDATE).
+            await client.query(
+                `UPDATE sellers
+                     SET balance = balance + $1,
+                         total_referral_earnings = total_referral_earnings + $1
+                     WHERE id = $2`,
+                [reward, referrer_seller_id]
+            );
+
+            // 5. Enqueue the reward event inside the same transaction — it is durable
+            //    via the outbox even if the process dies before dispatchManyAfterCommit.
+            const rewardEvent = await eventBus.enqueueInTransaction(client, AppEvents.REFERRAL.REWARD_CREATED, {
+                eventId: `referral.reward_created:${referrer_seller_id}:${referred_seller_id}:${year}:${month}`,
+                seller: {
+                    id: referrer_seller_id,
+                    whatsapp_number: referrer_whatsapp
+                },
+                reward: {
+                    amount: reward,
+                    referredShopName: referred_shop_name,
+                    referredSellerId: referred_seller_id,
+                    unitsSold,
+                    periodMonth: month,
+                    periodYear: year
+                }
+            });
+
+            await client.query('COMMIT');
+
+            logger.info(`[REFERRAL-CRON] SUCCESS: Credited KES ${reward} to referrer ${referrer_seller_id} from referred ${referred_seller_id} (products sold: ${unitsSold})`);
+            return { reward, eventId: rewardEvent.eventId };
+        } catch (err) {
+            await client.query('ROLLBACK').catch(() => {});
+            throw err;
+        }
     }
 
 }
