@@ -704,7 +704,8 @@ CREATE TABLE public.creator_withdrawal_requests (
     metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    processed_at timestamp with time zone
+    processed_at timestamp with time zone,
+    CONSTRAINT creator_withdrawal_requests_status_check CHECK (((status)::text = ANY (ARRAY[('processing'::character varying)::text, ('manual_review'::character varying)::text, ('completed'::character varying)::text, ('failed'::character varying)::text, ('compensation_required'::character varying)::text, ('rejected'::character varying)::text, ('success'::character varying)::text, ('paid'::character varying)::text])))
 );
 
 
@@ -2767,7 +2768,8 @@ CREATE TABLE public.withdrawal_requests (
     creator_id integer,
     buyer_id integer,
     CONSTRAINT withdrawal_requests_amount_check CHECK ((amount > (0)::numeric)),
-    CONSTRAINT withdrawal_requests_one_entity_check CHECK ((((seller_id IS NOT NULL) AND (creator_id IS NULL) AND (buyer_id IS NULL)) OR ((seller_id IS NULL) AND (creator_id IS NOT NULL) AND (buyer_id IS NULL)) OR ((seller_id IS NULL) AND (creator_id IS NULL) AND (buyer_id IS NOT NULL))))
+    CONSTRAINT withdrawal_requests_one_entity_check CHECK ((((seller_id IS NOT NULL) AND (creator_id IS NULL) AND (buyer_id IS NULL)) OR ((seller_id IS NULL) AND (creator_id IS NOT NULL) AND (buyer_id IS NULL)) OR ((seller_id IS NULL) AND (creator_id IS NULL) AND (buyer_id IS NOT NULL)))),
+    CONSTRAINT withdrawal_requests_status_check CHECK (((status)::text = ANY (ARRAY[('processing'::character varying)::text, ('manual_review'::character varying)::text, ('completed'::character varying)::text, ('failed'::character varying)::text, ('compensation_required'::character varying)::text, ('rejected'::character varying)::text, ('success'::character varying)::text, ('paid'::character varying)::text])))
 );
 
 
@@ -6199,6 +6201,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (102, '20260910010000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (103, '20260911120000_drop_orphaned_process_scheduled_payouts_function', '2026-09-11 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (104, '20260911130000_add_payments_provider_reference_unique_constraint', '2026-09-11 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (105, '20260913120000_add_product_orders_status_check_constraint', '2026-09-13 12:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (106, '20260913130000_add_withdrawal_status_check_constraints', '2026-09-13 13:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
