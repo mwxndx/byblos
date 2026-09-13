@@ -1,3 +1,25 @@
+-- ============================================================================
+-- INERT / SUPERSEDED — this file's body is historical and is NOT current schema.
+-- ----------------------------------------------------------------------------
+-- This consolidated migration already ran in production (recorded in
+-- pgmigrations) and is never re-run; a fresh database is bootstrapped from
+-- test/schema.sql (the single source of truth), never by replaying migrations
+-- from zero (unsupported — see server/scripts/migrate.js). So nothing below
+-- executes in any supported path.
+--
+-- Two production-audit findings live in this file and are harmless ONLY because
+-- of the above; do not copy these patterns (see migrations/CONVENTIONS.md):
+--   * schema-of-record DRIFT: the CREATE TABLE IF NOT EXISTS blocks re-declare
+--     core tables with types that no longer match test/schema.sql (e.g.
+--     sellers.total_sales INTEGER vs numeric(15,2); product_orders.status
+--     VARCHAR vs the order_status enum). Read test/schema.sql for real types —
+--     never trust the shapes below.
+--   * a bulk backfill (UPDATE product_orders ...) rides this DDL transaction.
+-- The body is left intact (and version-controlled) rather than rewritten,
+-- because editing an already-applied, never-replayed migration changes nothing
+-- at runtime. Do not add new DDL or backfills here.
+-- ============================================================================
+
 -- BYBLOS MASTER MIGRATION SCRIPT
 -- Consolidated: 2026-04-18
 -- This script combines all migrations and base schema into one idempotent file.
