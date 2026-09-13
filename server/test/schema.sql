@@ -687,49 +687,6 @@ ALTER SEQUENCE public.creator_shop_requests_id_seq OWNED BY public.creator_shop_
 
 
 --
--- Name: creator_withdrawal_requests; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.creator_withdrawal_requests (
-    id integer NOT NULL,
-    creator_id integer NOT NULL,
-    amount numeric(15,2) NOT NULL,
-    withdrawal_fee numeric(15,2) DEFAULT 0 NOT NULL,
-    total_deducted numeric(15,2) DEFAULT 0 NOT NULL,
-    mpesa_number character varying(50) NOT NULL,
-    mpesa_name character varying(255) NOT NULL,
-    status character varying(30) DEFAULT 'processing'::character varying NOT NULL,
-    provider_reference character varying(255),
-    idempotency_key character varying(120) NOT NULL,
-    metadata jsonb DEFAULT '{}'::jsonb NOT NULL,
-    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    processed_at timestamp with time zone,
-    CONSTRAINT creator_withdrawal_requests_status_check CHECK (((status)::text = ANY (ARRAY[('processing'::character varying)::text, ('manual_review'::character varying)::text, ('completed'::character varying)::text, ('failed'::character varying)::text, ('compensation_required'::character varying)::text, ('rejected'::character varying)::text, ('success'::character varying)::text, ('paid'::character varying)::text])))
-);
-
-
---
--- Name: creator_withdrawal_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.creator_withdrawal_requests_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: creator_withdrawal_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.creator_withdrawal_requests_id_seq OWNED BY public.creator_withdrawal_requests.id;
-
-
---
 -- Name: creators; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2836,13 +2793,6 @@ ALTER TABLE ONLY public.creator_shop_requests ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- Name: creator_withdrawal_requests id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.creator_withdrawal_requests ALTER COLUMN id SET DEFAULT nextval('public.creator_withdrawal_requests_id_seq'::regclass);
-
-
---
 -- Name: creators id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3255,22 +3205,6 @@ ALTER TABLE ONLY public.creator_shop_requests
 
 ALTER TABLE ONLY public.creator_shop_requests
     ADD CONSTRAINT creator_shop_requests_pkey PRIMARY KEY (id);
-
-
---
--- Name: creator_withdrawal_requests creator_withdrawal_requests_idempotency_key_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.creator_withdrawal_requests
-    ADD CONSTRAINT creator_withdrawal_requests_idempotency_key_key UNIQUE (idempotency_key);
-
-
---
--- Name: creator_withdrawal_requests creator_withdrawal_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.creator_withdrawal_requests
-    ADD CONSTRAINT creator_withdrawal_requests_pkey PRIMARY KEY (id);
 
 
 --
@@ -4100,20 +4034,6 @@ CREATE INDEX idx_creator_shop_requests_creator ON public.creator_shop_requests U
 --
 
 CREATE INDEX idx_creator_shop_requests_seller ON public.creator_shop_requests USING btree (seller_id, status);
-
-
---
--- Name: idx_creator_withdrawals_creator_recent; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_creator_withdrawals_creator_recent ON public.creator_withdrawal_requests USING btree (creator_id, created_at DESC);
-
-
---
--- Name: idx_creator_withdrawals_status; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_creator_withdrawals_status ON public.creator_withdrawal_requests USING btree (status);
 
 
 --
@@ -5382,12 +5302,6 @@ ALTER TABLE ONLY public.creator_shop_requests
     ADD CONSTRAINT creator_shop_requests_seller_id_fkey FOREIGN KEY (seller_id) REFERENCES public.sellers(id) ON DELETE CASCADE;
 
 
---
--- Name: creator_withdrawal_requests creator_withdrawal_requests_creator_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.creator_withdrawal_requests
-    ADD CONSTRAINT creator_withdrawal_requests_creator_id_fkey FOREIGN KEY (creator_id) REFERENCES public.creators(id) ON DELETE RESTRICT;
 
 
 --
@@ -6202,6 +6116,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (103, '20260911120000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (104, '20260911130000_add_payments_provider_reference_unique_constraint', '2026-09-11 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (105, '20260913120000_add_product_orders_status_check_constraint', '2026-09-13 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (106, '20260913130000_add_withdrawal_status_check_constraints', '2026-09-13 13:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (107, '20260913140000_drop_orphaned_creator_withdrawal_requests', '2026-09-13 14:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
