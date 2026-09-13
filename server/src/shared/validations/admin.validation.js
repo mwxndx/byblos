@@ -10,8 +10,19 @@ const s = z.string().optional();
 const n = z.coerce.number().optional();
 const anyId = z.union([z.string(), z.number()]).optional();
 
+// The only sellers.status values the app actually recognizes: 'active'
+// (default) and 'inactive' (the admin toggle), plus 'suspended' (the value
+// auth.js gates access on) and 'deleted' (soft-delete). Validating the enum
+// here means a typo or wrong-casing ('Active', 'pending_review', ...) is a
+// clean 400 instead of being written verbatim into the column, where the
+// exact-string auth gate would silently never match it while the admin UI
+// reported success.
+const sellerStatus = z.enum(['active', 'inactive', 'suspended', 'deleted'], {
+  errorMap: () => ({ message: "status must be one of 'active', 'inactive', 'suspended', or 'deleted'" })
+});
+
 export const login = z.object({ email: s, password: s }).passthrough();
-export const updateSellerStatus = z.object({ id: id, status: s }).passthrough();
+export const updateSellerStatus = z.object({ id: id, status: sellerStatus }).passthrough();
 export const deleteCreator = z.object({ id: id }).passthrough();
 export const deleteUser = z.object({ id: id, role: s }).passthrough();
 export const updateWithdrawalStatus = z.object({ id: id, status: s }).passthrough();

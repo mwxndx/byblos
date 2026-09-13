@@ -16,6 +16,18 @@ import { AppError } from '../../../shared/utils/errorHandler.js';
 // Regenerate with: node -e "const b=require('bcrypt');b.hash('__timing_dummy__',12).then(console.log)"
 const TIMING_DUMMY_HASH = '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TgxO7dCVS0VxMhUv8E1Y2d6PJHRW';
 
+// Constant-time string comparison for secrets (env-configured bootstrap
+// passwords). SHA-256 both sides to a fixed 32-byte digest first, so
+// crypto.timingSafeEqual never sees unequal-length buffers (it throws on
+// those, which itself leaks length) and the compare time does not depend on
+// the inputs' lengths or where they first differ — closing the byte-by-byte
+// timing oracle a plain `===` opens on ADMIN_PASSWORD / MARKETING_PASSWORD.
+function timingSafeStrEqual(a, b) {
+    const aHash = crypto.createHash('sha256').update(String(a)).digest();
+    const bHash = crypto.createHash('sha256').update(String(b)).digest();
+    return crypto.timingSafeEqual(aHash, bHash);
+}
+
 class AuthService {
     /**
      * Self-bootstrap the admin or marketing account from env-configured
@@ -41,7 +53,7 @@ class AuthService {
         const match = candidates.find((c) =>
             c.email && c.password &&
             c.email.toLowerCase().trim() === normalizedEmail &&
-            c.password === password
+            timingSafeStrEqual(c.password, password)
         );
         if (!match) return null;
 
