@@ -1824,6 +1824,7 @@ CREATE TABLE public.product_orders (
     payment_completed_at timestamp with time zone,
     CONSTRAINT product_orders_platform_fee_amount_non_negative CHECK ((platform_fee_amount >= (0)::numeric)),
     CONSTRAINT product_orders_seller_payout_amount_non_negative CHECK ((seller_payout_amount >= (0)::numeric)),
+    CONSTRAINT product_orders_status_check CHECK (((status)::text = ANY (ARRAY[('PENDING'::character varying)::text, ('RESERVED'::character varying)::text, ('HELD'::character varying)::text, ('PAID'::character varying)::text, ('PROCESSING'::character varying)::text, ('COMPLETED'::character varying)::text, ('CANCELLED'::character varying)::text, ('FAILED'::character varying)::text, ('EXPIRED'::character varying)::text, ('COLLECTION_PENDING'::character varying)::text, ('DELIVERY_PENDING'::character varying)::text, ('SERVICE_PENDING'::character varying)::text, ('CLIENT_PAYMENT_PENDING'::character varying)::text, ('DEBT_PENDING'::character varying)::text, ('DELIVERY_COMPLETE'::character varying)::text, ('CONFIRMED'::character varying)::text, ('CREATED'::character varying)::text, ('PAYMENT_PENDING'::character varying)::text, ('FULFILLMENT_PENDING'::character varying)::text, ('FULFILLED'::character varying)::text, ('DELIVERED'::character varying)::text, ('BOOKED'::character varying)::text, ('REFUND_PENDING'::character varying)::text, ('REFUNDED'::character varying)::text, ('COMPENSATION_REQUIRED'::character varying)::text, ('AWAITING_SELLER_ACTION'::character varying)::text, ('FULFILLING'::character varying)::text, ('READY_FOR_BUYER'::character varying)::text, ('MANUAL_REVIEW'::character varying)::text, ('READY_FOR_PICKUP'::character varying)::text]))),
     CONSTRAINT product_orders_total_amount_non_negative CHECK ((total_amount >= (0)::numeric))
 );
 
@@ -6197,6 +6198,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (101, '20260910000000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (102, '20260910010000_backfill_creator_terms_accepted', '2026-09-10 00:04:35');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (103, '20260911120000_drop_orphaned_process_scheduled_payouts_function', '2026-09-11 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (104, '20260911130000_add_payments_provider_reference_unique_constraint', '2026-09-11 13:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (105, '20260913120000_add_product_orders_status_check_constraint', '2026-09-13 12:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
