@@ -17,9 +17,9 @@ import { copyLinkedTextToClipboard, resolveShareOrigin } from '@/shared/utils/sh
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import {
   money,
-  getErrorMessage,
   MAX_PROMOTED_SHOPS,
   MAX_INVITED_BUSINESSES,
   type AnalysisPeriod
@@ -98,7 +98,7 @@ export default function CreatorDashboard() {
         toast.success('Shop request declined.');
       }
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Could not update shop request.'));
+      toast.error(classifyApiError(error, 'Could not update shop request.').message);
     } finally {
       setRespondingRequestId(null);
     }
@@ -110,7 +110,7 @@ export default function CreatorDashboard() {
       await leaveShopMutation.mutateAsync(sellerId);
       toast.success('You have left this shop.');
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Could not leave this shop.'));
+      toast.error(classifyApiError(error, 'Could not leave this shop.').message);
     } finally {
       setLeavingShopSellerId(null);
     }
@@ -122,7 +122,7 @@ export default function CreatorDashboard() {
       await leaveBusinessMutation.mutateAsync(sellerId);
       toast.success('You have left this business.');
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Could not leave this business.'));
+      toast.error(classifyApiError(error, 'Could not leave this business.').message);
     } finally {
       setLeavingBusinessSellerId(null);
     }

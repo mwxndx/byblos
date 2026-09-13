@@ -8,6 +8,7 @@ import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { CreatorSocialProfiles } from '@/features/creator/components/CreatorSocialProfiles';
 import { CreatorWithdrawalPanel } from '@/features/creator/components/CreatorWithdrawalPanel';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useUpdateCreatorProfileMutation } from '@/features/creator/hooks/mutations/useUpdateCreatorProfileMutation';
 import { LegalLinks } from '@/shared/components/LegalLinks';
 import type { CreatorProfile, CreatorClearance, WithdrawalRow } from '@/features/creator/utils/creatorDashboardUtils';
@@ -68,8 +69,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
       });
       toast.success('Details saved.');
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(error.response?.data?.message || error.message || 'Could not save your details.');
+      toast.error(classifyApiError(err, 'Could not save your details.').message);
     }
   };
 

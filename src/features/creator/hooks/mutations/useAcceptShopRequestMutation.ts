@@ -1,19 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import creatorApi from '@/features/creator/api';
 import { creatorQueryKeys } from '@/features/creator/api/queryKeys';
-import { toast } from 'sonner';
 
 export function useAcceptShopRequestMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (inviteId: string | number) => creatorApi.acceptShopRequest(inviteId),
+    // Toasts are owned by the caller (CreatorDashboard.handleShopRequest) so each
+    // fires exactly once; this hook only refreshes the dashboard on success.
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: creatorQueryKeys.dashboard() });
-      toast.success('Successfully accepted shop request');
-    },
-    onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to accept shop request');
     },
   });
 }

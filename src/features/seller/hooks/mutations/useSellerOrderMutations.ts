@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { sellerApi } from '@/features/seller/api';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
 import { toast } from 'sonner';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { OrderStatus } from '@/shared/types';
 
 export function useQuotePickupMutation() {
@@ -32,8 +33,7 @@ export function useRequestPickupMutation() {
       toast.success('Pickup request submitted successfully');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to request pickup');
+      toast.error(classifyApiError(error, 'Failed to request pickup').message);
     }
   });
 }
@@ -47,8 +47,7 @@ export function useSelectHubDropoffMutation() {
       toast.success('Dropoff method set to Hub Dropoff');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to select hub dropoff');
+      toast.error(classifyApiError(error, 'Failed to select hub dropoff').message);
     }
   });
 }
@@ -62,8 +61,7 @@ export function useMarkDroppedAtHubMutation() {
       toast.success('Order status updated');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to update order status');
+      toast.error(classifyApiError(error, 'Failed to update order status').message);
     }
   });
 }
@@ -78,8 +76,7 @@ export function useUpdateOrderStatusMutation() {
       toast.success('Order status updated');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to update order status');
+      toast.error(classifyApiError(error, 'Failed to update order status').message);
     }
   });
 }
@@ -93,8 +90,7 @@ export function useConfirmBookingMutation() {
       toast.success('Booking confirmed');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to confirm booking');
+      toast.error(classifyApiError(error, 'Failed to confirm booking').message);
     }
   });
 }
@@ -108,8 +104,7 @@ export function useCancelSellerOrderMutation() {
       toast.success('Order cancelled successfully');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to cancel order');
+      toast.error(classifyApiError(error, 'Failed to cancel order').message);
     }
   });
 }

@@ -5,6 +5,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { useToast } from '@/shared/hooks/use-toast';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import { Eye, EyeOff, Loader2, Mail, User, Phone, Lock, ArrowLeft, ShoppingBag, MapPin, Check, X, RefreshCw } from 'lucide-react';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { useBuyerResendVerificationMutation } from '@/features/buyer/hooks/mutations/useBuyerAuthMutations';
@@ -165,7 +166,8 @@ export function useBuyerRegister() {
 
       // Registration success and navigation is handled by the auth context
     } catch (error) {
-      // Handle structured validation errors
+      // Field-level validation errors (400 with an errors array) map to inline
+      // field messages.
       if (error.response?.status === 400 && error.response?.data?.errors) {
         const validationErrors: { field: string; message: string }[] = error.response.data.errors;
         const newErrors: { [key: string]: string } = {};
@@ -175,6 +177,15 @@ export function useBuyerRegister() {
         });
 
         setErrors(newErrors);
+      } else {
+        // Any OTHER failure (duplicate email/phone, 409/500, network/timeout) was
+        // previously swallowed here — the form just sat there with no feedback.
+        // Surface it via the shared classifier so the buyer knows registration failed.
+        toast({
+          title: 'Registration failed',
+          description: classifyApiError(error, 'Could not create your account. Please try again.').message,
+          variant: 'destructive',
+        });
       }
     }
   };

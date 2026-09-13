@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { getWithdrawalStatusLabel, getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useCreatorWithdrawalMutation } from '@/features/creator/hooks/mutations/useCreatorWithdrawalMutation';
 import {
   money,
@@ -13,7 +14,6 @@ import {
   getMaxWithdrawableAmount,
   formatSettlementDate,
   formatSettlementTimeOnly,
-  getErrorMessage,
   type CreatorProfile,
   type CreatorClearance,
   type WithdrawalRow
@@ -70,7 +70,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
       toast.success('Withdrawal request sent.');
       setWithdrawalAmount('');
     } catch (error: unknown) {
-      toast.error(getErrorMessage(error, 'Could not request withdrawal.'));
+      toast.error(classifyApiError(error, 'Could not request withdrawal.').message);
     } finally {
       setWithdrawing(false);
     }

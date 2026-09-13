@@ -137,7 +137,6 @@ export function formatSettlementTimeOnly(dateStr?: string | Date | null): string
   return d.toLocaleTimeString('en-KE', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
-export const getErrorMessage = (error: unknown, fallback: string) => {
-  const apiError = error as ApiError;
-  return apiError?.response?.data?.message || apiError?.message || fallback;
-};
+// Error messaging now goes through the shared classifyApiError
+// (src/shared/utils/errorClassification) so network/timeout/HTTP-body failures
+// are distinguished consistently across the app.

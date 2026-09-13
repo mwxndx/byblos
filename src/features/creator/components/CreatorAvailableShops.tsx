@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { useAvailableShopsQuery } from '../hooks/queries/useAvailableShopsQuery';
 import { useRequestCollaborationMutation } from '../hooks/mutations/useRequestCollaborationMutation';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { AvailableShop } from '../api/marketplace';
 
 export function CreatorAvailableShops() {
@@ -20,8 +21,7 @@ export function CreatorAvailableShops() {
       toast.success(`Collaboration request sent to ${shop.shopName}!`);
       refetch();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(error.response?.data?.message || error.message || 'Could not send request.');
+      toast.error(classifyApiError(err, 'Could not send request.').message);
     } finally {
       setRequestingShopId(null);
     }
