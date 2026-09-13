@@ -42,6 +42,14 @@ const createFallbackRedisClient = () => {
         }
     };
     return {
+        // Marker for callers that fail open when Redis isn't ready. The
+        // idempotency middleware treats the in-memory fallback as usable so it
+        // still works when ioredis isn't installed. Deliberately NOT a
+        // status:'ready' sentinel — createResilientRateLimiter reads
+        // `status === 'ready'` to build a RedisStore (which needs EVAL, a
+        // command this fallback can't serve), so it must keep seeing the
+        // fallback as not-ready and stay on its in-memory limiter.
+        __inMemoryFallback: true,
         async connect() {},
         on() {},
         async get(key) {
@@ -55,6 +63,13 @@ const createFallbackRedisClient = () => {
             if (!store.has(key)) evictIfFull();
             store.set(key, value);
             setExpiryFromArgs(key, args);
+            return 'OK';
+        },
+        async setex(key, seconds, value) {
+            cleanup(key);
+            if (!store.has(key)) evictIfFull();
+            store.set(key, value);
+            expirations.set(key, Date.now() + Number(seconds) * 1000);
             return 'OK';
         },
         async del(key) {
@@ -75,6 +90,7 @@ const createFallbackRedisClient = () => {
             const normalized = String(command || '').toLowerCase();
             if (normalized === 'get') return this.get(args[0]);
             if (normalized === 'set') return this.set(...args);
+            if (normalized === 'setex') return this.setex(...args);
             if (normalized === 'del') return this.del(args[0]);
             if (normalized === 'incr') return this.incr(args[0]);
             if (normalized === 'expire') return this.expire(...args);

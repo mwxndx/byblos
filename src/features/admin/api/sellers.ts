@@ -38,8 +38,12 @@ export async function getSellerById(id: string) {
   }
 }
 
-export function updateSellerStatus(sellerId: string, data: { status: string }) {
-  return api.patch(`/admin/sellers/${sellerId}/status`, data);
+export function updateSellerStatus(sellerId: string, data: { status: string }, idempotencyKey: string) {
+  return api.patch(
+    `/admin/sellers/${sellerId}/status`,
+    data,
+    { headers: { 'Idempotency-Key': idempotencyKey } }
+  );
 }
 
 

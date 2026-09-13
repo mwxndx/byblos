@@ -45,7 +45,7 @@ router.use(protect);
  */
 router.post(
   '/',
-  enforceIdempotency,
+  enforceIdempotency(),
   createOrder
 );
 

@@ -22,7 +22,10 @@ export function useUpdateSellerStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (args: { sellerId: string; status: string }) =>
-      adminApi.updateSellerStatus(args.sellerId, { status: args.status }),
+      // Deterministic idempotency key (same convention as the withdrawal
+      // status mutation): a retry of the same status change replays the cached
+      // result instead of applying twice; a different status yields a new key.
+      adminApi.updateSellerStatus(args.sellerId, { status: args.status }, `seller-status-${args.status}-${args.sellerId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.sellers() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
@@ -43,7 +46,7 @@ export function useGetBuyerByIdMutation() {
 export function useDeleteUserMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (userId: string) => adminApi.deleteUser(userId),
+    mutationFn: (userId: string) => adminApi.deleteUser(userId, `delete-user-${userId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.buyers() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
@@ -58,7 +61,7 @@ export function useDeleteUserMutation() {
 export function useDeleteCreatorMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (creatorId: string) => adminApi.deleteCreator(creatorId),
+    mutationFn: (creatorId: string) => adminApi.deleteCreator(creatorId, `delete-creator-${creatorId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.creators() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });

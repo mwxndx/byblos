@@ -4,6 +4,7 @@ import express from 'express';
 import * as adminController from '../../domains/identity/admin/admin.controller.js';
 import { protect, hasPermission } from '../middleware/auth.js';
 import { authLimiter } from '../middleware/authRateLimiter.js';
+import { enforceIdempotency } from '../middleware/idempotency.middleware.js';
 import { revokeSessionTokens, clearAuthCookies } from '../../shared/utils/sessionRevocation.js';
 
 const router = express.Router();
@@ -32,11 +33,14 @@ router.post('/process-pending-payments', adminController.processPendingPayments)
 // Seller management
 router.get('/sellers', adminController.getAllSellers);
 router.get('/sellers/:id', adminController.getSellerById);
-router.patch('/sellers/:id/status', validate(V.updateSellerStatus), adminController.updateSellerStatus);
+// Seller status is toggleable (active <-> suspended <-> inactive), so use a
+// short idempotency window that only absorbs an accidental double-submit — a
+// 24h cache would replay a stale success and skip a later genuine re-toggle.
+router.patch('/sellers/:id/status', enforceIdempotency(60), validate(V.updateSellerStatus), adminController.updateSellerStatus);
 
 // Creator management
 router.get('/creators', adminController.getAllCreators);
-router.delete('/creators/:id', validate(V.deleteCreator), adminController.deleteCreator);
+router.delete('/creators/:id', enforceIdempotency(), validate(V.deleteCreator), adminController.deleteCreator);
 
 // Creator self-dealing review queue (T+2 review-hold — see creator.service.js
 // _detectPostHocSelfDealing). Admin-only; never exposed to the creator/buyer.
@@ -67,7 +71,7 @@ router.get('/payment-provider/balances', adminController.getPaymentProviderBalan
 router.get('/clients', adminController.getAllClients);
 
 // User management (Delete/Block)
-router.delete('/users/:id', validate(V.deleteUser), adminController.deleteUser);
+router.delete('/users/:id', enforceIdempotency(), validate(V.deleteUser), adminController.deleteUser);
 
 // Withdrawal requests management
 router.get('/withdrawal-requests', adminController.getAllWithdrawalRequests);

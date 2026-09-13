@@ -55,6 +55,15 @@ services:
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 24h
+      # Backs the auth rate limiter and the Idempotency-Key response cache
+      # (middleware/idempotency.middleware.js). Without it getRedisClient()
+      # falls back to a per-process in-memory store, so idempotent replay and
+      # rate limits would not be shared across web replicas.
+      - key: REDIS_URL
+        fromService:
+          name: byblos-redis
+          type: redis
+          property: connectionString
     # Free plan suspends after 15 min of inactivity. Upgrade to `standard` (or
     # higher) for production traffic — change requires billing approval.
     plan: free
@@ -98,4 +107,15 @@ services:
       - key: JWT_EXPIRES_IN
         value: 24h
     plan: free
+
+  # Key Value (Redis) store: idempotency-key response cache + auth rate limiter.
+  # ipAllowList: [] keeps it reachable only from Render's private network (the
+  # web service connects via the internal connectionString), never the public
+  # internet. Free plan is 25MB — ample for short-lived idempotency/rate-limit
+  # keys, which all carry TTLs.
+  - type: redis
+    name: byblos-redis
+    plan: free
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
 

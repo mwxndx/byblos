@@ -48,13 +48,11 @@ export async function getBuyerById(id: string) {
   }
 }
 
-export async function deleteUser(userId: string) {
-  try {
-    const response = await api.delete(`/admin/users/${userId}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+export async function deleteUser(userId: string, idempotencyKey: string) {
+  const response = await api.delete(`/admin/users/${userId}`, {
+    headers: { 'Idempotency-Key': idempotencyKey },
+  });
+  return response.data;
 }
 
 

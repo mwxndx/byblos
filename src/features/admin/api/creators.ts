@@ -28,13 +28,11 @@ export async function getCreators() {
   }
 }
 
-export async function deleteCreator(creatorId: string) {
-  try {
-    const response = await api.delete(`/admin/creators/${creatorId}`);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+export async function deleteCreator(creatorId: string, idempotencyKey: string) {
+  const response = await api.delete(`/admin/creators/${creatorId}`, {
+    headers: { 'Idempotency-Key': idempotencyKey },
+  });
+  return response.data;
 }
 
 
