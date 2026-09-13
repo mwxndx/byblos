@@ -1,4 +1,5 @@
 import { query } from '../../../infrastructure/database/database.js';
+import logger from '../../../shared/utils/logger.js';
 
 /**
  * Counts a seller's products in the 'available' state.
@@ -32,14 +33,14 @@ export async function findSellerStats({ sellerId, excludedStatuses }) {
     SELECT
       COALESCE(financials.total_sales, 0) as total_sales,
       COALESCE(financials.net_revenue, 0) as net_revenue,
-      GREATEST(
-        COALESCE(s.balance, 0),
-        COALESCE(settled_payouts.settled_total, 0) - COALESCE(completed_withdrawals.withdrawn_total, 0)
-      ) as balance,
-      GREATEST(
-        COALESCE(s.balance, 0),
-        COALESCE(settled_payouts.settled_total, 0) - COALESCE(completed_withdrawals.withdrawn_total, 0)
-      ) as available_balance,
+      -- Display the authoritative ledger balance — this is what a withdrawal
+      -- request actually checks. The reconstructed total (settled payouts minus
+      -- completed withdrawals) is exposed alongside only so a divergence can be
+      -- surfaced (see below); it is NOT shown, because GREATEST(ledger, derived)
+      -- silently masked ledger drift and could display more than is withdrawable.
+      COALESCE(s.balance, 0) as balance,
+      COALESCE(s.balance, 0) as available_balance,
+      (COALESCE(settled_payouts.settled_total, 0) - COALESCE(completed_withdrawals.withdrawn_total, 0)) as ledger_derived_balance,
       GREATEST(COALESCE(s.pending_settlement_balance, 0), COALESCE(pending_payouts.pending_total, 0)) as pending_settlement_balance,
       GREATEST(COALESCE(s.withdrawal_reserved_balance, 0), COALESCE(active_withdrawals.active_total, 0)) as withdrawal_reserved_balance,
       COALESCE(s.refund_reserved_balance, 0) as refund_reserved_balance,
@@ -119,7 +120,24 @@ export async function findSellerStats({ sellerId, excludedStatuses }) {
     WHERE s.id = $1
   `;
   const { rows } = await query(sql, [sellerId, excludedStatuses]);
-  return rows[0];
+  const stats = rows[0];
+  if (stats) {
+    // Surface (don't mask) any drift between the authoritative ledger balance and
+    // the value reconstructed from settled payouts minus completed withdrawals.
+    // They should be equal; a divergence means the seller ledger needs
+    // reconciliation. Only fires on real drift, so this is quiet in steady state.
+    const ledger = Number(stats.balance || 0);
+    const derived = Number(stats.ledger_derived_balance || 0);
+    if (Math.abs(ledger - derived) > 0.01) {
+      logger.warn(
+        `[SellerStats] balance ledger/derived divergence for seller ${sellerId}: ` +
+        `ledger=KES ${ledger.toFixed(2)} vs derived(settled_payouts − completed_withdrawals)=KES ${derived.toFixed(2)} ` +
+        `(diff KES ${(ledger - derived).toFixed(2)}). Displaying the authoritative ledger; investigate the reconciliation.`
+      );
+    }
+    delete stats.ledger_derived_balance;
+  }
+  return stats;
 }
 
 /**
