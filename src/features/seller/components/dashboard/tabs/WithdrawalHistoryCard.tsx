@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/shared/ui/card';
 import { getWithdrawalFee } from '../dashboardUtils';
 import type { ApiWithdrawalRequest } from '@/shared/types/api/withdrawal';
 import { formatKes, formatSettlementTime, getWithdrawalStatusLabel } from './withdrawalsTab.utils';
+import { getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 
 export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalRequest }) {
   return (
@@ -16,13 +17,13 @@ export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalReque
                         </p>
                         <Badge
                           variant="outline"
-                          className={`${request.status === 'processing'
-                            ? 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30'
-                            : request.status === 'completed'
-                              ? 'bg-green-500/15 text-green-300 border-green-500/30'
-                              : request.status === 'failed'
-                                ? 'bg-red-500/15 text-red-300 border-red-500/30'
-                                : 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                          className={`${getWithdrawalStatusTone(request.status) === 'success'
+                            ? 'bg-green-500/15 text-green-300 border-green-500/30'
+                            : getWithdrawalStatusTone(request.status) === 'danger'
+                              ? 'bg-red-500/15 text-red-300 border-red-500/30'
+                              : getWithdrawalStatusTone(request.status) === 'review'
+                                ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                                : 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30'
                             } rounded-full px-3 py-1 font-semibold`}
                         >
                           {getWithdrawalStatusLabel(request.status)}

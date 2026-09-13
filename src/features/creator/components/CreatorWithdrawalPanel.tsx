@@ -3,6 +3,7 @@ import { Clock, Info, Loader2, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { getWithdrawalStatusLabel, getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 import { useCreatorWithdrawalMutation } from '@/features/creator/hooks/mutations/useCreatorWithdrawalMutation';
 import {
   money,
@@ -207,15 +208,25 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
       </div>
 
       <div className="mt-4 space-y-2">
-        {(withdrawals || []).slice(0, 3).map((item) => (
-          <div key={item.id} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-3 text-xs text-slate-950 dark:text-white">
-            <div className="flex justify-between gap-3 font-bold">
-              <span>{money(item.amount)}</span>
-              <span className="uppercase text-yellow-600 dark:text-yellow-200">{item.status}</span>
+        {(withdrawals || []).slice(0, 3).map((item) => {
+          const tone = getWithdrawalStatusTone(item.status);
+          const toneClass = tone === 'success'
+            ? 'text-green-600 dark:text-green-300'
+            : tone === 'danger'
+              ? 'text-red-600 dark:text-red-300'
+              : tone === 'review'
+                ? 'text-amber-600 dark:text-amber-300'
+                : 'text-yellow-600 dark:text-yellow-200';
+          return (
+            <div key={item.id} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-3 text-xs text-slate-950 dark:text-white">
+              <div className="flex justify-between gap-3 font-bold">
+                <span>{money(item.amount)}</span>
+                <span className={`uppercase ${toneClass}`}>{getWithdrawalStatusLabel(item.status)}</span>
+              </div>
+              <p className="mt-1 text-slate-500 dark:text-white/40">Charge {money(item.withdrawal_fee)}</p>
             </div>
-            <p className="mt-1 text-slate-500 dark:text-white/40">Charge {money(item.withdrawal_fee)}</p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

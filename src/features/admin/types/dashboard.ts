@@ -1,3 +1,5 @@
+import type { WithdrawalStatus } from '@/shared/types/api/withdrawal';
+
 export interface DashboardAnalytics {
   totalRevenue?: number;
   totalProducts?: number;
@@ -42,7 +44,11 @@ export interface WithdrawalRequest {
   amount: number;
   mpesaNumber: string;
   mpesaName: string;
-  status: 'pending' | 'approved' | 'rejected' | 'completed' | 'processing' | 'failed' | string;
+  // The real backend statuses (WithdrawalStatus) plus 'pending', which the admin
+  // list uses as a display default when a row has no status yet. NOT `| string`:
+  // that collapsed the whole union to `string` and removed all compile-time
+  // protection against the status-mismatch class that already broke this table.
+  status: WithdrawalStatus | 'pending';
   sellerId: string;
   sellerName: string;
   sellerEmail: string;

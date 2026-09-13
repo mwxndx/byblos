@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
+import { getWithdrawalStatusLabel, getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 import type { WithdrawalRequest } from '../types/dashboard';
 
 export interface ProviderHealth {
@@ -145,19 +146,18 @@ export const AdminWithdrawalsTab = ({
                     </div>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">
-                    {/* withdrawal_requests.status only ever reaches 'pending',
-                        'processing', 'completed', or 'failed' -- never
-                        'approved'/'rejected' (that was this table's own
-                        request-action vocabulary, not a real status value),
-                        so those two conditions below never matched anything
-                        and every finalized request fell through to the
-                        generic blue badge regardless of outcome. */}
+                    {/* Colour + label come from the shared withdrawal-status helpers
+                        (src/shared/utils/withdrawalStatus), so real terminal states
+                        — completed/failed/rejected/manual_review/compensation_required
+                        — each render distinctly instead of every finalized request
+                        falling through to one generic badge, and no raw enum term
+                        leaks into the UI. */}
                     <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border-none
-                    ${request.status === 'pending' ? 'bg-yellow-500/10 text-yellow-500' :
-                        request.status === 'completed' ? 'bg-green-500/10 text-green-400' :
-                          request.status === 'failed' ? 'bg-red-500/10 text-red-500' :
-                            'bg-blue-500/10 text-blue-400'}`}>
-                      {request.status}
+                    ${getWithdrawalStatusTone(request.status) === 'success' ? 'bg-green-500/10 text-green-400' :
+                        getWithdrawalStatusTone(request.status) === 'danger' ? 'bg-red-500/10 text-red-500' :
+                          getWithdrawalStatusTone(request.status) === 'review' ? 'bg-amber-500/10 text-amber-400' :
+                            'bg-yellow-500/10 text-yellow-500'}`}>
+                      {getWithdrawalStatusLabel(request.status)}
                     </Badge>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-right">

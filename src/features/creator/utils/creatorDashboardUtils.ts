@@ -1,3 +1,5 @@
+import type { WithdrawalStatus } from '@/shared/types/api/withdrawal';
+
 export const money = (amount: number | string) => `KSh ${Number(amount || 0).toLocaleString()}`;
 export const MIN_WITHDRAWAL_AMOUNT = 50;
 export const WITHDRAWAL_FEE_TIERS = [
@@ -68,7 +70,7 @@ export type BusinessEarningRow = {
   shop_name?: string;
   earnings?: number | string;
 };
-export type WithdrawalRow = { id: number; amount?: number | string; withdrawal_fee?: number | string; status?: string };
+export type WithdrawalRow = { id: number; amount?: number | string; withdrawal_fee?: number | string; status?: WithdrawalStatus };
 export type LeaderboardRow = {
   id: number;
   first_name?: string;
