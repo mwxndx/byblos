@@ -22,6 +22,7 @@ export function AdminLogisticsTab() {
   const [sort, setSort] = useState<LogisticsSort>('priority');
   const [draftStatuses, setDraftStatuses] = useState<Record<string, LogisticsStatusUpdate>>({});
   const [updatingKey, setUpdatingKey] = useState<string | null>(null);
+  const [resolvingId, setResolvingId] = useState<number | null>(null);
 
   const logisticsQuery = useQuery({
     queryKey: adminQueryKeys.logistics(status, sort),
@@ -57,6 +58,7 @@ export function AdminLogisticsTab() {
         description: err?.response?.data?.message || err?.message || 'The dispute action was not recorded.',
       });
     },
+    onSettled: () => setResolvingId(null),
   });
 
   const dashboard = logisticsQuery.data;
@@ -76,7 +78,13 @@ export function AdminLogisticsTab() {
     requestId: number,
     resolution: 'manual_review' | 'continue_delivery' | 'mark_failed' | 'resolved'
   ) => {
+    // Re-entrancy guard: one dispute action at a time, so a second click (or a
+    // different resolution button) can't fire a duplicate before the first
+    // resolves. The dispute buttons are also disabled while this is set.
+    if (resolvingId !== null) return;
+
     const note = window.prompt('Add an admin note for the tracking history.') || '';
+    setResolvingId(requestId);
     disputeMutation.mutate({ requestId, resolution, note });
   };
 
@@ -162,6 +170,7 @@ export function AdminLogisticsTab() {
                   onOverride={handleOverride}
                   onResolveDispute={handleResolveDispute}
                   updatingKey={updatingKey}
+                  resolvingId={resolvingId}
                 />
               ))}
             </div>

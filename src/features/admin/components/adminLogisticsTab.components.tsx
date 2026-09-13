@@ -114,6 +114,7 @@ export function LogisticsAdminCard({
   onOverride,
   onResolveDispute,
   updatingKey,
+  resolvingId,
 }: {
   request: LogisticsRequestCard;
   draftStatuses: Record<string, LogisticsStatusUpdate>;
@@ -121,7 +122,9 @@ export function LogisticsAdminCard({
   onOverride: (requestId: number, legType: LogisticsLegType, status: LogisticsStatusUpdate) => void;
   onResolveDispute: (requestId: number, resolution: 'manual_review' | 'continue_delivery' | 'mark_failed' | 'resolved') => void;
   updatingKey: string | null;
+  resolvingId: number | null;
 }) {
+  const isResolving = resolvingId === request.id;
   const isProblem = request.status === 'failed'
     || request.status === 'manual_review'
     || request.pickupLeg?.status === 'failed'
@@ -184,16 +187,16 @@ export function LogisticsAdminCard({
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2">
-        <Button type="button" variant="outline" className="border-yellow-300/40 bg-black text-yellow-200 hover:bg-yellow-300 hover:text-black" onClick={() => onResolveDispute(request.id, 'manual_review')}>
+        <Button type="button" variant="outline" disabled={isResolving} className="border-yellow-300/40 bg-black text-yellow-200 hover:bg-yellow-300 hover:text-black disabled:opacity-50 disabled:pointer-events-none" onClick={() => onResolveDispute(request.id, 'manual_review')}>
           Flag review
         </Button>
-        <Button type="button" variant="outline" className="border-white/10 bg-black text-white hover:bg-white hover:text-black" onClick={() => onResolveDispute(request.id, 'continue_delivery')}>
+        <Button type="button" variant="outline" disabled={isResolving} className="border-white/10 bg-black text-white hover:bg-white hover:text-black disabled:opacity-50 disabled:pointer-events-none" onClick={() => onResolveDispute(request.id, 'continue_delivery')}>
           Continue delivery
         </Button>
-        <Button type="button" variant="outline" className="border-red-300/40 bg-black text-red-200 hover:bg-red-400 hover:text-black" onClick={() => onResolveDispute(request.id, 'mark_failed')}>
+        <Button type="button" variant="outline" disabled={isResolving} className="border-red-300/40 bg-black text-red-200 hover:bg-red-400 hover:text-black disabled:opacity-50 disabled:pointer-events-none" onClick={() => onResolveDispute(request.id, 'mark_failed')}>
           Mark failed
         </Button>
-        <Button type="button" variant="outline" className="border-green-300/40 bg-black text-green-200 hover:bg-green-300 hover:text-black" onClick={() => onResolveDispute(request.id, 'resolved')}>
+        <Button type="button" variant="outline" disabled={isResolving} className="border-green-300/40 bg-black text-green-200 hover:bg-green-300 hover:text-black disabled:opacity-50 disabled:pointer-events-none" onClick={() => onResolveDispute(request.id, 'resolved')}>
           Resolve dispute
         </Button>
       </div>
