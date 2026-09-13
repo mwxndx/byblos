@@ -1,8 +1,12 @@
-// Enforces the migration conventions in migrations/CONVENTIONS.md for every
-// migration authored AFTER the cutoff below. All migrations that existed when the
-// convention was introduced are grandfathered (they carry the historical
-// anti-patterns the production audit flagged, which are inert — see CONVENTIONS.md),
-// so this test only guards NEW migrations against RE-introducing those patterns.
+// Enforces the migration conventions in server/MIGRATIONS.md for every migration
+// authored AFTER the cutoff below. All migrations that existed when the convention
+// was introduced are grandfathered (they carry the historical anti-patterns the
+// production audit flagged, which are inert — see server/MIGRATIONS.md), so this
+// test only guards NEW migrations against RE-introducing those patterns.
+//
+// It also guards the directory itself: node-pg-migrate loads EVERY file in
+// migrations/, so a stray non-.sql file (e.g. a docs .md) fails the whole deploy —
+// keep this directory to .sql migration files only.
 //
 // Two mechanical rules, both scoped to hot/large tables (where the hazard is real):
 //   1. no bulk backfill (UPDATE / INSERT..SELECT) in the same file as DDL
@@ -64,7 +68,20 @@ function nonConcurrentHotIndex(sql) {
   return re.test(sql);
 }
 
-describe('migration hygiene (migrations/CONVENTIONS.md) — enforced for new migrations', () => {
+describe('migration hygiene (server/MIGRATIONS.md) — enforced for new migrations', () => {
+  test('migrations/ contains only .sql files (node-pg-migrate loads every file here)', () => {
+    // A stray non-.sql file (e.g. a docs .md) makes node-pg-migrate try to parse
+    // it as a migration and fails the entire deploy. Keep this directory clean.
+    const strays = fs.readdirSync(MIGRATIONS_DIR).filter((f) => {
+      const full = path.join(MIGRATIONS_DIR, f);
+      return fs.statSync(full).isFile() && !f.endsWith('.sql');
+    });
+    assert.deepEqual(
+      strays, [],
+      `Non-migration files in server/migrations/ will break the deploy (node-pg-migrate loads every file). Move them out (docs belong at server/MIGRATIONS.md): ${strays.join(', ')}`
+    );
+  });
+
   test(`grandfather cutoff ${GRANDFATHER_CUTOFF} is a real, existing migration prefix`, () => {
     const prefixes = new Set(
       fs.readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql')).map(prefixOf).filter(Boolean)
@@ -81,7 +98,7 @@ describe('migration hygiene (migrations/CONVENTIONS.md) — enforced for new mig
     }
     assert.deepEqual(
       offenders, [],
-      `These migrations mix a hot-table backfill with DDL in one transaction — split the backfill into its own, batched migration (see migrations/CONVENTIONS.md #1), or add "-- migration-hygiene:allow-backfill-with-ddl reason: ...": ${offenders.join(', ')}`
+      `These migrations mix a hot-table backfill with DDL in one transaction — split the backfill into its own, batched migration (see server/MIGRATIONS.md #1), or add "-- migration-hygiene:allow-backfill-with-ddl reason: ...": ${offenders.join(', ')}`
     );
   });
 
@@ -94,7 +111,7 @@ describe('migration hygiene (migrations/CONVENTIONS.md) — enforced for new mig
     }
     assert.deepEqual(
       offenders, [],
-      `These migrations build a non-concurrent index on a hot table, locking writes for the whole build. Build it CONCURRENTLY out-of-band or in a JS noTransaction migration (see migrations/CONVENTIONS.md #2), or add "-- migration-hygiene:allow-nonconcurrent-index reason: ...": ${offenders.join(', ')}`
+      `These migrations build a non-concurrent index on a hot table, locking writes for the whole build. Build it CONCURRENTLY out-of-band or in a JS noTransaction migration (see server/MIGRATIONS.md #2), or add "-- migration-hygiene:allow-nonconcurrent-index reason: ...": ${offenders.join(', ')}`
     );
   });
 });

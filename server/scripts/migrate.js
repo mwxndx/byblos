@@ -177,6 +177,12 @@ async function run() {
             // them correctly; any format regression now fails loudly here
             // instead of being silently tolerated).
             checkOrder: true,
+            // node-pg-migrate tries to load EVERY file in the migrations directory
+            // (it once choked on a stray Markdown doc placed here and failed the
+            // whole deploy). Ignore Markdown docs as a runtime safety net; keep all
+            // non-migration files out of this directory in the first place (docs
+            // live at server/MIGRATIONS.md — enforced by migrationHygiene.test.js).
+            ignorePattern: '.*\\.md$',
             verbose: true,
             logger: {
                 info: console.log,
