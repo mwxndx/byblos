@@ -1,4 +1,4 @@
-import { Search, UserPlus, Trash2 } from 'lucide-react';
+import { Search, UserPlus, Trash2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
@@ -10,9 +10,10 @@ interface AdminCreatorsTabProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onDelete: (creatorId: string, creatorName?: string) => void;
+  deletingId?: string | null;
 }
 
-export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDelete }: AdminCreatorsTabProps) => {
+export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDelete, deletingId }: AdminCreatorsTabProps) => {
   const filtered = creators.filter((creator) =>
     creator.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     creator.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,10 +104,13 @@ export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDele
                     <Button
                       variant="ghost"
                       size="sm"
+                      disabled={deletingId === String(creator.id)}
                       onClick={() => onDelete(creator.id, creator.name)}
-                      className="h-8 md:h-9 px-2.5 md:px-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl font-bold text-xs"
+                      className="h-8 md:h-9 px-2.5 md:px-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl font-bold text-xs disabled:opacity-50 disabled:pointer-events-none"
                     >
-                      <Trash2 className="h-4 w-4 md:mr-1.5" />
+                      {deletingId === String(creator.id)
+                        ? <Loader2 className="h-4 w-4 md:mr-1.5 animate-spin" />
+                        : <Trash2 className="h-4 w-4 md:mr-1.5" />}
                       <span className="hidden md:inline">Delete</span>
                     </Button>
                   </td>

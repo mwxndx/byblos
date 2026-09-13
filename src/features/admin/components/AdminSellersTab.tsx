@@ -1,4 +1,4 @@
-import { Search, Store, MapPin, Eye, XCircle } from 'lucide-react';
+import { Search, Store, MapPin, Eye, XCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
@@ -11,9 +11,10 @@ interface AdminSellersTabProps {
   onSearchChange: (value: string) => void;
   onView: (sellerId: string) => void;
   onDelete: (userId: string | undefined, role: 'seller' | 'buyer') => void;
+  deletingId?: string | null;
 }
 
-export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, onView, onDelete }: AdminSellersTabProps) => {
+export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, onView, onDelete, deletingId }: AdminSellersTabProps) => {
   const filtered = sellers?.filter((s) =>
     s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.email?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -97,10 +98,13 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, onView, 
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-white/10 bg-white/5 text-red-400 hover:bg-red-500 hover:text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] border transition-all"
+                        disabled={deletingId === String(seller.user_id)}
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-white/10 bg-white/5 text-red-400 hover:bg-red-500 hover:text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
                         onClick={() => onDelete(seller.user_id, 'seller')}
                       >
-                        <XCircle className="h-3 md:h-3.5 w-3 md:w-3.5" />
+                        {deletingId === String(seller.user_id)
+                          ? <Loader2 className="h-3 md:h-3.5 w-3 md:w-3.5 animate-spin" />
+                          : <XCircle className="h-3 md:h-3.5 w-3 md:w-3.5" />}
                         <span className="hidden sm:inline ml-2">Delete</span>
                       </Button>
                     </div>

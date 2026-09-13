@@ -53,6 +53,7 @@ const NewAdminDashboard = () => {
     handleViewSeller,
     handleDeleteUser,
     handleDeleteCreator,
+    deletingId,
     handleViewBuyer,
     handleWithdrawalRequestAction,
     processingWithdrawalId,
@@ -225,6 +226,7 @@ const NewAdminDashboard = () => {
                 onSearchChange={setSearchQuery}
                 onView={handleViewSeller}
                 onDelete={handleDeleteUser}
+                deletingId={deletingId}
               />
             </TabsContent>
 
@@ -235,6 +237,7 @@ const NewAdminDashboard = () => {
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 onDelete={handleDeleteCreator}
+                deletingId={deletingId}
               />
             </TabsContent>
 
@@ -246,6 +249,7 @@ const NewAdminDashboard = () => {
                 onSearchChange={setSearchQuery}
                 onView={handleViewBuyer}
                 onDelete={handleDeleteUser}
+                deletingId={deletingId}
                 formatDate={safeFormatDate}
               />
             </TabsContent>

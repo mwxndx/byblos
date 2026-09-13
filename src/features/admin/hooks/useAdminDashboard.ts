@@ -64,6 +64,10 @@ export function useAdminDashboard() {
   // since a React state update is not guaranteed to have re-rendered before a
   // second click lands.
   const [processingWithdrawalId, setProcessingWithdrawalId] = useState<string | null>(null);
+  // Row currently being deleted (a user_id for seller/buyer, or a creator id).
+  // Only one delete runs at a time, so a single value drives every Delete
+  // button's disabled state. Mirrors processingWithdrawalId.
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const [dashboardState, setDashboardState] = React.useState<DashboardState>({
     analytics: {
@@ -360,10 +364,15 @@ export function useAdminDashboard() {
       return;
     }
 
+    // Synchronous re-entrancy guard (checked before the confirm/await), same as
+    // handleWithdrawalRequestAction: a second click can't start a duplicate DELETE.
+    if (deletingId) return;
+
     if (!window.confirm(`Delete this ${role}'s login account? Financial history and order records will be preserved for audit.`)) {
       return;
     }
 
+    setDeletingId(String(userId));
     try {
       await deleteUserMutation.mutateAsync(userId);
       toast.success(`${role.charAt(0).toUpperCase() + role.slice(1)} user deleted. History was preserved.`);
@@ -377,14 +386,19 @@ export function useAdminDashboard() {
     } catch (error) {
       // useDeleteUserMutation's own onError already shows the real backend
       // reason via classifyApiError.
+    } finally {
+      setDeletingId(null);
     }
   };
 
   const handleDeleteCreator = async (creatorId: string, creatorName?: string) => {
+    if (deletingId) return;
+
     if (!window.confirm(`Delete ${creatorName || 'this creator'}'s account? Their earnings and sales history will be preserved for audit.`)) {
       return;
     }
 
+    setDeletingId(String(creatorId));
     try {
       await deleteCreatorMutation.mutateAsync(creatorId);
       toast.success('Creator account deleted. History was preserved.');
@@ -395,6 +409,8 @@ export function useAdminDashboard() {
     } catch (error) {
       // useDeleteCreatorMutation's own onError already shows the real backend
       // reason via classifyApiError.
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -486,6 +502,7 @@ export function useAdminDashboard() {
     handleViewSeller,
     handleDeleteUser,
     handleDeleteCreator,
+    deletingId,
     handleViewBuyer,
     handleWithdrawalRequestAction,
     processingWithdrawalId,
