@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { sellerApi } from '@/features/seller/api';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
 import { toast } from 'sonner';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { ApiSellerProduct } from '@/shared/types';
 
 // Products Queries
@@ -43,8 +44,7 @@ export function useCreateProductMutation() {
       toast.success('Product created successfully');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to create product');
+      toast.error(classifyApiError(error, 'Failed to create product').message);
     }
   });
 }
@@ -60,8 +60,7 @@ export function useUpdateProductMutation() {
       toast.success('Product updated successfully');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to update product');
+      toast.error(classifyApiError(error, 'Failed to update product').message);
     }
   });
 }
@@ -77,8 +76,7 @@ export function useUpdateInventoryMutation() {
       toast.success('Inventory updated successfully');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to update inventory');
+      toast.error(classifyApiError(error, 'Failed to update inventory').message);
     }
   });
 }
@@ -93,8 +91,7 @@ export function useDeleteProductMutation() {
       toast.success('Product deleted successfully');
     },
     onError: (error) => {
-      const err = error as Error;
-      toast.error(err.message || 'Failed to delete product');
+      toast.error(classifyApiError(error, 'Failed to delete product').message);
     }
   });
 }

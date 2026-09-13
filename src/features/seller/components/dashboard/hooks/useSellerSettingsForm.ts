@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { checkShopNameAvailability } from '@/features/seller/api';
 import { useUpdateProfileMutation } from '@/features/seller/hooks/useSellerProfile';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { SellerSettingsFormData } from '../types';
 import type { ApiSeller } from '@/shared/types';
 import type { LocationCoordinates } from '@/infrastructure/location/location';
@@ -145,7 +146,7 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
       console.error('Error deleting shop location:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to delete shop location. Please try again.',
+        description: classifyApiError(error, 'Failed to delete shop location. Please try again.').message,
         variant: 'destructive',
       });
     } finally {
@@ -247,7 +248,7 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
       console.error('Error updating profile:', error);
       toast({
         title: 'Error',
-        description: error.message || 'Failed to update profile. Please try again.',
+        description: classifyApiError(error, 'Failed to update profile. Please try again.').message,
         variant: 'destructive',
       });
     } finally {
@@ -289,11 +290,11 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
         title: 'Link removed',
         description: `Your ${platformName} link has been removed.`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`Error removing ${platformName} link:`, error);
       toast({
         title: 'Error',
-        description: error.message || `Failed to remove ${platformName} link. Please try again.`,
+        description: classifyApiError(error, `Failed to remove ${platformName} link. Please try again.`).message,
         variant: 'destructive',
       });
     } finally {
