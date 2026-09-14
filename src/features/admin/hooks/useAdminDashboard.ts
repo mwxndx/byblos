@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGlobalAuth } from '@/features/auth/contexts';
@@ -117,6 +117,12 @@ export function useAdminDashboard() {
 
   const queryClient = useQueryClient();
 
+  // Tracks the last set of failed sections we already toasted about, so the
+  // warning fires once per distinct failure (not on every unrelated
+  // re-render while a query stays isError) and fires again if a *different*
+  // combination of sections starts failing.
+  const lastReportedFailureRef = useRef<string>('');
+
   const refetchAll = useCallback(async () => {
     setIsLoading(true);
     await Promise.allSettled([
@@ -227,6 +233,34 @@ export function useAdminDashboard() {
           providerHealth
         });
 
+        // Surface read failures instead of letting them render as
+        // confidently-empty data. Each queryFn now rejects on failure (see
+        // src/features/admin/api/*), so TanStack Query's own isError is
+        // meaningful here. balancesQuery is intentionally excluded: it backs
+        // a health-check widget that already degrades gracefully to an
+        // "Unavailable" state (see getPaymentProviderBalances) rather than
+        // failing outright, so its own request failures shouldn't warn about
+        // the whole dashboard being broken.
+        const failedSections: string[] = [];
+        if (analyticsQuery.isError) failedSections.push('analytics');
+        if (sellersQuery.isError) failedSections.push('sellers');
+        if (creatorsQuery.isError) failedSections.push('creators');
+        if (buyersQuery.isError) failedSections.push('buyers');
+        if (withdrawalsQuery.isError) failedSections.push('withdrawal requests');
+        if (monthlyMetricsQuery.isError) failedSections.push('monthly metrics');
+        if (financialsQuery.isError) failedSections.push('financial metrics');
+        if (monthlyFinancialDataQuery.isError) failedSections.push('monthly financial data');
+        if (dashboardStatsQuery.isError) failedSections.push('dashboard stats');
+        if (clientsQuery.isError) failedSections.push('clients');
+
+        const failureSignature = failedSections.join(',');
+        if (failureSignature && failureSignature !== lastReportedFailureRef.current) {
+          toast.error(`Some dashboard data failed to load: ${failedSections.join(', ')}.`, {
+            description: "Showing what's available -- try refreshing to retry the failed sections."
+          });
+        }
+        lastReportedFailureRef.current = failureSignature;
+
       } catch (err: unknown) {
         const error = err as Error;
         setError(error.message || 'Failed to initialize dashboard');
@@ -241,15 +275,25 @@ export function useAdminDashboard() {
   }, [
     isEnabled,
     analyticsQuery.data,
+    analyticsQuery.isError,
     sellersQuery.data,
+    sellersQuery.isError,
     creatorsQuery.data,
+    creatorsQuery.isError,
     buyersQuery.data,
+    buyersQuery.isError,
     withdrawalsQuery.data,
+    withdrawalsQuery.isError,
     monthlyMetricsQuery.data,
+    monthlyMetricsQuery.isError,
     financialsQuery.data,
+    financialsQuery.isError,
     monthlyFinancialDataQuery.data,
+    monthlyFinancialDataQuery.isError,
     dashboardStatsQuery.data,
+    dashboardStatsQuery.isError,
     clientsQuery.data,
+    clientsQuery.isError,
     balancesQuery.data
   ]);
 
@@ -317,21 +361,27 @@ export function useAdminDashboard() {
 
   const handleToggleSellerStatus = async (sellerId: string, newStatus: 'active' | 'inactive') => {
     try {
-      const response = await updateSellerStatusMutation.mutateAsync({ sellerId, status: newStatus }) as { data: { status: string } };
+      // A blind `as { data: { status: string } }` cast used to gate this
+      // update on response.data.status === 'success' with no runtime check.
+      // Axios already rejects (into the catch below) on any non-2xx response,
+      // so reaching past the await means the request succeeded -- there is
+      // nothing left to validate, and the old cast/check could only ever
+      // silently no-op (no toast, no state update, no error) if the backend's
+      // success body ever stopped matching the assumed shape. Mirrors
+      // handleDeleteUser/handleDeleteCreator's unconditional-after-await
+      // pattern below.
+      await updateSellerStatusMutation.mutateAsync({ sellerId, status: newStatus });
 
-      if (response.data.status === 'success') {
-        setDashboardState(prevState => ({
-          ...prevState,
-          sellers: prevState.sellers.map(seller =>
-            seller.id === sellerId
-              ? { ...seller, status: newStatus }
-              : seller
-          )
-        }));
+      setDashboardState(prevState => ({
+        ...prevState,
+        sellers: prevState.sellers.map(seller =>
+          seller.id === sellerId
+            ? { ...seller, status: newStatus }
+            : seller
+        )
+      }));
 
-        // Show success message
-        toast.success(`Seller has been ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
-      }
+      toast.success(`Seller has been ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
     } catch (error) {
       // useUpdateSellerStatusMutation's own onError already shows the real
       // backend reason via classifyApiError — this catch only exists to stop
@@ -432,27 +482,28 @@ export function useAdminDashboard() {
     const idempotencyKey = `withdrawal-${status}-${requestId}`;
 
     try {
-      const response = await updateWithdrawalRequestStatusMutation.mutateAsync({ requestId, status, idempotencyKey }) as { data: { status: string } };
+      // Same fix as handleToggleSellerStatus: no more blind
+      // `as { data: { status: string } }` cast gating the update on an
+      // unvalidated field. Axios rejects into the catch below on any non-2xx
+      // response, so reaching past the await already means success.
+      await updateWithdrawalRequestStatusMutation.mutateAsync({ requestId, status, idempotencyKey });
 
-      if (response.data.status === 'success') {
-        // Update the UI to reflect the new status
-        setDashboardState(prevState => ({
-          ...prevState,
-          withdrawalRequests: prevState.withdrawalRequests.map(request =>
-            request.id === requestId
-              ? {
-                ...request,
-                status,
-                processedAt: new Date().toISOString(),
-                processedBy: 'Admin' // You might want to get the actual admin name
-              }
-              : request
-          )
-        }));
+      // Update the UI to reflect the new status
+      setDashboardState(prevState => ({
+        ...prevState,
+        withdrawalRequests: prevState.withdrawalRequests.map(request =>
+          request.id === requestId
+            ? {
+              ...request,
+              status,
+              processedAt: new Date().toISOString(),
+              processedBy: 'Admin' // You might want to get the actual admin name
+            }
+            : request
+        )
+      }));
 
-        // Show success message
-        toast.success(`Withdrawal request has been ${action}`);
-      }
+      toast.success(`Withdrawal request has been ${action}`);
     } catch (error) {
       // useUpdateWithdrawalRequestStatusMutation's own onError already shows
       // the real backend reason via classifyApiError.
