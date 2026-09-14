@@ -68,8 +68,21 @@ export function useUpdateProductMutation() {
 export function useUpdateInventoryMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (args: { id: string; stockCount: number }) =>
-      sellerApi.updateInventory(args.id, { stockCount: args.stockCount } as unknown as Parameters<typeof sellerApi.updateInventory>[1]),
+    // Previously sent { stockCount } -- a field the backend's
+    // PATCH /sellers/products/:id/inventory has never read (it destructures
+    // track_inventory/quantity/low_stock_threshold, see
+    // product.controller.js updateInventory), forced through an
+    // `as unknown as Parameters<...>` cast that hid the mismatch from
+    // TypeScript. The request "succeeded" (200, toast shown) while silently
+    // writing none of the three real fields, so a seller toggling Track
+    // Inventory or editing the low-stock threshold saw a success toast but
+    // the setting never persisted.
+    mutationFn: (args: { id: string; trackInventory: boolean; quantity: number | null; lowStockThreshold: number | null }) =>
+      sellerApi.updateInventory(args.id, {
+        track_inventory: args.trackInventory,
+        quantity: args.quantity,
+        low_stock_threshold: args.lowStockThreshold
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.products() });
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.analytics() });

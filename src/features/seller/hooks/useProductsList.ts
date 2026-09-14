@@ -325,7 +325,9 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
       setUpdatingStock(true);
       await updateInventoryMutation.mutateAsync({
         id: selectedProduct.id,
-        stockCount: trackInventory ? stockQuantity : 0
+        trackInventory,
+        quantity: trackInventory ? stockQuantity : null,
+        lowStockThreshold: trackInventory ? lowStockThreshold : null
       });
 
       toast({
