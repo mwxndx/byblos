@@ -28,12 +28,15 @@ export const login = async (emailOrCredentials: string | { email: string; passwo
     try {
       responseBody = JSON.parse(responseBody);
     } catch {
-      /* ignore -- leaves responseBody as the raw string; the optional
-         chains below then resolve everything to undefined rather than
-         throwing, and the caller sees a login that silently has no
-         creator/token instead of a clear parse-failure message. Tracked
-         separately (creator TS review finding #5); out of scope for the
-         precedence fix below. */
+      // A 200 response whose body isn't valid JSON is a genuinely malformed
+      // server response, not a login failure to classify via the usual
+      // error path -- throw explicitly instead of silently falling through
+      // with responseBody left as the raw string. Previously the optional
+      // chains below would just resolve creator/token/refreshToken to
+      // undefined off a string, and the caller saw a generic "no creator"
+      // failure with no signal that the actual problem was an unparsable
+      // response body.
+      throw new Error('Received a malformed response from the server. Please try again.');
     }
   }
 

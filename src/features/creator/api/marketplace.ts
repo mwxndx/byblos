@@ -19,17 +19,19 @@ export const getAvailableShops = async (): Promise<AvailableShop[]> => {
   return response.data?.data?.shops || [];
 };
 
+// <unknown> instead of no type parameter (defaults to axios's own `any`) --
+// see the matching comment in profile.ts.
 export const requestCollaboration = async (sellerId: number, message?: string) => {
-  const response = await apiClient.post(`/creators/shops/${sellerId}/request`, { message });
+  const response = await apiClient.post<unknown>(`/creators/shops/${sellerId}/request`, { message });
   return response.data;
 };
 
 export const leavePromotedShop = async (sellerId: number) => {
-  const response = await apiClient.post(`/creators/shops/${sellerId}/leave`);
+  const response = await apiClient.post<unknown>(`/creators/shops/${sellerId}/leave`);
   return response.data;
 };
 
 export const leaveInvitedBusiness = async (sellerId: number) => {
-  const response = await apiClient.post(`/creators/invited-businesses/${sellerId}/leave`);
+  const response = await apiClient.post<unknown>(`/creators/invited-businesses/${sellerId}/leave`);
   return response.data;
 };

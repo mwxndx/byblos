@@ -28,20 +28,20 @@ export default function CreatorLogin() {
     void getFreshCsrfToken();
   }, []);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let targetEmail = email?.trim();
-    let targetPassword = password?.trim();
-
-    if (!targetEmail) {
-      const emailEl = document.querySelector<HTMLInputElement>('input[name="email"], input[type="email"]');
-      if (emailEl?.value) targetEmail = emailEl.value.trim();
-    }
-    if (!targetPassword) {
-      const passEl = document.querySelector<HTMLInputElement>('input[name="password"], input[type="password"]');
-      if (passEl?.value) targetPassword = passEl.value;
-    }
+    // Browser autofill sometimes sets an input's DOM value without firing
+    // React's onChange (a long-standing Chrome/password-manager quirk), so
+    // `email`/`password` state can lag what's actually visible in the
+    // fields at submit time. Read the live value via FormData -- scoped to
+    // THIS form via event.currentTarget -- instead of the previous
+    // document.querySelector('input[name="email"]', ...) fallback, which
+    // searched the whole document and could grab the wrong field if another
+    // form on the page happened to share that name/type.
+    const formData = new FormData(event.currentTarget);
+    const targetEmail = (String(formData.get('email') || '').trim()) || email.trim();
+    const targetPassword = (String(formData.get('password') || '').trim()) || password.trim();
 
     if (!targetEmail || !targetPassword) {
       return;

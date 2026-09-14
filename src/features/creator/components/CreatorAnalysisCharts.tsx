@@ -91,6 +91,7 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
           <select
             value={selectedBusiness}
             onChange={(e) => setSelectedBusiness(e.target.value)}
+            aria-label="Filter by business"
             className="h-8 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#141414] px-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400"
           >
             <option value="all">All businesses</option>

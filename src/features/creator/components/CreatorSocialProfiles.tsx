@@ -6,6 +6,7 @@ import { Input } from '@/shared/ui/input';
 import instagramLogo from '@/assets/social/instagram.png';
 import tiktokLogo from '@/assets/social/tiktok.png';
 import { socialUrl } from '@/features/shop/utils/socialLinks';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useUpdateCreatorProfileMutation } from '../hooks/mutations/useUpdateCreatorProfileMutation';
 import type { CreatorProfile } from '../utils/creatorDashboardUtils';
 
@@ -41,8 +42,13 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
       });
       toast.success('Social profiles saved successfully!');
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(error.response?.data?.message || error.message || 'Failed to update social profiles.');
+      // classifyApiError distinguishes network/timeout/HTTP-body failures,
+      // matching every sibling handler in this feature (CreatorDashboard,
+      // CreatorAvailableShops, CreatorWithdrawalPanel, CreatorProfileSheet)
+      // -- this one previously hand-rolled the same
+      // err.response?.data?.message chain, so a timeout/offline failure here
+      // showed a raw/generic message instead of the standardized copy.
+      toast.error(classifyApiError(err, 'Could not update social profiles.').message);
     }
   };
 
@@ -54,8 +60,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
       if (network === 'instagram') setInstagram(''); else setTiktok('');
       toast.success(`${network === 'instagram' ? 'Instagram' : 'TikTok'} link removed.`);
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      toast.error(error.response?.data?.message || error.message || 'Failed to remove link.');
+      toast.error(classifyApiError(err, 'Could not remove link.').message);
     }
   };
 

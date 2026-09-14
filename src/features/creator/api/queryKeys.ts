@@ -21,6 +21,7 @@ export const creatorQueryKeys = {
   referrals: () => [...creatorQueryKeys.all, 'referrals'] as const,
   invite: (token: string) => [...creatorQueryKeys.all, 'invite', token] as const,
   profile: () => [...creatorQueryKeys.all, 'profile'] as const,
+  availableShops: () => [...creatorQueryKeys.all, 'available-shops'] as const,
 };
 
 
