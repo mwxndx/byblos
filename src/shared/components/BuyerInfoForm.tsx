@@ -82,10 +82,12 @@ export function BuyerInfoForm({
                 onChange={(e) => setBuyerInfo(prev => ({ ...prev, firstName: e.target.value }))}
                 className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.firstName ? 'border-red-500' : ''}`}
                 disabled={isLoading}
+                aria-invalid={!!errors.firstName}
+                aria-describedby={errors.firstName ? 'firstName-error' : undefined}
               />
             </div>
             {errors.firstName && (
-              <p className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.firstName}</p>
+              <p id="firstName-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.firstName}</p>
             )}
           </div>
           <div className="space-y-1.5">
@@ -104,10 +106,12 @@ export function BuyerInfoForm({
                 onChange={(e) => setBuyerInfo(prev => ({ ...prev, lastName: e.target.value }))}
                 className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.lastName ? 'border-red-500' : ''}`}
                 disabled={isLoading}
+                aria-invalid={!!errors.lastName}
+                aria-describedby={errors.lastName ? 'lastName-error' : undefined}
               />
             </div>
             {errors.lastName && (
-              <p className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.lastName}</p>
+              <p id="lastName-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.lastName}</p>
             )}
           </div>
         </div>
@@ -131,10 +135,12 @@ export function BuyerInfoForm({
               onChange={(e) => setBuyerInfo(prev => ({ ...prev, email: e.target.value }))}
               className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.email ? 'border-red-500' : ''}`}
               disabled={isLoading}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'email-error' : undefined}
             />
           </div>
           {errors.email && (
-            <p className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.email}</p>
+            <p id="email-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.email}</p>
           )}
         </div>
 
@@ -177,6 +183,7 @@ export function BuyerInfoForm({
                 className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.whatsappNumber ? 'border-red-500' : ''}`}
                 disabled={isLoading}
                 required
+                aria-invalid={!!errors.whatsappNumber}
               />
             </div>
           </div>
@@ -203,7 +210,7 @@ export function BuyerInfoForm({
                 }}
                 disabled={isLoading}
               >
-                <SelectTrigger className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}>
+                <SelectTrigger id="city" className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}>
                   <SelectValue placeholder="Select city" />
                 </SelectTrigger>
                 <SelectContent className="bg-black border-white/15 text-white">
@@ -238,7 +245,7 @@ export function BuyerInfoForm({
                 }}
                 disabled={isLoading || !buyerInfo.city}
               >
-                <SelectTrigger className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}>
+                <SelectTrigger id="location" className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}>
                   <SelectValue placeholder={buyerInfo.city ? "Select area" : "City first"} />
                 </SelectTrigger>
                 <SelectContent className="bg-black border-white/15 text-white">
@@ -274,10 +281,14 @@ export function BuyerInfoForm({
               onChange={(e) => setBuyerInfo(prev => ({ ...prev, password: e.target.value }))}
               className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.password ? 'border-red-500' : ''}`}
               disabled={isLoading}
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? 'password-error' : undefined}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
             >
               {showPassword ? (
@@ -288,9 +299,11 @@ export function BuyerInfoForm({
             </button>
           </div>
 
-          {/* Password Strength Checklist */}
+          {/* Password Strength Checklist -- aria-live so each met/unmet
+              requirement is announced as the user types, without them having
+              to navigate back to it. WCAG 4.1.3. */}
           {buyerInfo.password && (
-            <div className="p-3 bg-white/5 rounded-xl border border-white/15">
+            <div aria-live="polite" className="p-3 bg-white/5 rounded-xl border border-white/15">
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { label: "8+ chars", met: checkPasswordStrength(buyerInfo.password).minLength },
@@ -312,7 +325,7 @@ export function BuyerInfoForm({
           )}
 
           {errors.password && (
-            <p className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.password}</p>
+            <p id="password-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.password}</p>
           )}
         </div>
 
@@ -335,10 +348,14 @@ export function BuyerInfoForm({
               onChange={(e) => setBuyerInfo(prev => ({ ...prev, confirmPassword: e.target.value }))}
               className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.confirmPassword ? 'border-red-500' : ''}`}
               disabled={isLoading}
+              aria-invalid={!!errors.confirmPassword}
+              aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showConfirmPassword}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
             >
               {showConfirmPassword ? (
@@ -349,7 +366,7 @@ export function BuyerInfoForm({
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.confirmPassword}</p>
+            <p id="confirmPassword-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.confirmPassword}</p>
           )}
         </div>
 

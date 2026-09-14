@@ -26,6 +26,10 @@ const ProductImage = ({ src, alt, className, style }: ProductImageProps) => {
                     className
                 )}
                 style={style}
+                // role="img" is required for aria-label to be reliably exposed
+                // as the accessible name -- on a plain (generic-role) div, most
+                // screen readers drop the label entirely. WCAG 1.1.1 / 4.1.2.
+                role="img"
                 aria-label={alt}
             >
                 {/* Stylish store/image placeholder */}

@@ -48,7 +48,13 @@ export default function LocationPicker({
     const [showResults, setShowResults] = useState(false);
     const [searchError, setSearchError] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
+    // Index of the arrow-key-highlighted result for the ARIA combobox pattern
+    // (-1 = none highlighted). Drives aria-activedescendant so screen readers
+    // announce the focused option while focus stays in the input.
+    const [activeIndex, setActiveIndex] = useState(-1);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const LISTBOX_ID = 'location-search-results';
+    const optionId = (index: number) => `location-search-option-${index}`;
     const mapWatchKey = `${center[0]}:${center[1]}:${markerPosition?.[0] || ''}:${markerPosition?.[1] || ''}`;
 
     // Cleanup timeout on unmount
@@ -155,8 +161,41 @@ export default function LocationPicker({
         }
     };
 
+    // A fresh result set (or a closed list) has no highlight yet.
+    useEffect(() => {
+        setActiveIndex(-1);
+    }, [searchResults, showResults]);
+
     const selectLocation = (result: LocationSearchResult) => {
         applyLocationResult(result, true);
+    };
+
+    // ARIA combobox keyboard handling: arrow keys move the highlight, Enter
+    // selects it, Escape closes the list -- keeping the search fully operable
+    // without a pointer (WCAG 2.1.1) and announced via aria-activedescendant.
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (!showResults || searchResults.length === 0) return;
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setActiveIndex((prev) => (prev + 1) % searchResults.length);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setActiveIndex((prev) => (prev <= 0 ? searchResults.length - 1 : prev - 1));
+                break;
+            case 'Enter':
+                if (activeIndex >= 0 && activeIndex < searchResults.length) {
+                    e.preventDefault();
+                    selectLocation(searchResults[activeIndex]);
+                }
+                break;
+            case 'Escape':
+                setShowResults(false);
+                break;
+            default:
+                break;
+        }
     };
 
     const handleManualAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,9 +239,15 @@ export default function LocationPicker({
                         type="text"
                         value={searchQuery}
                         onChange={handleSearchChange}
+                        onKeyDown={handleSearchKeyDown}
                         className="pl-12 md:pl-12 h-11 bg-white border-slate-200 text-slate-950 placeholder:text-slate-400"
                         placeholder={placeholder}
                         autoComplete="off"
+                        role="combobox"
+                        aria-expanded={showResults}
+                        aria-controls={LISTBOX_ID}
+                        aria-autocomplete="list"
+                        aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
                     />
                     {isSearching && (
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -211,21 +256,33 @@ export default function LocationPicker({
                     )}
 
                     {showResults && (
-                        <div className="absolute left-0 right-0 top-full z-[5000] mt-1 max-h-56 overflow-y-auto rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-[#141414] text-slate-900 dark:text-white shadow-2xl">
+                        <div
+                            id={LISTBOX_ID}
+                            role="listbox"
+                            aria-label={label}
+                            className="absolute left-0 right-0 top-full z-[5000] mt-1 max-h-56 overflow-y-auto rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-[#141414] text-slate-900 dark:text-white shadow-2xl"
+                        >
                             {searchResults.length > 0 ? (
                                 searchResults.map((result, index) => (
                                     <button
                                         key={`${result.provider || 'location'}-${result.id || index}`}
+                                        id={optionId(index)}
                                         type="button"
-                                        className="w-full border-b border-slate-100 dark:border-white/10 px-3 py-2.5 text-left text-xs leading-snug text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 focus:bg-slate-100 dark:focus:bg-white/10 focus:outline-none sm:text-sm last:border-0"
+                                        role="option"
+                                        aria-selected={index === activeIndex}
+                                        className={cn(
+                                            "w-full border-b border-slate-100 dark:border-white/10 px-3 py-2.5 text-left text-xs leading-snug text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 focus:bg-slate-100 dark:focus:bg-white/10 focus:outline-none sm:text-sm last:border-0",
+                                            index === activeIndex && "bg-slate-100 dark:bg-white/10"
+                                        )}
                                         onMouseDown={(event) => event.preventDefault()}
+                                        onMouseEnter={() => setActiveIndex(index)}
                                         onClick={() => selectLocation(result)}
                                     >
                                         {result.displayName}
                                     </button>
                                 ))
                             ) : (
-                                <div className="px-3 py-3 text-xs font-semibold text-slate-500 dark:text-white/60 sm:text-sm">
+                                <div role="status" aria-live="polite" className="px-3 py-3 text-xs font-semibold text-slate-500 dark:text-white/60 sm:text-sm">
                                     {isSearching
                                         ? 'Searching locations...'
                                         : searchError || (hasSearched ? 'No locations found. Try adding Nairobi, Kenya, or a nearby landmark.' : 'Keep typing to search locations.')}
@@ -265,6 +322,7 @@ export default function LocationPicker({
                             type="button"
                             onClick={handleClearDetailedAddress}
                             className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                            aria-label="Clear address"
                             title="Clear address text"
                         >
                             <X className="h-4 w-4" />

@@ -83,7 +83,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                                         caption: "text-sm font-bold pt-1 text-slate-950 dark:text-white",
                                         head_cell: "text-slate-500 dark:text-[#666] text-[0.8rem] font-medium pt-1 w-8 sm:w-9",
                                         cell: "h-8 w-8 sm:h-9 sm:w-9 text-center text-sm p-0 flex items-center justify-center",
-                                        day: "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-white/5 rounded-xl aria-selected:opacity-100 text-yellow-600 dark:text-yellow-400",
+                                        day: "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal hover:bg-slate-100 dark:hover:bg-slate-100 dark:bg-white/5 rounded-xl aria-selected:opacity-100 text-yellow-700 dark:text-yellow-400",
                                         day_selected: "!bg-yellow-400 !text-black hover:!bg-yellow-400 hover:!text-black focus:!bg-yellow-400 focus:!text-black font-bold",
                                         day_today: "text-slate-950 dark:text-white bg-slate-100 dark:bg-white/5 font-bold",
                                         day_outside: "text-slate-300 dark:text-[#333] opacity-50",
@@ -95,9 +95,9 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
 
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-[#666]">Time</Label>
+                                <Label htmlFor="service-time" className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-[#666]">Time</Label>
                                 <Select value={time} onValueChange={setTime}>
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-transparent text-base sm:text-sm font-medium focus:ring-1 focus:ring-yellow-400 transition-all text-slate-950 dark:text-white">
+                                    <SelectTrigger id="service-time" className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-transparent text-base sm:text-sm font-medium focus:ring-1 focus:ring-yellow-400 transition-all text-slate-950 dark:text-white">
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-slate-500 dark:text-[#666]" />
                                             <SelectValue placeholder="Select time" />
@@ -178,10 +178,11 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                             </div>
 
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-[#666]">
+                                <Label htmlFor="service-requirements" className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-[#666]">
                                     Service Requirements <span className={`ml-1 ${wordCount > maxWords ? 'text-red-400' : 'text-slate-400 dark:text-[#444]'}`}>({wordCount}/{maxWords})</span>
                                 </Label>
                                 <textarea
+                                    id="service-requirements"
                                     placeholder="Describe your needs..."
                                     value={serviceRequirements}
                                     onChange={(e) => setServiceRequirements(e.target.value)}
@@ -203,12 +204,16 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                     <Button
                         onClick={handleConfirm}
                         disabled={!isValid}
+                        aria-describedby={!isValid ? 'booking-disabled-reason' : undefined}
                         className="w-full h-12 rounded-xl bg-yellow-400 text-black font-bold text-sm hover:bg-yellow-500 shadow-[0_0_20px_rgba(250,204,21,0.1)] disabled:opacity-50 transition-all active:scale-[0.98]"
                     >
                         Confirm Booking
                     </Button>
                     {!isValid && (
-                        <p className="text-xs text-slate-500 dark:text-[#666] text-center font-medium">
+                        // aria-live so the reason the button is disabled is announced
+                        // as it changes -- screen readers commonly skip disabled
+                        // controls, so aria-describedby alone may never surface it.
+                        <p id="booking-disabled-reason" aria-live="polite" className="text-xs text-slate-500 dark:text-[#666] text-center font-medium">
                             {getDisabledReason()}
                         </p>
                     )}

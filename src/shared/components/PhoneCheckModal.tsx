@@ -99,9 +99,11 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 disabled={isLoading}
+                aria-invalid={!!error}
+                aria-describedby={error ? 'phone-error' : undefined}
                 className="h-10 rounded-xl border-slate-300 dark:border-white/10 bg-white dark:bg-[#141414] px-4 text-sm text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus-visible:ring-yellow-400"
               />
-              {error && <p className="text-xs text-red-500 font-medium ml-1">{error}</p>}
+              {error && <p id="phone-error" role="alert" className="text-xs text-red-500 font-medium ml-1">{error}</p>}
             </div>
             <div className="space-y-3">
               <p className="text-xs text-slate-600 dark:text-white/60 font-medium leading-relaxed px-1">
@@ -144,7 +146,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
                   {doorDeliveryEnabled && (
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-xs font-semibold text-slate-500 dark:text-white/50">Delivery fee</span>
-                      <span className="text-xs sm:text-sm font-semibold text-slate-950 dark:text-white">
+                      <span aria-live="polite" className="text-xs sm:text-sm font-semibold text-slate-950 dark:text-white">
                         {isQuoteLoading ? 'Calculating...' : formatCurrency(displayedDeliveryFee)}
                       </span>
                     </div>
@@ -188,7 +190,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
                           <div className="rounded-2xl border border-yellow-200 dark:border-yellow-400/20 bg-yellow-50 dark:bg-yellow-400/10 p-3 space-y-2">
                             <div className="flex items-center justify-between gap-3">
                               <span className="text-xs font-semibold text-slate-600 dark:text-yellow-100/70">Delivery fee</span>
-                              <span className="text-xs font-semibold text-slate-950 dark:text-yellow-100">
+                              <span aria-live="polite" className="text-xs font-semibold text-slate-950 dark:text-yellow-100">
                                 {isQuoteLoading ? 'Calculating...' : formatCurrency(displayedDeliveryFee)}
                               </span>
                             </div>
@@ -200,7 +202,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
                                 </span>
                               </div>
                             )}
-                            {quoteError && <p className="text-xs text-red-500 font-bold">{quoteError}</p>}
+                            {quoteError && <p role="alert" className="text-xs text-red-500 font-bold">{quoteError}</p>}
                             <div className="flex items-start gap-2 rounded-xl bg-white dark:bg-black/40 border border-yellow-200 dark:border-yellow-400/20 p-2 text-[11px] font-semibold leading-relaxed text-slate-600 dark:text-yellow-100/80">
                               <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-yellow-600 dark:text-yellow-400" />
                               <span>Mzigo Ego handles your package securely, checks it against the order, and delivers within 24 hours.</span>

@@ -18,21 +18,21 @@ export function OrderStatusBadge({ status, viewerRole = 'seller', className }: O
       content = {
         icon: <CheckCircle className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: 'Completed',
-        style: 'bg-emerald-600 dark:bg-emerald-600',
+        style: 'bg-emerald-700 dark:bg-emerald-700',
       };
       break;
     case 'AWAITING_SELLER_ACTION':
       content = {
         icon: <Clock className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: viewerRole === 'buyer' ? 'Awaiting Seller' : 'Seller Action',
-        style: 'bg-yellow-600 dark:bg-yellow-600',
+        style: 'bg-yellow-700 dark:bg-yellow-700',
       };
       break;
     case 'FULFILLING':
       content = {
         icon: <Truck className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: 'Fulfilling',
-        style: 'bg-amber-600 dark:bg-amber-600',
+        style: 'bg-amber-700 dark:bg-amber-700',
       };
       break;
     case 'READY_FOR_BUYER':
@@ -88,21 +88,21 @@ export function OrderStatusBadge({ status, viewerRole = 'seller', className }: O
       content = {
         icon: <Clock className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: viewerRole === 'buyer' ? 'Awaiting Payment' : 'Payment Pending',
-        style: 'bg-amber-600 dark:bg-amber-600',
+        style: 'bg-amber-700 dark:bg-amber-700',
       };
       break;
     case 'FULFILLMENT_PENDING':
       content = {
         icon: <Truck className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: 'Preparing',
-        style: 'bg-amber-600 dark:bg-amber-600',
+        style: 'bg-amber-700 dark:bg-amber-700',
       };
       break;
     case 'FULFILLED':
       content = {
         icon: <CheckCircle className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: 'Fulfilled',
-        style: 'bg-emerald-600 dark:bg-emerald-600',
+        style: 'bg-emerald-700 dark:bg-emerald-700',
       };
       break;
     case 'DELIVERED':
@@ -123,7 +123,7 @@ export function OrderStatusBadge({ status, viewerRole = 'seller', className }: O
       content = {
         icon: <Clock className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: 'Refund Pending',
-        style: 'bg-orange-600 dark:bg-orange-600',
+        style: 'bg-orange-700 dark:bg-orange-700',
       };
       break;
     case 'REFUNDED':
@@ -138,7 +138,7 @@ export function OrderStatusBadge({ status, viewerRole = 'seller', className }: O
       content = {
         icon: <Clock className="h-3.5 w-3.5 mr-1 shrink-0" />,
         label: 'Under Review',
-        style: 'bg-orange-600 dark:bg-orange-600',
+        style: 'bg-orange-700 dark:bg-orange-700',
       };
       break;
     case 'RESERVED':
@@ -179,7 +179,7 @@ export function OrderStatusBadge({ status, viewerRole = 'seller', className }: O
         label: statusValue
           ? statusValue.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
           : 'Pending',
-        style: 'bg-yellow-600 dark:bg-yellow-600',
+        style: 'bg-yellow-700 dark:bg-yellow-700',
       };
       break;
   }
