@@ -22,26 +22,40 @@ export const login = async (emailOrCredentials: string | { email: string; passwo
     ? { email: emailOrCredentials, password: maybePassword }
     : emailOrCredentials;
 
-  const response = await apiClient.post<any>('/creators/login', credentials);
-  let responseBody = response?.data !== undefined ? response.data : response;
+  const response = await apiClient.post<unknown>('/creators/login', credentials);
+  let responseBody: Record<string, unknown> | unknown = response?.data !== undefined ? response.data : response;
   if (typeof responseBody === 'string' && responseBody.trim()) {
     try {
       responseBody = JSON.parse(responseBody);
     } catch {
-      /* ignore */
+      /* ignore -- leaves responseBody as the raw string; the optional
+         chains below then resolve everything to undefined rather than
+         throwing, and the caller sees a login that silently has no
+         creator/token instead of a clear parse-failure message. Tracked
+         separately (creator TS review finding #5); out of scope for the
+         precedence fix below. */
     }
   }
 
-  const responseData = responseBody?.data || responseBody;
-  const rawCreator = responseData?.creator || responseData?.user || responseBody?.creator || responseBody?.user;
-  const token = responseData?.token || responseData?.accessToken || responseBody?.token || responseBody?.accessToken;
-  const refreshToken = responseData?.refreshToken || responseBody?.refreshToken;
+  const body = (responseBody ?? {}) as Record<string, unknown>;
+  const data = (body.data ?? body) as Record<string, unknown>;
+  const rawCreator = data.creator ?? data.user ?? body.creator ?? body.user;
+  const token = data.token ?? data.accessToken ?? body.token ?? body.accessToken;
+  const refreshToken = data.refreshToken ?? body.refreshToken;
 
+  // Previously spread `...responseBody` AFTER these resolved fields, so any
+  // own top-level `creator`/`token`/`refreshToken` key on the raw response
+  // body would silently win over the value resolved above -- a
+  // precedence bug with no compiler signal (the whole function was typed
+  // `any`). The real backend response nests these under `data` (see
+  // creator.controller.js login), so this never fired in practice, but
+  // nothing protected against it. No caller reads anything from the raw
+  // body beyond these three fields (see useAuthActions.ts), so the spread
+  // added risk without adding value -- dropped rather than just reordered.
   return {
     creator: rawCreator,
     token,
-    refreshToken,
-    ...responseBody
+    refreshToken
   };
 };
 
