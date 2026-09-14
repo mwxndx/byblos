@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
-import { useGetBuyerByIdMutation, useDeleteUserMutation, useDeleteCreatorMutation, useGetSellerByIdMutation, useUpdateSellerStatusMutation, useUpdateWithdrawalRequestStatusMutation } from '@/features/admin/hooks/mutations/useAdminMutations';
+import { useGetBuyerByIdMutation, useDeleteUserMutation, useDeleteCreatorMutation, useGetSellerByIdMutation, useUpdateWithdrawalRequestStatusMutation } from '@/features/admin/hooks/mutations/useAdminMutations';
 import {
   useAdminAnalyticsQuery,
   useAdminSellersQuery,
@@ -30,7 +30,6 @@ export function useAdminDashboard() {
   const deleteUserMutation = useDeleteUserMutation();
   const deleteCreatorMutation = useDeleteCreatorMutation();
   const getSellerByIdMutation = useGetSellerByIdMutation();
-  const updateSellerStatusMutation = useUpdateSellerStatusMutation();
   const updateWithdrawalRequestStatusMutation = useUpdateWithdrawalRequestStatusMutation();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -419,36 +418,6 @@ export function useAdminDashboard() {
     setSelectedSeller(null);
   };
 
-  const handleToggleSellerStatus = async (sellerId: string, newStatus: 'active' | 'inactive') => {
-    try {
-      // A blind `as { data: { status: string } }` cast used to gate this
-      // update on response.data.status === 'success' with no runtime check.
-      // Axios already rejects (into the catch below) on any non-2xx response,
-      // so reaching past the await means the request succeeded -- there is
-      // nothing left to validate, and the old cast/check could only ever
-      // silently no-op (no toast, no state update, no error) if the backend's
-      // success body ever stopped matching the assumed shape. Mirrors
-      // handleDeleteUser/handleDeleteCreator's unconditional-after-await
-      // pattern below.
-      await updateSellerStatusMutation.mutateAsync({ sellerId, status: newStatus });
-
-      setDashboardState(prevState => ({
-        ...prevState,
-        sellers: prevState.sellers.map(seller =>
-          seller.id === sellerId
-            ? { ...seller, status: newStatus }
-            : seller
-        )
-      }));
-
-      toast.success(`Seller has been ${newStatus === 'active' ? 'activated' : 'deactivated'}`);
-    } catch (error) {
-      // useUpdateSellerStatusMutation's own onError already shows the real
-      // backend reason via classifyApiError — this catch only exists to stop
-      // execution before the success-branch state update above runs.
-    }
-  };
-
   // Handle viewing buyer details
   // Same stale-response guard as handleViewSeller above.
   const latestBuyerRequestIdRef = useRef<string | null>(null);
@@ -550,10 +519,9 @@ export function useAdminDashboard() {
     const idempotencyKey = `withdrawal-${status}-${requestId}`;
 
     try {
-      // Same fix as handleToggleSellerStatus: no more blind
-      // `as { data: { status: string } }` cast gating the update on an
-      // unvalidated field. Axios rejects into the catch below on any non-2xx
-      // response, so reaching past the await already means success.
+      // No blind `as { data: { status: string } }` cast gating the update
+      // on an unvalidated field. Axios rejects into the catch below on any
+      // non-2xx response, so reaching past the await already means success.
       await updateWithdrawalRequestStatusMutation.mutateAsync({ requestId, status, idempotencyKey });
 
       // Update the UI to reflect the new status
