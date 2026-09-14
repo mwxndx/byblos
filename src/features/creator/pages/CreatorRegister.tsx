@@ -9,6 +9,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
 import TermsModal from '@/shared/components/TermsModal';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 
 import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';
 
@@ -237,8 +238,8 @@ export default function CreatorRegister() {
         </section>
 
         <form onSubmit={handleSubmit} className="grid gap-3 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:grid-cols-2 transition-colors duration-200">
-          <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
-          <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <Input
             value={form.email}
             readOnly={Boolean(token)}
@@ -247,14 +248,15 @@ export default function CreatorRegister() {
             id="email"
             name="email"
             autoComplete="email"
+            aria-label="Email"
             placeholder="Email"
             className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white/70 placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2"
             required
           />
-          <Input value={form.mpesaNumber} onChange={(e) => updateForm('mpesaNumber', e.target.value)} placeholder="M-Pesa number" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" required />
-          <Input value={form.whatsappNumber} onChange={(e) => updateForm('whatsappNumber', e.target.value)} placeholder="WhatsApp number (Optional)" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" />
+          <Input value={form.mpesaNumber} onChange={(e) => updateForm('mpesaNumber', e.target.value)} aria-label="M-Pesa number" placeholder="M-Pesa number" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" required />
+          <Input value={form.whatsappNumber} onChange={(e) => updateForm('whatsappNumber', e.target.value)} aria-label="WhatsApp number (optional)" placeholder="WhatsApp number (Optional)" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" />
           <div className="relative sm:col-span-2">
-            <Input value={form.password} onChange={(e) => updateForm('password', e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="new-password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
+            <Input value={form.password} onChange={(e) => updateForm('password', e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="new-password" aria-label="Password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
@@ -265,7 +267,7 @@ export default function CreatorRegister() {
             </button>
           </div>
           <div className="relative sm:col-span-2">
-            <Input value={form.confirmPassword} onChange={(e) => updateForm('confirmPassword', e.target.value)} type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" autoComplete="new-password" placeholder="Confirm password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
+            <Input value={form.confirmPassword} onChange={(e) => updateForm('confirmPassword', e.target.value)} type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" autoComplete="new-password" aria-label="Confirm password" placeholder="Confirm password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowConfirmPassword((current) => !current)}
@@ -329,69 +331,79 @@ export default function CreatorRegister() {
         </div>
       </div>
 
-      {/* Already registered prompt modal */}
-      {existingAccountPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md rounded-3xl border border-black/[0.08] dark:border-white/15 bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white p-6 shadow-2xl space-y-4 transition-colors duration-200">
-            <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 text-yellow-500 dark:text-yellow-400 flex items-center justify-center text-2xl font-black">
-              !
-            </div>
+      {/* Already registered prompt modal. Previously a hand-rolled
+          `fixed inset-0` div with no role="dialog"/aria-modal, no focus
+          trap, and no Escape handling -- unlike TermsModal right below,
+          which already uses these same Radix Dialog primitives. A
+          keyboard-only creator hitting this (registering with an email
+          that already has a Byblos account) could Tab straight past it
+          into background page content and had no way to dismiss it
+          without a mouse. Rebuilt on Dialog/DialogContent, which gets
+          focus trapping, Escape-to-close, and dialog semantics for free.
+          registerModalDismiss (the Android/browser back-button handler
+          below) is unaffected -- it drives the same existingAccountPrompt
+          state Dialog's open prop now also reads. */}
+      <Dialog open={existingAccountPrompt} onOpenChange={(open) => !open && setExistingAccountPrompt(false)}>
+        <DialogContent className="w-[92vw] sm:max-w-md rounded-3xl border border-black/[0.08] dark:border-white/15 bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white p-6 shadow-2xl transition-colors duration-200">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 text-yellow-500 dark:text-yellow-400 flex items-center justify-center text-2xl font-black">
+            !
+          </div>
 
-            <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
               You already have a Byblos account
-            </h2>
-
-            <p className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
+            </DialogTitle>
+            <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
               Log in with your existing account, then add Creator access from your account switcher.
-            </p>
+            </DialogDescription>
+          </DialogHeader>
 
-            <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
-              {existingAccountInfo?.hasSeller && !existingAccountInfo?.hasBuyer ? (
-                <Button
-                  type="button"
-                  onClick={() => navigate('/seller/login')}
-                  className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
-                >
-                  Log in as Seller
-                </Button>
-              ) : existingAccountInfo?.hasBuyer && !existingAccountInfo?.hasSeller ? (
+          <DialogFooter className="pt-2 flex flex-col sm:flex-row gap-2.5">
+            {existingAccountInfo?.hasSeller && !existingAccountInfo?.hasBuyer ? (
+              <Button
+                type="button"
+                onClick={() => navigate('/seller/login')}
+                className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+              >
+                Log in as Seller
+              </Button>
+            ) : existingAccountInfo?.hasBuyer && !existingAccountInfo?.hasSeller ? (
+              <Button
+                type="button"
+                onClick={() => navigate('/buyer/login')}
+                className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+              >
+                Log in as Buyer
+              </Button>
+            ) : (
+              <>
                 <Button
                   type="button"
                   onClick={() => navigate('/buyer/login')}
                   className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
                 >
-                  Log in as Buyer
+                  Buyer Login
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    type="button"
-                    onClick={() => navigate('/buyer/login')}
-                    className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
-                  >
-                    Buyer Login
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => navigate('/seller/login')}
-                    className="h-11 flex-1 rounded-xl border border-yellow-400/40 bg-yellow-400/10 font-bold text-yellow-600 dark:text-yellow-300 hover:bg-yellow-400/20 transition"
-                  >
-                    Seller Login
-                  </Button>
-                </>
-              )}
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setExistingAccountPrompt(false)}
-                className="h-11 rounded-xl border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-white/[0.05] text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition"
-              >
-                Dismiss
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+                <Button
+                  type="button"
+                  onClick={() => navigate('/seller/login')}
+                  className="h-11 flex-1 rounded-xl border border-yellow-400/40 bg-yellow-400/10 font-bold text-yellow-600 dark:text-yellow-300 hover:bg-yellow-400/20 transition"
+                >
+                  Seller Login
+                </Button>
+              </>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setExistingAccountPrompt(false)}
+              className="h-11 rounded-xl border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-white/[0.05] text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition"
+            >
+              Dismiss
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <TermsModal
         isOpen={isTermsModalOpen}

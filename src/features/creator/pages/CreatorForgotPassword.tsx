@@ -80,6 +80,7 @@ export default function CreatorForgotPassword() {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 type="email"
+                aria-label="Email"
                 placeholder="Email"
                 className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400"
                 required
