@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Search, Users2, Store, Mail } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
@@ -10,11 +11,13 @@ interface AdminClientsTabProps {
 }
 
 export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, formatDate }: AdminClientsTabProps) => {
-  const filtered = ((clients || []) as Array<Record<string, unknown>>).filter((c) =>
+  // clients is fetched unpaginated, so this re-filter was re-running on
+  // every render -- including every keystroke in the search input above.
+  const filtered = useMemo(() => ((clients || []) as Array<Record<string, unknown>>).filter((c) =>
     String(c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     String(c.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
     String(c.sellerName || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ), [clients, searchQuery]);
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">

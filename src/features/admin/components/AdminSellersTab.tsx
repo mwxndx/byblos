@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Search, Store, MapPin, Eye, XCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
@@ -15,10 +16,12 @@ interface AdminSellersTabProps {
 }
 
 export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, onView, onDelete, deletingId }: AdminSellersTabProps) => {
-  const filtered = sellers?.filter((s) =>
+  // sellers is fetched unpaginated, so this re-filter was re-running on
+  // every render -- including every keystroke in the search input above.
+  const filtered = useMemo(() => sellers?.filter((s) =>
     s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) ?? [];
+  ) ?? [], [sellers, searchQuery]);
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">

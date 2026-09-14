@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Search, UserPlus, Trash2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
@@ -14,10 +15,12 @@ interface AdminCreatorsTabProps {
 }
 
 export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDelete, deletingId }: AdminCreatorsTabProps) => {
-  const filtered = creators.filter((creator) =>
+  // creators is fetched unpaginated, so this re-filter was re-running on
+  // every render -- including every keystroke in the search input above.
+  const filtered = useMemo(() => creators.filter((creator) =>
     creator.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     creator.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  ), [creators, searchQuery]);
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
