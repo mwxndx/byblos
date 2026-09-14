@@ -6,6 +6,7 @@ import * as sellerRepository from '../../commerce/sellers/seller.repository.js';
 import payoutService from '../../payments/payouts/payout.service.js';
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
 import CacheService from '../../../shared/utils/cache.service.js';
+import { buildSearchClause } from '../../../shared/utils/pagination.utils.js';
 
 class AdminService {
   async getDashboardStats() {
@@ -33,6 +34,12 @@ class AdminService {
           AND accepted_creator_id IS NOT NULL
       `,
       creatorEarnings: 'SELECT COALESCE(SUM(total_earnings + total_referral_earnings), 0) AS count FROM creators',
+      // Site-wide creator sales/click totals -- the admin creators tab used to
+      // sum these off its own (previously unpaginated) list response. Now that
+      // that endpoint returns one page at a time, these two site-wide sums
+      // live here instead, alongside the other dashboard-stats aggregates.
+      creatorTotalSales: 'SELECT COALESCE(SUM(total_sales), 0) AS count FROM creators',
+      creatorLinkClicks: "SELECT COALESCE(SUM(click_count), 0) AS count FROM seller_creator_links WHERE status = 'active'",
       clients: 'SELECT COUNT(DISTINCT buyer_id) FROM product_orders WHERE payment_status = \'completed\' AND buyer_id IS NOT NULL',
       orders: 'SELECT COUNT(*) FROM product_orders',
       wishlists: 'SELECT COUNT(*) FROM wishlists',
@@ -54,6 +61,15 @@ class AdminService {
         SELECT COUNT(*)
         FROM withdrawal_requests
         WHERE status NOT IN ('completed', 'failed', 'rejected')
+      `,
+      // Site-wide pending payout value -- the admin withdrawals tab used to
+      // sum this off its own (previously ~500-row-capped, near-complete)
+      // list response. Now that endpoint returns one page at a time, this
+      // sum lives here instead, alongside the pendingWithdrawals count above.
+      pendingWithdrawalAmount: `
+        SELECT COALESCE(SUM(amount), 0) AS count
+        FROM withdrawal_requests
+        WHERE status NOT IN ('completed', 'failed', 'rejected')
       `
     };
 
@@ -63,7 +79,10 @@ class AdminService {
       Object.entries(queries).map(async ([key, query]) => {
         try {
           const res = await pool.query(query);
-          stats[`total_${key}`] = key.toLowerCase().includes('earnings')
+          const lowerKey = key.toLowerCase();
+          // Money sums (earnings/amount) can be fractional -- parseInt would
+          // silently truncate cents.
+          stats[`total_${key}`] = (lowerKey.includes('earnings') || lowerKey.includes('amount'))
             ? Number.parseFloat(res.rows[0].count || 0)
             : Number.parseInt(res.rows[0].count, 10);
         } catch (e) {
@@ -100,6 +119,8 @@ class AdminService {
       totalCreators: stats.total_creators,
       pendingCreatorRequests: stats.total_creatorPendingRequests,
       totalCreatorEarnings: stats.total_creatorEarnings,
+      totalCreatorSales: stats.total_creatorTotalSales,
+      totalCreatorLinkClicks: stats.total_creatorLinkClicks,
       totalClients: stats.total_clients,
       totalShops: stats.total_sellers,
       totalProducts: stats.total_products,
@@ -108,6 +129,7 @@ class AdminService {
       activeOrders: stats.total_activeOrders,
       lowStockProducts: stats.total_lowStockProducts,
       pendingWithdrawals: stats.total_pendingWithdrawals,
+      pendingWithdrawalAmount: stats.total_pendingWithdrawalAmount,
       topShops
     };
 
@@ -298,19 +320,34 @@ class AdminService {
     }
   }
 
-  async getAllSellers() {
-    const query = `
-            SELECT id, user_id, full_name as name, email, whatsapp_number as phone, status, city, location, created_at, shop_name, balance
+  async getAllSellers({ limit, offset, search } = {}) {
+    const params = [];
+    const searchClause = buildSearchClause(['full_name', 'email'], search, params);
+
+    let sql = `
+            SELECT id, user_id, full_name as name, email, whatsapp_number as phone, status, city, location, created_at, shop_name, balance,
+                   COUNT(*) OVER() AS total_count
             FROM sellers
             WHERE user_id IS NOT NULL
-            ORDER BY created_at DESC
         `;
-    const { rows } = await pool.query(query);
+    if (searchClause) sql += ` AND ${searchClause}`;
+
+    params.push(limit, offset);
+    sql += ` ORDER BY created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
+
+    const { rows } = await pool.query(sql, params);
     return rows;
   }
 
-  async getAllCreators() {
-    const query = `
+  async getAllCreators({ limit, offset, search } = {}) {
+    const params = [];
+    const searchClause = buildSearchClause(
+      ["CONCAT_WS(' ', c.first_name, c.last_name)", 'c.email'],
+      search,
+      params
+    );
+
+    let sql = `
       SELECT c.id,
              c.user_id,
              c.first_name,
@@ -328,15 +365,20 @@ class AdminService {
              c.created_at,
              COUNT(DISTINCT CASE WHEN scl.status = 'active' THEN scl.id END) AS linked_shops,
              COALESCE(SUM(CASE WHEN scl.status = 'active' THEN scl.click_count ELSE 0 END), 0) AS link_clicks,
-             COUNT(DISTINCT CASE WHEN sci.status = 'pending' THEN sci.id END) AS pending_requests
+             COUNT(DISTINCT CASE WHEN sci.status = 'pending' THEN sci.id END) AS pending_requests,
+             COUNT(*) OVER() AS total_count
       FROM creators c
       LEFT JOIN seller_creator_links scl ON scl.creator_id = c.id
       LEFT JOIN seller_creator_invites sci ON sci.accepted_creator_id = c.id
       WHERE c.user_id IS NOT NULL
-      GROUP BY c.id
-      ORDER BY c.created_at DESC
     `;
-    const { rows } = await pool.query(query);
+    if (searchClause) sql += ` AND ${searchClause}`;
+    sql += ` GROUP BY c.id`;
+
+    params.push(limit, offset);
+    sql += ` ORDER BY c.created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
+
+    const { rows } = await pool.query(sql, params);
     return rows.map(row => ({
       ...row,
       balance: Number.parseFloat(row.balance || 0),
@@ -515,8 +557,11 @@ class AdminService {
     return res.rows[0];
   }
 
-  async getAllClients() {
-    const { rows } = await pool.query(`
+  async getAllClients({ limit, offset, search } = {}) {
+    const params = [];
+    const searchClause = buildSearchClause(['b.full_name', 'b.email'], search, params);
+
+    let sql = `
       SELECT
         b.id,
         b.full_name AS name,
@@ -529,15 +574,20 @@ class AdminService {
         COALESCE(SUM(CASE WHEN po.payment_status = 'completed' THEN po.total_amount ELSE 0 END), 0) AS total_spend,
         s.id AS seller_id,
         s.full_name AS seller_name,
-        s.shop_name AS seller_shop_name
+        s.shop_name AS seller_shop_name,
+        COUNT(*) OVER() AS total_count
       FROM buyers b
       JOIN product_orders po ON po.buyer_id = b.id
       LEFT JOIN sellers s ON s.id = po.seller_id
       WHERE b.user_id IS NOT NULL
-      GROUP BY b.id, s.id, s.full_name, s.shop_name
-      ORDER BY MAX(po.created_at) DESC
-      LIMIT 500
-    `);
+    `;
+    if (searchClause) sql += ` AND ${searchClause}`;
+    sql += ` GROUP BY b.id, s.id, s.full_name, s.shop_name`;
+
+    params.push(limit, offset);
+    sql += ` ORDER BY MAX(po.created_at) DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
+
+    const { rows } = await pool.query(sql, params);
 
     return rows.map(row => ({
       id: row.id,
@@ -550,7 +600,8 @@ class AdminService {
       orderCount: Number.parseInt(row.order_count, 10) || 0,
       totalSpend: Number.parseFloat(row.total_spend) || 0,
       sellerId: row.seller_id,
-      sellerName: row.seller_shop_name || row.seller_name || 'Unassigned'
+      sellerName: row.seller_shop_name || row.seller_name || 'Unassigned',
+      total_count: row.total_count
     }));
   }
 

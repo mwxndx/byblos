@@ -3946,6 +3946,13 @@ CREATE INDEX idx_buyers_city ON public.buyers USING btree (city) WHERE (city IS 
 
 
 --
+-- Name: idx_buyers_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_buyers_created_at ON public.buyers USING btree (created_at DESC);
+
+
+--
 -- Name: idx_buyers_email; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4671,6 +4678,13 @@ CREATE INDEX idx_seller_knocks_seller_recent ON public.seller_knocks USING btree
 --
 
 CREATE INDEX idx_sellers_city ON public.sellers USING btree (city) WHERE (city IS NOT NULL);
+
+
+--
+-- Name: idx_sellers_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_sellers_created_at ON public.sellers USING btree (created_at DESC);
 
 
 --

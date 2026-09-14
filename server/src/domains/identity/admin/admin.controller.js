@@ -18,6 +18,7 @@ import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUti
 import { setAuthCookie } from '../../../shared/utils/cookie.utils.js';
 import OrderService from '../../orders/order/OrderService.js';
 import CreatorService from '../../growth/creators/creator.service.js';
+import { parsePaginationParams, buildPaginationMeta } from '../../../shared/utils/pagination.utils.js';
 
 const paymentService = new PaymentService();
 
@@ -106,8 +107,14 @@ const getDashboardStats = async (req, res, next) => {
 
 const getAllSellers = async (req, res, next) => {
   try {
-    const sellers = await AdminService.getAllSellers();
-    res.status(200).json({ status: 'success', results: sellers.length, data: sellers });
+    const { page, limit, offset } = parsePaginationParams(req.query);
+    const sellers = await AdminService.getAllSellers({ limit, offset, search: req.query.search });
+    res.status(200).json({
+      status: 'success',
+      results: sellers.length,
+      pagination: buildPaginationMeta({ rows: sellers, page, limit, offset }),
+      data: sellers
+    });
   } catch (error) {
     next(error);
   }
@@ -115,8 +122,14 @@ const getAllSellers = async (req, res, next) => {
 
 const getAllCreators = async (req, res, next) => {
   try {
-    const creators = await AdminService.getAllCreators();
-    res.status(200).json({ status: 'success', results: creators.length, data: creators });
+    const { page, limit, offset } = parsePaginationParams(req.query);
+    const creators = await AdminService.getAllCreators({ limit, offset, search: req.query.search });
+    res.status(200).json({
+      status: 'success',
+      results: creators.length,
+      pagination: buildPaginationMeta({ rows: creators, page, limit, offset }),
+      data: creators
+    });
   } catch (error) {
     next(error);
   }
@@ -351,7 +364,9 @@ const processPendingPayments = async (req, res, next) => {
 // Get all buyers
 const getAllBuyers = async (req, res, next) => {
   try {
-    const rows = await buyerRepository.findAllForAdmin();
+    const { page, limit, offset } = parsePaginationParams(req.query);
+    const rows = await buyerRepository.findAllForAdmin({ limit, offset, search: req.query.search });
+    const pagination = buildPaginationMeta({ rows, page, limit, offset });
 
     // Process the rows to include default values for city and location
     const buyers = rows.map(buyer => ({
@@ -364,6 +379,8 @@ const getAllBuyers = async (req, res, next) => {
 
     res.status(200).json({
       status: 'success',
+      results: buyers.length,
+      pagination,
       data: buyers
     });
   } catch (error) {
@@ -395,10 +412,12 @@ const getBuyerById = async (req, res, next) => {
 // Get all clients
 const getAllClients = async (req, res, next) => {
   try {
-    const clients = await AdminService.getAllClients();
+    const { page, limit, offset } = parsePaginationParams(req.query);
+    const clients = await AdminService.getAllClients({ limit, offset, search: req.query.search });
     res.status(200).json({
       status: 'success',
       results: clients.length,
+      pagination: buildPaginationMeta({ rows: clients, page, limit, offset }),
       data: clients
     });
   } catch (error) {
@@ -426,12 +445,14 @@ const deleteUser = async (req, res, next) => {
 // GET /api/admin/withdrawal-requests
 const getAllWithdrawalRequests = async (req, res, next) => {
   try {
-    const { status } = req.query;
-    const rows = await withdrawalRequestRepository.findAllWithSeller({ status });
+    const { status, search } = req.query;
+    const { page, limit, offset } = parsePaginationParams(req.query);
+    const rows = await withdrawalRequestRepository.findAllWithSeller({ status, search, limit, offset });
 
     res.status(200).json({
       status: 'success',
       count: rows.length,
+      pagination: buildPaginationMeta({ rows, page, limit, offset }),
       data: rows.map(r => ({
         id: r.id,
         amount: parseFloat(r.amount),

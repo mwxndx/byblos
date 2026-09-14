@@ -1,18 +1,39 @@
 import { query } from '../../../infrastructure/database/database.js';
+import { buildSearchClause } from '../../../shared/utils/pagination.utils.js';
+
+// Columns searched against: the same underlying identity fields entity_name
+// / entity_email / mpesa_name are derived from below. Those three are
+// SELECT-level aliases and can't be referenced from WHERE, so the search
+// clause matches the raw source columns directly instead.
+const SEARCH_COLUMNS = [
+  's.shop_name', 's.full_name', 's.email',
+  "CONCAT_WS(' ', c.first_name, c.last_name)", 'c.email',
+  'b.full_name', 'b.email',
+  'wr.mpesa_name', 'wr.mpesa_number'
+];
 
 /**
- * Lists withdrawal requests with their seller's identity / balance,
- * newest first, capped at 500 rows. Optional status filter.
+ * Lists one page of withdrawal requests with their seller's identity /
+ * balance, newest first. Optional status filter and name/email/mpesa search.
+ * Each row carries a windowed total_count (see pagination.utils.js
+ * buildPaginationMeta).
  *
  * @param {object} [opts]
  * @param {string} [opts.status]
+ * @param {string} [opts.search]
+ * @param {number} opts.limit
+ * @param {number} opts.offset
  * @returns {Promise<Array<object>>}
  */
-export async function findAllWithSeller({ status } = {}) {
+export async function findAllWithSeller({ status, search, limit, offset } = {}) {
   const params = [];
-  const where = status ? `WHERE wr.status = $${params.push(status)}` : '';
+  const conditions = [];
+  if (status) conditions.push(`wr.status = $${params.push(status)}`);
+  const searchClause = buildSearchClause(SEARCH_COLUMNS, search, params);
+  if (searchClause) conditions.push(searchClause);
+  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
-  const sql = `
+  let sql = `
     SELECT
       wr.id, wr.amount, wr.mpesa_number, wr.mpesa_name, wr.status,
       wr.provider_reference, wr.created_at, wr.processed_at,
@@ -26,15 +47,19 @@ export async function findAllWithSeller({ status } = {}) {
       COALESCE(NULLIF(s.shop_name, ''), NULLIF(s.full_name, ''), NULLIF(CONCAT_WS(' ', c.first_name, c.last_name), ''), NULLIF(b.full_name, ''), NULLIF(wr.mpesa_name, ''), 'Withdrawal user') AS entity_name,
       COALESCE(s.email, c.email, b.email) AS entity_email,
       COALESCE(s.whatsapp_number, c.whatsapp_number, c.mpesa_number, b.whatsapp_number, b.mobile_payment) AS entity_phone,
-      COALESCE(s.balance, c.balance, b.refunds, 0) AS current_balance
+      COALESCE(s.balance, c.balance, b.refunds, 0) AS current_balance,
+      COUNT(*) OVER() AS total_count
     FROM withdrawal_requests wr
     LEFT JOIN sellers s ON wr.seller_id = s.id
     LEFT JOIN creators c ON wr.creator_id = c.id
     LEFT JOIN buyers b ON wr.buyer_id = b.id
     ${where}
     ORDER BY wr.created_at DESC
-    LIMIT 500
   `;
+
+  params.push(limit, offset);
+  sql += ` LIMIT $${params.length - 1} OFFSET $${params.length}`;
+
   const { rows } = await query(sql, params);
   return rows;
 }
