@@ -1,5 +1,7 @@
 import { api } from './instance';
 import type { WithdrawalStatus } from '@/shared/types/api/withdrawal';
+import { toRequestParams, readPaginationMeta, type AdminListParams } from './pagination';
+import type { PaginatedList } from '../types/dashboard';
 
 // The exact 8 values the backend's withdrawal_requests.status CHECK
 // constraint allows (migration 20260913130000) -- kept in lockstep with the
@@ -34,19 +36,21 @@ function normalizeWithdrawalStatus(raw: unknown, requestId: string): WithdrawalS
 }
 
 // Must reject on failure -- see the matching comment in buyers.ts.
-export async function getWithdrawalRequests() {
-  const response = await api.get('/admin/withdrawal-requests');
+export async function getWithdrawalRequests(
+  params: AdminListParams & { status?: string } = {}
+): Promise<PaginatedList<Record<string, unknown>>> {
+  const { status, ...listParams } = params;
+  const requestParams = toRequestParams(listParams);
+  if (status) requestParams.status = status;
 
-  let withdrawalRequests = [];
-  if (response.data && Array.isArray(response.data.data)) {
-    withdrawalRequests = response.data.data;
-  } else if (Array.isArray(response.data)) {
-    withdrawalRequests = response.data;
-  } else {
-    return [];
-  }
+  const response = await api.get('/admin/withdrawal-requests', { params: requestParams });
 
-  return withdrawalRequests.map((request: Record<string, unknown>) => {
+  const rows: unknown[] = response.data && Array.isArray(response.data.data)
+    ? response.data.data
+    : (Array.isArray(response.data) ? response.data : []);
+
+  const items = rows.map((raw) => {
+    const request = raw as Record<string, unknown>;
     const id = String(request.id || `withdrawal-${globalThis.crypto.randomUUID()}`);
     return {
       id,
@@ -63,6 +67,8 @@ export async function getWithdrawalRequests() {
       processedBy: request.processed_by || request.processedBy || null
     };
   });
+
+  return { items, pagination: readPaginationMeta(response.data, items.length) };
 }
 
 // The backend (admin.service.js overrideWithdrawalStatus) only ever accepts

@@ -29,7 +29,10 @@ export function useDeleteUserMutation() {
   return useMutation({
     mutationFn: (userId: string) => adminApi.deleteUser(userId, `delete-user-${userId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminQueryKeys.buyers() });
+      // Base/prefix keys, not the page-1-no-search key -- this must
+      // invalidate every cached page+search variant, not just one.
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.buyersAll() });
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.sellersAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
       toast.success('User deleted successfully');
     },
@@ -44,7 +47,7 @@ export function useDeleteCreatorMutation() {
   return useMutation({
     mutationFn: (creatorId: string) => adminApi.deleteCreator(creatorId, `delete-creator-${creatorId}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminQueryKeys.creators() });
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.creatorsAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
       toast.success('Creator deleted successfully');
     },
@@ -60,7 +63,7 @@ export function useUpdateWithdrawalRequestStatusMutation() {
     mutationFn: (args: { requestId: string; status: 'completed' | 'failed'; idempotencyKey: string }) =>
       adminApi.updateWithdrawalRequestStatus(args.requestId, args.status, args.idempotencyKey),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: adminQueryKeys.withdrawals() });
+      queryClient.invalidateQueries({ queryKey: adminQueryKeys.withdrawalsAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
       toast.success('Withdrawal request status updated');
     },

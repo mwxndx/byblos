@@ -1,6 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { adminApi } from '@/features/admin/api';
 import { adminQueryKeys } from '@/features/admin/api/queryKeys';
+
+export interface PaginatedQueryParams {
+  page: number;
+  search?: string;
+}
 
 export function useAdminAnalyticsQuery(enabled = true) {
   return useQuery({
@@ -12,42 +17,49 @@ export function useAdminAnalyticsQuery(enabled = true) {
   });
 }
 
-export function useAdminSellersQuery(enabled = true) {
+export function useAdminSellersQuery({ page, search }: PaginatedQueryParams, enabled = true) {
   return useQuery({
-    queryKey: adminQueryKeys.sellers(),
-    queryFn: adminApi.getSellers,
+    queryKey: adminQueryKeys.sellers(page, search),
+    queryFn: () => adminApi.getSellers({ page, search }),
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    // Keeps the previous page's rows on screen while the next page loads,
+    // instead of the table flashing empty/loading on every page click or
+    // search keystroke.
+    placeholderData: keepPreviousData,
     enabled,
   });
 }
 
-export function useAdminCreatorsQuery(enabled = true) {
+export function useAdminCreatorsQuery({ page, search }: PaginatedQueryParams, enabled = true) {
   return useQuery({
-    queryKey: adminQueryKeys.creators(),
-    queryFn: adminApi.getCreators,
+    queryKey: adminQueryKeys.creators(page, search),
+    queryFn: () => adminApi.getCreators({ page, search }),
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     enabled,
   });
 }
 
-export function useAdminBuyersQuery(enabled = true) {
+export function useAdminBuyersQuery({ page, search }: PaginatedQueryParams, enabled = true) {
   return useQuery({
-    queryKey: adminQueryKeys.buyers(),
-    queryFn: adminApi.getBuyers,
+    queryKey: adminQueryKeys.buyers(page, search),
+    queryFn: () => adminApi.getBuyers({ page, search }),
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     enabled,
   });
 }
 
-export function useAdminWithdrawalsQuery(enabled = true) {
+export function useAdminWithdrawalsQuery({ page, search }: PaginatedQueryParams, enabled = true) {
   return useQuery({
-    queryKey: adminQueryKeys.withdrawals(),
-    queryFn: adminApi.getWithdrawalRequests,
+    queryKey: adminQueryKeys.withdrawals(page, search),
+    queryFn: () => adminApi.getWithdrawalRequests({ page, search }),
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     enabled,
   });
 }
@@ -92,12 +104,13 @@ export function useAdminDashboardStatsQuery(enabled = true) {
   });
 }
 
-export function useAdminClientsQuery(enabled = true) {
+export function useAdminClientsQuery({ page, search }: PaginatedQueryParams, enabled = true) {
   return useQuery({
-    queryKey: adminQueryKeys.clients(),
-    queryFn: adminApi.getClients,
+    queryKey: adminQueryKeys.clients(page, search),
+    queryFn: () => adminApi.getClients({ page, search }),
     staleTime: 60 * 1000,
     gcTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
     enabled,
   });
 }

@@ -1,26 +1,42 @@
-import { useMemo } from 'react';
 import { Search, UserPlus, Trash2, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
 import { IconButton } from '@/shared/ui/icon-button';
-import type { AdminCreator } from '../types/dashboard';
+import { AdminPaginationControls } from './AdminPaginationControls';
+import type { AdminCreator, PaginationMeta } from '../types/dashboard';
 
 interface AdminCreatorsTabProps {
   creators: AdminCreator[];
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
   onDelete: (creatorId: string, creatorName?: string) => void;
   deletingId?: string | null;
+  // Site-wide totals, not sums over the current page -- creators is now one
+  // server-paginated page, so these come from the dashboard-stats aggregate
+  // endpoint instead of being computed by reducing the visible rows.
+  totalCreatorSales: number;
+  totalCreatorLinkClicks: number;
+  totalCreatorEarnings: number;
 }
 
-export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDelete, deletingId }: AdminCreatorsTabProps) => {
-  // creators is fetched unpaginated, so this re-filter was re-running on
-  // every render -- including every keystroke in the search input above.
-  const filtered = useMemo(() => creators.filter((creator) =>
-    creator.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    creator.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ), [creators, searchQuery]);
+export const AdminCreatorsTab = ({
+  creators,
+  searchQuery,
+  onSearchChange,
+  pagination,
+  onPageChange,
+  onDelete,
+  deletingId,
+  totalCreatorSales,
+  totalCreatorLinkClicks,
+  totalCreatorEarnings
+}: AdminCreatorsTabProps) => {
+  // creators is now one server-paginated, server-searched page -- see the
+  // matching comment in AdminBuyersTab.tsx.
+  const filtered = creators;
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
@@ -45,19 +61,19 @@ export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDele
       <div className="grid grid-cols-1 gap-3 border-b border-white/5 bg-white/[0.012] p-5 md:grid-cols-4 md:p-8">
         <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-yellow-200/70">Creators</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">{creators.length.toLocaleString()}</p>
+          <p className="mt-3 text-2xl font-black text-white tabular-nums">{pagination.total.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl border border-lime-500/20 bg-lime-500/[0.06] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-lime-200/70">Creator sales</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">{creators.reduce((sum, creator) => sum + (Number(creator.totalSales) || 0), 0).toLocaleString()}</p>
+          <p className="mt-3 text-2xl font-black text-white tabular-nums">{totalCreatorSales.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-cyan-200/70">Link clicks</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">{creators.reduce((sum, creator) => sum + (Number(creator.linkClicks) || 0), 0).toLocaleString()}</p>
+          <p className="mt-3 text-2xl font-black text-white tabular-nums">{totalCreatorLinkClicks.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200/70">Creator earnings</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">KSh {creators.reduce((sum, creator) => sum + (Number(creator.totalIncome) || 0), 0).toLocaleString()}</p>
+          <p className="mt-3 text-2xl font-black text-white tabular-nums">KSh {totalCreatorEarnings.toLocaleString()}</p>
         </div>
       </div>
       <CardContent className="p-0">
@@ -125,9 +141,7 @@ export const AdminCreatorsTab = ({ creators, searchQuery, onSearchChange, onDele
         </div>
       </CardContent>
       <CardFooter className="p-8 border-t border-white/5 bg-white/[0.01]">
-        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
-          Total creators: <span className="text-white ml-2 tabular-nums">{creators.length}</span>
-        </p>
+        <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>
   );

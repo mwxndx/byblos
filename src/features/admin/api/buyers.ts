@@ -1,4 +1,6 @@
 import { api } from './instance';
+import { toRequestParams, readPaginationMeta, type AdminListParams } from './pagination';
+import type { PaginatedList } from '../types/dashboard';
 
 // Both functions below deliberately let a request failure reject rather than
 // resolving to []/null: this is a queryFn (getBuyers) and a mutationFn
@@ -8,11 +10,16 @@ import { api } from './instance';
 // toast for the latter. Swallowing the error here previously meant a failed
 // fetch silently looked like "zero buyers" / "buyer has no details" instead
 // of a visible, retryable failure.
-export async function getBuyers() {
-  const response = await api.get('/admin/buyers');
+export async function getBuyers(params: AdminListParams = {}): Promise<PaginatedList<Record<string, unknown>>> {
+  const response = await api.get('/admin/buyers', { params: toRequestParams(params) });
 
-  if (response.data && Array.isArray(response.data.data)) {
-    return response.data.data.map((buyer: Record<string, unknown>) => ({
+  const rows: unknown[] = response.data && Array.isArray(response.data.data)
+    ? response.data.data
+    : (Array.isArray(response.data) ? response.data : []);
+
+  const items = rows.map((raw) => {
+    const buyer = raw as Record<string, unknown>;
+    return {
       id: String(buyer.id || `buyer-${globalThis.crypto.randomUUID()}`),
       name: String(buyer.name || buyer.full_name || 'Unnamed Buyer'),
       email: String(buyer.email || ''),
@@ -22,14 +29,10 @@ export async function getBuyers() {
       location: buyer.location || 'N/A',
       createdAt: buyer.created_at || buyer.createdAt || new Date().toISOString(),
       user_id: buyer.user_id
-    }));
-  }
+    };
+  });
 
-  if (Array.isArray(response.data)) {
-    return response.data;
-  }
-
-  return [];
+  return { items, pagination: readPaginationMeta(response.data, items.length) };
 }
 
 export async function getBuyerById(id: string) {

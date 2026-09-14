@@ -1,5 +1,22 @@
 import type { WithdrawalStatus } from '@/shared/types/api/withdrawal';
 
+// Matches the shape the backend's pagination.utils.js (buildPaginationMeta)
+// already returns for every paginated admin list endpoint, and the same
+// PaginationMeta shape src/features/shop/api/types.ts uses for the public
+// catalog -- kept as its own copy here rather than importing across feature
+// slices.
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
+}
+
+export interface PaginatedList<T> {
+  items: T[];
+  pagination: PaginationMeta;
+}
+
 export interface DashboardAnalytics {
   totalRevenue?: number;
   totalProducts?: number;
@@ -18,8 +35,11 @@ export interface DashboardAnalytics {
   activeOrders?: number;
   lowStockProducts?: number;
   pendingWithdrawals?: number;
+  pendingWithdrawalAmount?: number;
   pendingCreatorRequests?: number;
   totalCreatorEarnings?: number;
+  totalCreatorSales?: number;
+  totalCreatorLinkClicks?: number;
   userGrowth?: Array<{ name: string; buyers: number; sellers: number }>;
   revenueTrends?: Array<{ name: string; revenue: number; orders: number }>;
   salesTrends?: Array<{ name: string; sales: number }>;
@@ -127,6 +147,19 @@ export interface DashboardState {
   topShops: unknown[];
   providerHealth: unknown;
 }
+
+// One pagination meta per paginated admin list -- these 5 endpoints (buyers,
+// sellers, clients, creators, withdrawal requests) are the ones that moved
+// from "fetch the whole table" to real page/limit/search pagination.
+export interface DashboardPaginationState {
+  sellers: PaginationMeta;
+  creators: PaginationMeta;
+  buyers: PaginationMeta;
+  clients: PaginationMeta;
+  withdrawalRequests: PaginationMeta;
+}
+
+export const EMPTY_PAGINATION: PaginationMeta = { total: 0, page: 1, pageSize: 25, hasMore: false };
 
 export type AdminSeller = DashboardState['sellers'][number];
 export type AdminCreator = DashboardState['creators'][number];

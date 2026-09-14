@@ -18,8 +18,10 @@ import {
   useAdminClientsQuery,
   useAdminBalancesQuery
 } from '@/features/admin/hooks/queries/useAdminQueries';
+import { usePaginatedAdminList } from '@/features/admin/hooks/usePaginatedAdminList';
 
-import type { DashboardAnalytics, MonthlyMetricsData, WithdrawalRequest, FinancialMetrics, MonthlyFinancialData, DashboardState } from '../types/dashboard';
+import type { DashboardAnalytics, MonthlyMetricsData, WithdrawalRequest, FinancialMetrics, MonthlyFinancialData, DashboardState, DashboardPaginationState } from '../types/dashboard';
+import { EMPTY_PAGINATION } from '../types/dashboard';
 
 export function useAdminDashboard() {
   // All hooks must be called unconditionally at the top level
@@ -33,7 +35,16 @@ export function useAdminDashboard() {
   const updateWithdrawalRequestStatusMutation = useUpdateWithdrawalRequestStatusMutation();
 
   const [activeTab, setActiveTab] = useState('overview');
-  const [searchQuery, setSearchQuery] = useState('');
+  // Each paginated admin directory tab (sellers/creators/buyers/withdrawals/
+  // clients) now fetches its own server-paginated, server-searched page, so
+  // each needs independent page/search state -- a single shared searchQuery
+  // previously meant typing in one tab's search box silently carried over
+  // and filtered whichever tab you switched to next.
+  const sellersList = usePaginatedAdminList();
+  const creatorsList = usePaginatedAdminList();
+  const buyersList = usePaginatedAdminList();
+  const withdrawalsList = usePaginatedAdminList();
+  const clientsList = usePaginatedAdminList();
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const inspectionSessionId = useMemo(() => {
@@ -102,16 +113,34 @@ export function useAdminDashboard() {
 
   const isEnabled = isAuthenticated && !authLoading;
   const analyticsQuery = useAdminAnalyticsQuery(isEnabled);
-  const sellersQuery = useAdminSellersQuery(isEnabled);
-  const creatorsQuery = useAdminCreatorsQuery(isEnabled);
-  const buyersQuery = useAdminBuyersQuery(isEnabled);
-  const withdrawalsQuery = useAdminWithdrawalsQuery(isEnabled);
+  const sellersQuery = useAdminSellersQuery({ page: sellersList.page, search: sellersList.debouncedSearch }, isEnabled);
+  const creatorsQuery = useAdminCreatorsQuery({ page: creatorsList.page, search: creatorsList.debouncedSearch }, isEnabled);
+  const buyersQuery = useAdminBuyersQuery({ page: buyersList.page, search: buyersList.debouncedSearch }, isEnabled);
+  const withdrawalsQuery = useAdminWithdrawalsQuery({ page: withdrawalsList.page, search: withdrawalsList.debouncedSearch }, isEnabled);
   const monthlyMetricsQuery = useAdminMonthlyMetricsQuery(isEnabled);
   const financialsQuery = useAdminFinancialsQuery(isEnabled);
   const monthlyFinancialDataQuery = useAdminMonthlyFinancialDataQuery(isEnabled);
   const dashboardStatsQuery = useAdminDashboardStatsQuery(isEnabled);
-  const clientsQuery = useAdminClientsQuery(isEnabled);
+  const clientsQuery = useAdminClientsQuery({ page: clientsList.page, search: clientsList.debouncedSearch }, isEnabled);
   const balancesQuery = useAdminBalancesQuery(isEnabled);
+
+  // Pagination meta for the 5 paginated directory tabs -- read directly off
+  // each query's own data rather than routed through the big
+  // dashboardState-aggregation effect below, so it never lags behind an
+  // in-flight page/search change waiting on that effect's isLoading gate.
+  const paginationState: DashboardPaginationState = useMemo(() => ({
+    sellers: sellersQuery.data?.pagination ?? EMPTY_PAGINATION,
+    creators: creatorsQuery.data?.pagination ?? EMPTY_PAGINATION,
+    buyers: buyersQuery.data?.pagination ?? EMPTY_PAGINATION,
+    clients: clientsQuery.data?.pagination ?? EMPTY_PAGINATION,
+    withdrawalRequests: withdrawalsQuery.data?.pagination ?? EMPTY_PAGINATION,
+  }), [
+    sellersQuery.data?.pagination,
+    creatorsQuery.data?.pagination,
+    buyersQuery.data?.pagination,
+    clientsQuery.data?.pagination,
+    withdrawalsQuery.data?.pagination,
+  ]);
 
   const queryClient = useQueryClient();
 
@@ -184,20 +213,26 @@ export function useAdminDashboard() {
       setError(null);
       try {
         const analytics = analyticsQuery.data || null;
-        const sellers = sellersQuery.data || [];
-        const creators = creatorsQuery.data || [];
-        const buyers = buyersQuery.data || [];
-        const withdrawalRequests = withdrawalsQuery.data || [];
+        // Each of these 5 is now a paginated {items, pagination} envelope
+        // instead of the full unpaginated array it used to be.
+        const sellers = sellersQuery.data?.items || [];
+        const creators = creatorsQuery.data?.items || [];
+        const buyers = buyersQuery.data?.items || [];
+        const withdrawalRequests = withdrawalsQuery.data?.items || [];
         const monthlyMetrics = monthlyMetricsQuery.data || null;
         const financialMetrics = financialsQuery.data || null;
         const monthlyFinancialData = monthlyFinancialDataQuery.data || [];
         const dashboardStats = dashboardStatsQuery.data || null;
-        const clients = clientsQuery.data || [];
+        const clients = clientsQuery.data?.items || [];
         const providerHealth = balancesQuery.data || null;
 
-        const totalSellersCount = Array.isArray(sellers) ? sellers.length : 0;
-        const totalCreatorsCount = Array.isArray(creators) ? creators.length : 0;
-        const totalBuyersCount = Array.isArray(buyers) ? buyers.length : 0;
+        // Real directory totals, not just this page's row count -- each
+        // list endpoint now returns only one page, so `.length` would
+        // silently report the page size (e.g. 25) once dashboardStats is
+        // unavailable, instead of the true count these fall back to.
+        const totalSellersCount = sellersQuery.data?.pagination.total ?? 0;
+        const totalCreatorsCount = creatorsQuery.data?.pagination.total ?? 0;
+        const totalBuyersCount = buyersQuery.data?.pagination.total ?? 0;
 
         const safeAnalytics: DashboardAnalytics = {
           totalRevenue: financialMetrics?.totalSales || 0,
@@ -210,8 +245,11 @@ export function useAdminDashboard() {
           activeOrders: dashboardStats?.activeOrders || 0,
           lowStockProducts: dashboardStats?.lowStockProducts || 0,
           pendingWithdrawals: dashboardStats?.pendingWithdrawals || 0,
+          pendingWithdrawalAmount: dashboardStats?.pendingWithdrawalAmount || 0,
           pendingCreatorRequests: dashboardStats?.pendingCreatorRequests || 0,
           totalCreatorEarnings: dashboardStats?.totalCreatorEarnings || 0,
+          totalCreatorSales: dashboardStats?.totalCreatorSales || 0,
+          totalCreatorLinkClicks: dashboardStats?.totalCreatorLinkClicks || 0,
           userGrowth: analytics?.userGrowth || [],
           revenueTrends: analytics?.revenueTrends || [],
           salesTrends: analytics?.salesTrends || [],
@@ -377,15 +415,14 @@ export function useAdminDashboard() {
     && !providerHealth?.payin?.error
     && !providerHealth?.payout?.error;
 
-  const pendingPayoutRequests = useMemo(() => (
-    dashboardState.withdrawalRequests.filter(request =>
-      !['completed', 'failed', 'rejected'].includes(String(request.status).toLowerCase())
-    )
-  ), [dashboardState.withdrawalRequests]);
-
-  const pendingPayoutAmount = useMemo(() => (
-    pendingPayoutRequests.reduce((sum, request) => sum + (Number(request.amount) || 0), 0)
-  ), [pendingPayoutRequests]);
+  // Site-wide pending-payout count/amount, not derived from
+  // dashboardState.withdrawalRequests -- that's now one paginated page
+  // (~25 rows) rather than the near-complete list it used to be, so
+  // filtering/summing it here would silently undercount once there's more
+  // than a page of pending requests. dashboardStats already computes both
+  // as real aggregates (admin.service.js getDashboardStats).
+  const pendingPayoutCount = dashboardState.analytics.pendingWithdrawals || 0;
+  const pendingPayoutAmount = dashboardState.analytics.pendingWithdrawalAmount || 0;
 
   // Guards against a stale response overwriting a newer one: if the admin
   // clicks View on seller A, then clicks View on seller B before A's
@@ -579,14 +616,18 @@ export function useAdminDashboard() {
     dashboardState,
     activeTab,
     setActiveTab,
-    searchQuery,
-    setSearchQuery,
+    sellersList,
+    creatorsList,
+    buyersList,
+    withdrawalsList,
+    clientsList,
+    paginationState,
     safeFormatDate,
     formatProviderBalance,
     providerHealth,
     providerHealthOk,
     providerHealthAvailable,
-    pendingPayoutRequests,
+    pendingPayoutCount,
     pendingPayoutAmount,
     inspectionSessionId,
     selectedSeller,

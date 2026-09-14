@@ -1,23 +1,22 @@
-import { useMemo } from 'react';
 import { Search, Users2, Store, Mail } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
+import { AdminPaginationControls } from './AdminPaginationControls';
+import type { PaginationMeta } from '../types/dashboard';
 
 interface AdminClientsTabProps {
   clients: unknown[];
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
   formatDate: (dateString: string | null | undefined) => string;
 }
 
-export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, formatDate }: AdminClientsTabProps) => {
-  // clients is fetched unpaginated, so this re-filter was re-running on
-  // every render -- including every keystroke in the search input above.
-  const filtered = useMemo(() => ((clients || []) as Array<Record<string, unknown>>).filter((c) =>
-    String(c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    String(c.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    String(c.sellerName || '').toLowerCase().includes(searchQuery.toLowerCase())
-  ), [clients, searchQuery]);
+export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, pagination, onPageChange, formatDate }: AdminClientsTabProps) => {
+  // clients is now one server-paginated, server-searched page -- see the
+  // matching comment in AdminBuyersTab.tsx.
+  const filtered = (clients || []) as Array<Record<string, unknown>>;
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
@@ -90,6 +89,9 @@ export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, formatDa
           </table>
         </div>
       </CardContent>
+      <CardFooter className="p-8 border-t border-white/5 bg-white/[0.01]">
+        <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
+      </CardFooter>
     </Card>
   );
 };

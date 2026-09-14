@@ -1,27 +1,26 @@
-import { useMemo } from 'react';
 import { Search, Store, MapPin, Eye, XCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import type { AdminSeller } from '../types/dashboard';
+import { AdminPaginationControls } from './AdminPaginationControls';
+import type { AdminSeller, PaginationMeta } from '../types/dashboard';
 
 interface AdminSellersTabProps {
   sellers: AdminSeller[];
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
   onView: (sellerId: string) => void;
   onDelete: (userId: string | undefined, role: 'seller' | 'buyer') => void;
   deletingId?: string | null;
 }
 
-export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, onView, onDelete, deletingId }: AdminSellersTabProps) => {
-  // sellers is fetched unpaginated, so this re-filter was re-running on
-  // every render -- including every keystroke in the search input above.
-  const filtered = useMemo(() => sellers?.filter((s) =>
-    s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) ?? [], [sellers, searchQuery]);
+export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, pagination, onPageChange, onView, onDelete, deletingId }: AdminSellersTabProps) => {
+  // sellers is now one server-paginated, server-searched page -- see the
+  // matching comment in AdminBuyersTab.tsx.
+  const filtered = sellers ?? [];
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
@@ -120,9 +119,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, onView, 
         </div>
       </CardContent>
       <CardFooter className="p-8 border-t border-white/5 bg-white/[0.01]">
-        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
-          Total sellers: <span className="text-white ml-2 tabular-nums">{sellers?.length || 0}</span>
-        </p>
+        <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>
   );

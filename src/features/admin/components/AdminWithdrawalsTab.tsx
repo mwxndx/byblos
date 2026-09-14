@@ -4,7 +4,8 @@ import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { getWithdrawalStatusLabel, getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
-import type { WithdrawalRequest } from '../types/dashboard';
+import { AdminPaginationControls } from './AdminPaginationControls';
+import type { WithdrawalRequest, PaginationMeta } from '../types/dashboard';
 
 export interface ProviderHealth {
   payin?: Record<string, unknown>;
@@ -15,6 +16,8 @@ interface AdminWithdrawalsTabProps {
   withdrawalRequests: WithdrawalRequest[];
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
   activeOrders?: number;
   pendingPayoutCount: number;
   pendingPayoutAmount: number;
@@ -34,6 +37,8 @@ export const AdminWithdrawalsTab = ({
   withdrawalRequests,
   searchQuery,
   onSearchChange,
+  pagination,
+  onPageChange,
   activeOrders,
   pendingPayoutCount,
   pendingPayoutAmount,
@@ -208,9 +213,7 @@ export const AdminWithdrawalsTab = ({
         </div>
       </CardContent>
       <CardFooter className="p-8 border-t border-white/5 bg-white/[0.01]">
-        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
-          Total requests: <span className="text-white ml-2 tabular-nums">{withdrawalRequests?.length || 0}</span>
-        </p>
+        <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>
   );

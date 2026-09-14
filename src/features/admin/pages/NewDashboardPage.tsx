@@ -34,14 +34,18 @@ const NewAdminDashboard = () => {
     dashboardState,
     activeTab,
     setActiveTab,
-    searchQuery,
-    setSearchQuery,
+    sellersList,
+    creatorsList,
+    buyersList,
+    withdrawalsList,
+    clientsList,
+    paginationState,
     safeFormatDate,
     formatProviderBalance,
     providerHealth,
     providerHealthOk,
     providerHealthAvailable,
-    pendingPayoutRequests,
+    pendingPayoutCount,
     pendingPayoutAmount,
     inspectionSessionId,
     selectedSeller,
@@ -222,8 +226,10 @@ const NewAdminDashboard = () => {
             <TabsContent value="sellers" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <AdminSellersTab
                 sellers={dashboardState.sellers}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                searchQuery={sellersList.search}
+                onSearchChange={sellersList.setSearch}
+                pagination={paginationState.sellers}
+                onPageChange={sellersList.setPage}
                 onView={handleViewSeller}
                 onDelete={handleDeleteUser}
                 deletingId={deletingId}
@@ -234,10 +240,15 @@ const NewAdminDashboard = () => {
             <TabsContent value="creators" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <AdminCreatorsTab
                 creators={dashboardState.creators}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                searchQuery={creatorsList.search}
+                onSearchChange={creatorsList.setSearch}
+                pagination={paginationState.creators}
+                onPageChange={creatorsList.setPage}
                 onDelete={handleDeleteCreator}
                 deletingId={deletingId}
+                totalCreatorSales={dashboardState.analytics.totalCreatorSales || 0}
+                totalCreatorLinkClicks={dashboardState.analytics.totalCreatorLinkClicks || 0}
+                totalCreatorEarnings={dashboardState.analytics.totalCreatorEarnings || 0}
               />
             </TabsContent>
 
@@ -245,8 +256,10 @@ const NewAdminDashboard = () => {
             <TabsContent value="buyers" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <AdminBuyersTab
                 buyers={dashboardState.buyers}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                searchQuery={buyersList.search}
+                onSearchChange={buyersList.setSearch}
+                pagination={paginationState.buyers}
+                onPageChange={buyersList.setPage}
                 onView={handleViewBuyer}
                 onDelete={handleDeleteUser}
                 deletingId={deletingId}
@@ -258,10 +271,12 @@ const NewAdminDashboard = () => {
             <TabsContent value="withdrawals" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <AdminWithdrawalsTab
                 withdrawalRequests={dashboardState.withdrawalRequests}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                searchQuery={withdrawalsList.search}
+                onSearchChange={withdrawalsList.setSearch}
+                pagination={paginationState.withdrawalRequests}
+                onPageChange={withdrawalsList.setPage}
                 activeOrders={dashboardState.analytics.activeOrders}
-                pendingPayoutCount={pendingPayoutRequests.length}
+                pendingPayoutCount={pendingPayoutCount}
                 pendingPayoutAmount={pendingPayoutAmount}
                 providerHealth={providerHealth}
                 providerHealthOk={providerHealthOk}
@@ -295,8 +310,10 @@ const NewAdminDashboard = () => {
             <TabsContent value="clients" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
               <AdminClientsTab
                 clients={dashboardState.clients}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                searchQuery={clientsList.search}
+                onSearchChange={clientsList.setSearch}
+                pagination={paginationState.clients}
+                onPageChange={clientsList.setPage}
                 formatDate={safeFormatDate}
               />
             </TabsContent>

@@ -1,29 +1,28 @@
-import { useMemo } from 'react';
 import { Search, User, Calendar, Eye, XCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import type { AdminBuyer } from '../types/dashboard';
+import { AdminPaginationControls } from './AdminPaginationControls';
+import type { AdminBuyer, PaginationMeta } from '../types/dashboard';
 
 interface AdminBuyersTabProps {
   buyers: AdminBuyer[];
   searchQuery: string;
   onSearchChange: (value: string) => void;
+  pagination: PaginationMeta;
+  onPageChange: (page: number) => void;
   onView: (buyerId: string) => void;
   onDelete: (userId: string | undefined, role: 'seller' | 'buyer') => void;
   deletingId?: string | null;
   formatDate: (dateString: string | null | undefined) => string;
 }
 
-export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, onView, onDelete, deletingId, formatDate }: AdminBuyersTabProps) => {
-  // buyers is fetched unpaginated (could be thousands of rows), so this
-  // re-filter was re-running on every render -- including every keystroke in
-  // the search input above, since searchQuery changes per keystroke.
-  const filtered = useMemo(() => buyers?.filter((b) =>
-    b.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) ?? [], [buyers, searchQuery]);
+export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination, onPageChange, onView, onDelete, deletingId, formatDate }: AdminBuyersTabProps) => {
+  // buyers is now one server-paginated, server-searched page -- filtering
+  // client-side here would only ever search whatever page happened to be
+  // loaded, not the whole directory.
+  const filtered = buyers ?? [];
 
   return (
     <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
@@ -122,9 +121,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, onView, on
         </div>
       </CardContent>
       <CardFooter className="p-8 border-t border-white/5 bg-white/[0.01]">
-        <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
-          Total buyers: <span className="text-white ml-2 tabular-nums">{buyers?.length || 0}</span>
-        </p>
+        <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>
   );
