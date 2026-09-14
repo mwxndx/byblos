@@ -43,7 +43,7 @@ export default function DetectionsPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-tighter italic">
+          <h1 className="text-4xl font-semibold text-white tracking-tight italic">
             DETECTIONS<span className="text-orange-500">.</span>
           </h1>
           <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 ml-1">
@@ -77,17 +77,17 @@ export default function DetectionsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-[2.5rem] p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
+          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-black text-white tracking-tighter italic">RELEASE<span className="text-green-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">RELEASE<span className="text-green-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedEarning && (
             <div className="space-y-8">
               <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-8 text-center shadow-inner">
-                <p className="text-[10px] font-black text-green-500 uppercase tracking-widest mb-4 opacity-60">Reviewed as legitimate</p>
-                <p className="text-5xl font-black text-green-400 tracking-tighter tabular-nums mb-4">
+                <p className="text-[10px] font-semibold text-green-500 uppercase tracking-widest mb-4 opacity-60">Reviewed as legitimate</p>
+                <p className="text-5xl font-semibold text-green-400 tracking-tight tabular-nums mb-4">
                   {formatCurrency(selectedEarning.amount)}
                 </p>
                 <div className="h-px bg-green-500/20 w-12 mx-auto mb-4"></div>
@@ -99,7 +99,7 @@ export default function DetectionsPage() {
                 This clears the hold. The earning becomes subject to the normal T+2 clearing rule again — immediately withdrawable if that window has already passed.
               </p>
               <div className="space-y-4">
-                <Label htmlFor="releaseNotes" className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2 opacity-60">Review notes (optional)</Label>
+                <Label htmlFor="releaseNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Review notes (optional)</Label>
                 <Textarea
                   id="releaseNotes"
                   placeholder="Why this is a false positive..."
@@ -117,14 +117,14 @@ export default function DetectionsPage() {
               variant="outline"
               onClick={() => { setIsReleaseDialogOpen(false); setReviewNotes(''); }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-black text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Cancel
             </Button>
             <Button
               onClick={handleRelease}
               disabled={isProcessing}
-              className="flex-1 h-12 bg-green-500 hover:bg-green-400 text-black font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-green-500/10"
+              className="flex-1 h-12 bg-green-500 hover:bg-green-400 text-black font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-green-500/10"
             >
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm Release'}
             </Button>
@@ -137,17 +137,17 @@ export default function DetectionsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-[2.5rem] p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
+          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-black text-white tracking-tighter italic">REVERSE<span className="text-red-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">REVERSE<span className="text-red-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedEarning && (
             <div className="space-y-8">
               <div className="bg-red-500/10 border border-red-500/20 rounded-3xl p-8 text-center shadow-inner">
-                <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-4 opacity-60">Confirmed self-dealing</p>
-                <p className="text-5xl font-black text-red-400 tracking-tighter tabular-nums mb-4">
+                <p className="text-[10px] font-semibold text-red-500 uppercase tracking-widest mb-4 opacity-60">Confirmed self-dealing</p>
+                <p className="text-5xl font-semibold text-red-400 tracking-tight tabular-nums mb-4">
                   {formatCurrency(selectedEarning.amount)}
                 </p>
                 <div className="h-px bg-red-500/20 w-12 mx-auto mb-4"></div>
@@ -159,7 +159,7 @@ export default function DetectionsPage() {
                 This claws back only this specific earning. If the creator's balance already covers it, it's deducted immediately; if they already withdrew it, a deficit is recorded for manual follow-up instead of a silent write-off.
               </p>
               <div className="space-y-4">
-                <Label htmlFor="reverseNotes" className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2 opacity-60">Review notes *</Label>
+                <Label htmlFor="reverseNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Review notes *</Label>
                 <Textarea
                   id="reverseNotes"
                   placeholder="Evidence for confirmed self-dealing..."
@@ -177,14 +177,14 @@ export default function DetectionsPage() {
               variant="outline"
               onClick={() => { setIsReverseDialogOpen(false); setReviewNotes(''); }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-black text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Cancel
             </Button>
             <Button
               onClick={handleReverse}
               disabled={isProcessing || !reviewNotes.trim()}
-              className="flex-1 h-12 bg-red-500 hover:bg-red-400 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-red-500/10"
+              className="flex-1 h-12 bg-red-500 hover:bg-red-400 text-white font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-red-500/10"
             >
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm Reversal'}
             </Button>

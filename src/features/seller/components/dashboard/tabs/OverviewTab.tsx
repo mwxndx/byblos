@@ -50,12 +50,12 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
               </span>
               <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-white/70">Available balance</p>
             </div>
-            <p className="mt-3 text-3xl font-black tracking-tight text-slate-900 dark:text-white sm:text-4xl">{formatCurrency(balance)}</p>
+            <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-4xl">{formatCurrency(balance)}</p>
           </div>
           <button
             type="button"
             onClick={() => { onSelectTab('withdrawals'); }}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-black shadow-[0_12px_28px_rgba(0,0,0,0.45)] transition-transform active:scale-95 w-fit"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold shadow-[0_12px_28px_rgba(0,0,0,0.45)] transition-transform active:scale-95 w-fit"
             style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
           >
             <Wallet className="h-4 w-4" />
@@ -76,7 +76,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
                 </span>
                 <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-white/50 truncate">Total Sales</p>
               </div>
-              <p className="mt-2 truncate text-lg font-black text-slate-900 dark:text-white sm:text-2xl">{formatCurrency(totalSales)}</p>
+              <p className="mt-2 truncate text-lg font-semibold text-slate-900 dark:text-white sm:text-2xl">{formatCurrency(totalSales)}</p>
             </div>
             <p className="mt-1.5 text-[9px] sm:text-[10px] text-slate-500 dark:text-white/50 leading-tight">
               Total product price value (excludes 2% customer service charge).
@@ -94,7 +94,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
                 </span>
                 <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-white/50 truncate">Total Revenue</p>
               </div>
-              <p className="mt-2 truncate text-lg font-black text-slate-900 dark:text-white sm:text-2xl">{formatCurrency(revenue)}</p>
+              <p className="mt-2 truncate text-lg font-semibold text-slate-900 dark:text-white sm:text-2xl">{formatCurrency(revenue)}</p>
             </div>
             <p className="mt-1.5 text-[9px] sm:text-[10px] text-slate-500 dark:text-white/50 leading-tight">
               Net earnings after KSh 10 platform fee per sale.
@@ -116,7 +116,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
                 <Icon className="h-3.5 w-3.5" />
                 <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
               </div>
-              <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white">{value}</p>
+              <p className="mt-1 text-lg font-semibold tabular-nums text-slate-900 dark:text-white">{value}</p>
             </div>
           ))}
         </div>
@@ -142,7 +142,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="px-1 sm:px-0">
-        <h2 className="text-lg font-black text-slate-900 dark:text-white sm:text-xl lg:text-2xl">{greeting.title}</h2>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white sm:text-xl lg:text-2xl">{greeting.title}</h2>
         <p className="mt-1 text-xs font-medium text-slate-500 dark:text-white/60 sm:text-sm">{greeting.sub}</p>
       </div>
 
@@ -159,7 +159,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
             >
               <PackagePlus className="h-6 w-6" style={{ color: 'var(--theme-accent, #f5c518)' }} />
             </span>
-            <p className="mt-3 text-base font-black text-slate-900 dark:text-white sm:text-lg">Add your first product to start getting clicks</p>
+            <p className="mt-3 text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Add your first product to start getting clicks</p>
             <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500 dark:text-white/60 sm:text-sm">
               Once buyers start engaging, your balance, revenue and activity will show up right here.
             </p>
@@ -167,7 +167,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
               <button
                 type="button"
                 onClick={() => { onSelectTab('products'); }}
-                className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-black shadow-[0_12px_28px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
+                className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold shadow-[0_12px_28px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
                 style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
               >
                 <PackagePlus className="h-4 w-4" />
@@ -196,7 +196,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
             >
               <Clock className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
             </span>
-            <h3 className="text-base font-black text-slate-900 dark:text-white sm:text-lg">Action Needed</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Action Needed</h3>
           </div>
           <div className="space-y-2 px-4 pb-4">
             {pendingOverviewOrders.length > 0 ? (
@@ -217,7 +217,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
                       </p>
                     </div>
                     <div className="shrink-0 sm:text-right">
-                      <p className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
                       <p className="text-[11px] text-slate-500 dark:text-white/70">
                         {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                       </p>
@@ -235,15 +235,15 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a]">
           <div className="p-4">
-            <h3 className="text-base font-black text-slate-900 dark:text-white sm:text-lg">Recent Activity</h3>
+            <h3 className="text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Recent Activity</h3>
           </div>
           <div className="space-y-2 px-4 pb-4">
             {recentOrders.length > 0 ? (
               recentOrders.map((order) => (
                 <div key={order.id} className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] px-3 py-2">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-xs font-black text-slate-900 dark:text-white">{order.orderNumber}</p>
-                    <p className="shrink-0 text-xs font-black text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
+                    <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{order.orderNumber}</p>
+                    <p className="shrink-0 text-xs font-semibold text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
                   </div>
                   <div className="mt-1 flex items-center justify-between gap-2">
                     <Badge className={`border text-[9px] font-bold ${getPendingStatusStyles(order.status)}`}>

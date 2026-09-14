@@ -116,7 +116,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
               <Sparkles className="h-7 w-7 text-[#f5c518]" />
             </span>
             <div className="space-y-2">
-              <DialogTitle className="text-xl font-black tracking-tight text-white">
+              <DialogTitle className="text-xl font-semibold tracking-tight text-white">
                 Become a Byblos member
               </DialogTitle>
               <p className="mx-auto max-w-xs text-sm leading-relaxed text-white/60">
@@ -152,7 +152,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 py-1 text-center">
-            <DialogTitle className="text-lg font-black tracking-tight text-white">
+            <DialogTitle className="text-lg font-semibold tracking-tight text-white">
               You’re member No. {String(displayNumber).padStart(6, '0')} 🎉
             </DialogTitle>
             <p className="-mt-1 text-xs text-white/55">Share your card and show you shop protected.</p>

@@ -379,7 +379,7 @@ export const AddProductFormSteps = ({
         <div className="space-y-3 p-4 sm:p-5">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
             <h3 className="break-words text-lg font-bold text-slate-900 dark:text-white sm:text-xl">{formData.name}</h3>
-            <span className="shrink-0 text-lg font-black text-yellow-600 dark:text-yellow-400 sm:text-xl">KES {formData.price}</span>
+            <span className="shrink-0 text-lg font-semibold text-yellow-600 dark:text-yellow-400 sm:text-xl">KES {formData.price}</span>
           </div>
           <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{formData.description}</p>
           <div className="flex items-center gap-2 pt-2 text-[10px] text-slate-700 dark:text-white uppercase font-bold">

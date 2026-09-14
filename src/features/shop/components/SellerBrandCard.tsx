@@ -166,7 +166,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                             event.stopPropagation();
                             handleUnfollow();
                         }}
-                        className="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-black text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
+                        className="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-semibold text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
                         aria-label={`Unfollow ${shopName}`}
                     >
                         <UserMinus className="h-3.5 w-3.5" />

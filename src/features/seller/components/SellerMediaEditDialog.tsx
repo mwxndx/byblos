@@ -94,7 +94,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
                 <img src={photoPreview} alt="Business photo" className="h-full w-full object-cover" />
               ) : (
                 <div
-                  className="flex h-full w-full items-center justify-center text-xl font-black"
+                  className="flex h-full w-full items-center justify-center text-xl font-semibold"
                   style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
                 >
                   {fallbackInitial}
@@ -102,7 +102,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-black text-slate-900 dark:text-white">Business photo</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">Business photo</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <Button
                   size="sm"

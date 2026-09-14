@@ -158,7 +158,7 @@ export function RefundConfirmDialog({
                 <span>Withdrawal charge</span>
                 <span className="font-bold">+{formatCurrency(withdrawalFee)}</span>
               </div>
-              <div className="border-t border-amber-400/20 pt-2 flex items-center justify-between text-sm font-black text-slate-950 dark:text-white">
+              <div className="border-t border-amber-400/20 pt-2 flex items-center justify-between text-sm font-semibold text-slate-950 dark:text-white">
                 <span>Total deducted from refund balance</span>
                 <span className="text-amber-600 dark:text-amber-400">{formatCurrency(totalDeducted)}</span>
               </div>

@@ -32,10 +32,10 @@ export function CreatorAvailableShops() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-black tracking-tight text-slate-950 dark:text-white">
+            <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
               Explore Available Shops
             </h2>
-            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400 text-xs font-black px-2.5 py-0.5">
+            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400 text-xs font-semibold px-2.5 py-0.5">
               Marketplace
             </span>
           </div>
@@ -59,7 +59,7 @@ export function CreatorAvailableShops() {
         ) : shops.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-8 text-center">
             <Store className="h-10 w-10 mx-auto text-slate-400 dark:text-white/20 mb-2" />
-            <p className="text-sm font-black text-slate-900 dark:text-white">No shops currently listed</p>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">No shops currently listed</p>
             <p className="mt-1 text-xs text-slate-500 dark:text-white/50 max-w-sm mx-auto">
               Check back soon! When sellers list their stores in the Creator Marketplace, they will appear here.
             </p>
@@ -92,7 +92,7 @@ export function CreatorAvailableShops() {
                           </div>
                         )}
                         <div className="min-w-0">
-                          <h3 className="font-black text-slate-900 dark:text-white truncate text-base">
+                          <h3 className="font-semibold text-slate-900 dark:text-white truncate text-base">
                             {shop.shopName}
                           </h3>
                           {shop.location && (
@@ -108,7 +108,7 @@ export function CreatorAvailableShops() {
                         <span className="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
                           Commission
                         </span>
-                        <span className="block text-sm font-black text-emerald-600 dark:text-emerald-300">
+                        <span className="block text-sm font-semibold text-emerald-600 dark:text-emerald-300">
                           {commissionPercent}%
                         </span>
                       </div>
@@ -153,7 +153,7 @@ export function CreatorAvailableShops() {
                         type="button"
                         onClick={() => handleSendRequest(shop)}
                         disabled={isRequesting}
-                        className="h-9 px-3.5 bg-yellow-400 font-black text-black hover:bg-yellow-300 text-xs"
+                        className="h-9 px-3.5 bg-yellow-400 font-semibold text-black hover:bg-yellow-300 text-xs"
                       >
                         {isRequesting ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />

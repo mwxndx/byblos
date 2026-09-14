@@ -66,14 +66,14 @@ export function AdminEntityModals({
                   aria-modal="true"
                   aria-labelledby="buyer-modal-title"
                 >
-                  <div className="bg-[#0A0A0A]/90 backdrop-blur-3xl border border-white/10 rounded-2xl md:rounded-[2.5rem] w-full max-w-4xl max-h-[95vh] flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.1)] scale-in-95 duration-300">
+                  <div className="bg-[#0A0A0A]/90 backdrop-blur-3xl border border-white/10 rounded-2xl md:rounded-card w-full max-w-4xl max-h-[95vh] flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.1)] scale-in-95 duration-300">
                     <div className="flex items-center justify-between p-5 md:p-8 border-b border-white/10 bg-white/[0.02]">
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-inner">
                           <UserCircle className="h-5 w-5 md:h-7 md:w-7 text-cyan-500" />
                         </div>
                         <div>
-                          <h3 id="buyer-modal-title" className="text-xl md:text-2xl font-black text-white tracking-tight">{buyer.name}</h3>
+                          <h3 id="buyer-modal-title" className="text-xl md:text-2xl font-semibold text-white tracking-tight">{buyer.name}</h3>
                           <p className="text-xs md:text-sm text-gray-400 font-medium">Customer Intelligence Report</p>
                         </div>
                       </div>
@@ -85,12 +85,12 @@ export function AdminEntityModals({
                       {isLoadingBuyer ? (
                         <div className="flex flex-col items-center justify-center h-60 space-y-4">
                           <Loader2 className="h-12 w-12 text-cyan-500 animate-spin" />
-                          <p className="text-gray-400 font-black uppercase tracking-widest text-xs">Analyzing User Patterns...</p>
+                          <p className="text-gray-400 font-semibold uppercase tracking-widest text-xs">Analyzing User Patterns...</p>
                         </div>
                       ) : (
                         <>
                           <Card className="bg-white/[0.02] border border-white/10 rounded-[2rem] p-8">
-                            <h4 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-8">Identity Protocol</h4>
+                            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-8">Identity Protocol</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                               {[
                                 { label: 'Full Legal Name', value: buyer.name },
@@ -116,7 +116,7 @@ export function AdminEntityModals({
                       )}
                     </div>
                     <div className="p-8 border-t border-white/10 bg-white/[0.02] flex justify-end">
-                      <Button onClick={closeBuyerModal} className="bg-white text-black font-black uppercase tracking-widest px-10 py-4 rounded-2xl hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                      <Button onClick={closeBuyerModal} className="bg-white text-black font-semibold uppercase tracking-widest px-10 py-4 rounded-2xl hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                         Close Report
                       </Button>
                     </div>

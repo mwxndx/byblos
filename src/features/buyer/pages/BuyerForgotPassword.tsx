@@ -120,7 +120,7 @@ export function BuyerForgotPassword() {
 
                             <Button
                                 type="submit"
-                                className="w-full h-11 mt-2 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+                                className="w-full h-11 mt-2 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (

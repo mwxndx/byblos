@@ -17,7 +17,7 @@ export function DashboardStat({
         <span className="text-[11px] font-bold uppercase tracking-wide text-white/50">{label}</span>
         <span className="text-yellow-400">{icon}</span>
       </div>
-      <p className="text-2xl font-black text-white">{value}</p>
+      <p className="text-2xl font-semibold text-white">{value}</p>
     </div>
   );
 }

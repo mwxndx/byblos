@@ -294,14 +294,14 @@ const NewAdminDashboard = () => {
 
             {/* Refunds Tab */}
             <TabsContent value="refunds" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="bg-white/80 dark:bg-[#0A0A0A]/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-[2.5rem] p-8 shadow-xl dark:shadow-2xl">
+              <div className="bg-white/80 dark:bg-[#0A0A0A]/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-card p-8 shadow-xl dark:shadow-2xl">
                 <RefundRequestsPage />
               </div>
             </TabsContent>
 
             {/* Detections Tab — creator self-dealing review queue */}
             <TabsContent value="detections" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="bg-white/80 dark:bg-[#0A0A0A]/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-[2.5rem] p-8 shadow-xl dark:shadow-2xl">
+              <div className="bg-white/80 dark:bg-[#0A0A0A]/40 backdrop-blur-2xl border border-black/10 dark:border-white/10 rounded-card p-8 shadow-xl dark:shadow-2xl">
                 <DetectionsPage />
               </div>
             </TabsContent>

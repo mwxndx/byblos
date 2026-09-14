@@ -97,8 +97,8 @@ const MzigoLoginPage = () => {
           className="my-auto w-full space-y-5 rounded-[2rem] border border-black/10 dark:border-white/10 bg-white dark:bg-white/[0.04] p-6 shadow-xl dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)]"
         >
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Logistics</p>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Logistics</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Door-to-door logistics dashboard.</p>
           </div>
 

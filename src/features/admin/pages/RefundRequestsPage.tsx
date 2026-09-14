@@ -84,7 +84,7 @@ export default function RefundRequestsPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-tighter italic">REFUND<span className="text-red-500">.</span>PROTOCOL</h1>
+          <h1 className="text-4xl font-semibold text-white tracking-tight italic">REFUND<span className="text-red-500">.</span>PROTOCOL</h1>
           <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 ml-1">Capital Reclamation Management</p>
         </div>
 
@@ -94,7 +94,7 @@ export default function RefundRequestsPage() {
               key={status}
               variant="ghost"
               onClick={() => setStatusFilter(status)}
-              className={`capitalize px-5 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${statusFilter === status
+              className={`capitalize px-5 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all duration-300 ${statusFilter === status
                 ? 'bg-white/10 text-white shadow-inner'
                 : 'text-gray-500 hover:text-white hover:bg-white/5'
                 }`}
@@ -131,17 +131,17 @@ export default function RefundRequestsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-[2.5rem] p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
+          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-black text-white tracking-tighter italic">AUTHORIZE<span className="text-green-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">AUTHORIZE<span className="text-green-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedRequest && (
             <div className="space-y-8">
               <div className="bg-green-500/10 border border-green-500/20 rounded-3xl p-8 text-center shadow-inner">
-                <p className="text-[10px] font-black text-green-500 uppercase tracking-widest mb-4 opacity-60">Pending Settlement</p>
-                <p className="text-5xl font-black text-green-400 tracking-tighter tabular-nums mb-4">
+                <p className="text-[10px] font-semibold text-green-500 uppercase tracking-widest mb-4 opacity-60">Pending Settlement</p>
+                <p className="text-5xl font-semibold text-green-400 tracking-tight tabular-nums mb-4">
                   {formatCurrency(selectedRequest.amount)}
                 </p>
                 <div className="h-px bg-green-500/20 w-12 mx-auto mb-4"></div>
@@ -151,7 +151,7 @@ export default function RefundRequestsPage() {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="confirmNotes" className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2 opacity-60">Operator Log (Optional)</Label>
+                <Label htmlFor="confirmNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Operator Log (Optional)</Label>
                 <Textarea
                   id="confirmNotes"
                   placeholder="Record transmission details..."
@@ -172,14 +172,14 @@ export default function RefundRequestsPage() {
                 setAdminNotes('');
               }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-black text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Abort
             </Button>
             <Button
               onClick={handleConfirmRefund}
               disabled={isProcessing}
-              className="flex-1 h-12 bg-green-500 hover:bg-green-400 text-black font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-green-500/10"
+              className="flex-1 h-12 bg-green-500 hover:bg-green-400 text-black font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-green-500/10"
             >
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm Release'}
             </Button>
@@ -192,17 +192,17 @@ export default function RefundRequestsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-[2.5rem] p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
+          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-black text-white tracking-tighter italic">VETO<span className="text-red-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">VETO<span className="text-red-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedRequest && (
             <div className="space-y-8">
               <div className="bg-red-500/10 border border-red-500/20 rounded-3xl p-8 text-center shadow-inner">
-                <p className="text-[10px] font-black text-red-500 uppercase tracking-widest mb-4 opacity-60">Reclamation Void</p>
-                <p className="text-5xl font-black text-red-400 tracking-tighter tabular-nums mb-4">
+                <p className="text-[10px] font-semibold text-red-500 uppercase tracking-widest mb-4 opacity-60">Reclamation Void</p>
+                <p className="text-5xl font-semibold text-red-400 tracking-tight tabular-nums mb-4">
                   {formatCurrency(selectedRequest.amount)}
                 </p>
                 <div className="h-px bg-red-500/20 w-12 mx-auto mb-4"></div>
@@ -212,7 +212,7 @@ export default function RefundRequestsPage() {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="rejectNotes" className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-2 opacity-60">Veto Rationale *</Label>
+                <Label htmlFor="rejectNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Veto Rationale *</Label>
                 <Textarea
                   id="rejectNotes"
                   placeholder="Record rejection cause..."
@@ -233,14 +233,14 @@ export default function RefundRequestsPage() {
                 setAdminNotes('');
               }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-black text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Abort
             </Button>
             <Button
               onClick={handleRejectRefund}
               disabled={isProcessing || !adminNotes.trim()}
-              className="flex-1 h-12 bg-red-500 hover:bg-red-400 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-red-500/10"
+              className="flex-1 h-12 bg-red-500 hover:bg-red-400 text-white font-semibold text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-red-500/10"
             >
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Execute Veto'}
             </Button>

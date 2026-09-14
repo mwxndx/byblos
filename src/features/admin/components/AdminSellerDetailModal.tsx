@@ -66,16 +66,16 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                   aria-modal="true"
                   aria-labelledby="seller-modal-title"
                 >
-                  <div className="bg-[#0A0A0A]/90 backdrop-blur-3xl border border-white/10 rounded-2xl md:rounded-[2.5rem] w-full max-w-6xl max-h-[95dvh] flex flex-col shadow-[0_0_50px_rgba(245,158,11,0.1)] scale-in-95 duration-300">
+                  <div className="bg-[#0A0A0A]/90 backdrop-blur-3xl border border-white/10 rounded-2xl md:rounded-card w-full max-w-6xl max-h-[95dvh] flex flex-col shadow-[0_0_50px_rgba(245,158,11,0.1)] scale-in-95 duration-300">
                     <div className="flex items-center justify-between p-5 md:p-8 border-b border-white/10 bg-white/[0.02]">
                       <div className="flex items-center gap-4">
                         <div className="h-14 w-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 shadow-inner">
                           <Store className="h-7 w-7 text-yellow-500" />
                         </div>
                         <div>
-                          <h3 id="seller-modal-title" className="text-2xl font-black text-white tracking-tight">{seller.shop_name || seller.name}</h3>
+                          <h3 id="seller-modal-title" className="text-2xl font-semibold text-white tracking-tight">{seller.shop_name || seller.name}</h3>
                           <div className="flex items-center gap-2 mt-1">
-                            <Badge className="bg-yellow-500/10 text-yellow-500 border-none px-2 py-0.5 text-[10px] font-black uppercase tracking-widest">Verified Merchant</Badge>
+                            <Badge className="bg-yellow-500/10 text-yellow-500 border-none px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest">Verified Merchant</Badge>
                             <span className="text-gray-500 text-xs font-medium flex items-center gap-1.5">
                               <Calendar className="h-3 w-3" />
                               Joined {seller.created_at ? format(new Date(seller.created_at), 'MMMM dd, yyyy') : 'N/A'}
@@ -91,7 +91,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                       {isLoading ? (
                         <div className="flex flex-col items-center justify-center h-60 space-y-4">
                           <Loader2 className="h-12 w-12 text-yellow-500 animate-spin" />
-                          <p className="text-gray-400 font-black uppercase tracking-widest text-xs">Accessing Encrypted Data...</p>
+                          <p className="text-gray-400 font-semibold uppercase tracking-widest text-xs">Accessing Encrypted Data...</p>
                         </div>
                       ) : (
                         <>
@@ -106,8 +106,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                   </div>
                                 )}
                                 <div className="mb-2">
-                                  <Badge className="bg-yellow-500 text-black font-black text-[9px] tracking-widest px-3 py-1 mb-2">OFFICIAL STORE</Badge>
-                                  <h4 className="text-xl font-black text-white tracking-tighter">{seller.shop_name}</h4>
+                                  <Badge className="bg-yellow-500 text-black font-semibold text-[9px] tracking-widest px-3 py-1 mb-2">OFFICIAL STORE</Badge>
+                                  <h4 className="text-xl font-semibold text-white tracking-tight">{seller.shop_name}</h4>
                                 </div>
                               </div>
                             </div>
@@ -116,7 +116,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                             {/* Section 1: Core Identity */}
                             <Card className="bg-white/[0.02] border border-white/10 rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl">
-                              <h4 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <UserCircle className="h-4 w-4 text-yellow-500" />
                                 Merchant Identity
                               </h4>
@@ -129,7 +129,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                   { label: 'Merchant Balance', value: `KSh ${parseFloat(String(seller.balance || 0)).toLocaleString()}`, highlight: true, icon: <DollarSign className="h-3.5 w-3.5" /> }
                                 ].map((item, i) => (
                                   <div key={i} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 group/item">
-                                    <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                    <span className="text-gray-500 text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2">
                                       <span className="opacity-40 group-hover/item:opacity-100 transition-opacity">{item.icon}</span>
                                       {item.label}
                                     </span>
@@ -141,13 +141,13 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
 
                             {/* Section 2: Marketplace Profile */}
                             <Card className="bg-white/[0.02] border border-white/10 rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl">
-                              <h4 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+                              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <Globe className="h-4 w-4 text-blue-500" />
                                 Digital Presence
                               </h4>
                               <div className="space-y-4">
                                 <div className="space-y-3">
-                                  <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                                  <span className="text-gray-500 text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2">
                                     <Globe className="h-3.5 w-3.5 opacity-40" />
                                     Public Shop Link
                                   </span>
@@ -181,7 +181,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                   ))}
                                 </div>
                                 <div className="pt-2">
-                                  <span className="text-gray-500 text-[10px] font-black uppercase tracking-widest block mb-2">Merchant Bio</span>
+                                  <span className="text-gray-500 text-[10px] font-semibold uppercase tracking-widest block mb-2">Merchant Bio</span>
                                   <p className="text-xs text-gray-400 leading-relaxed font-medium bg-white/5 rounded-xl p-3 border border-white/5 min-h-[60px]">
                                     {seller.bio || 'Enterprise-grade merchant specializing in premium logistics and high-quality products.'}
                                   </p>
@@ -192,7 +192,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                             {/* Section 3: Engagement Metrics */}
                             <div className="grid grid-cols-2 lg:grid-cols-1 gap-6">
                               <Card className="bg-white/[0.02] border border-white/10 rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl flex flex-col justify-between">
-                                <h4 className="text-xs font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                                   <Activity className="h-4 w-4 text-purple-500" />
                                   Growth & Engagement
                                 </h4>
@@ -203,8 +203,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                         <Users2 className="h-5 w-5 text-purple-500" />
                                       </div>
                                       <div>
-                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Active Clients</p>
-                                        <p className="text-2xl font-black text-white">{seller.client_count || 0}</p>
+                                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Active Clients</p>
+                                        <p className="text-2xl font-semibold text-white">{seller.client_count || 0}</p>
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -212,8 +212,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                         <Heart className="h-5 w-5 text-pink-500" />
                                       </div>
                                       <div>
-                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Wishlist Hits</p>
-                                        <p className="text-2xl font-black text-white">{seller.metrics?.wishlistCount || 0}</p>
+                                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Wishlist Hits</p>
+                                        <p className="text-2xl font-semibold text-white">{seller.metrics?.wishlistCount || 0}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -223,8 +223,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                         <Package className="h-5 w-5 text-blue-500" />
                                       </div>
                                       <div>
-                                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Total Inventory</p>
-                                        <p className="text-2xl font-black text-white">{seller.metrics?.totalProducts || 0}</p>
+                                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Total Inventory</p>
+                                        <p className="text-2xl font-semibold text-white">{seller.metrics?.totalProducts || 0}</p>
                                       </div>
                                     </div>
                                     <div className="h-10 w-32 bg-white/5 rounded-full border border-white/10 flex items-center justify-center">
@@ -245,8 +245,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                               ].map((met, i) => (
                                 <div key={i} className="bg-white/[0.03] border border-white/5 rounded-3xl p-5 hover:bg-white/[0.05] transition-all group/met">
                                   <div className={`h-8 w-8 rounded-xl bg-white/5 flex items-center justify-center ${met.color} mb-3 shadow-inner group-hover/met:scale-110 transition-transform`}>{met.icon}</div>
-                                  <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{met.label}</p>
-                                  <p className={`text-xl font-black mt-1 ${met.color}`}>
+                                  <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">{met.label}</p>
+                                  <p className={`text-xl font-semibold mt-1 ${met.color}`}>
                                     {met.noCurrency ? met.value || 0 : `KSh ${(met.value || 0).toLocaleString()}`}
                                   </p>
                                 </div>
@@ -259,8 +259,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                       )}
                     </div>
                     <div className="p-8 border-t border-white/10 bg-white/[0.02] flex justify-between items-center">
-                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Session ID: {inspectionSessionId}</p>
-                      <Button onClick={onClose} className="bg-white text-black font-black uppercase tracking-widest px-12 py-5 rounded-[1.5rem] hover:bg-gray-200 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] active:scale-95 group">
+                      <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Session ID: {inspectionSessionId}</p>
+                      <Button onClick={onClose} className="bg-white text-black font-semibold uppercase tracking-widest px-12 py-5 rounded-[1.5rem] hover:bg-gray-200 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] active:scale-95 group">
                         Close Inspection
                         <X className="ml-3 h-5 w-5 group-hover:rotate-90 transition-transform" />
                       </Button>

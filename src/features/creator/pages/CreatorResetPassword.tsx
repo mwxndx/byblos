@@ -79,7 +79,7 @@ export default function CreatorResetPassword() {
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-yellow-500/15 dark:bg-yellow-400/15">
               <Lock className="h-6 w-6 text-yellow-600 dark:text-yellow-300" />
             </span>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Set a new password</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Set a new password</h1>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Choose a strong password for your creator account.</p>
           </div>
 
@@ -127,7 +127,7 @@ export default function CreatorResetPassword() {
           <Button
             type="submit"
             disabled={resetMut.isPending}
-            className="h-12 w-full rounded-2xl bg-yellow-400 font-black text-black hover:bg-yellow-300"
+            className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300"
           >
             {resetMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update password'}
           </Button>

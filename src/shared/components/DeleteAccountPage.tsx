@@ -27,8 +27,8 @@ export default function DeleteAccountPage() {
       </header>
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
-        <p className="text-[11px] font-black uppercase tracking-[0.22em] text-yellow-400">Byblos</p>
-        <h1 className="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-yellow-400">Byblos</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           Delete your Byblos account
         </h1>
         <p className="mt-2 text-sm leading-6 text-white/70">
@@ -84,7 +84,7 @@ export default function DeleteAccountPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5">
-              <h3 className="text-sm font-black uppercase tracking-wide text-emerald-300">Deleted / anonymised</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-emerald-300">Deleted / anonymised</h3>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-white/80">
                 <li>Your name</li>
                 <li>Email address and login credentials</li>
@@ -96,7 +96,7 @@ export default function DeleteAccountPage() {
             </div>
 
             <div className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.06] p-5">
-              <h3 className="text-sm font-black uppercase tracking-wide text-yellow-300">Kept for a limited time</h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">Kept for a limited time</h3>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-white/80">
                 <li>Transaction and order records</li>
                 <li>Payment / M-Pesa references, receipts and refunds</li>

@@ -113,7 +113,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
 
                             {/* Location Selection - STRICT MODE */}
                             <div className="space-y-4">
-                                <Label className="text-[10px] font-black uppercase text-yellow-400/80 tracking-widest pl-1">
+                                <Label className="text-[10px] font-semibold uppercase text-yellow-400/80 tracking-widest pl-1">
                                     {isShopless ? "Your Service Address / My Location" : "Service Location"}
                                 </Label>
 
@@ -196,7 +196,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                 <div className="p-6 pt-2 pb-8 mt-auto shrink-0 space-y-3">
                     <div className="flex items-center justify-between text-xs px-1 mb-1">
                         <span className="text-slate-500 dark:text-[#666] font-medium">Total Price</span>
-                        <span className="text-lg font-black text-slate-900 dark:text-white">
+                        <span className="text-lg font-semibold text-slate-900 dark:text-white">
                             {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(product.price)}
                         </span>
                     </div>

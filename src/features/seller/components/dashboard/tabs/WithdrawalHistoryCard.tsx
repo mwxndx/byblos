@@ -12,7 +12,7 @@ export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalReque
                   <div className="flex min-w-0 justify-between items-start">
                     <div className="space-y-2 min-w-0 w-full">
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-                        <p className="text-base sm:text-xl font-black text-slate-900 dark:text-white truncate">
+                        <p className="text-base sm:text-xl font-semibold text-slate-900 dark:text-white truncate">
                           {formatKes(request.amount)}
                         </p>
                         <Badge

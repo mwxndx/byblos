@@ -95,7 +95,7 @@ export function SettingsTab({
           setIsEditingContacts(false);
         }}
         disabled={isSaving}
-        className="h-8 rounded-lg bg-[var(--theme-button-bg,#f5c518)] text-xs font-black text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md"
+        className="h-8 rounded-lg bg-[var(--theme-button-bg,#f5c518)] text-xs font-semibold text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md"
       >
         {isSaving ? (
           <>
@@ -126,7 +126,7 @@ export function SettingsTab({
       <section className="seller-card p-4 sm:p-5 lg:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-base font-black tracking-tight text-slate-950 dark:text-white sm:text-lg">Theme</h3>
+            <h3 className="text-base font-semibold tracking-tight text-slate-950 dark:text-white sm:text-lg">Theme</h3>
             <p className="mt-0.5 seller-subtext">Choose how your dashboard looks. System follows your device.</p>
           </div>
           <ThemeSegmentedPill value={theme} onChange={setTheme} />
@@ -231,7 +231,7 @@ export function SettingsTab({
 
       <section className="rounded-2xl border border-yellow-400/25 bg-yellow-400/[0.06] p-4 sm:p-5 flex items-center justify-between gap-4">
         <div>
-          <h4 className="text-base font-black text-slate-900 dark:text-white">Creator Partnerships</h4>
+          <h4 className="text-base font-semibold text-slate-900 dark:text-white">Creator Partnerships</h4>
           <p className="mt-0.5 text-xs text-slate-500 dark:text-white/60">
             Marketplace listings, commission rates, and incoming creator collaboration requests have moved to the dedicated <strong>Creators</strong> tab.
           </p>
@@ -250,7 +250,7 @@ export function SettingsTab({
         <div className="mt-4">
           <Button
             onClick={onLogout}
-            className="h-10 w-full bg-red-600 font-black text-slate-900 dark:text-white hover:bg-red-500 sm:w-auto"
+            className="h-10 w-full bg-red-600 font-semibold text-slate-900 dark:text-white hover:bg-red-500 sm:w-auto"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Logout

@@ -39,10 +39,10 @@ export const AdminCreatorsTab = ({
   const filtered = creators;
 
   return (
-    <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+    <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-card overflow-hidden shadow-2xl">
       <CardHeader className="p-5 md:p-8 border-b border-white/5 bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
-          <CardTitle className="text-2xl md:text-3xl font-black text-white tracking-tighter">Creators</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl font-semibold text-white tracking-tight">Creators</CardTitle>
           <CardDescription className="text-xs md:text-sm text-gray-400 font-medium">Shop links, clicks, and earnings</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
@@ -60,26 +60,26 @@ export const AdminCreatorsTab = ({
       </CardHeader>
       <div className="grid grid-cols-1 gap-3 border-b border-white/5 bg-white/[0.012] p-5 md:grid-cols-4 md:p-8">
         <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-yellow-200/70">Creators</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">{pagination.total.toLocaleString()}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-yellow-200/70">Creators</p>
+          <p className="mt-3 text-2xl font-semibold text-white tabular-nums">{pagination.total.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl border border-lime-500/20 bg-lime-500/[0.06] p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-lime-200/70">Creator sales</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">{totalCreatorSales.toLocaleString()}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-lime-200/70">Creator sales</p>
+          <p className="mt-3 text-2xl font-semibold text-white tabular-nums">{totalCreatorSales.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-cyan-200/70">Link clicks</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">{totalCreatorLinkClicks.toLocaleString()}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-cyan-200/70">Link clicks</p>
+          <p className="mt-3 text-2xl font-semibold text-white tabular-nums">{totalCreatorLinkClicks.toLocaleString()}</p>
         </div>
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200/70">Creator earnings</p>
-          <p className="mt-3 text-2xl font-black text-white tabular-nums">KSh {totalCreatorEarnings.toLocaleString()}</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-200/70">Creator earnings</p>
+          <p className="mt-3 text-2xl font-semibold text-white tabular-nums">KSh {totalCreatorEarnings.toLocaleString()}</p>
         </div>
       </div>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+            <thead className="bg-white/5 text-[10px] font-semibold text-gray-500 uppercase tracking-widest">
               <tr>
                 <th className="px-5 md:px-8 py-4 md:py-6">Creator</th>
                 <th className="px-5 md:px-8 py-4 md:py-6 hidden lg:table-cell">Contact</th>
@@ -94,7 +94,7 @@ export const AdminCreatorsTab = ({
                 <tr key={creator.id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-5 md:px-8 py-4 md:py-6">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 md:h-10 md:w-10 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center font-black text-yellow-500 text-xs md:text-sm uppercase group-hover:scale-105 transition-transform">
+                      <div className="h-9 w-9 md:h-10 md:w-10 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center font-semibold text-yellow-500 text-xs md:text-sm uppercase group-hover:scale-105 transition-transform">
                         {creator.name?.[0] || 'C'}
                       </div>
                       <div className="min-w-0">
@@ -113,12 +113,12 @@ export const AdminCreatorsTab = ({
                     </span>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">
-                    <p className="text-sm font-black text-white tabular-nums">{creator.totalSales || 0}</p>
-                    <p className="text-[10px] uppercase font-black text-gray-500 tracking-wider">Sales</p>
+                    <p className="text-sm font-semibold text-white tabular-nums">{creator.totalSales || 0}</p>
+                    <p className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Sales</p>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-right">
-                    <p className="text-sm font-black text-emerald-400 tabular-nums">KSh {(Number(creator.totalIncome) || 0).toLocaleString()}</p>
-                    <p className="text-[10px] uppercase font-black text-gray-500 tracking-wider">Earned</p>
+                    <p className="text-sm font-semibold text-emerald-400 tabular-nums">KSh {(Number(creator.totalIncome) || 0).toLocaleString()}</p>
+                    <p className="text-[10px] uppercase font-semibold text-gray-500 tracking-wider">Earned</p>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-right">
                     <Button

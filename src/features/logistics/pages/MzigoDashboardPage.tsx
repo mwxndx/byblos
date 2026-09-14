@@ -60,8 +60,8 @@ const MzigoDashboardPage = () => {
           </div>
 
           <div className="text-center">
-            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-yellow-500 dark:text-yellow-400">Mzigo Ego</p>
-            <h1 className="text-lg font-black tracking-tight text-slate-900 dark:text-white sm:text-xl">Deliveries</h1>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-yellow-500 dark:text-yellow-400">Mzigo Ego</p>
+            <h1 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl">Deliveries</h1>
             <p className="text-[11px] text-slate-500 dark:text-white/50">{partner?.name || 'Logistics partner'}</p>
           </div>
 
@@ -79,7 +79,7 @@ const MzigoDashboardPage = () => {
           <div className="flex items-center gap-2 rounded-xl border border-yellow-500/25 bg-yellow-500/[0.08] px-3 py-1.5 text-xs">
             <Truck size={14} className="text-yellow-500 dark:text-yellow-400" />
             <span className="font-medium text-slate-700 dark:text-white/70">To do:</span>
-            <span className="font-black text-yellow-600 dark:text-yellow-300">{activeCount}</span>
+            <span className="font-semibold text-yellow-600 dark:text-yellow-300">{activeCount}</span>
           </div>
 
           <div className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs ${
@@ -87,19 +87,19 @@ const MzigoDashboardPage = () => {
           }`}>
             <CalendarClock size={14} className={overdueCount > 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-white/40'} />
             <span className="font-medium text-slate-700 dark:text-white/70">Late:</span>
-            <span className={`font-black ${overdueCount > 0 ? 'text-red-500 dark:text-red-300' : 'text-slate-900 dark:text-white'}`}>{overdueCount}</span>
+            <span className={`font-semibold ${overdueCount > 0 ? 'text-red-500 dark:text-red-300' : 'text-slate-900 dark:text-white'}`}>{overdueCount}</span>
           </div>
 
           <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.08] px-3 py-1.5 text-xs">
             <CheckCircle2 size={14} className="text-emerald-500 dark:text-emerald-400" />
             <span className="font-medium text-slate-700 dark:text-white/70">Done:</span>
-            <span className="font-black text-emerald-600 dark:text-emerald-300">{done.length}</span>
+            <span className="font-semibold text-emerald-600 dark:text-emerald-300">{done.length}</span>
           </div>
 
           <div className="flex items-center gap-2 rounded-xl border border-black/10 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] px-3 py-1.5 text-xs">
             <PackageCheck size={14} className="text-slate-400 dark:text-white/40" />
             <span className="font-medium text-slate-700 dark:text-white/70">All:</span>
-            <span className="font-black text-slate-900 dark:text-white">{dashboard?.count || 0}</span>
+            <span className="font-semibold text-slate-900 dark:text-white">{dashboard?.count || 0}</span>
           </div>
         </div>
 

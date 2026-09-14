@@ -29,7 +29,7 @@ export function ProductsTab({
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div className="text-center px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-white mb-1.5">Product Management</h2>
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-1.5">Product Management</h2>
         <p className="text-white/60 text-xs sm:text-sm lg:text-base font-medium">Manage all your products in one place</p>
       </div>
 
@@ -58,7 +58,7 @@ export function ProductsTab({
           <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
-                <h3 className="text-base sm:text-lg font-black text-white">All Products</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-white">All Products</h3>
                 <p className="text-white/60 text-xs sm:text-sm font-medium mt-1">Manage inventory and track stock levels</p>
               </div>
 

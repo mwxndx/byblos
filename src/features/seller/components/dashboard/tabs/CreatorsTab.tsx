@@ -165,7 +165,7 @@ export function CreatorsTab() {
               <Sparkles className="h-6 w-6" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-900 dark:text-white">Creator Marketplace</h2>
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Creator Marketplace</h2>
               <p className="mt-1 text-xs sm:text-sm text-slate-500 dark:text-white/60 leading-relaxed max-w-2xl">
                 List your shop in the Byblos Creator Marketplace so verified creators can discover your brand, inspect your products, and request to promote them.
               </p>
@@ -244,10 +244,10 @@ export function CreatorsTab() {
                     setCommissionRate(e.target.value);
                     setHasUnsavedChanges(true);
                   }}
-                  className={`${inputClass} pr-10 font-black text-lg`}
+                  className={`${inputClass} pr-10 font-semibold text-lg`}
                   placeholder="5"
                 />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-white/40 font-black text-sm">
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 dark:text-white/40 font-semibold text-sm">
                   %
                 </span>
               </div>
@@ -256,7 +256,7 @@ export function CreatorsTab() {
                 type="button"
                 onClick={handleSaveListing}
                 disabled={updateListingMutation.isPending || !hasUnsavedChanges}
-                className="h-11 px-5 bg-yellow-400 text-black font-black hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-11 px-5 bg-yellow-400 text-black font-semibold hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updateListingMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save Settings'}
               </Button>
@@ -278,14 +278,14 @@ export function CreatorsTab() {
               <Users className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900 dark:text-white">Incoming Creator Requests</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Incoming Creator Requests</h3>
               <p className="text-xs text-slate-500 dark:text-white/50">
                 Creators requesting to promote your shop on commission.
               </p>
             </div>
           </div>
           {incomingRequests.length > 0 && (
-            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-400 px-2.5 py-0.5 text-xs font-black">
+            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-400 px-2.5 py-0.5 text-xs font-semibold">
               {incomingRequests.length} Pending
             </span>
           )}
@@ -309,7 +309,7 @@ export function CreatorsTab() {
                 >
                   <div className="space-y-1.5 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-black text-base text-slate-900 dark:text-white">{req.creatorName}</span>
+                      <span className="font-semibold text-base text-slate-900 dark:text-white">{req.creatorName}</span>
                       <span className="text-xs text-slate-500 dark:text-white/40">· {req.email}</span>
                       {req.whatsappNumber && (
                         <span className="text-xs text-emerald-400 font-semibold">
@@ -358,7 +358,7 @@ export function CreatorsTab() {
                       type="button"
                       onClick={() => handleRespondToRequest(req.id, 'accept')}
                       disabled={respondingId === req.id}
-                      className="h-10 px-4 bg-yellow-400 text-black font-black hover:bg-yellow-300"
+                      className="h-10 px-4 bg-yellow-400 text-black font-semibold hover:bg-yellow-300"
                     >
                       {respondingId === req.id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -395,7 +395,7 @@ export function CreatorsTab() {
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-black text-slate-900 dark:text-white">Active Creators ({activeCreators.length})</h3>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Active Creators ({activeCreators.length})</h3>
               <p className="text-xs text-slate-500 dark:text-white/50">
                 Creators actively sharing links to your shop.
               </p>
@@ -420,7 +420,7 @@ export function CreatorsTab() {
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-black text-slate-900 dark:text-white text-base truncate">{creator.creatorName}</p>
+                      <p className="font-semibold text-slate-900 dark:text-white text-base truncate">{creator.creatorName}</p>
                       {/* Social logos: clickable when linked, disabled when not */}
                       {creator.instagramLink ? (
                         <a
@@ -505,7 +505,7 @@ export function CreatorsTab() {
             <MailPlus className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">Direct Email Invite</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Direct Email Invite</h3>
             <p className="text-xs text-slate-500 dark:text-white/50">
               Invite an influencer or partner directly by their email address.
             </p>
@@ -524,7 +524,7 @@ export function CreatorsTab() {
             type="button"
             onClick={handleDirectInvite}
             disabled={invitingDirect}
-            className="h-11 px-5 bg-yellow-400 text-black font-black hover:bg-yellow-300"
+            className="h-11 px-5 bg-yellow-400 text-black font-semibold hover:bg-yellow-300"
           >
             {invitingDirect ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send Invite'}
           </Button>

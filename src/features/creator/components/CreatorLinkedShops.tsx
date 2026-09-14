@@ -16,7 +16,7 @@ export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, ma
   return (
     <section className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-black text-slate-950 dark:text-white">Your links</h2>
+        <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Your links</h2>
         <span className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-white/60">
           {shops.length}/{maxPromotions} promoting
         </span>
@@ -47,7 +47,7 @@ export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, ma
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-black text-slate-950 dark:text-white truncate">{shop.shop_name}</p>
+                    <p className="font-semibold text-slate-950 dark:text-white truncate">{shop.shop_name}</p>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-white/40">
                       {Number(shop.commission_rate || 0.01) * 100}% cut | {shop.sales_count || 0} sales | {shop.click_count || 0} clicks | {money(shop.earnings)}
                     </p>

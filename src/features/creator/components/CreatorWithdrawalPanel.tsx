@@ -84,13 +84,13 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
             <Wallet className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
           </div>
           <div>
-            <h2 className="text-base font-black text-slate-950 dark:text-white">Get paid</h2>
+            <h2 className="text-base font-semibold text-slate-950 dark:text-white">Get paid</h2>
             <p className="text-xs text-slate-500 dark:text-white/50">To {creator.mpesaNumber || 'your registered M-Pesa'}</p>
           </div>
         </div>
         <div className="text-right">
           <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/40">Available</div>
-          <div className="text-base font-black text-emerald-600 dark:text-emerald-400">{money(availableBalance)}</div>
+          <div className="text-base font-semibold text-emerald-600 dark:text-emerald-400">{money(availableBalance)}</div>
         </div>
       </div>
 
@@ -100,12 +100,12 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
       <div className="mt-1.5 grid grid-cols-2 gap-2">
         <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Commission</p>
-          <p className="mt-0.5 text-sm font-black text-slate-900 dark:text-white">{money(commissionEarnings)}</p>
+          <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">{money(commissionEarnings)}</p>
           <p className="text-[10px] text-slate-400 dark:text-white/40">From promoted shops</p>
         </div>
         <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Invited business</p>
-          <p className="mt-0.5 text-sm font-black text-slate-900 dark:text-white">{money(referralEarnings)}</p>
+          <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">{money(referralEarnings)}</p>
           <p className="text-[10px] text-slate-400 dark:text-white/40">From businesses you invited</p>
         </div>
       </div>
@@ -137,14 +137,14 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
           <Info className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-400 mt-0.5" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <span className="font-black text-slate-900 dark:text-white">M-Pesa Withdrawal Fees</span>
+              <span className="font-semibold text-slate-900 dark:text-white">M-Pesa Withdrawal Fees</span>
               <span className="text-[10px] font-bold text-slate-600 dark:text-white/60">Min: KSh {MIN_WITHDRAWAL_AMOUNT}</span>
             </div>
             <div className="mt-2.5 grid grid-cols-3 gap-1.5 text-center text-[10px] font-bold">
               {WITHDRAWAL_FEE_TIERS.map((tier) => (
                 <div key={tier.label} className="rounded-xl border border-yellow-400/20 bg-white/70 dark:bg-black/30 p-1.5 text-slate-800 dark:text-white">
                   <div className="text-[9px] text-slate-500 dark:text-white/50">{tier.label}</div>
-                  <div className="mt-0.5 text-yellow-600 dark:text-yellow-300 font-black">Fee: KSh {tier.fee}</div>
+                  <div className="mt-0.5 text-yellow-600 dark:text-yellow-300 font-semibold">Fee: KSh {tier.fee}</div>
                 </div>
               ))}
             </div>
@@ -166,7 +166,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
             <button
               type="button"
               onClick={() => setWithdrawalAmount(String(maxWithdrawable))}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md bg-yellow-400/20 hover:bg-yellow-400/30 px-2 py-1 text-[11px] font-black text-yellow-700 dark:text-yellow-300 transition-colors"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md bg-yellow-400/20 hover:bg-yellow-400/30 px-2 py-1 text-[11px] font-semibold text-yellow-700 dark:text-yellow-300 transition-colors"
             >
               Max
             </button>
@@ -191,7 +191,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
         <Button
           onClick={handleWithdrawal}
           disabled={withdrawing || requestedAmount < MIN_WITHDRAWAL_AMOUNT || !hasEnoughBalance || availableBalance < MIN_WITHDRAWAL_AMOUNT}
-          className="h-11 w-full bg-yellow-400 font-black text-black hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-11 w-full bg-yellow-400 font-semibold text-black hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {withdrawing ? (
             <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Processing...</>

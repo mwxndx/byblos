@@ -43,7 +43,7 @@ export function WithdrawalRequestForm({
         {!showWithdrawalForm ? (
           <Button
             onClick={() => setShowWithdrawalForm(true)}
-            className="gap-1.5 sm:gap-2 shadow-lg px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 rounded-xl font-black text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-auto"
+            className="gap-1.5 sm:gap-2 shadow-lg px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-auto"
             style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
             disabled={balance < MIN_WITHDRAWAL_AMOUNT}
           >
@@ -52,7 +52,7 @@ export function WithdrawalRequestForm({
           </Button>
         ) : (
           <div className="border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
-            <h4 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mb-4">Request Withdrawal</h4>
+            <h4 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-4">Request Withdrawal</h4>
             <form onSubmit={handleWithdrawalRequest} className="space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
@@ -109,7 +109,7 @@ export function WithdrawalRequestForm({
                     <span className="text-slate-600 dark:text-white/70">Withdrawal charge</span>
                     <span>{formatKes(withdrawalFee)}</span>
                   </div>
-                  <div className="mt-1 flex items-center justify-between gap-3 text-sm font-black">
+                  <div className="mt-1 flex items-center justify-between gap-3 text-sm font-semibold">
                     <span>Total deducted from balance</span>
                     <span style={{ color: 'var(--theme-accent, #f5c518)' }}>{formatKes(totalDeducted)}</span>
                   </div>
@@ -119,7 +119,7 @@ export function WithdrawalRequestForm({
                 <Button
                   type="submit"
                   disabled={isRequestingWithdrawal || totalDeducted > balance}
-                  className="shadow-lg px-4 py-2 h-10 sm:h-8 text-xs rounded-lg font-black w-full sm:w-auto"
+                  className="shadow-lg px-4 py-2 h-10 sm:h-8 text-xs rounded-lg font-semibold w-full sm:w-auto"
                   style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
                   size="sm"
                 >

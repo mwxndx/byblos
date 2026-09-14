@@ -58,7 +58,7 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
               <MailPlus className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white">Invite Creators</h3>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Invite Creators</h3>
               <p className="text-slate-500 dark:text-white/60 text-xs sm:text-sm">
                 Give influencers a creator link for your shop. They earn your chosen commission after completed sales.
               </p>
@@ -69,8 +69,8 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
         <div className="rounded-2xl border border-yellow-400/25 bg-yellow-400/[0.08] p-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.22em]" style={{ color: 'var(--theme-accent, #f5c518)' }}>Creator commission</p>
-              <h4 className="mt-1 text-lg font-black text-slate-900 dark:text-white">{creatorCommissionLabel} per completed sale</h4>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--theme-accent, #f5c518)' }}>Creator commission</p>
+              <h4 className="mt-1 text-lg font-semibold text-slate-900 dark:text-white">{creatorCommissionLabel} per completed sale</h4>
               <p className="mt-1 text-xs font-medium text-slate-500 dark:text-white/60 sm:text-sm">
                 This is the cut creators earn from sales they bring to your shop. Default is 1%; you can raise it before inviting creators.
               </p>
@@ -119,7 +119,7 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
             type="button"
             onClick={handleInviteCreator}
             disabled={isInvitingCreator}
-            className="h-10 font-black"
+            className="h-10 font-semibold"
             style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
           >
             {isInvitingCreator ? 'Sending...' : 'Send Invite'}
@@ -138,7 +138,7 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
                  return (
                  <div key={invite.id} className="grid gap-3 bg-slate-100 dark:bg-white/[0.03] p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                    <div className="min-w-0">
-                     <p className="truncate text-sm font-black text-slate-900 dark:text-white">
+                     <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                        {invite.creatorName || invite.email}
                      </p>
                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-white/45">

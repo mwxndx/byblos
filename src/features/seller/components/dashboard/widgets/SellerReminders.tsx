@@ -47,14 +47,14 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
           <Icon className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-black text-white sm:text-base">{title}</p>
+          <p className="text-sm font-semibold text-white sm:text-base">{title}</p>
           <p className="mt-1 text-xs leading-5 text-white/60 sm:text-sm">{description}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={onCta}
-              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform active:scale-95 sm:text-sm"
+              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform active:scale-95 sm:text-sm"
               style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
             >
               {ctaLabel}

@@ -129,7 +129,7 @@ export function ShopProductCard({
 
           {isSold && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/55">
-              <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-black uppercase tracking-wider text-slate-900">Sold</span>
+              <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-slate-900">Sold</span>
             </div>
           )}
 

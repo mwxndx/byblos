@@ -68,7 +68,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Refund balance</p>
-                  <p className="mt-1 text-xl font-black leading-none text-slate-950 dark:text-white">{formatCurrency(totalRefunds)}</p>
+                  <p className="mt-1 text-xl font-semibold leading-none text-slate-950 dark:text-white">{formatCurrency(totalRefunds)}</p>
                 </div>
               </div>
               <Badge className="shrink-0 border-slate-200 dark:border-white/10 bg-slate-200 dark:bg-zinc-800 text-[10px] font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-800">
@@ -147,7 +147,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
             <Button
               onClick={handleWithdrawClick}
               disabled={hasPendingRequest || isLoadingPending || (availableBalance < minWithdrawalAmount && clearingBalance === 0) || (availableBalance < minWithdrawalAmount && isClearing)}
-              className="h-10 w-full bg-[#F5C518] text-xs font-black text-black hover:bg-yellow-300 disabled:opacity-50"
+              className="h-10 w-full bg-[#F5C518] text-xs font-semibold text-black hover:bg-yellow-300 disabled:opacity-50"
             >
               {isLoadingPending ? (
                 <>
@@ -214,7 +214,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
                 </p>
               </div>
               <div className="flex items-baseline gap-2">
-                <p className="text-4xl font-black text-green-600 dark:text-green-400">
+                <p className="text-4xl font-semibold text-green-600 dark:text-green-400">
                   {formatCurrency(totalRefunds)}
                 </p>
               </div>

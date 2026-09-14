@@ -57,7 +57,7 @@ const ShopPage = () => {
             <Loader2 className="h-12 w-12 text-yellow-600 animate-spin" />
           </div>
           <div>
-            <h3 className="text-2xl font-black text-[var(--byblos-text)] mb-3">Loading Shop</h3>
+            <h3 className="text-2xl font-semibold text-[var(--byblos-text)] mb-3">Loading Shop</h3>
             <p className="text-[var(--byblos-muted)] text-lg font-medium">Please wait while we fetch the shop details...</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ const ShopPage = () => {
             <Store className="h-12 w-12 text-red-600" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-[var(--byblos-text)] mb-3">Error Loading Shop</h2>
+            <h2 className="text-2xl font-semibold text-[var(--byblos-text)] mb-3">Error Loading Shop</h2>
             <p className="text-[var(--byblos-muted)] text-lg font-medium mb-6">{error}</p>
             <Button
               asChild
@@ -191,7 +191,7 @@ const ShopPage = () => {
         </div>
 
         {filteredProducts.length > 0 ? (
-          <div className="shop-products-card rounded-[2rem] p-5 sm:p-10 sm:rounded-[2.5rem] transition-all duration-300">
+          <div className="shop-products-card rounded-[2rem] p-5 sm:p-10 sm:rounded-card transition-all duration-300">
             <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
               {filteredProducts.map((product) => {
                 // Ensure the product has the seller info from the shop

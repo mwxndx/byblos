@@ -92,7 +92,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
 
           {/* Personal details */}
           <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-4">
-            <h3 className="text-sm font-black text-slate-950 dark:text-white">Personal details</h3>
+            <h3 className="text-sm font-semibold text-slate-950 dark:text-white">Personal details</h3>
             <ReadOnlyDetail icon={UserRound} label="Full name" value={fullName} />
             <ReadOnlyDetail icon={Mail} label="Email" value={creator.email} />
 
@@ -127,7 +127,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
               type="button"
               onClick={handleSaveContact}
               disabled={!contactChanged || updateMutation.isPending}
-              className="h-9 w-full bg-yellow-400 font-black text-black hover:bg-yellow-300 disabled:opacity-50"
+              className="h-9 w-full bg-yellow-400 font-semibold text-black hover:bg-yellow-300 disabled:opacity-50"
             >
               {updateMutation.isPending ? <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />Saving...</> : 'Save details'}
             </Button>

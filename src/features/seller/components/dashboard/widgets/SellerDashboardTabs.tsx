@@ -102,7 +102,7 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
                 <span className="absolute -top-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 bg-red-500 rounded-full border-2 border-black animate-pulse" />
               )}
               {id === 'creators' && pendingCreatorsCount > 0 && (
-                <span className="ml-1.5 rounded-full bg-yellow-400 px-1.5 py-0.2 text-[10px] font-black text-black">
+                <span className="ml-1.5 rounded-full bg-yellow-400 px-1.5 py-0.2 text-[10px] font-semibold text-black">
                   {pendingCreatorsCount}
                 </span>
               )}

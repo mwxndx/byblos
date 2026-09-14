@@ -69,10 +69,10 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-black tracking-tight text-slate-950 dark:text-white">
+            <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
               Social Media Accounts
             </h2>
-            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400 text-xs font-black px-2.5 py-0.5 flex items-center gap-1">
+            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400 text-xs font-semibold px-2.5 py-0.5 flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
               Creator Reach
             </span>
@@ -205,7 +205,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
           <Button
             type="submit"
             disabled={!hasChanges || updateMutation.isPending}
-            className="h-9 px-5 bg-yellow-400 font-black text-black hover:bg-yellow-300 transition-colors text-xs disabled:opacity-50"
+            className="h-9 px-5 bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition-colors text-xs disabled:opacity-50"
           >
             {updateMutation.isPending ? (
               <>

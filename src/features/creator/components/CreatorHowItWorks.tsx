@@ -45,7 +45,7 @@ export function CreatorHowItWorks() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-950 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-950 dark:text-white">
               How Byblos Creators Works
             </h2>
             <p className="text-xs text-slate-500 dark:text-white/50">
@@ -76,12 +76,12 @@ export function CreatorHowItWorks() {
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 font-black text-[11px] text-black">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 font-semibold text-[11px] text-black">
                       {item.step}
                     </span>
                     <Icon className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                     {item.title}
                   </h3>
                   <p className="mt-1.5 text-xs text-slate-600 dark:text-white/60 leading-relaxed">

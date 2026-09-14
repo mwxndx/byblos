@@ -210,7 +210,7 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
       <div className="shrink-0 space-y-3 px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:space-y-4 sm:px-6 sm:pt-6 sm:pb-4">
         <div className="flex justify-between items-center pr-8">
           <div>
-            <span className="text-[10px] font-black uppercase text-yellow-600 dark:text-yellow-400 tracking-widest bg-yellow-400/20 px-2 py-1 rounded">Step {step} of 4</span>
+            <span className="text-[10px] font-semibold uppercase text-yellow-600 dark:text-yellow-400 tracking-widest bg-yellow-400/20 px-2 py-1 rounded">Step {step} of 4</span>
           </div>
         </div>
         <div className="flex gap-2">

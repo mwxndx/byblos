@@ -19,10 +19,10 @@ export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, paginati
   const filtered = (clients || []) as Array<Record<string, unknown>>;
 
   return (
-    <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+    <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-card overflow-hidden shadow-2xl">
       <CardHeader className="p-5 md:p-8 border-b border-white/5 bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
-          <CardTitle className="text-2xl md:text-3xl font-black text-white tracking-tighter">Clients</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl font-semibold text-white tracking-tight">Clients</CardTitle>
           <CardDescription className="text-xs md:text-sm text-gray-400 font-medium">Customers and the sellers they buy from</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
@@ -41,7 +41,7 @@ export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, paginati
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+            <thead className="bg-white/5 text-[10px] font-semibold text-gray-500 uppercase tracking-widest">
               <tr>
                 <th className="px-5 md:px-8 py-4 md:py-6">Client</th>
                 <th className="px-5 md:px-8 py-4 md:py-6 hidden md:table-cell">Seller</th>
@@ -58,8 +58,8 @@ export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, paginati
                         <Users2 className="w-4 h-4 md:w-5 md:h-5 text-gray-500 group-hover:text-pink-500 transition-all" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm md:text-base font-black text-white tracking-tight truncate">{String(client.name || '')}</p>
-                        <p className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest opacity-50 truncate">CID: {String(client.id).slice(0, 12)}</p>
+                        <p className="text-sm md:text-base font-semibold text-white tracking-tight truncate">{String(client.name || '')}</p>
+                        <p className="text-[9px] md:text-[10px] font-semibold text-gray-500 uppercase tracking-widest opacity-50 truncate">CID: {String(client.id).slice(0, 12)}</p>
                       </div>
                     </div>
                   </td>
@@ -81,7 +81,7 @@ export const AdminClientsTab = ({ clients, searchQuery, onSearchChange, paginati
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-right">
                     <p className="text-[10px] md:text-sm font-bold text-gray-400 tabular-nums">{formatDate(client.createdAt as string)}</p>
-                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest mt-0.5 hidden sm:block">First Seen</p>
+                    <p className="text-[9px] font-semibold text-gray-600 uppercase tracking-widest mt-0.5 hidden sm:block">First Seen</p>
                   </td>
                 </tr>
               ))}

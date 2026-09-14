@@ -51,8 +51,8 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
   return (
     <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-black text-slate-950 dark:text-white">How you're doing</h2>
-        <div className="grid grid-cols-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-200/60 dark:bg-black/30 p-1 text-xs font-black">
+        <h2 className="text-xl font-semibold text-slate-950 dark:text-white">How you're doing</h2>
+        <div className="grid grid-cols-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-200/60 dark:bg-black/30 p-1 text-xs font-semibold">
           {PERIODS.map((period) => (
             <button
               key={period}

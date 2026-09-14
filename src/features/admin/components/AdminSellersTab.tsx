@@ -23,10 +23,10 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
   const filtered = sellers ?? [];
 
   return (
-    <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+    <Card className="bg-[#0A0A0A]/40 backdrop-blur-2xl border border-white/10 rounded-card overflow-hidden shadow-2xl">
       <CardHeader className="p-5 md:p-8 border-b border-white/5 bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
         <div>
-          <CardTitle className="text-2xl md:text-3xl font-black text-white tracking-tighter">Sellers</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl font-semibold text-white tracking-tight">Sellers</CardTitle>
           <CardDescription className="text-xs md:text-sm text-gray-400 font-medium">All sellers on the marketplace</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
@@ -45,7 +45,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-white/5 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+            <thead className="bg-white/5 text-[10px] font-semibold text-gray-500 uppercase tracking-widest">
               <tr>
                 <th className="px-5 md:px-8 py-4 md:py-6">Seller</th>
                 <th className="px-5 md:px-8 py-4 md:py-6 hidden lg:table-cell">Contact</th>
@@ -63,8 +63,8 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                         <Store className="w-4 h-4 md:w-6 md:h-6 text-gray-500 group-hover:text-yellow-500 transition-all" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm md:text-base font-black text-white tracking-tight truncate">{seller.name}</p>
-                        <p className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest opacity-50 truncate">ID: {String(seller.id).slice(0, 12)}</p>
+                        <p className="text-sm md:text-base font-semibold text-white tracking-tight truncate">{seller.name}</p>
+                        <p className="text-[9px] md:text-[10px] font-semibold text-gray-500 uppercase tracking-widest opacity-50 truncate">ID: {String(seller.id).slice(0, 12)}</p>
                       </div>
                     </div>
                   </td>
@@ -83,7 +83,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                     </div>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">
-                    <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border-none ${seller.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'}`}>
+                    <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-widest border-none ${seller.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'}`}>
                       {seller.status}
                     </Badge>
                   </td>
@@ -92,7 +92,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-white/10 bg-white/5 text-yellow-500 hover:bg-yellow-500 hover:text-black font-black uppercase tracking-widest text-[9px] md:text-[10px] border transition-all"
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-white/10 bg-white/5 text-yellow-500 hover:bg-yellow-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all"
                         onClick={() => onView(seller.id)}
                       >
                         <Eye className="h-3 md:h-3.5 w-3 md:w-3.5" />
@@ -102,7 +102,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                         variant="outline"
                         size="sm"
                         disabled={deletingId === String(seller.user_id)}
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-white/10 bg-white/5 text-red-400 hover:bg-red-500 hover:text-white font-black uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-white/10 bg-white/5 text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
                         onClick={() => onDelete(seller.user_id, 'seller')}
                       >
                         {deletingId === String(seller.user_id)

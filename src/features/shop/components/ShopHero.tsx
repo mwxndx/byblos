@@ -47,7 +47,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
       <div className="flex flex-col items-start text-left">
         {/* Business Profile Photo Avatar */}
         <div className="relative mb-3">
-          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border-4 border-yellow-400 bg-[var(--byblos-surface-soft)] shadow-xl flex items-center justify-center text-2xl sm:text-3xl font-black text-[var(--byblos-text)]">
+          <div className="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border-4 border-yellow-400 bg-[var(--byblos-surface-soft)] shadow-xl flex items-center justify-center text-2xl sm:text-3xl font-semibold text-[var(--byblos-text)]">
             {showSellerAvatar ? (
               <img
                 src={getImageUrl(sellerInfo?.avatarUrl || '')}
@@ -62,7 +62,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
         </div>
 
         {/* Shop Name */}
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-[var(--byblos-text)] max-w-xl px-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-[var(--byblos-text)] max-w-xl px-2">
           {sellerInfo?.shopName || 'Shop'}
         </h1>
 

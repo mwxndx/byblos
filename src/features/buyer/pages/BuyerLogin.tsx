@@ -129,8 +129,8 @@ export function BuyerLogin() {
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Byblos Marketplace</p>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Byblos Marketplace</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Browse products, manage orders, and track deliveries.</p>
           </div>
 
@@ -173,7 +173,7 @@ export function BuyerLogin() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="h-12 w-full rounded-2xl bg-yellow-400 font-black text-black hover:bg-yellow-300"
+            className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300"
           >
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign In'}
           </Button>
@@ -185,7 +185,7 @@ export function BuyerLogin() {
           </p>
           <p className="text-center text-sm font-medium text-slate-500 dark:text-white/50">
             New to Byblos?{' '}
-            <Link to="/buyer/register" className="font-black text-yellow-500 dark:text-yellow-300 hover:text-yellow-400 dark:hover:text-yellow-200">
+            <Link to="/buyer/register" className="font-semibold text-yellow-500 dark:text-yellow-300 hover:text-yellow-400 dark:hover:text-yellow-200">
               Create an account
             </Link>
           </p>

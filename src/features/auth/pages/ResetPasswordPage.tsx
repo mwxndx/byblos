@@ -184,7 +184,7 @@ export function ResetPasswordPage() {
             <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center">
               <ShieldCheck className="h-4 w-4 text-slate-950" />
             </div>
-            <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Security Center</h1>
+            <h1 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Security Center</h1>
           </div>
           <div className="w-20" /> {/* Spacer */}
         </div>
@@ -272,7 +272,7 @@ export function ResetPasswordPage() {
 
               {passwordError && <p className="text-[11px] text-red-500 font-medium px-1 leading-tight">{passwordError}</p>}
 
-              <Button type="submit" disabled={isLoading} className="w-full h-11 mt-4 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition">
+              <Button type="submit" disabled={isLoading} className="w-full h-11 mt-4 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition">
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
