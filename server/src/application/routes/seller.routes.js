@@ -15,6 +15,7 @@ import {
 } from '../../domains/growth/creators/creator.controller.js';
 import { upload } from '../middleware/upload.js';
 import { protect, hasPermission } from '../middleware/auth.js';
+import { enforceIdempotency } from '../middleware/idempotency.middleware.js';
 import referralRoutes from './referral.routes.js';
 import { createWithdrawal, getWithdrawals, getWithdrawalById } from '../../domains/payments/withdrawals/withdrawal.controller.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
@@ -107,8 +108,16 @@ router.route('/orders/:id')
   .get(orderController.getOrderById)     // Get a specific order
   .patch(orderController.updateOrderStatus); // Update order status
 
+// Books a real courier pickup (a real fee). Without enforceIdempotency, the
+// Idempotency-Key the frontend sends (useSellerOrderMutations.ts
+// useRequestPickupMutation) went completely unread server-side -- a
+// network-level retry, or a request that times out client-side after
+// actually succeeding, had no server-side dedup at all. Default 24h TTL:
+// this is a terminal booking action (same category as delete-user/
+// create-order), not a toggleable one.
 router.post(
   '/orders/:id/request-pickup',
+  enforceIdempotency(),
   validate(sellerPickupRequestSchema),
   orderController.requestSellerPickup
 );
