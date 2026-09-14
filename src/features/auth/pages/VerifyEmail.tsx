@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { toast } from 'sonner';
@@ -105,11 +104,8 @@ const VerifyEmail = () => {
                 fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
             }}
         >
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="max-w-md w-full bg-white dark:bg-[#0a0a0a] border border-black/[0.08] dark:border-white/10 p-8 rounded-3xl shadow-[0_18px_45px_rgba(17,17,17,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] relative z-10 text-center transition-colors duration-200"
+            <div
+                className="animate-in fade-in slide-in-from-bottom-5 duration-500 ease-out max-w-md w-full bg-white dark:bg-[#0a0a0a] border border-black/[0.08] dark:border-white/10 p-8 rounded-3xl shadow-[0_18px_45px_rgba(17,17,17,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] relative z-10 text-center transition-colors duration-200"
             >
                 <div className="mb-8 flex justify-center">
                     {status === 'loading' && (
@@ -119,34 +115,19 @@ const VerifyEmail = () => {
                         </div>
                     )}
                     {status === 'success' && (
-                        <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: "spring", damping: 12 }}
-                            className="w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center"
-                        >
+                        <div className="animate-in zoom-in-50 fade-in duration-300 w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center">
                             <CheckCircle className="w-12 h-12 text-emerald-500" />
-                        </motion.div>
+                        </div>
                     )}
                     {status === 'error' && (
-                        <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: "spring", damping: 12 }}
-                            className="w-20 h-20 bg-red-500/15 rounded-full flex items-center justify-center"
-                        >
+                        <div className="animate-in zoom-in-50 fade-in duration-300 w-20 h-20 bg-red-500/15 rounded-full flex items-center justify-center">
                             <XCircle className="w-12 h-12 text-red-500" />
-                        </motion.div>
+                        </div>
                     )}
                     {status === 'check-email' && (
-                        <motion.div
-                            initial={{ scale: 0.5, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ type: "spring", damping: 12 }}
-                            className="w-20 h-20 bg-yellow-400/20 rounded-full flex items-center justify-center"
-                        >
+                        <div className="animate-in zoom-in-50 fade-in duration-300 w-20 h-20 bg-yellow-400/20 rounded-full flex items-center justify-center">
                             <Mail className="w-12 h-12 text-yellow-500 dark:text-yellow-400" />
-                        </motion.div>
+                        </div>
                     )}
                 </div>
 
@@ -195,7 +176,7 @@ const VerifyEmail = () => {
                         Back to Homepage
                     </button>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };

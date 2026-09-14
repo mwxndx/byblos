@@ -1,16 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Loader2, Search, X } from 'lucide-react';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import { LocationMarker, MapSizeInvalidator, MapFlyTo } from './locationPickerParts';
-
-const MAP_TILE_URLS = [
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    'https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-];
 import { cn } from '@/shared/utils/formatting';
 import {
     DEFAULT_MAP_CENTER,
@@ -20,6 +11,7 @@ import {
 } from '@/infrastructure/location/location';
 import { searchLocations, type LocationSearchResult } from '@/infrastructure/location/locationApi';
 
+const LocationMapView = lazy(() => import('./LocationMapView'));
 
 interface LocationPickerProps {
     initialAddress?: string;
@@ -56,10 +48,8 @@ export default function LocationPicker({
     const [showResults, setShowResults] = useState(false);
     const [searchError, setSearchError] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
-    const [tileUrlIndex, setTileUrlIndex] = useState(0);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const mapWatchKey = `${center[0]}:${center[1]}:${markerPosition?.[0] || ''}:${markerPosition?.[1] || ''}`;
-    const tileUrl = MAP_TILE_URLS[tileUrlIndex] || MAP_TILE_URLS[0];
 
     // Cleanup timeout on unmount
     useEffect(() => {
@@ -284,26 +274,18 @@ export default function LocationPicker({
             </div>
 
             <div className={cn("h-56 w-full rounded-xl overflow-hidden border border-white/10 shadow-inner z-0 relative sm:h-64", mapClassName)}>
-                <MapContainer
-                    center={center}
-                    zoom={13}
-                    scrollWheelZoom={false}
-                    style={{ height: '100%', width: '100%' }}
-                >
-                    <TileLayer
-                        key={tileUrl}
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                        url={tileUrl}
-                        eventHandlers={{
-                            tileerror: () => {
-                                setTileUrlIndex((currentIndex) => Math.min(currentIndex + 1, MAP_TILE_URLS.length - 1));
-                            },
-                        }}
+                <Suspense fallback={
+                    <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-white/5">
+                        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+                    </div>
+                }>
+                    <LocationMapView
+                        center={center}
+                        markerPosition={markerPosition}
+                        watchKey={mapWatchKey}
+                        onMapClick={handleMapClick}
                     />
-                    <LocationMarker position={markerPosition} setPosition={(pos) => handleMapClick(pos[0], pos[1])} />
-                    <MapSizeInvalidator watchKey={mapWatchKey} />
-                    <MapFlyTo position={center} />
-                </MapContainer>
+                </Suspense>
             </div>
             <p className="text-center text-[10px] font-semibold text-slate-500">
                 Tap the map to pin exact location
