@@ -1,4 +1,37 @@
 import { api } from './instance';
+import type { WithdrawalStatus } from '@/shared/types/api/withdrawal';
+
+// The exact 8 values the backend's withdrawal_requests.status CHECK
+// constraint allows (migration 20260913130000) -- kept in lockstep with the
+// WithdrawalStatus union it validates against.
+const KNOWN_WITHDRAWAL_STATUSES = new Set<WithdrawalStatus>([
+  'processing', 'manual_review', 'completed', 'failed',
+  'compensation_required', 'rejected', 'success', 'paid'
+]);
+
+function isWithdrawalStatus(value: string): value is WithdrawalStatus {
+  return (KNOWN_WITHDRAWAL_STATUSES as Set<string>).has(value);
+}
+
+// Narrows a raw status string into WithdrawalStatus | 'pending' instead of
+// the plain `string` the previous `String(request.status || 'pending')`
+// produced -- that widened type let useAdminDashboard.ts force-cast the
+// whole array to WithdrawalRequest[] with zero runtime check, defeating the
+// WithdrawalStatus union entirely (any typo'd/unexpected value would
+// compile and silently mis-render/mis-branch downstream with no signal).
+// The DB CHECK constraint makes an unrecognized value here practically
+// impossible in normal operation; if it ever happens anyway (constraint
+// removed, direct DB edit), warn instead of silently pretending it was
+// validated -- getWithdrawalStatusLabel/Tone already render an unknown
+// value safely, so surfacing it as-is (not silently relabeling it
+// 'pending', which would misrepresent a real, different state) is correct.
+function normalizeWithdrawalStatus(raw: unknown, requestId: string): WithdrawalStatus | 'pending' {
+  const value = String(raw || '').toLowerCase();
+  if (!value) return 'pending';
+  if (isWithdrawalStatus(value)) return value;
+  console.warn(`[admin] Unrecognized withdrawal status "${value}" for request ${requestId}`);
+  return value as WithdrawalStatus;
+}
 
 // Must reject on failure -- see the matching comment in buyers.ts.
 export async function getWithdrawalRequests() {
@@ -13,20 +46,23 @@ export async function getWithdrawalRequests() {
     return [];
   }
 
-  return withdrawalRequests.map((request: Record<string, unknown>) => ({
-    id: String(request.id || `withdrawal-${globalThis.crypto.randomUUID()}`),
-    amount: Number(request.amount || 0),
-    mpesaNumber: String(request.mpesa_number || request.mpesaNumber || ''),
-    mpesaName: String(request.mpesa_name || request.mpesaName || ''),
-    status: String(request.status || 'pending'),
-    sellerId: String(request.seller_id || request.sellerId || ''),
-    sellerName: String(request.entityName || request.entity_name || request.seller_name || request.sellerName || request.mpesaName || request.mpesa_name || 'Seller'),
-    sellerEmail: String(request.entityEmail || request.entity_email || request.seller_email || request.sellerEmail || ''),
-    providerReference: request.provider_reference || request.providerReference || null,
-    createdAt: request.created_at || request.createdAt || new Date().toISOString(),
-    processedAt: request.processed_at || request.processedAt || null,
-    processedBy: request.processed_by || request.processedBy || null
-  }));
+  return withdrawalRequests.map((request: Record<string, unknown>) => {
+    const id = String(request.id || `withdrawal-${globalThis.crypto.randomUUID()}`);
+    return {
+      id,
+      amount: Number(request.amount || 0),
+      mpesaNumber: String(request.mpesa_number || request.mpesaNumber || ''),
+      mpesaName: String(request.mpesa_name || request.mpesaName || ''),
+      status: normalizeWithdrawalStatus(request.status, id),
+      sellerId: String(request.seller_id || request.sellerId || ''),
+      sellerName: String(request.entityName || request.entity_name || request.seller_name || request.sellerName || request.mpesaName || request.mpesa_name || 'Seller'),
+      sellerEmail: String(request.entityEmail || request.entity_email || request.seller_email || request.sellerEmail || ''),
+      providerReference: request.provider_reference || request.providerReference || null,
+      createdAt: request.created_at || request.createdAt || new Date().toISOString(),
+      processedAt: request.processed_at || request.processedAt || null,
+      processedBy: request.processed_by || request.processedBy || null
+    };
+  });
 }
 
 // The backend (admin.service.js overrideWithdrawalStatus) only ever accepts

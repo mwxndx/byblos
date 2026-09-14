@@ -33,6 +33,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, onView, on
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-hover:text-cyan-500 transition-colors" />
           <Input
             type="text"
+            aria-label="Search buyers"
             placeholder="Search buyers..."
             className="pl-12 w-full md:w-[320px] lg:w-[400px] h-11 md:h-12 bg-white/5 border-white/10 text-white placeholder:text-gray-500 rounded-2xl focus:border-cyan-500/50 focus:ring-cyan-500/10 transition-all font-medium text-sm"
             value={searchQuery}

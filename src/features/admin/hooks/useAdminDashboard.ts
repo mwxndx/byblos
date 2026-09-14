@@ -37,7 +37,6 @@ export function useAdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [dashboardReloadToken, setDashboardReloadToken] = useState(0);
   const inspectionSessionId = useMemo(() => {
     const bytes = new Uint32Array(2);
     globalThis.crypto?.getRandomValues?.(bytes);
@@ -155,6 +154,31 @@ export function useAdminDashboard() {
 
   useEffect(() => {
     if (!isEnabled) return;
+
+    // Guard against the "flash of false loaded zero-data" bug: this effect
+    // used to build dashboardState (and set isInitialized(true)) from
+    // whatever `.data` happened to be available on the very first render,
+    // which is `undefined` for every query before their first fetch
+    // resolves -- briefly rendering a fully "loaded" dashboard with 0
+    // sellers/revenue/etc. before the real numbers arrive.
+    // `.isLoading` is true only during a query's very first fetch with no
+    // cached data, so once every core query has left that state (whether it
+    // succeeded, is now isError, or was served from cache), it's safe to
+    // finalize. Skip finalizing while any of them are still on that first
+    // fetch -- isInitialized stays false, so the page keeps showing its own
+    // loading state instead of a premature "empty" one.
+    const stillOnFirstFetch = analyticsQuery.isLoading
+      || sellersQuery.isLoading
+      || creatorsQuery.isLoading
+      || buyersQuery.isLoading
+      || withdrawalsQuery.isLoading
+      || monthlyMetricsQuery.isLoading
+      || financialsQuery.isLoading
+      || monthlyFinancialDataQuery.isLoading
+      || dashboardStatsQuery.isLoading
+      || clientsQuery.isLoading
+      || balancesQuery.isLoading;
+    if (stillOnFirstFetch) return;
 
     const fetchDashboardData = () => {
       setIsLoading(true);
@@ -276,25 +300,36 @@ export function useAdminDashboard() {
     isEnabled,
     analyticsQuery.data,
     analyticsQuery.isError,
+    analyticsQuery.isLoading,
     sellersQuery.data,
     sellersQuery.isError,
+    sellersQuery.isLoading,
     creatorsQuery.data,
     creatorsQuery.isError,
+    creatorsQuery.isLoading,
     buyersQuery.data,
     buyersQuery.isError,
+    buyersQuery.isLoading,
     withdrawalsQuery.data,
     withdrawalsQuery.isError,
+    withdrawalsQuery.isLoading,
     monthlyMetricsQuery.data,
     monthlyMetricsQuery.isError,
+    monthlyMetricsQuery.isLoading,
     financialsQuery.data,
     financialsQuery.isError,
+    financialsQuery.isLoading,
     monthlyFinancialDataQuery.data,
     monthlyFinancialDataQuery.isError,
+    monthlyFinancialDataQuery.isLoading,
     dashboardStatsQuery.data,
     dashboardStatsQuery.isError,
+    dashboardStatsQuery.isLoading,
     clientsQuery.data,
     clientsQuery.isError,
-    balancesQuery.data
+    clientsQuery.isLoading,
+    balancesQuery.data,
+    balancesQuery.isLoading
   ]);
 
   useEffect(() => {
@@ -520,10 +555,19 @@ export function useAdminDashboard() {
   // initialized flag (which surfaces the loading state), and bumps the reload
   // token to force a fresh render pass. Mirrors the pre-decomposition behavior.
   const retryDashboard = useCallback(() => {
+    // Previously only reset local flags (error, isInitialized) and bumped an
+    // unused reload token -- no network request was ever fired, so every
+    // query stayed in its already-failed state, the aggregating effect
+    // still had nothing new to read, and isInitialized never got set back
+    // to true. The error screen's "Try Again" button did nothing until a
+    // full page reload. refetchAll() actually re-requests every query;
+    // isInitialized(false) shows the loading state while that's in flight,
+    // and the aggregating effect (gated on each query's isLoading/isError)
+    // finalizes again once the refetches settle.
     setError(null);
     setIsInitialized(false);
-    setDashboardReloadToken(token => token + 1);
-  }, []);
+    void refetchAll();
+  }, [refetchAll]);
 
   return {
     authLoading,
