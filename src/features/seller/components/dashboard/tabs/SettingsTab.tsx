@@ -175,6 +175,7 @@ export function SettingsTab({
 
           <SocialInput
             isEditing={isEditingContacts}
+            kind="instagram"
             label="Instagram Link"
             value={formData.instagramLink}
             displayValue={sellerProfile?.instagramLink}
@@ -185,6 +186,7 @@ export function SettingsTab({
           />
           <SocialInput
             isEditing={isEditingContacts}
+            kind="tiktok"
             label="TikTok Link"
             value={formData.tiktokLink}
             displayValue={sellerProfile?.tiktokLink}

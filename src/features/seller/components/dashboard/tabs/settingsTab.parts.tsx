@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import { Input } from '@/shared/ui/input';
+import { socialUrl } from '@/features/shop/utils/socialLinks';
 
 export function SectionHeader({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
   return (
@@ -15,6 +16,11 @@ export function SectionHeader({ title, description, action }: { title: string; d
 
 interface SocialInputProps {
   displayValue?: string;
+  /** Which platform this stores a handle/link for -- routes the raw stored
+   *  value through socialUrl() to normalize it into an openable URL and,
+   *  same fix as CreatorsTab.tsx's equivalent icons, validate its scheme
+   *  before it ever reaches an href. */
+  kind: 'instagram' | 'tiktok';
   iconPath: React.ReactNode;
   isEditing: boolean;
   label: string;
@@ -24,7 +30,16 @@ interface SocialInputProps {
   value: string;
 }
 
-export function SocialInput({ displayValue, iconPath, isEditing, label, onChange, onRemove, placeholder, value }: SocialInputProps) {
+export function SocialInput({ displayValue, kind, iconPath, isEditing, label, onChange, onRemove, placeholder, value }: SocialInputProps) {
+  // Previously rendered `href={displayValue}` -- the raw stored value --
+  // directly, with no scheme validation. Unlike the identical data
+  // rendered elsewhere in the app (CreatorsTab.tsx routes the same kind of
+  // link through this exact socialUrl() helper), a non-http(s) scheme
+  // stored in this field (no validation currently happens on this path
+  // before it reaches here) would execute on click. socialUrl() also
+  // normalizes a bare handle ("myhandle") into a real URL -- previously
+  // that rendered as a broken relative link on the current origin.
+  const safeHref = socialUrl(kind, displayValue);
   return (
     <div className="seller-card-soft p-4">
       <div className="flex items-center justify-between mb-1">
@@ -50,10 +65,10 @@ export function SocialInput({ displayValue, iconPath, isEditing, label, onChange
         />
       ) : (
         <div className="flex items-center justify-between gap-2">
-          {displayValue ? (
+          {safeHref ? (
             <>
               <a
-                href={displayValue}
+                href={safeHref}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm sm:text-base lg:text-lg font-semibold text-[var(--theme-accent,#f5c518)] hover:underline flex items-center gap-1.5 truncate max-w-[calc(100%-80px)]"

@@ -1,13 +1,9 @@
-import { useState, useMemo, useCallback, useEffect, useRef, type FormEvent } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { type OrderStatus, type ApiOrder } from '@/shared/types';
+import { type OrderStatus } from '@/shared/types';
 
-import { Clock, Package, Truck, CheckCircle, RefreshCw, XCircle, Calendar, User, Download, MapPin, CreditCard } from 'lucide-react';
 import { useToast } from '@/shared/hooks/use-toast';
-import { exportOrdersToCSV } from '@/shared/utils/exportUtils';
 import {
-  useQuotePickupMutation,
-  useRequestPickupMutation,
   useSelectHubDropoffMutation,
   useMarkDroppedAtHubMutation,
   useUpdateOrderStatusMutation,
@@ -15,13 +11,9 @@ import {
   useCancelSellerOrderMutation
 } from '@/features/seller/hooks/mutations/useSellerOrderMutations';
 import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
-import { getOrderInstruction } from '@/features/orders/utils/orderInstructions';
 import { useSellerOrders } from '../components/dashboard/hooks/useSellerOrders';
 import { sellerDashboardQueryKeys } from '../components/dashboard/queryKeys';
-import LocationPicker from '@/shared/components/LocationPicker';
-import { OrderLogisticsTracking } from '@/components/orders/OrderLogisticsTracking';
-
-import { formatCurrency, formatDate, getEffectiveFulfillmentType, hasBuyerPaidDoorDelivery, HUB_DROPOFF_LOCATION } from '../utils/sellerOrders.utils';
+import { usePickupRequestFlow } from './usePickupRequestFlow';
 
 export function useSellerOrderActions() {
     const queryClient = useQueryClient();
@@ -29,20 +21,20 @@ export function useSellerOrderActions() {
     const orders = useMemo(() => ordersQuery.data || [], [ordersQuery.data]);
     const isLoading = ordersQuery.isLoading;
     const [isUpdating, setIsUpdating] = useState(false);
-    
-    const quotePickupMutation = useQuotePickupMutation();
-    const requestPickupMutation = useRequestPickupMutation();
+
     const selectHubDropoffMutation = useSelectHubDropoffMutation();
     const markDroppedAtHubMutation = useMarkDroppedAtHubMutation();
     const updateOrderStatusMutation = useUpdateOrderStatusMutation();
     const confirmBookingMutation = useConfirmBookingMutation();
     const cancelOrderMutation = useCancelSellerOrderMutation();
 
-    // Store latest mutateAsync in a ref so the quote effect doesn't need the mutation as a dep
-    const quotePickupRef = useRef(quotePickupMutation.mutateAsync);
-    quotePickupRef.current = quotePickupMutation.mutateAsync;
-
-    // FIX (Task 18): Prevent duplicate order mutations via synchronous lock
+    // FIX (Task 18): Prevent duplicate order mutations via synchronous lock.
+    // Shared (not one lock per action) so that no two order mutations from
+    // this hook -- including the pickup-request flow, extracted into its own
+    // hook below -- can run at once. Passed into usePickupRequestFlow rather
+    // than each hook owning its own lock, which would let a pickup request
+    // and, say, a cancel run concurrently -- a real behavior change the
+    // extraction must not introduce.
     const { runWithLock } = useAsyncLock();
     const [showPickupDialog, setShowPickupDialog] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -50,83 +42,24 @@ export function useSellerOrderActions() {
     const [readyAction, setReadyAction] = useState<'hub_dropoff' | 'shop_ready'>('hub_dropoff');
     const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const [pickupOrder, setPickupOrder] = useState<ApiOrder | null>(null);
-    const [pickupPhone, setPickupPhone] = useState('');
-    const [pickupLocation, setPickupLocation] = useState<{ address: string; lat: number | null; lng: number | null }>({
-        address: '',
-        lat: null,
-        lng: null
-    });
-    const [pickupQuote, setPickupQuote] = useState<{
-        feeAmount: number;
-        distanceKm: number;
-        chargeableDistanceKm: number;
-        rateKesPerKm: number;
-        currency: string;
-        pricingModel?: string;
-        cbdPickupFeeKes?: number;
-        cbdRadiusKm?: number;
-    } | null>(null);
-    const [pickupQuoteError, setPickupQuoteError] = useState('');
-    const [isPickupQuoteLoading, setIsPickupQuoteLoading] = useState(false);
-    const [isRequestingPickup, setIsRequestingPickup] = useState(false);
 
     const { toast } = useToast();
 
+    const pickupFlow = usePickupRequestFlow({ runWithLock });
+
+    // Neither refreshOrders nor markAsDelivered (below) is called by any
+    // handler in this hook, nor returned to a consumer -- confirmed dead
+    // code carried over unchanged from the pre-split hook (each mutation's
+    // own onSuccess already invalidates the relevant queries). Left in
+    // place rather than silently deleted as a side effect of this
+    // structural split -- that's a call for whoever owns this flow to make,
+    // not an incidental cleanup.
     const refreshOrders = useCallback(async () => {
         await Promise.all([
             queryClient.invalidateQueries({ queryKey: sellerDashboardQueryKeys.orders }),
             queryClient.invalidateQueries({ queryKey: sellerDashboardQueryKeys.analytics })
         ]);
     }, [queryClient]);
-
-    useEffect(() => {
-        if (!pickupOrder) {
-            setPickupQuote(null);
-            setPickupQuoteError('');
-            setIsPickupQuoteLoading(false);
-            return;
-        }
-
-        if (
-            pickupLocation.lat === null ||
-            pickupLocation.lng === null ||
-            (pickupLocation.lat === 0 && pickupLocation.lng === 0)
-        ) {
-            setPickupQuote(null);
-            setPickupQuoteError('');
-            return;
-        }
-
-        const timer = window.setTimeout(async () => {
-            setIsPickupQuoteLoading(true);
-            setPickupQuoteError('');
-            try {
-                const quote = await quotePickupRef.current({
-                    orderId: pickupOrder.id,
-                    phone: pickupPhone,
-                    address: pickupLocation.address,
-                    lat: pickupLocation.lat,
-                    lng: pickupLocation.lng
-                });
-                setPickupQuote({
-                    feeAmount: Number(quote.feeAmount || 0),
-                    distanceKm: Number(quote.distanceKm || 0),
-                    chargeableDistanceKm: Number(quote.chargeableDistanceKm || 0),
-                    rateKesPerKm: Number(quote.rateKesPerKm || 40),
-                    currency: quote.currency || 'KES'
-                });
-            } catch (error) {
-                const err = error as { message?: string; response?: { data?: { error?: string; message?: string } } };
-                setPickupQuote(null);
-                setPickupQuoteError(err.response?.data?.error || err.response?.data?.message || err.message || 'Could not calculate pickup fee');
-            } finally {
-                setIsPickupQuoteLoading(false);
-            }
-        }, 400);
-
-        return () => window.clearTimeout(timer);
-    }, [pickupOrder, pickupLocation.address, pickupLocation.lat, pickupLocation.lng, pickupPhone]);
 
     // Filter orders based on search query
     const filteredOrders = useMemo(() => {
@@ -145,79 +78,6 @@ export function useSellerOrderActions() {
         setSelectedOrderId(orderId);
         setReadyAction(action);
         setShowPickupDialog(true);
-    };
-
-    const openRequestPickupDialog = (order: ApiOrder) => {
-        setPickupOrder(order);
-        setPickupPhone('');
-        setPickupLocation({ address: '', lat: null, lng: null });
-        setPickupQuote(null);
-        setPickupQuoteError('');
-    };
-
-    const closeRequestPickupDialog = () => {
-        if (isRequestingPickup) return;
-        setPickupOrder(null);
-        setPickupPhone('');
-        setPickupLocation({ address: '', lat: null, lng: null });
-        setPickupQuote(null);
-        setPickupQuoteError('');
-    };
-
-    const requestPickup = async (event: FormEvent) => {
-        event.preventDefault();
-        if (!pickupOrder) return;
-
-        const phonePattern = /^(\+?254|0)[17]\d{8}$/;
-        if (!phonePattern.test(pickupPhone.trim())) {
-            setPickupQuoteError('Enter a valid M-Pesa number, for example 0712345678.');
-            return;
-        }
-
-        if (!pickupLocation.address.trim() || pickupLocation.lat === null || pickupLocation.lng === null) {
-            setPickupQuoteError('Pin the pickup location and enter the full pickup address.');
-            return;
-        }
-
-        if (isPickupQuoteLoading) {
-            setPickupQuoteError('Please wait while the pickup fee is calculated.');
-            return;
-        }
-
-        if (!pickupQuote) {
-            setPickupQuoteError(pickupQuoteError || 'Pickup fee could not be calculated.');
-            return;
-        }
-
-        await runWithLock(async () => {
-            try {
-                setIsRequestingPickup(true);
-                const idempotencyKey = `seller-pickup:${pickupOrder.id}:${Date.now()}`;
-                await requestPickupMutation.mutateAsync({
-                    orderId: pickupOrder.id,
-                    phone: pickupPhone.trim(),
-                    address: pickupLocation.address.trim(),
-                    lat: pickupLocation.lat,
-                    lng: pickupLocation.lng,
-                    quote: {
-                        ...pickupQuote,
-                        idempotencyKey
-                    }
-                });
-                setIsRequestingPickup(false);
-                closeRequestPickupDialog();
-            } catch (error) {
-                const err = error as { message?: string; response?: { data?: { message?: string } } };
-                setPickupQuoteError(err.response?.data?.message || err.message || 'Failed to request pickup');
-                toast({
-                    title: 'Pickup request failed',
-                    description: err.response?.data?.message || err.message || 'Please try again.',
-                    variant: 'destructive'
-                });
-            } finally {
-                setIsRequestingPickup(false);
-            }
-        });
     };
 
     const selectHubDropoff = async (orderId: string) => {
@@ -301,6 +161,7 @@ export function useSellerOrderActions() {
             }
         });
     };
+    void markAsDelivered;
 
     const markServiceReadyForBuyerConfirmation = async (orderId: string) => {
         // FIX (Task 18): Prevent duplicate order mutations
@@ -383,14 +244,6 @@ export function useSellerOrderActions() {
         });
     };
 
-    const pickupOrderIsPhysicalOnline = pickupOrder
-        ? !pickupOrder.items?.some(item => item.productType === 'service' || item.productType === 'digital') && getEffectiveFulfillmentType(pickupOrder) === 'COURIER'
-        : false;
-    const pickupDialogHelpText = pickupOrderIsPhysicalOnline
-        ? 'Choose pickup if you want Mzigo Ego to collect the package from your location. They will secure it and check it against the order before delivery.'
-        : 'Mzigo pickup is only available for online shop courier orders.';
-
-
     return {
         isLoading,
         ordersQuery,
@@ -400,22 +253,22 @@ export function useSellerOrderActions() {
         filteredOrders,
         isUpdating,
         handleReadyForPickupClick,
-        openRequestPickupDialog,
+        openRequestPickupDialog: pickupFlow.openRequestPickupDialog,
         selectHubDropoff,
         markServiceReadyForBuyerConfirmation,
         confirmBooking,
         handleCancelClick,
-        pickupOrder,
-        closeRequestPickupDialog,
-        pickupDialogHelpText,
-        requestPickup,
-        isPickupQuoteLoading,
-        pickupQuote,
-        setPickupLocation,
-        pickupPhone,
-        setPickupPhone,
-        isRequestingPickup,
-        pickupQuoteError,
+        pickupOrder: pickupFlow.pickupOrder,
+        closeRequestPickupDialog: pickupFlow.closeRequestPickupDialog,
+        pickupDialogHelpText: pickupFlow.pickupDialogHelpText,
+        requestPickup: pickupFlow.requestPickup,
+        isPickupQuoteLoading: pickupFlow.isPickupQuoteLoading,
+        pickupQuote: pickupFlow.pickupQuote,
+        setPickupLocation: pickupFlow.setPickupLocation,
+        pickupPhone: pickupFlow.pickupPhone,
+        setPickupPhone: pickupFlow.setPickupPhone,
+        isRequestingPickup: pickupFlow.isRequestingPickup,
+        pickupQuoteError: pickupFlow.pickupQuoteError,
         showPickupDialog,
         setShowPickupDialog,
         readyAction,
