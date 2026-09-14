@@ -165,22 +165,37 @@ export function useBuyerRegister() {
       }
 
       // Registration success and navigation is handled by the auth context
-    } catch (error) {
+    } catch (error: unknown) {
       // Field-level validation errors (400 with an errors array) map to inline
-      // field messages.
-      if (error.response?.status === 400 && error.response?.data?.errors) {
-        const validationErrors: { field: string; message: string }[] = error.response.data.errors;
-        const newErrors: { [key: string]: string } = {};
+      // field messages. `error` is unknown (an implicit-any catch variable
+      // previously let `error.response.data.errors` be declared straight into
+      // a `{field,message}[]` type with zero runtime check -- an alternate
+      // validation-error shape, or a 400 whose `errors` isn't an array at
+      // all, would throw `.forEach is not a function` from inside this catch
+      // itself, escaping as an unhandled rejection with no toast, no error,
+      // just a form that silently stops responding).
+      const err = error as { response?: { status?: number; data?: { errors?: unknown } } } | null | undefined;
+      const rawErrors = err?.response?.status === 400 ? err.response?.data?.errors : undefined;
 
-        validationErrors.forEach(err => {
-          newErrors[err.field] = err.message;
-        });
+      const newErrors: { [key: string]: string } = {};
+      if (Array.isArray(rawErrors)) {
+        for (const entry of rawErrors) {
+          const field = (entry as { field?: unknown } | null)?.field;
+          const message = (entry as { message?: unknown } | null)?.message;
+          if (typeof field === 'string' && typeof message === 'string') {
+            newErrors[field] = message;
+          }
+        }
+      }
 
+      if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
       } else {
-        // Any OTHER failure (duplicate email/phone, 409/500, network/timeout) was
-        // previously swallowed here — the form just sat there with no feedback.
-        // Surface it via the shared classifier so the buyer knows registration failed.
+        // No usable field-level errors (either a non-validation failure --
+        // duplicate email/phone, 409/500, network/timeout -- or a 400 whose
+        // errors array didn't contain any recognizable {field,message}
+        // entries). Surface it via the shared classifier so the buyer isn't
+        // left with a form that appears to do nothing.
         toast({
           title: 'Registration failed',
           description: classifyApiError(error, 'Could not create your account. Please try again.').message,

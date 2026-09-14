@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -19,6 +19,22 @@ export function useBuyerProfileForm() {
   const [mobilePayment, setMobilePayment] = useState<string>(user?.mobilePayment || '');
   const [whatsappNumber, setWhatsappNumber] = useState<string>(user?.whatsappNumber || '');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // useAuthRevalidation refetches the profile on tab focus / TTL expiry and
+  // calls setUser with fresh data while this component stays mounted across
+  // in-app navigation -- without this, the form's local state was set once
+  // at mount and never resynced, so a background refresh (another device, an
+  // admin edit, or simply a slow initial fetch resolving late) left the form
+  // showing stale values. Saving from that stale form would then PATCH the
+  // old value back over the newer one. Only resync while NOT actively
+  // editing, so this can't clobber an in-progress edit -- same pattern as
+  // useSellerSettingsForm.ts.
+  useEffect(() => {
+    if (!isEditingProfile) {
+      setMobilePayment(user?.mobilePayment || '');
+      setWhatsappNumber(user?.whatsappNumber || '');
+    }
+  }, [isEditingProfile, user?.mobilePayment, user?.whatsappNumber]);
 
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);

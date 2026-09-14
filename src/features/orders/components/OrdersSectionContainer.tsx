@@ -14,7 +14,14 @@ import { OrdersSectionView } from '@/components/orders/OrdersSectionView';
 export function OrdersSectionContainer() {
   const { user: globalUser } = useGlobalAuth();
   const user = globalUser?.role === 'buyer' ? globalUser.profile as BuyerProfile : null;
-  const { runWithLock } = useAsyncLock();
+  // Separate lock per action: a single shared lock meant cancelling order A
+  // and confirming receipt on order B -- two unrelated orders, two unrelated
+  // actions -- couldn't run concurrently. The second click landing while the
+  // first request was still in flight was silently dropped (runWithLock
+  // just returns undefined), with no toast, no spinner, nothing -- it looked
+  // like the button was broken.
+  const { runWithLock: runCancelWithLock } = useAsyncLock();
+  const { runWithLock: runConfirmWithLock } = useAsyncLock();
 
   const [isConfirming, setIsConfirming] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState<string | null>(null);
@@ -67,9 +74,10 @@ export function OrdersSectionContainer() {
   const handleCancelOrder = async (orderId: string) => {
     if (!orderId) return;
 
-    // runWithLock provides a synchronous ref guard, so a second click can't
-    // fire a duplicate cancel (and duplicate refund) before the first resolves.
-    await runWithLock(async () => {
+    // runCancelWithLock provides a synchronous ref guard, so a second click
+    // can't fire a duplicate cancel (and duplicate refund) before the first
+    // resolves.
+    await runCancelWithLock(async () => {
       setIsCancelling(orderId);
       try {
         await cancelOrderMutation.mutateAsync(orderId);
@@ -85,7 +93,7 @@ export function OrdersSectionContainer() {
     const targetOrderId = orderId || currentConfirmOrderId;
     if (!targetOrderId) return;
 
-    await runWithLock(async () => {
+    await runConfirmWithLock(async () => {
       setIsConfirming(targetOrderId);
       const loadingToast = toast.loading('Confirming order receipt...');
 

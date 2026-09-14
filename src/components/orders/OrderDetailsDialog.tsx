@@ -32,22 +32,24 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
               <div className="space-y-6 max-h-[60dvh] overflow-y-auto pr-2">
                 {order.items.map((item, idx) => (
                   <div key={idx} className="flex gap-4 items-start">
-                    <div
-                      className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => item.imageUrl && onViewImage(getImageUrl(item.imageUrl))}
-                    >
-                      {item.imageUrl ? (
+                    {item.imageUrl ? (
+                      <button
+                        type="button"
+                        onClick={() => onViewImage(getImageUrl(item.imageUrl))}
+                        aria-label={`View full-size image of ${item.name}`}
+                        className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
+                      >
                         <img
                           src={getImageUrl(item.imageUrl)}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="h-8 w-8 text-slate-400 dark:text-white/60" />
-                        </div>
-                      )}
-                    </div>
+                      </button>
+                    ) : (
+                      <div className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 flex items-center justify-center">
+                        <Package className="h-8 w-8 text-slate-400 dark:text-white/60" />
+                      </div>
+                    )}
 
                     <div className="flex-1 min-w-0">
                       <h4 className="text-base font-bold text-slate-950 dark:text-white leading-tight mb-1">{item.name}</h4>
