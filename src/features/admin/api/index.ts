@@ -3,7 +3,7 @@ import { login, getMe } from './auth';
 import { getDashboardStats } from './dashboard';
 import { getAnalytics, getMonthlyMetrics } from './analytics';
 import { getBuyers, getBuyerById, deleteUser } from './buyers';
-import { getSellers, getSellerById, updateSellerStatus } from './sellers';
+import { getSellers, getSellerById } from './sellers';
 import { getClients } from './clients';
 import { getCreators, deleteCreator } from './creators';
 import { getWithdrawalRequests, updateWithdrawalRequestStatus } from './withdrawals';
@@ -36,7 +36,6 @@ export const adminApi = {
   deleteCreator,
   getSellerById,
   getMonthlyMetrics,
-  updateSellerStatus,
   getClients,
   deleteUser,
   getWithdrawalRequests,
