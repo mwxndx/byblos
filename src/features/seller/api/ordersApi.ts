@@ -5,9 +5,17 @@ import type { OrdersAnalytics, OrderQueryParams } from '../types';
 const sellerApiInstance = apiClient;
 
 export const sellerOrdersApi = {
+  // Previously typed the raw axios response <any>, so every property read
+  // through the fallback chain below (responseBody?.data?.orders etc.) was
+  // completely unchecked -- the return type (Promise<ApiOrder[]>) was pure
+  // assertion, trusted on nothing. <unknown> plus explicit narrowing at each
+  // step keeps the same tolerance for multiple possible response shapes
+  // (deliberate -- this backend's envelope shape isn't fully consistent
+  // across endpoints) while forcing the compiler to actually check the
+  // accesses instead of waving every one of them through.
   async getOrders(params?: OrderQueryParams): Promise<ApiOrder[]> {
-    const response = await sellerApiInstance.get<any>('/sellers/orders', { params });
-    let responseBody = response?.data !== undefined ? response.data : response;
+    const response = await sellerApiInstance.get<unknown>('/sellers/orders', { params });
+    let responseBody: unknown = response?.data !== undefined ? response.data : response;
     if (typeof responseBody === 'string' && responseBody.trim()) {
       try {
         responseBody = JSON.parse(responseBody);
@@ -20,17 +28,20 @@ export const sellerOrdersApi = {
       return [];
     }
 
-    const rawOrders = Array.isArray(responseBody)
+    const body = responseBody as { data?: unknown; orders?: unknown };
+    const nestedData = body.data as { orders?: unknown } | unknown[] | undefined;
+
+    const rawOrders: unknown = Array.isArray(responseBody)
       ? responseBody
-      : (Array.isArray(responseBody?.data)
-          ? responseBody.data
-          : (Array.isArray(responseBody?.data?.orders)
-              ? responseBody.data.orders
-              : (Array.isArray(responseBody?.orders)
-                  ? responseBody.orders
+      : (Array.isArray(nestedData)
+          ? nestedData
+          : (Array.isArray((nestedData as { orders?: unknown } | undefined)?.orders)
+              ? (nestedData as { orders: unknown[] }).orders
+              : (Array.isArray(body.orders)
+                  ? body.orders
                   : [])));
 
-    return rawOrders;
+    return rawOrders as ApiOrder[];
   },
 
   async getOrder(orderId: string): Promise<ApiOrder> {

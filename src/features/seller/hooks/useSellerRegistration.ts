@@ -295,6 +295,21 @@ export function useSellerRegistration(onSuccess?: () => void) {
 
 
 
+  // Ticks resendCooldown down once a second while > 0, tied to the component
+  // lifecycle via the effect cleanup -- so if the seller navigates away
+  // (e.g. "Go to Login") before the 60s cooldown finishes, the interval is
+  // cleared on unmount instead of continuing to fire setResendCooldown on an
+  // unmounted component. Previously the interval was created ad hoc inside
+  // handleResend with no cleanup path at all, only self-clearing once it
+  // naturally reached 0.
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const interval = setInterval(() => {
+      setResendCooldown(prev => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendCooldown]);
+
   const handleResend = async () => {
     if (resendCooldown > 0 || isResending) return;
     setIsResending(true);
@@ -302,9 +317,6 @@ export function useSellerRegistration(onSuccess?: () => void) {
       await resendVerificationMutation.mutateAsync(formData.email);
       toast({ title: 'Email Sent', description: 'A new verification link has been sent to your inbox.' });
       setResendCooldown(60);
-      const interval = setInterval(() => {
-        setResendCooldown(prev => { if (prev <= 1) { clearInterval(interval); return 0; } return prev - 1; });
-      }, 1000);
     } catch (err: unknown) {
       const error = err as Error;
       toast({ title: 'Error', description: error.message || 'Failed to resend email.', variant: 'destructive' });

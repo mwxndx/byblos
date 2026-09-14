@@ -122,9 +122,11 @@ export const checkShopNameAvailability = async (shopName: string): Promise<{ ava
 export const deleteSellerAccount = () => sellerApiInstance.delete('/sellers/account');
 
 export const sellerProfileApi = {
+  // <unknown> + explicit narrowing instead of the previous <any> -- see the
+  // matching comment on sellerOrdersApi.getOrders in ordersApi.ts.
   login: async (credentials: { email: string; password: string; acceptTerms?: boolean }): Promise<{ seller: ApiSeller; token?: string; refreshToken?: string }> => {
-    const response = await sellerApiInstance.post<any>('/sellers/login', credentials);
-    let responseBody = response?.data !== undefined ? response.data : response;
+    const response = await sellerApiInstance.post<unknown>('/sellers/login', credentials);
+    let responseBody: unknown = response?.data !== undefined ? response.data : response;
     if (typeof responseBody === 'string' && responseBody.trim()) {
       try {
         responseBody = JSON.parse(responseBody);
@@ -137,17 +139,19 @@ export const sellerProfileApi = {
       throw new Error('Malformed server response payload. Please try again.');
     }
 
-    if (responseBody.status === 'error' || responseBody.status === 'fail') {
-      throw new Error(responseBody.message || responseBody.error || 'Login failed');
+    const body = responseBody as Record<string, unknown>;
+
+    if (body.status === 'error' || body.status === 'fail') {
+      throw new Error(String(body.message || body.error || 'Login failed'));
     }
 
-    const responseData = responseBody.data || responseBody;
-    const rawSeller = responseData?.seller || responseData?.user || responseBody?.seller || responseBody?.user || (responseData?.id ? responseData : null);
-    const token = responseData?.token || responseData?.accessToken || responseBody?.token || responseBody?.accessToken;
-    const refreshToken = responseData?.refreshToken || responseBody?.refreshToken;
+    const responseData = (body.data && typeof body.data === 'object' ? body.data : body) as Record<string, unknown>;
+    const rawSeller = responseData.seller ?? responseData.user ?? body.seller ?? body.user ?? (responseData.id ? responseData : null);
+    const token = (responseData.token ?? responseData.accessToken ?? body.token ?? body.accessToken) as string | undefined;
+    const refreshToken = (responseData.refreshToken ?? body.refreshToken) as string | undefined;
 
     if (!rawSeller) {
-      throw new Error(responseBody.message || 'Login response incomplete: missing seller profile details.');
+      throw new Error(String(body.message || 'Login response incomplete: missing seller profile details.'));
     }
 
     return { seller: transformSeller(rawSeller), token, refreshToken };
@@ -219,9 +223,11 @@ export const sellerProfileApi = {
     }
   },
 
+  // <unknown> + explicit narrowing instead of the previous <any> -- see the
+  // matching comment on sellerOrdersApi.getOrders in ordersApi.ts.
   getProfile: async (): Promise<ApiSeller> => {
-    const response = await sellerApiInstance.get<any>('/sellers/profile');
-    let bodyData = response?.data !== undefined ? response.data : response;
+    const response = await sellerApiInstance.get<unknown>('/sellers/profile');
+    let bodyData: unknown = response?.data !== undefined ? response.data : response;
     if (typeof bodyData === 'string' && bodyData.trim()) {
       try {
         bodyData = JSON.parse(bodyData);
@@ -230,7 +236,9 @@ export const sellerProfileApi = {
       }
     }
 
-    const profileData = bodyData?.data?.seller || bodyData?.seller || bodyData?.data || bodyData;
+    const body = (bodyData && typeof bodyData === 'object' ? bodyData : {}) as Record<string, unknown>;
+    const nestedData = body.data as Record<string, unknown> | undefined;
+    const profileData = nestedData?.seller ?? body.seller ?? nestedData ?? body;
     if (!profileData || typeof profileData !== 'object') {
       throw new Error('No profile data received');
     }
@@ -271,9 +279,11 @@ export const sellerProfileApi = {
     }
   },
 
+  // <unknown> + explicit narrowing instead of the previous <any> -- see the
+  // matching comment on sellerOrdersApi.getOrders in ordersApi.ts.
   getAnalytics: async (): Promise<SellerAnalytics> => {
-    const response = await sellerApiInstance.get<any>('/sellers/analytics');
-    let bodyData = response?.data !== undefined ? response.data : response;
+    const response = await sellerApiInstance.get<unknown>('/sellers/analytics');
+    let bodyData: unknown = response?.data !== undefined ? response.data : response;
     if (typeof bodyData === 'string' && bodyData.trim()) {
       try {
         bodyData = JSON.parse(bodyData);
@@ -282,7 +292,8 @@ export const sellerProfileApi = {
       }
     }
 
-    const analyticsData = bodyData?.data || bodyData;
+    const body = (bodyData && typeof bodyData === 'object' ? bodyData : {}) as Record<string, unknown>;
+    const analyticsData = body.data ?? bodyData;
     if (!analyticsData || typeof analyticsData !== 'object') {
       return {
         totalProducts: 0,
@@ -299,7 +310,7 @@ export const sellerProfileApi = {
         recentOrders: []
       } as unknown as SellerAnalytics;
     }
-    return analyticsData;
+    return analyticsData as SellerAnalytics;
   },
 
   forgotPassword: async (email: string): Promise<{ message: string }> => {
@@ -409,7 +420,7 @@ export const sellerProfileApi = {
 };
 
 if (typeof window !== 'undefined') {
-  (window as any).sellerProfileApi = sellerProfileApi;
+  (window as unknown as { sellerProfileApi: typeof sellerProfileApi }).sellerProfileApi = sellerProfileApi;
 }
 
 

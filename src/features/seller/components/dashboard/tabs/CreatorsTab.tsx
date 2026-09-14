@@ -62,12 +62,20 @@ export function CreatorsTab() {
     }
   };
 
+  // Both useRespondToCreatorRequestMutation and useRemoveSellerCreatorMutation
+  // invalidate the same creators-dashboard query on success, and this
+  // component also calls refetch() directly after accept/decline/remove --
+  // so `data` can change while a seller has an in-progress, unsaved edit to
+  // the marketplace toggle or commission rate. Without the hasUnsavedChanges
+  // gate, that refetch silently reverted the edit to the server value with
+  // no warning. Only resync while there's nothing unsaved to lose -- same
+  // pattern as useSellerSettingsForm.ts / useBuyerProfileForm.ts.
   useEffect(() => {
-    if (data) {
+    if (data && !hasUnsavedChanges) {
       setIsMarketplaceEnabled(data.isCreatorMarketplaceEnabled);
       setCommissionRate(String(Math.round(data.creatorCommissionRate * 100 * 10) / 10 || 5));
     }
-  }, [data]);
+  }, [data, hasUnsavedChanges]);
 
   const handleSaveListing = async () => {
     const rateNumber = parseFloat(commissionRate);

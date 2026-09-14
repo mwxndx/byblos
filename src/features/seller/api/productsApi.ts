@@ -54,9 +54,11 @@ export const sellerProductsApi = {
     return transformProduct(response.data);
   },
 
+  // <unknown> + explicit narrowing instead of the previous <any> -- see the
+  // matching comment on sellerOrdersApi.getOrders in ordersApi.ts.
   getProducts: async (): Promise<ApiSellerProduct[]> => {
-    const response = await sellerApiInstance.get<any>('/sellers/products');
-    let bodyData = response?.data !== undefined ? response.data : response;
+    const response = await sellerApiInstance.get<unknown>('/sellers/products');
+    let bodyData: unknown = response?.data !== undefined ? response.data : response;
     if (typeof bodyData === 'string' && bodyData.trim()) {
       try {
         bodyData = JSON.parse(bodyData);
@@ -65,7 +67,17 @@ export const sellerProductsApi = {
       }
     }
 
-    const products = bodyData?.data?.products || bodyData?.products || (Array.isArray(bodyData?.data) ? bodyData.data : []) || (Array.isArray(bodyData) ? bodyData : []);
+    const body = (bodyData && typeof bodyData === 'object' ? bodyData : {}) as { data?: unknown; products?: unknown };
+    const nestedData = body.data as { products?: unknown } | unknown[] | undefined;
+
+    const products: unknown[] = Array.isArray((nestedData as { products?: unknown } | undefined)?.products)
+      ? (nestedData as { products: unknown[] }).products
+      : (Array.isArray(body.products)
+          ? body.products
+          : (Array.isArray(nestedData)
+              ? nestedData
+              : (Array.isArray(bodyData) ? bodyData : [])));
+
     return products.map(transformProduct);
   },
 

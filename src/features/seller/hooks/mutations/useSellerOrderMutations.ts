@@ -19,14 +19,25 @@ export function useQuotePickupMutation() {
 export function useRequestPickupMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (args: { orderId: string; phone: string; address: string; lat: number | null; lng: number | null; quote: unknown }) =>
+    // `quote` carries the idempotency key the caller generates per submit
+    // attempt (see useSellerOrderActions.ts's handleRequestPickup) --
+    // previously typed `unknown` and never read here, silently discarded
+    // before reaching sellerApi.requestPickup, which DOES accept
+    // idempotencyKey and sends it as the Idempotency-Key header. Without
+    // it, a network-level retry of the same request (or a request that
+    // times out client-side after actually succeeding server-side) had no
+    // server-side dedup key at all on a mutation that books a real courier
+    // pickup and incurs a real fee -- a gap distinct from the client-side
+    // runWithLock guard, which only prevents a same-session double-click.
+    mutationFn: (args: { orderId: string; phone: string; address: string; lat: number | null; lng: number | null; quote: { idempotencyKey?: string } }) =>
       sellerApi.requestPickup(args.orderId, {
         mobilePayment: args.phone,
         pickupLocation: {
           address: args.address,
           latitude: args.lat ?? 0,
           longitude: args.lng ?? 0
-        }
+        },
+        idempotencyKey: args.quote?.idempotencyKey
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.orders() });
