@@ -99,7 +99,10 @@ export default defineConfig(({ command, mode }) => {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
             'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-slot', 'lucide-react', 'class-variance-authority', 'clsx', 'tailwind-merge'],
-            'utils-vendor': ['lodash', 'date-fns', 'axios', '@tanstack/react-query'],
+            // lodash removed: declared as a dependency but never imported
+            // anywhere in src/ -- confirmed via grep. Dead weight in both
+            // package.json and this chunking config.
+            'utils-vendor': ['date-fns', 'axios', '@tanstack/react-query'],
             'charts-vendor': ['recharts'],
           },
         },
