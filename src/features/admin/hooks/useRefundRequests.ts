@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useAdminRefundRequestsQuery, useConfirmRefundMutation, useRejectRefundMutation } from '@/features/admin/hooks/mutations/useAdminRefunds';
 import { toast } from 'sonner';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { RefundRequest } from '../types/refunds';
 
 export function useRefundRequests() {
-  const [requests, setRequests] = useState<RefundRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<RefundRequest | null>(null);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
@@ -18,11 +17,14 @@ export function useRefundRequests() {
 
   const refundQuery = useAdminRefundRequestsQuery(statusFilter);
 
-  useEffect(() => {
-    if (refundQuery.data) {
-      setRequests(refundQuery.data.data?.requests || []);
-    }
-  }, [refundQuery.data]);
+  // Derived directly during render instead of mirrored into its own state
+  // via a useEffect -- matches useDetections.ts's identical pattern
+  // (`earnings = flaggedQuery.data?.data || []`). The effect version had a
+  // real gap: right after fetchRefundRequests() triggers a refetch,
+  // `requests` kept showing the stale value until the effect fired on the
+  // next render pass -- two sources of truth for the same data that could
+  // drift for a render.
+  const requests = refundQuery.data?.data?.requests || [];
 
   const fetchRefundRequests = useCallback(async () => {
     await refundQuery.refetch();

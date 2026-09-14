@@ -34,7 +34,12 @@ export async function getSellerById(id: string) {
   };
 }
 
-export function updateSellerStatus(sellerId: string, data: { status: string }, idempotencyKey: string) {
+// 'active' | 'inactive' instead of unconstrained `string` -- the only two
+// values either call site (handleToggleSellerStatus) ever passes. An
+// unconstrained string meant a typo'd/copy-pasted value ('Active',
+// 'suspended', anything) would type-check here and only fail (or silently
+// misbehave) at runtime, with no compiler signal at the actual mistake.
+export function updateSellerStatus(sellerId: string, data: { status: 'active' | 'inactive' }, idempotencyKey: string) {
   return api.patch(
     `/admin/sellers/${sellerId}/status`,
     data,

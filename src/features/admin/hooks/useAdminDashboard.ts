@@ -226,14 +226,24 @@ export function useAdminDashboard() {
           }
         };
 
-        let metricsData = [];
-        if (Array.isArray(monthlyMetrics)) {
-          metricsData = monthlyMetrics;
-        } else if (Array.isArray((monthlyMetrics as { data?: unknown })?.data)) {
-          metricsData = (monthlyMetrics as { data: unknown[] }).data as MonthlyMetricsData[];
-        } else if ((monthlyMetrics as { data?: { data?: unknown } })?.data?.data && Array.isArray((monthlyMetrics as { data: { data: unknown[] } }).data.data)) {
-          metricsData = (monthlyMetrics as { data: { data: MonthlyMetricsData[] } }).data.data;
-        }
+        // The backend's monthly-metrics envelope has been observed in three
+        // shapes (a bare array, {data: array}, and {data: {data: array}}),
+        // so this still tolerates all three -- but narrows through named
+        // intermediates instead of re-casting the same `monthlyMetrics`
+        // value to a different shape at each branch, which read as a blind
+        // assertion even though each branch IS runtime-checked via
+        // Array.isArray before its cast.
+        const metricsData: MonthlyMetricsData[] = (() => {
+          if (Array.isArray(monthlyMetrics)) return monthlyMetrics as MonthlyMetricsData[];
+          if (!monthlyMetrics || typeof monthlyMetrics !== 'object') return [];
+
+          const wrapper = monthlyMetrics as { data?: unknown };
+          if (Array.isArray(wrapper.data)) return wrapper.data as MonthlyMetricsData[];
+          if (!wrapper.data || typeof wrapper.data !== 'object') return [];
+
+          const nested = (wrapper.data as { data?: unknown }).data;
+          return Array.isArray(nested) ? (nested as MonthlyMetricsData[]) : [];
+        })();
 
         setDashboardState({
           analytics: safeAnalytics,
@@ -378,15 +388,30 @@ export function useAdminDashboard() {
     pendingPayoutRequests.reduce((sum, request) => sum + (Number(request.amount) || 0), 0)
   ), [pendingPayoutRequests]);
 
+  // Guards against a stale response overwriting a newer one: if the admin
+  // clicks View on seller A, then clicks View on seller B before A's
+  // request resolves, and A's response happens to land after B's, this
+  // would previously overwrite selectedSeller with A's data while the
+  // admin -- looking at a modal they believe is showing B -- has no idea
+  // the identity/balance/orders on screen actually belong to a different
+  // seller. Tracks which id is the latest request and ignores anything
+  // that resolves for a different one.
+  const latestSellerRequestIdRef = useRef<string | null>(null);
+
   const handleViewSeller = async (sellerId: string) => {
+    latestSellerRequestIdRef.current = sellerId;
     try {
       setIsLoadingSeller(true);
       const response = await getSellerByIdMutation.mutateAsync(sellerId);
+      if (latestSellerRequestIdRef.current !== sellerId) return;
       setSelectedSeller(response);
     } catch (error) {
+      if (latestSellerRequestIdRef.current !== sellerId) return;
       toast.error('Failed to load seller details');
     } finally {
-      setIsLoadingSeller(false);
+      if (latestSellerRequestIdRef.current === sellerId) {
+        setIsLoadingSeller(false);
+      }
     }
   };
 
@@ -425,15 +450,23 @@ export function useAdminDashboard() {
   };
 
   // Handle viewing buyer details
+  // Same stale-response guard as handleViewSeller above.
+  const latestBuyerRequestIdRef = useRef<string | null>(null);
+
   const handleViewBuyer = async (buyerId: string) => {
+    latestBuyerRequestIdRef.current = buyerId;
     try {
       setIsLoadingBuyer(true);
       const response = await getBuyerByIdMutation.mutateAsync(buyerId);
+      if (latestBuyerRequestIdRef.current !== buyerId) return;
       setSelectedBuyer(response);
     } catch (error) {
+      if (latestBuyerRequestIdRef.current !== buyerId) return;
       toast.error('Failed to load buyer details');
     } finally {
-      setIsLoadingBuyer(false);
+      if (latestBuyerRequestIdRef.current === buyerId) {
+        setIsLoadingBuyer(false);
+      }
     }
   };
 

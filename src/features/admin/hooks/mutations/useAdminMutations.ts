@@ -21,7 +21,11 @@ export function useGetSellerByIdMutation() {
 export function useUpdateSellerStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (args: { sellerId: string; status: string }) =>
+    // 'active' | 'inactive' instead of unconstrained `string` -- matches
+    // adminApi.updateSellerStatus's now-equally-tightened type, and
+    // useUpdateWithdrawalRequestStatusMutation's existing
+    // 'completed' | 'failed' precedent right below.
+    mutationFn: (args: { sellerId: string; status: 'active' | 'inactive' }) =>
       // Deterministic idempotency key (same convention as the withdrawal
       // status mutation): a retry of the same status change replays the cached
       // result instead of applying twice; a different status yields a new key.
