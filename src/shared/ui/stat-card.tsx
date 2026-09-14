@@ -30,25 +30,25 @@ export function StatCard({
     return (
       <div
         className={cn(
-          "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0a0a0a]",
+          "rounded-card border border-separator bg-surface-1 p-5 shadow-sm",
           className
         )}
         {...props}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className={cn("text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-gray-500", titleClassName)}>
+            <p className={cn("text-xs font-medium text-label-2", titleClassName)}>
               {title}
             </p>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className={cn("text-3xl font-black tabular-nums text-slate-950 dark:text-white", valueClassName)}>
+              <span className={cn("text-3xl font-bold tabular-nums tracking-[-0.02em] text-label", valueClassName)}>
                 {value}
               </span>
               {trend != null && (
                 <span
                   className={cn(
                     "text-xs font-semibold tabular-nums",
-                    Number(trend) >= 0 ? "text-emerald-500" : "text-red-500"
+                    Number(trend) >= 0 ? "text-sys-green" : "text-sys-red"
                   )}
                 >
                   {Number(trend) >= 0 ? `+${trend}%` : `${trend}%`}
@@ -56,7 +56,7 @@ export function StatCard({
               )}
             </div>
             {subtitle && (
-              <p className={cn("mt-1 text-xs font-medium text-slate-500 dark:text-gray-500", subtitleClassName)}>
+              <p className={cn("mt-1 text-xs font-medium text-label-2", subtitleClassName)}>
                 {subtitle}
               </p>
             )}
@@ -70,26 +70,26 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#0a0a0a]",
+        "rounded-card border border-separator bg-surface-1 p-4 shadow-sm",
         className
       )}
       {...props}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className={cn("text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-white/50", titleClassName)}>
+        <span className={cn("text-xs font-medium text-label-2", titleClassName)}>
           {title}
         </span>
         {icon && <div className="shrink-0">{icon}</div>}
       </div>
       <div className="mt-2 flex items-baseline justify-between gap-2">
-        <span className={cn("text-xl font-black tabular-nums tracking-tight text-slate-950 dark:text-white sm:text-2xl", valueClassName)}>
+        <span className={cn("text-xl font-bold tabular-nums tracking-[-0.02em] text-label sm:text-2xl", valueClassName)}>
           {value}
         </span>
         {trend != null && (
           <span
             className={cn(
               "text-xs font-semibold tabular-nums",
-              Number(trend) >= 0 ? "text-emerald-500" : "text-red-500"
+              Number(trend) >= 0 ? "text-sys-green" : "text-sys-red"
             )}
           >
             {Number(trend) >= 0 ? `+${trend}%` : `${trend}%`}
@@ -97,7 +97,7 @@ export function StatCard({
         )}
       </div>
       {subtitle && (
-        <p className={cn("mt-1 text-xs font-medium text-slate-500 dark:text-white/60", subtitleClassName)}>
+        <p className={cn("mt-1 text-xs font-medium text-label-2", subtitleClassName)}>
           {subtitle}
         </p>
       )}
