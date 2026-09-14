@@ -20,6 +20,7 @@ export function BuyerDashboardSearch({
         <input
           value={productSearchQuery}
           onChange={event => onProductSearchChange(event.target.value)}
+          aria-label="Search products"
           placeholder="Search products..."
           className="flex-1 bg-transparent border-none outline-none text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 text-xs sm:text-sm font-medium"
         />

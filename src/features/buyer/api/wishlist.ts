@@ -47,8 +47,16 @@ export async function getWishlist(maxRetries = 2, retryCount = 0): Promise<Wishl
     return items;
 
   } catch (error) {
-    const err = error as ApiError;
-    if ((err.code === 'ECONNABORTED' || err.message.includes('timeout')) && retryCount < maxRetries) {
+    // ApiError declares `message: string` as required, but the caught value
+    // isn't guaranteed to actually be an Error/AxiosError at runtime (a
+    // plain object rejection, or an interceptor upstream rejecting with
+    // something else) -- err.message.includes(...) would then throw
+    // TypeError: Cannot read properties of undefined (reading 'includes')
+    // from inside this catch itself, turning getWishlist's documented
+    // graceful "always resolves to []" fallback into a hard rejection.
+    const err = error as Partial<ApiError>;
+    const isTimeout = err.code === 'ECONNABORTED' || (typeof err.message === 'string' && err.message.includes('timeout'));
+    if (isTimeout && retryCount < maxRetries) {
       await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
       return getWishlist(maxRetries, retryCount + 1);
     }

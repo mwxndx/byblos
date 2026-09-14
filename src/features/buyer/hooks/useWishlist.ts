@@ -25,7 +25,7 @@ export function useWishlist() {
   const addOptimisticAddition = useWishlistStore((s) => s.addOptimisticAddition);
   const removeOptimisticAddition = useWishlistStore((s) => s.removeOptimisticAddition);
   const addOptimisticRemoval = useWishlistStore((s) => s.addOptimisticRemoval);
-  const clearOptimistic = useWishlistStore((s) => s.clearOptimistic);
+  const removeOptimisticRemoval = useWishlistStore((s) => s.removeOptimisticRemoval);
   const isInWishlistSelector = useWishlistStore((s) => s.isInWishlist);
 
   const addMutation = useAddWishlistMutation();
@@ -120,9 +120,15 @@ export function useWishlist() {
         toast({ title: 'Failed to add to wishlist', description: 'There was an error adding this item.', variant: 'destructive' });
       }
     } finally {
-      clearOptimistic();
+      // Clear only THIS item's optimistic marker, not the blanket
+      // clearOptimistic(): if a buyer adds product A and removes product B
+      // in quick succession (two independent optimistic updates in
+      // flight), whichever mutation settles first would otherwise wipe the
+      // optimistic marker for BOTH, causing the still-pending one to
+      // visibly flicker back to its pre-optimistic state for a moment.
+      removeOptimisticAddition(pid);
     }
-  }, [user, addOptimisticAddition, addWishlistId, removeWishlistId, removeOptimisticAddition, clearOptimistic, addMutation, toast]);
+  }, [user, addOptimisticAddition, addWishlistId, removeWishlistId, removeOptimisticAddition, addMutation, toast]);
 
   const removeFromWishlist = useCallback(async (productId: string | number) => {
     if (!user) {
@@ -148,9 +154,10 @@ export function useWishlist() {
       addWishlistId(pid);
       toast({ title: 'Failed to remove', description: 'There was an error removing this item.', variant: 'destructive' });
     } finally {
-      clearOptimistic();
+      // Per-item clear -- see the matching comment in addToWishlist above.
+      removeOptimisticRemoval(pid);
     }
-  }, [user, addOptimisticRemoval, removeWishlistId, addWishlistId, clearOptimistic, removeMutation, toast]);
+  }, [user, addOptimisticRemoval, removeWishlistId, addWishlistId, removeOptimisticRemoval, removeMutation, toast]);
 
   const isInWishlist = useCallback((productId: string) => isInWishlistSelector(productId), [isInWishlistSelector]);
 

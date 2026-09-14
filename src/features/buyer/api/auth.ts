@@ -42,9 +42,17 @@ export interface RegisterData {
   location: string;
 }
 
+// <unknown> + explicit narrowing instead of the previous <any> -- <any>
+// meant every property read below (responseBody.status, responseData?.buyer,
+// etc.) was completely unchecked, so the eventual Promise<LoginResponse>
+// return type was pure assertion, trusted on nothing. A payload contract
+// drift (e.g. the backend renaming `buyer` to `user` only, or moving `token`
+// under a different key not covered by the existing fallback chain) would
+// compile clean and only surface at runtime as a generic "unable to load
+// buyer account details" error with no signal about what actually changed.
 export async function login(credentials: { email: string; password: string; acceptTerms?: boolean }): Promise<LoginResponse> {
-  const response = await apiClient.post<any>('/buyers/login', credentials);
-  let responseBody = response?.data !== undefined ? response.data : response;
+  const response = await apiClient.post<unknown>('/buyers/login', credentials);
+  let responseBody: unknown = response?.data !== undefined ? response.data : response;
   if (typeof responseBody === 'string' && responseBody.trim()) {
     try {
       responseBody = JSON.parse(responseBody);
@@ -57,67 +65,65 @@ export async function login(credentials: { email: string; password: string; acce
     throw new Error('Unable to connect to server. Please try again.');
   }
 
-  if (responseBody.status === 'error' || responseBody.status === 'fail') {
-    throw new Error(responseBody.message || responseBody.error || 'Login failed');
+  const body = responseBody as Record<string, unknown>;
+
+  if (body.status === 'error' || body.status === 'fail') {
+    throw new Error(String(body.message || body.error || 'Login failed'));
   }
 
-  const responseData = responseBody.data || responseBody;
-  const rawBuyer = responseData?.buyer || responseData?.user || responseBody?.buyer || responseBody?.user || (responseData?.id ? responseData : null);
-  const token = responseData?.token || responseData?.accessToken || responseBody?.token || responseBody?.accessToken;
-  const refreshToken = responseData?.refreshToken || responseBody?.refreshToken;
+  const responseData = (body.data && typeof body.data === 'object' ? body.data : body) as Record<string, unknown>;
+  const rawBuyer = responseData.buyer ?? responseData.user ?? body.buyer ?? body.user ?? (responseData.id ? responseData : null);
+  const token = (responseData.token ?? responseData.accessToken ?? body.token ?? body.accessToken) as string | undefined;
+  const refreshToken = (responseData.refreshToken ?? body.refreshToken) as string | undefined;
 
   if (!rawBuyer) {
-    throw new Error(responseBody.message || 'Unable to load buyer account details. Please try again.');
+    throw new Error(String(body.message || 'Unable to load buyer account details. Please try again.'));
   }
 
   return { buyer: transformBuyer(rawBuyer), token, refreshToken };
 }
 
 export async function register(data: RegisterData): Promise<LoginResponse> {
-  try {
-    const payload = {
-      fullName: data.fullName,
-      email: data.email,
-      mobile_payment: data.mobilePayment,
-      whatsapp_number: data.whatsappNumber,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
-      city: data.city,
-      location: data.location,
-      termsAccepted: (data as unknown as Record<string, unknown>).termsAccepted === true
-    };
+  const payload = {
+    fullName: data.fullName,
+    email: data.email,
+    mobile_payment: data.mobilePayment,
+    whatsapp_number: data.whatsappNumber,
+    password: data.password,
+    confirmPassword: data.confirmPassword,
+    city: data.city,
+    location: data.location,
+    termsAccepted: (data as unknown as Record<string, unknown>).termsAccepted === true
+  };
 
-    const response = await buyerApiInstance.post<RegisterResponse>('/buyers/register', payload);
-    const responseBody = response.data;
-    const responseData = responseBody?.data;
+  const response = await buyerApiInstance.post<RegisterResponse>('/buyers/register', payload);
+  const responseBody = response.data;
+  const responseData = responseBody?.data;
 
-    if (!responseBody || typeof responseBody !== 'object') {
-      const httpStatus = response?.status;
-      if (httpStatus && httpStatus >= 500) {
-        throw new Error(`Server temporarily unavailable (HTTP ${httpStatus}). Please try again later.`);
-      }
-      throw new Error('Malformed server response payload. Please try again.');
+  if (!responseBody || typeof responseBody !== 'object') {
+    const httpStatus = response?.status;
+    if (httpStatus && httpStatus >= 500) {
+      throw new Error(`Server temporarily unavailable (HTTP ${httpStatus}). Please try again later.`);
     }
-
-    if (responseBody.status === 'success' && responseData?.emailVerificationRequired) {
-      return {
-        status: 'pending_verification',
-        message: responseBody.message
-      };
-    }
-
-    const { buyer } = responseData || {};
-
-    if (!buyer) {
-      throw new Error('Registration response incomplete: missing buyer profile details.');
-    }
-
-    await getFreshCsrfToken();
-
-    return { buyer: transformBuyer(buyer) };
-  } catch (error) {
-    throw error;
+    throw new Error('Malformed server response payload. Please try again.');
   }
+
+  if (responseBody.status === 'success' && responseData?.emailVerificationRequired) {
+    return {
+      status: 'pending_verification',
+      message: responseBody.message
+    };
+  }
+
+  const { buyer } = responseData || {};
+
+  if (!buyer) {
+    throw new Error('Registration response incomplete: missing buyer profile details.');
+  }
+
+  await getFreshCsrfToken();
+
+  return { buyer: transformBuyer(buyer) };
 }
 
 export async function resendVerification(email: string): Promise<{ message: string }> {
@@ -259,12 +265,8 @@ export async function verifyEmail(email: string, token: string): Promise<{ succe
 }
 
 export async function autoLogin(autoLoginToken: string): Promise<unknown> {
-  try {
-    const response = await apiClient.post('/buyers/auto-login', { autoLoginToken });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await apiClient.post('/buyers/auto-login', { autoLoginToken });
+  return response.data;
 }
 
 

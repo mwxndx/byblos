@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
@@ -28,6 +28,15 @@ export function OrdersSectionContainer() {
   const [downloadingOrderId, setDownloadingOrderId] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
   const [currentConfirmOrderId, setCurrentConfirmOrderId] = useState<string | null>(null);
+  // Synchronous per-order guard for handleDownload: the button's `disabled`
+  // prop only takes effect once state updates and React re-renders, so two
+  // rapid clicks on the SAME order's download button before that repaint
+  // could otherwise fire two concurrent downloads (duplicate requests,
+  // overlapping onProgress callbacks stomping the same downloadProgress
+  // entry). Keyed per order id (not a single shared lock) since different
+  // orders are meant to download concurrently -- see BuyerOrderCard's
+  // disabled={downloadingOrderId === order.id}.
+  const inFlightDownloadsRef = useRef<Set<string>>(new Set());
 
   // React Query: fetch orders
   const { data: orders = [], isLoading, error, refetch } = useBuyerOrdersQuery(!!user);
@@ -44,6 +53,9 @@ export function OrdersSectionContainer() {
       return;
     }
 
+    if (inFlightDownloadsRef.current.has(order.id)) return;
+    inFlightDownloadsRef.current.add(order.id);
+
     try {
       setDownloadingOrderId(order.id);
       setDownloadProgress(prev => ({ ...prev, [order.id]: 0 }));
@@ -58,6 +70,7 @@ export function OrdersSectionContainer() {
     } catch {
       // Error handled in mutation's onError
     } finally {
+      inFlightDownloadsRef.current.delete(order.id);
       setDownloadingOrderId(null);
       setDownloadProgress(prev => {
         const next = { ...prev };

@@ -7,9 +7,18 @@ interface ApiResponse<T> {
   message?: string;
 }
 
+// <unknown> + explicit narrowing at the unwrap boundary instead of the
+// previous <any> -- see the matching comment on getOrders in
+// seller/api/ordersApi.ts. Note this does not add full runtime validation
+// of ApiOrder's other required fields (totalAmount, customer, seller,
+// shippingAddress, per-item price/subtotal/imageUrl) -- the final `as
+// ApiOrder` cast below still trusts those. Doing that properly would need a
+// real schema (e.g. Zod) covering the whole shape, which is a larger,
+// separate change; this fix is scoped to removing the blanket `any` that
+// left every access on this unwrap path completely unchecked.
 export async function getOrders(): Promise<ApiOrder[]> {
-  const response = await buyerApiInstance.get<any>('/orders/user');
-  let responseBody = response?.data !== undefined ? response.data : response;
+  const response = await buyerApiInstance.get<unknown>('/orders/user');
+  let responseBody: unknown = response?.data !== undefined ? response.data : response;
   if (typeof responseBody === 'string' && responseBody.trim()) {
     try {
       responseBody = JSON.parse(responseBody);
@@ -22,14 +31,17 @@ export async function getOrders(): Promise<ApiOrder[]> {
     return [];
   }
 
-  const rawOrders = Array.isArray(responseBody)
+  const body = responseBody as { data?: unknown; orders?: unknown };
+  const nestedData = body.data as { orders?: unknown } | unknown[] | undefined;
+
+  const rawOrders: unknown[] = Array.isArray(responseBody)
     ? responseBody
-    : (Array.isArray(responseBody?.data)
-        ? responseBody.data
-        : (Array.isArray(responseBody?.data?.orders)
-            ? responseBody.data.orders
-            : (Array.isArray(responseBody?.orders)
-                ? responseBody.orders
+    : (Array.isArray(nestedData)
+        ? nestedData
+        : (Array.isArray((nestedData as { orders?: unknown } | undefined)?.orders)
+            ? (nestedData as { orders: unknown[] }).orders
+            : (Array.isArray(body.orders)
+                ? body.orders
                 : [])));
 
   return rawOrders.map((order: unknown) => {
@@ -44,12 +56,8 @@ export async function getOrders(): Promise<ApiOrder[]> {
 }
 
 export async function getOrder(orderId: string): Promise<ApiOrder> {
-  try {
-    const response = await buyerApiInstance.get<ApiResponse<ApiOrder>>(`/orders/${orderId}`);
-    return response.data.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await buyerApiInstance.get<ApiResponse<ApiOrder>>(`/orders/${orderId}`);
+  return response.data.data;
 }
 
 export async function cancelOrder(orderId: string): Promise<{ success: boolean; message?: string }> {
