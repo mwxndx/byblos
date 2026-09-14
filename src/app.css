@@ -139,6 +139,8 @@ body.android-native {
     --sys-orange: #ff9f0a;
     --sys-blue: #0a84ff;
     --chrome: rgba(28, 28, 30, 0.72);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 .page-enter {
@@ -1007,6 +1009,8 @@ body.dashboard-active .seller-tab-selected {
     --sys-orange: #ff9500;
     --sys-blue: #007aff;
     --chrome: rgba(255, 255, 255, 0.72);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
+    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.14);
 }
 
 /* html/body background in light mode */
