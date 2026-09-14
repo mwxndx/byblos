@@ -1,43 +1,42 @@
 import { api } from './instance';
 
+// Must reject on failure -- see the matching comment in buyers.ts.
 export async function getFinancialMetrics() {
-  try {
-    const response = await api.get('/admin/metrics/financial');
-    return response.data.data || {
-      totalSales: 0,
-      totalOrders: 0,
-      totalCommission: 0,
-      totalRefunds: 0,
-      totalRefundRequests: 0,
-      pendingRefunds: 0,
-      netRevenue: 0
-    };
-  } catch (error) {
-    return {
-      totalSales: 0,
-      totalOrders: 0,
-      totalCommission: 0,
-      totalRefunds: 0,
-      totalRefundRequests: 0,
-      pendingRefunds: 0,
-      netRevenue: 0
-    };
-  }
+  const response = await api.get('/admin/metrics/financial');
+  return response.data.data || {
+    totalSales: 0,
+    totalOrders: 0,
+    totalCommission: 0,
+    totalRefunds: 0,
+    totalRefundRequests: 0,
+    pendingRefunds: 0,
+    netRevenue: 0
+  };
 }
 
+// Must reject on failure -- see the matching comment in buyers.ts.
 export async function getMonthlyFinancialData() {
-  try {
-    const response = await api.get('/admin/metrics/financial/monthly');
-    return response.data.data || [];
-  } catch (error) {
-    return [];
-  }
+  const response = await api.get('/admin/metrics/financial/monthly');
+  return response.data.data || [];
 }
 
+// Unlike the other admin reads, this one intentionally keeps a catch: it
+// backs a payment-provider health widget, and the backend itself already
+// degrades per-provider ({error: message}) rather than failing the whole
+// request (see admin.controller.js getPaymentProviderBalances). Treating a
+// health CHECK's own failure as a reason to fail the entire admin dashboard
+// would be a worse outcome than showing "Unavailable" for this one widget.
+// Both branches now return the identical shape (previously the success path
+// fell back to `null`, forcing every consumer to handle two different
+// "no data" shapes for the same condition).
 export async function getPaymentProviderBalances() {
   try {
     const response = await api.get('/admin/payment-provider/balances');
-    return response.data.data || null;
+    return response.data.data || {
+      payin: { error: 'Unavailable' },
+      payout: { error: 'Unavailable' },
+      timestamp: new Date().toISOString()
+    };
   } catch (error) {
     return {
       payin: { error: 'Unavailable' },

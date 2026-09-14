@@ -1,23 +1,13 @@
 import { api } from './instance';
 
+// Deliberately does not catch-and-default: a failed request must reject so
+// TanStack Query marks this queryFn's query isError (and retries per its
+// configured policy) instead of silently caching a fabricated all-zero
+// result as if it were real data -- see useAdminDashboard.ts's read-error
+// surfacing for how the failure reaches the admin.
 export async function getDashboardStats() {
-  try {
-    const { data } = await api.get('/admin/stats');
-    return data.data;
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    return {
-      totalBuyers: 0,
-      totalClients: 0,
-      totalCreators: 0,
-      pendingCreatorRequests: 0,
-      totalCreatorEarnings: 0,
-      totalProducts: 0,
-      totalOrders: 0,
-      totalWishlists: 0,
-      topShops: []
-    };
-  }
+  const { data } = await api.get('/admin/stats');
+  return data.data;
 }
 
 
