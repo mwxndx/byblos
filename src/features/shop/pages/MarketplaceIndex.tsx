@@ -18,13 +18,13 @@ const LandingHome = () => (
         siblings, so relying on ordering alone here would be fragile. */}
     <LandingDoodles />
     <Link to="/mzigo/login" className="absolute left-5 top-[calc(1.25rem+env(safe-area-inset-top,0px))] z-10" aria-label="Mzigo Ego delivery partner login">
-      <Button className="flex h-10 w-10 items-center justify-center rounded-full border border-black/10 dark:border-white/15 bg-black/[0.04] dark:bg-white/[0.06] p-0 shadow-sm hover:bg-black/[0.08] dark:hover:bg-white/10">
+      <Button className="flex h-10 w-10 items-center justify-center rounded-full border border-separator bg-fill p-0 hover:bg-fill-2">
         <img src="/mzigo-ego.png" alt="Mzigo Ego" className="h-6 w-6 object-contain" />
       </Button>
     </Link>
 
     <Link to="/creator/login" className="absolute right-5 top-[calc(1.25rem+env(safe-area-inset-top,0px))] z-10">
-      <Button className="h-7 rounded-full border border-black/10 dark:border-white/15 bg-black/[0.04] dark:bg-white/[0.06] px-3 text-[10px] font-bold uppercase tracking-wider text-slate-800 dark:text-white shadow-sm hover:bg-black/[0.08] dark:hover:bg-white/10">
+      <Button className="h-8 rounded-full border border-separator bg-fill px-4 text-xs font-semibold text-label hover:bg-fill-2">
         Creator
       </Button>
     </Link>
@@ -48,11 +48,11 @@ const LandingHome = () => (
         />
       </Link>
 
-      <p className="text-xs font-semibold tracking-wide text-slate-600 dark:text-white/80 max-w-[280px] leading-relaxed">
+      <p className="text-[15px] font-medium text-label-2 max-w-[280px] leading-relaxed">
         The safer way to buy from businesses on social media
       </p>
 
-      <p className="text-[13px] font-bold tracking-wide text-slate-800 dark:text-white/90">
+      <p className="text-[13px] font-semibold text-label">
         Tap logo to get access
       </p>
 

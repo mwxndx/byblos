@@ -38,11 +38,11 @@ export function AddBusinessCard() {
         onTouchStart={native ? handleTouchStart : undefined}
         onTouchEnd={native ? handleTouchEnd : undefined}
         aria-label="Add your business — open seller registration"
-        className="flex w-full flex-col items-center gap-1 rounded-t-3xl border-x border-t border-black/10 bg-white px-6 pb-4 pt-2.5 shadow-[0_-10px_30px_rgba(0,0,0,0.18)] backdrop-blur transition-colors hover:bg-slate-50 dark:border-white/12 dark:bg-white/[0.06] dark:shadow-[0_-12px_34px_rgba(0,0,0,0.55)] dark:hover:bg-white/10"
+        className="flex w-full flex-col items-center gap-1 rounded-t-sheet border-x border-t border-separator bg-surface-1 px-6 pb-4 pt-2.5 shadow-[var(--shadow-pop)] backdrop-blur transition-colors hover:bg-fill"
       >
-        <span className="h-1.5 w-10 rounded-full bg-slate-300 dark:bg-white/25" aria-hidden="true" />
-        <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-900 dark:text-white">
-          <ChevronUp className={`h-4 w-4 text-yellow-500 ${native ? 'animate-bounce' : ''}`} aria-hidden="true" />
+        <span className="h-1.5 w-10 rounded-full bg-separator-strong" aria-hidden="true" />
+        <span className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-label">
+          <ChevronUp className={`h-4 w-4 text-brand-text motion-reduce:animate-none ${native ? 'animate-bounce' : ''}`} aria-hidden="true" />
           {native ? 'Swipe up to add business' : 'Click here to add business'}
         </span>
       </button>
