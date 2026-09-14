@@ -112,17 +112,21 @@ export function useSellerWithdrawals({ balance, enabled = true, toast }: UseSell
 
     await runWithLock(async () => {
       try {
-        if (!withdrawalIdempotencyKeyRef.current) {
-          withdrawalIdempotencyKeyRef.current = globalThis.crypto?.randomUUID
+        // Reuse the ref's key across retries of the same attempt, or mint
+        // one now -- either way `idempotencyKey` below is a guaranteed
+        // string, matching useRequestWithdrawalMutation's now-required (not
+        // optional) idempotencyKey param, so no `|| undefined` fallback (and
+        // no unsafe cast on the mutation's side) is needed.
+        const idempotencyKey = withdrawalIdempotencyKeyRef.current
+          ?? (withdrawalIdempotencyKeyRef.current = globalThis.crypto?.randomUUID
             ? `withdrawal-${globalThis.crypto.randomUUID()}`
-            : `withdrawal-${Date.now()}`;
-        }
+            : `withdrawal-${Date.now()}`);
 
         await requestWithdrawalMutation.mutateAsync({
           amount,
           mpesaNumber: withdrawalForm.mpesaNumber,
           mpesaName: withdrawalForm.mpesaName,
-          idempotencyKey: withdrawalIdempotencyKeyRef.current || undefined
+          idempotencyKey
         });
 
         toast({

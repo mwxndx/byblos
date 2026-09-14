@@ -83,7 +83,28 @@ export const sellerOrdersApi = {
       legType: 'pickup',
       location
     });
-    return response.data.data as { feeAmount: number; distanceKm: number; chargeableDistanceKm: number; rateKesPerKm: number; currency: string; pricingModel?: string; cbdPickupFeeKes?: number; cbdRadiusKm?: number };
+
+    // Previously cast response.data.data straight to this shape with no
+    // runtime check. The one current caller (usePickupRequestFlow.ts)
+    // already defensively coerces feeAmount/distanceKm/chargeableDistanceKm/
+    // rateKesPerKm/currency with Number(x || 0) before use, but
+    // pricingModel/cbdPickupFeeKes/cbdRadiusKm were trusted as-is with no
+    // check anywhere -- a partial/malformed response would silently carry a
+    // wrong type into anything reading those fields directly. Doing the
+    // same coercion here, once, at the boundary, means every caller (not
+    // just the one that happens to defend itself today) gets a genuinely
+    // safe value instead of an unchecked assertion.
+    const raw = (response.data.data && typeof response.data.data === 'object' ? response.data.data : {}) as Record<string, unknown>;
+    return {
+      feeAmount: Number(raw.feeAmount) || 0,
+      distanceKm: Number(raw.distanceKm) || 0,
+      chargeableDistanceKm: Number(raw.chargeableDistanceKm) || 0,
+      rateKesPerKm: Number(raw.rateKesPerKm) || 40,
+      currency: typeof raw.currency === 'string' ? raw.currency : 'KES',
+      pricingModel: typeof raw.pricingModel === 'string' ? raw.pricingModel : undefined,
+      cbdPickupFeeKes: typeof raw.cbdPickupFeeKes === 'number' ? raw.cbdPickupFeeKes : undefined,
+      cbdRadiusKm: typeof raw.cbdRadiusKm === 'number' ? raw.cbdRadiusKm : undefined,
+    };
   },
 
   async requestPickup(orderId: string, payload: {

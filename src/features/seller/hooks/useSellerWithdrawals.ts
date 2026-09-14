@@ -17,8 +17,17 @@ export function useSellerWithdrawalsQuery(enabled = true) {
 export function useRequestWithdrawalMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (args: { amount: number; mpesaNumber: string; mpesaName: string; idempotencyKey?: string }) =>
-      sellerApi.requestWithdrawal(args as unknown as Parameters<typeof sellerApi.requestWithdrawal>[0]),
+    // idempotencyKey is required here (matching sellerApi.requestWithdrawal's
+    // real, required idempotencyKey: string) rather than the previous
+    // optional `?: string`, which forced an `as unknown as
+    // Parameters<...>` double-cast to bridge the two. That cast currently
+    // didn't misbehave -- requestWithdrawal has its own runtime guard
+    // (`if (!data.idempotencyKey) throw`) -- but gave zero compile-time
+    // protection: a future refactor of this hook's caller that dropped the
+    // key would compile clean and only fail at runtime. Types now match
+    // exactly, so no cast is needed at all.
+    mutationFn: (args: { amount: number; mpesaNumber: string; mpesaName: string; idempotencyKey: string }) =>
+      sellerApi.requestWithdrawal(args),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.withdrawals() });
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.analytics() });
