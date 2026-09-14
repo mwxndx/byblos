@@ -54,6 +54,39 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// Apple semantic layer (light/dark values resolved via CSS vars in
+				// src/app.css). Primitives migrate onto these; existing pages keep
+				// using the shadcn tokens above until each portal is converted.
+				label: {
+					DEFAULT: 'var(--label)',
+					2: 'var(--label-2)',
+					3: 'var(--label-3)'
+				},
+				surface: {
+					1: 'var(--surface-1)',
+					2: 'var(--surface-2)'
+				},
+				separator: {
+					DEFAULT: 'var(--separator)',
+					strong: 'var(--separator-strong)'
+				},
+				fill: {
+					DEFAULT: 'var(--fill)',
+					2: 'var(--fill-2)'
+				},
+				brand: {
+					DEFAULT: 'var(--brand)',
+					press: 'var(--brand-press)',
+					text: 'var(--brand-text)',
+					on: 'var(--on-brand)'
+				},
+				sys: {
+					red: 'var(--sys-red)',
+					green: 'var(--sys-green)',
+					orange: 'var(--sys-orange)',
+					blue: 'var(--sys-blue)'
+				},
+				chrome: 'var(--chrome)',
 				ivory: {
 					DEFAULT: '#ffffff',
 					cream: '#faf9f7',
@@ -67,16 +100,24 @@ export default {
 				}
 			},
 			fontFamily: {
-				sans: ['Nunito Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-				serif: ['Nunito Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				// SF Pro on Apple (via -apple-system) → Inter on web/Android.
+				sans: ['-apple-system', 'Inter', 'system-ui', 'Segoe UI', 'Roboto', 'sans-serif'],
+				serif: ['-apple-system', 'Inter', 'system-ui', 'sans-serif'],
 				mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
-				display: ['Nunito Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-				body: ['Nunito Sans', 'ui-sans-serif', 'system-ui', 'sans-serif']
+				display: ['-apple-system', 'Inter', 'system-ui', 'sans-serif'],
+				body: ['-apple-system', 'Inter', 'system-ui', 'sans-serif']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)'
+				sm: 'calc(var(--radius) - 4px)',
+				// Apple continuous-corner scale (retires the ad-hoc 40px radii).
+				control: 'var(--r-control)',
+				card: 'var(--r-card)',
+				sheet: 'var(--r-sheet)'
+			},
+			transitionTimingFunction: {
+				ios: 'var(--ease-ios)'
 			},
 			keyframes: {
 				'accordion-down': {
