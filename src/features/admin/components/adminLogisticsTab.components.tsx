@@ -49,7 +49,7 @@ export function LegAdminPanel({
   if (!leg) {
     return (
       <div className="rounded-2xl border border-separator bg-black p-4">
-        <p className="text-xs uppercase tracking-widest text-label/50">{legType}</p>
+        <p className="text-xs uppercase tracking-widest text-label-2">{legType}</p>
         <p className="mt-2 text-sm text-label">Not requested</p>
       </div>
     );
@@ -63,7 +63,7 @@ export function LegAdminPanel({
     <div className="rounded-2xl border border-separator bg-black p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-widest text-label/50">{legType}</p>
+          <p className="text-xs uppercase tracking-widest text-label-2">{legType}</p>
           <p className="mt-1 text-lg font-semibold capitalize text-label">{label(leg.status)}</p>
         </div>
         <span className="rounded-full bg-white px-3 py-1 text-[10px] font-semibold uppercase text-black">
@@ -71,14 +71,14 @@ export function LegAdminPanel({
         </span>
       </div>
 
-      <div className="mt-4 grid gap-3 text-sm text-label/80 md:grid-cols-2">
+      <div className="mt-4 grid gap-3 text-sm text-label-2 md:grid-cols-2">
         <div>
-          <p className="text-xs text-label/45">From</p>
+          <p className="text-xs text-label-2">From</p>
           <p>{leg.origin.address || leg.origin.label || 'Not provided'}</p>
           {leg.origin.mapLink && <a className="text-xs text-yellow-200 underline" href={leg.origin.mapLink} target="_blank" rel="noreferrer">Open map</a>}
         </div>
         <div>
-          <p className="text-xs text-label/45">To</p>
+          <p className="text-xs text-label-2">To</p>
           <p>{leg.destination.address || leg.destination.label || 'Not provided'}</p>
           {leg.destination.mapLink && <a className="text-xs text-yellow-200 underline" href={leg.destination.mapLink} target="_blank" rel="noreferrer">Open map</a>}
         </div>
@@ -137,11 +137,11 @@ export function LogisticsAdminCard({
         <div>
           <p className="text-xs uppercase tracking-[0.25em] text-yellow-200">Order {request.order.orderNumber}</p>
           <h3 className="mt-1 text-xl font-semibold text-label">{request.product.summary || 'Logistics package'}</h3>
-          <p className="mt-1 text-sm text-label/60">
+          <p className="mt-1 text-sm text-label-2">
             {request.seller.shopName || request.seller.name || 'Shop'} - {request.partner?.name || 'Mzigo Ego'}
           </p>
         </div>
-        <div className="grid gap-2 text-right text-sm text-label/70">
+        <div className="grid gap-2 text-right text-sm text-label-2">
           <span className="rounded-full bg-white px-3 py-1 text-center text-xs font-semibold uppercase text-black">{label(request.status)}</span>
           <span>{formatDate(request.deadlineAt)}</span>
         </div>
@@ -170,17 +170,17 @@ export function LogisticsAdminCard({
 
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border border-separator bg-black p-4">
-          <p className="mb-2 text-xs uppercase tracking-widest text-label/50">Buyer</p>
+          <p className="mb-2 text-xs uppercase tracking-widest text-label-2">Buyer</p>
           <p className="text-sm font-semibold text-label">{request.buyer.name || 'Buyer'}</p>
           <ContactLinks phone={request.buyer.phone} email={request.buyer.email} label="Call buyer" />
         </div>
         <div className="rounded-2xl border border-separator bg-black p-4">
-          <p className="mb-2 text-xs uppercase tracking-widest text-label/50">Seller</p>
+          <p className="mb-2 text-xs uppercase tracking-widest text-label-2">Seller</p>
           <p className="text-sm font-semibold text-label">{request.seller.shopName || request.seller.name || 'Seller'}</p>
           <ContactLinks phone={request.seller.phone} label="Call seller" />
         </div>
         <div className="rounded-2xl border border-separator bg-black p-4">
-          <p className="mb-2 text-xs uppercase tracking-widest text-label/50">Mzigo</p>
+          <p className="mb-2 text-xs uppercase tracking-widest text-label-2">Mzigo</p>
           <p className="text-sm font-semibold text-label">{request.partner?.name || 'Mzigo Ego'}</p>
           <ContactLinks phone={request.partner?.whatsappNumber || request.partner?.phone} label="Call Mzigo" />
         </div>
@@ -208,13 +208,13 @@ export function LogisticsAdminCard({
         </div>
         <div className="space-y-3">
           {request.events.length === 0 ? (
-            <p className="text-sm text-label/55">No tracking events yet.</p>
+            <p className="text-sm text-label-2">No tracking events yet.</p>
           ) : (
             request.events.map((event) => (
               <div key={event.id} className="border-l border-yellow-300/40 pl-3">
                 <p className="text-sm font-semibold capitalize text-label">{label(event.status || event.type)}</p>
-                {event.message && <p className="text-sm text-label/70">{event.message}</p>}
-                <p className="text-xs text-label/45">{formatDate(event.createdAt)} - {event.source || 'system'}</p>
+                {event.message && <p className="text-sm text-label-2">{event.message}</p>}
+                <p className="text-xs text-label-2">{formatDate(event.createdAt)} - {event.source || 'system'}</p>
               </div>
             ))
           )}

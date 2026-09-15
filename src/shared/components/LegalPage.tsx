@@ -35,7 +35,7 @@ export default function LegalPage() {
         </div>
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs text-white/40">
+      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs text-label-2">
         &copy; 2026 Byblos. All rights reserved.
       </footer>
     </div>

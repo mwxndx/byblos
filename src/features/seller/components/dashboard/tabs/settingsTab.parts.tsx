@@ -90,7 +90,7 @@ export function SocialInput({ displayValue, kind, iconPath, isEditing, label, on
               )}
             </>
           ) : (
-            <p className="text-sm sm:text-base font-semibold text-label/40 italic">Not set</p>
+            <p className="text-sm sm:text-base font-semibold text-label-2 italic">Not set</p>
           )}
         </div>
       )}

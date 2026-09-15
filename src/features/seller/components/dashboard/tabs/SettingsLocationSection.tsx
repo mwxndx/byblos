@@ -181,7 +181,7 @@ export function SettingsLocationSection({
                         <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
                           {sellerProfile.physicalAddress}
                         </p>
-                        <p className="text-xs text-label/40">
+                        <p className="text-xs text-label-2">
                           {sellerProfile.latitude && sellerProfile.longitude
                             ? `Coordinates: ${Number(sellerProfile.latitude).toFixed(6)}, ${Number(sellerProfile.longitude).toFixed(6)}`
                             : 'No map location pinned'}
@@ -205,7 +205,7 @@ export function SettingsLocationSection({
                       </Button>
                     </div>
                   ) : (
-                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-label/40 italic">
+                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-label-2 italic">
                       No physical address set
                     </p>
                   )}

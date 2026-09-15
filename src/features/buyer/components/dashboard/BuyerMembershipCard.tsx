@@ -74,7 +74,7 @@ export function BuyerMembershipCard() {
 
       {isMember ? (
         <>
-          <p className="text-xs text-label/50">
+          <p className="text-xs text-label-2">
             You're member No. {String(displayNumber).padStart(6, '0')} — share your card anytime.
           </p>
 
@@ -126,7 +126,7 @@ export function BuyerMembershipCard() {
         </>
       ) : (
         <>
-          <p className="text-xs text-label/50">
+          <p className="text-xs text-label-2">
             Get your own numbered founder card — proof you shop protected, and one of the first to do it.
           </p>
           <button

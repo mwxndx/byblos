@@ -94,28 +94,28 @@ export function AdminLogisticsTab() {
         <Card className="border-separator bg-surface-1 text-label">
           <CardContent className="p-4">
             <Truck className="mb-3 h-5 w-5 text-yellow-300" />
-            <p className="text-xs uppercase tracking-widest text-label/50">Total</p>
+            <p className="text-xs uppercase tracking-widest text-label-2">Total</p>
             <p className="text-2xl font-semibold">{dashboard?.count || 0}</p>
           </CardContent>
         </Card>
         <Card className="border-red-300/20 bg-red-500/10 text-label">
           <CardContent className="p-4">
             <AlertTriangle className="mb-3 h-5 w-5 text-red-300" />
-            <p className="text-xs uppercase tracking-widest text-label/50">Failed</p>
+            <p className="text-xs uppercase tracking-widest text-label-2">Failed</p>
             <p className="text-2xl font-semibold">{dashboard?.summary?.failed || 0}</p>
           </CardContent>
         </Card>
         <Card className="border-yellow-300/20 bg-yellow-300/10 text-label">
           <CardContent className="p-4">
             <Clock className="mb-3 h-5 w-5 text-yellow-300" />
-            <p className="text-xs uppercase tracking-widest text-label/50">Delayed</p>
+            <p className="text-xs uppercase tracking-widest text-label-2">Delayed</p>
             <p className="text-2xl font-semibold">{dashboard?.summary?.delayed || 0}</p>
           </CardContent>
         </Card>
         <Card className="border-cyan-300/20 bg-cyan-300/10 text-label">
           <CardContent className="p-4">
             <ShieldCheck className="mb-3 h-5 w-5 text-cyan-200" />
-            <p className="text-xs uppercase tracking-widest text-label/50">Review</p>
+            <p className="text-xs uppercase tracking-widest text-label-2">Review</p>
             <p className="text-2xl font-semibold">{dashboard?.summary?.manualReview || 0}</p>
           </CardContent>
         </Card>
@@ -125,7 +125,7 @@ export function AdminLogisticsTab() {
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <CardTitle className="text-2xl text-label">Logistics Oversight</CardTitle>
-            <p className="mt-1 text-sm text-label/60">Delivered completes logistics only. Escrow release stays under order completion rules.</p>
+            <p className="mt-1 text-sm text-label-2">Delivered completes logistics only. Escrow release stays under order completion rules.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {STATUS_FILTERS.map((filter) => (
@@ -156,7 +156,7 @@ export function AdminLogisticsTab() {
               {[0, 1].map((item) => <div key={item} className="h-80 animate-pulse rounded-3xl bg-fill" />)}
             </div>
           ) : requests.length === 0 ? (
-            <div className="rounded-3xl border border-separator bg-black p-8 text-center text-label/60">
+            <div className="rounded-3xl border border-separator bg-black p-8 text-center text-label-2">
               No logistics requests match this filter.
             </div>
           ) : (

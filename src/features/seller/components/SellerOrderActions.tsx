@@ -52,8 +52,8 @@ export function SellerOrderActions({
                                                     <p className="font-bold text-lg sm:text-xl text-label">
                                                         {formatCurrency(order.totalAmount, order.currency)}
                                                     </p>
-                                                    <p className="text-xs text-label/70">Total Amount</p>
-                                                    <p className="mt-1 text-xs text-label/70">Payment: {order.paymentStatus || 'Pending'}</p>
+                                                    <p className="text-xs text-label-2">Total Amount</p>
+                                                    <p className="mt-1 text-xs text-label-2">Payment: {order.paymentStatus || 'Pending'}</p>
                                                 </div>
 
                                                 {/* Action Buttons */}
@@ -83,7 +83,7 @@ export function SellerOrderActions({
                                                                 <Truck className="h-3 w-3 mr-1.5" />
                                                                 Request Mzigo pickup
                                                             </Button>
-                                                            <p className="text-[10px] leading-relaxed text-label/60">
+                                                            <p className="text-[10px] leading-relaxed text-label-2">
                                                                 Choose one handoff method. Mzigo Ego secures the package and checks it against the order.
                                                             </p>
                                                         </div>

@@ -9,7 +9,7 @@ import { MzigoJourneyStepper } from './MzigoJourneyStepper';
 function CallButton({ name, phone }: { name: string; phone?: string | null }) {
   if (!phone) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-separator bg-white/[0.03] px-3 py-1.5 text-xs text-label/40">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-separator bg-white/[0.03] px-3 py-1.5 text-xs text-label-2">
         <Phone size={13} />
         {name}: no number
       </span>
@@ -72,24 +72,24 @@ export function RequestCard({
           {imageSrc ? (
             <img src={imageSrc} alt={productSummary} className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-label/40">
+            <div className="flex h-full w-full items-center justify-center text-label-2">
               <ShoppingBag size={22} />
             </div>
           )}
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] uppercase tracking-wide text-label/50">Order {request.order.orderNumber}</p>
+          <p className="text-[11px] uppercase tracking-wide text-label-2">Order {request.order.orderNumber}</p>
           <h3 className="truncate text-base font-semibold text-label">{productSummary}</h3>
           <p className="mt-1 text-sm font-semibold text-yellow-300">{journey.label}</p>
         </div>
 
         <div className="shrink-0 rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-right">
-          <p className="text-[11px] text-label/60">{isCompleted ? 'Completed' : 'Deadline'}</p>
+          <p className="text-[11px] text-label-2">{isCompleted ? 'Completed' : 'Deadline'}</p>
           <p className={request.isOverdue && !isCompleted ? 'text-sm font-semibold text-red-300' : 'text-sm font-semibold text-yellow-200'}>
             {isCompleted ? 'Done' : deadlineText(request.deadlineAt, now)}
           </p>
-          <p className="text-[11px] text-label/50">{formatDate(isCompleted ? completedAt : request.deadlineAt)}</p>
+          <p className="text-[11px] text-label-2">{formatDate(isCompleted ? completedAt : request.deadlineAt)}</p>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export function RequestCard({
               type="button"
               disabled={Boolean(updatingStatusKey)}
               onClick={() => onStatusUpdate(request.id, action.legType, action.status)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-label/70 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-55"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-label-2 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-55"
             >
               {updatingStatusKey === `${request.id}:${action.legType}:${action.status}` && (
                 <Loader2 size={12} className="animate-spin" />
@@ -164,7 +164,7 @@ export function RequestCard({
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-label/80 transition hover:bg-white/10"
+        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-label-2 transition hover:bg-white/10"
       >
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         {expanded ? 'Hide details' : 'Show details'}
@@ -173,11 +173,11 @@ export function RequestCard({
       {expanded && (
         <div className="mt-3 space-y-3 text-sm">
           <div className="rounded-xl border border-separator bg-black/40 p-3">
-            <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label/55">
+            <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
               <ShoppingBag size={13} />
               What&apos;s in the package
             </p>
-            <div className="space-y-1 text-xs text-label/75">
+            <div className="space-y-1 text-xs text-label-2">
               {request.product.items.map((item) => (
                 <p key={item.id}>
                   {item.name} &times;{item.quantity} — {formatCurrency(item.subtotal)}
@@ -188,38 +188,38 @@ export function RequestCard({
 
           <div className="grid gap-3 md:grid-cols-2">
             <div className="rounded-xl border border-separator bg-black/40 p-3">
-              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label/55">
+              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
                 <Store size={13} />
                 Pick up from
               </p>
               <p className="text-sm font-semibold text-label">{sellerDisplayName}</p>
-              <p className="text-xs text-label/65">{sellerAddress}</p>
-              <p className="mt-1 text-xs text-label/50">{request.seller.phone || 'No phone saved'}</p>
+              <p className="text-xs text-label-2">{sellerAddress}</p>
+              <p className="mt-1 text-xs text-label-2">{request.seller.phone || 'No phone saved'}</p>
             </div>
 
             <div className="rounded-xl border border-separator bg-black/40 p-3">
-              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label/55">
+              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
                 <UserRound size={13} />
                 Deliver to
               </p>
               <p className="text-sm font-semibold text-label">{buyerName}</p>
-              <p className="text-xs text-label/65">{buyerAddress}</p>
-              <p className="mt-1 text-xs text-label/50">{request.buyer.phone || 'No phone saved'}</p>
+              <p className="text-xs text-label-2">{buyerAddress}</p>
+              <p className="mt-1 text-xs text-label-2">{request.buyer.phone || 'No phone saved'}</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-separator bg-black/40 p-3 text-xs">
-            <span className="flex items-center gap-1.5 text-label/55">
+            <span className="flex items-center gap-1.5 text-label-2">
               <MapPin size={13} />
               Handover: {request.sellerDropoff.address || request.sellerDropoff.label || 'hub'}
             </span>
-            <span className="text-label/70">
+            <span className="text-label-2">
               Fees — pickup {statusLabel(request.pickupFeeStatus)}, delivery {statusLabel(request.deliveryFeeStatus)}
             </span>
           </div>
 
           {request.events[0]?.message && (
-            <p className="rounded-xl border border-separator bg-black/40 p-3 text-xs text-label/70">
+            <p className="rounded-xl border border-separator bg-black/40 p-3 text-xs text-label-2">
               Latest update: {request.events[0].message}
             </p>
           )}

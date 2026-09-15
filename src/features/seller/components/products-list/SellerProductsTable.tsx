@@ -32,12 +32,12 @@ export function SellerProductsTable({
       <Table>
         <TableHeader className="border-b border-separator">
           <TableRow className="bg-white/[0.03]">
-            <TableHead className="w-1/4 text-label/60 font-semibold">Product</TableHead>
-            <TableHead className="w-1/6 text-label/60 font-semibold">Aesthetic</TableHead>
-            <TableHead className="w-1/8 text-label/60 font-semibold">Price</TableHead>
-            <TableHead className="w-1/8 text-label/60 font-semibold">Stock</TableHead>
-            <TableHead className="w-1/8 text-label/60 font-semibold">Status</TableHead>
-            <TableHead className="w-1/6 text-right text-label/60 font-semibold">Actions</TableHead>
+            <TableHead className="w-1/4 text-label-2 font-semibold">Product</TableHead>
+            <TableHead className="w-1/6 text-label-2 font-semibold">Aesthetic</TableHead>
+            <TableHead className="w-1/8 text-label-2 font-semibold">Price</TableHead>
+            <TableHead className="w-1/8 text-label-2 font-semibold">Stock</TableHead>
+            <TableHead className="w-1/8 text-label-2 font-semibold">Status</TableHead>
+            <TableHead className="w-1/6 text-right text-label-2 font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -53,7 +53,7 @@ export function SellerProductsTable({
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-lg seller-card-soft flex items-center justify-center">
-                      <EyeOff className="h-5 w-5 text-label/40" />
+                      <EyeOff className="h-5 w-5 text-label-2" />
                     </div>
                   )}
                   <div className="flex flex-col">
@@ -74,7 +74,7 @@ export function SellerProductsTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="capitalize text-label/60">{product.aesthetic}</TableCell>
+              <TableCell className="capitalize text-label-2">{product.aesthetic}</TableCell>
               <TableCell className="text-label font-semibold">{formatCurrency(product.price)}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
@@ -93,13 +93,13 @@ export function SellerProductsTable({
                       {product.quantity ?? 0}
                     </Badge>
                   ) : (
-                    <span className="text-xs text-label/60 italic">Not tracked</span>
+                    <span className="text-xs text-label-2 italic">Not tracked</span>
                   )}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onInventoryEdit(product)}
-                    className="h-8 px-2 text-xs text-label/60 hover:text-emerald-300 hover:bg-emerald-500/10"
+                    className="h-8 px-2 text-xs text-label-2 hover:text-emerald-300 hover:bg-emerald-500/10"
                   >
                     Edit
                   </Button>

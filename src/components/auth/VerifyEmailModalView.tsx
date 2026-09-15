@@ -25,7 +25,7 @@ export function VerifyEmailModalView({
 }: VerifyEmailModalViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-[#0d0d0d] border border-slate-200 dark:border-white/10 text-slate-950 dark:text-white rounded-3xl overflow-hidden shadow-2xl transition-colors duration-200">
+      <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl overflow-hidden shadow-2xl transition-colors duration-200">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600" />
 
         <DialogHeader className="pt-6">
@@ -78,7 +78,7 @@ export function VerifyEmailModalView({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="w-full text-slate-500 hover:text-slate-950 hover:bg-slate-100 dark:hover:bg-white/5 dark:hover:text-white h-11 rounded-xl"
+            className="w-full text-slate-500 hover:text-slate-950 hover:bg-slate-100 dark:hover:bg-fill dark:hover:text-white h-11 rounded-xl"
           >
             Close and go back
           </Button>

@@ -289,7 +289,7 @@ export function BuyerInfoForm({
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
               aria-pressed={showPassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-2 hover:text-white transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -356,7 +356,7 @@ export function BuyerInfoForm({
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               aria-pressed={showConfirmPassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-2 hover:text-white transition-colors"
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-5 h-5" />

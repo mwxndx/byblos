@@ -119,12 +119,12 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
               <DialogTitle className="text-xl font-semibold tracking-tight text-label">
                 Become a Byblos member
               </DialogTitle>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed text-label/60">
+              <p className="mx-auto max-w-xs text-sm leading-relaxed text-label-2">
                 Get your own numbered founder card — proof you shop protected, and
                 one of the first to do it. Yours to show off.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-label/45">
+            <div className="flex items-center gap-2 text-xs font-medium text-label-2">
               <ShieldCheck className="h-4 w-4 text-[#f5c518]" />
               Every order held safe until it shows up
             </div>
@@ -144,7 +144,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-label/50 transition hover:text-white/80"
+                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-label-2 transition hover:text-white/80"
               >
                 Maybe later
               </button>
@@ -155,7 +155,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
             <DialogTitle className="text-lg font-semibold tracking-tight text-label">
               You’re member No. {String(displayNumber).padStart(6, '0')} 🎉
             </DialogTitle>
-            <p className="-mt-1 text-xs text-label/55">Share your card and show you shop protected.</p>
+            <p className="-mt-1 text-xs text-label-2">Share your card and show you shop protected.</p>
 
             {/* min-w-0 is mandatory here: this div is a direct grid-item of
                 DialogContent (display:grid). Without it the grid column's
@@ -188,7 +188,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-label/45 transition hover:text-white/75"
+                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-label-2 transition hover:text-white/75"
               >
                 Done
               </button>

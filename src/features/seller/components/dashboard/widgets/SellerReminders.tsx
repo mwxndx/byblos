@@ -34,7 +34,7 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
         onClick={onDismiss}
         aria-label="Do not show this again"
         title="Do not show this again"
-        className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-label/40 transition-colors hover:bg-white/10 hover:text-white/80"
+        className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-label-2 transition-colors hover:bg-white/10 hover:text-white/80"
       >
         <X className="h-4 w-4" />
       </button>
@@ -48,7 +48,7 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-label sm:text-base">{title}</p>
-          <p className="mt-1 text-xs leading-5 text-label/60 sm:text-sm">{description}</p>
+          <p className="mt-1 text-xs leading-5 text-label-2 sm:text-sm">{description}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <button
@@ -63,7 +63,7 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
             <button
               type="button"
               onClick={onDismiss}
-              className="text-[11px] font-semibold text-label/40 underline-offset-2 transition-colors hover:text-white/70 hover:underline"
+              className="text-[11px] font-semibold text-label-2 underline-offset-2 transition-colors hover:text-white/70 hover:underline"
             >
               Do not show this again
             </button>

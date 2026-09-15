@@ -92,7 +92,7 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
               onClick={() => onSelectTab(id)}
               className={`relative flex min-h-10 flex-shrink-0 items-center justify-center space-x-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-all duration-300 sm:space-x-2 sm:px-4 sm:text-sm lg:min-h-0 lg:px-5 lg:py-2.5 ${activeTab === id
                 ? 'bg-[var(--theme-button-bg,#facc15)] text-[var(--theme-button-text,#000000)] border-[var(--theme-accent,#facc15)] shadow-[0_8px_22px_rgba(0,0,0,0.18)]'
-                : 'text-label/60 border-transparent hover:text-white hover:bg-white/[0.06]'
+                : 'text-label-2 border-transparent hover:text-white hover:bg-white/[0.06]'
                 } ${activeTab === id ? 'seller-tab-selected' : ''}`}
             >
               <Icon className="h-3.5 w-3.5 sm:h-5 sm:w-5" />

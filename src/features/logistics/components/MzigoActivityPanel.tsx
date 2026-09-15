@@ -52,7 +52,7 @@ export function MzigoActivityPanel() {
           <button
             type="button"
             onClick={() => markAllRead()}
-            className="inline-flex items-center gap-1 text-xs text-label/50 transition hover:text-white"
+            className="inline-flex items-center gap-1 text-xs text-label-2 transition hover:text-white"
           >
             <CheckCheck className="h-3.5 w-3.5" /> Mark all read
           </button>
@@ -60,9 +60,9 @@ export function MzigoActivityPanel() {
       </div>
       <div className="max-h-72 divide-y divide-separator overflow-y-auto">
         {isLoading ? (
-          <div className="px-5 py-8 text-center text-sm text-label/40">Loading activity…</div>
+          <div className="px-5 py-8 text-center text-sm text-label-2">Loading activity…</div>
         ) : notifications.length === 0 ? (
-          <div className="px-5 py-8 text-center text-sm text-label/40">No new pickups or updates yet</div>
+          <div className="px-5 py-8 text-center text-sm text-label-2">No new pickups or updates yet</div>
         ) : (
           notifications.map((n) => (
             <button
@@ -74,8 +74,8 @@ export function MzigoActivityPanel() {
               <span className={`mt-1.5 h-2 w-2 flex-shrink-0 rounded-full ${n.read_at ? 'bg-transparent' : 'bg-yellow-400'}`} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium text-label">{n.title}</span>
-                <span className="block text-xs text-label/60 line-clamp-2">{n.body}</span>
-                <span className="mt-0.5 block text-[11px] text-label/40">{timeAgo(n.created_at)}</span>
+                <span className="block text-xs text-label-2 line-clamp-2">{n.body}</span>
+                <span className="mt-0.5 block text-[11px] text-label-2">{timeAgo(n.created_at)}</span>
               </span>
             </button>
           ))

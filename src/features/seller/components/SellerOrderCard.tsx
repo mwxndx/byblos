@@ -92,7 +92,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                 {firstItem?.imageUrl ? (
                                                     <img src={firstItem.imageUrl} alt={firstItem.name} className="h-full w-full object-cover" />
                                                 ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-label/40">
+                                                    <div className="flex h-full w-full items-center justify-center text-label-2">
                                                         <Package className="h-5 w-5" />
                                                     </div>
                                                 )}
@@ -100,9 +100,9 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                             <div className="min-w-0 flex-1">
                                                 <p className="truncate text-sm font-semibold text-label sm:text-base">
                                                     {firstItem?.name || `Order #${order.orderNumber}`}
-                                                    {extraCount > 0 && <span className="text-label/60"> +{extraCount} more</span>}
+                                                    {extraCount > 0 && <span className="text-label-2"> +{extraCount} more</span>}
                                                 </p>
-                                                <p className="text-[11px] text-label/60 sm:text-xs">{formatDate(order.createdAt)}</p>
+                                                <p className="text-[11px] text-label-2 sm:text-xs">{formatDate(order.createdAt)}</p>
                                             </div>
                                             <Button
                                                 variant="ghost"
@@ -185,12 +185,12 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                                 <li key={item.id} className={itemClasses}>
                                                                     <div className="flex items-center justify-between gap-3 min-w-0">
                                                                         <span className="font-semibold truncate min-w-0 flex-1">{item.name}</span>
-                                                                        <span className="shrink-0 text-label/70">Qty {item.quantity}</span>
+                                                                        <span className="shrink-0 text-label-2">Qty {item.quantity}</span>
                                                                     </div>
                                                                 </li>
                                                             ))
                                                         ) : (
-                                                            <li className="text-xs sm:text-sm text-label/70 bg-white/8 rounded-lg px-3 py-2 border border-white/12">No items in this order</li>
+                                                            <li className="text-xs sm:text-sm text-label-2 bg-white/8 rounded-lg px-3 py-2 border border-white/12">No items in this order</li>
                                                         )}
                                                     </ul>
                                                 </div>
@@ -207,7 +207,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                                 <p className="text-purple-200 text-xs font-medium mb-1">Date & Time</p>
                                                                 <p className="font-semibold text-label">
                                                                     {order.metadata.booking_date ? formatDate(order.metadata.booking_date as string) : 'N/A'}
-                                                                    {order.metadata.booking_time && <span className="text-label/70 font-normal"> at {String(order.metadata.booking_time)}</span>}
+                                                                    {order.metadata.booking_time && <span className="text-label-2 font-normal"> at {String(order.metadata.booking_time)}</span>}
                                                                 </p>
                                                             </div>
                                                             <div className="bg-black/60 p-2 rounded border border-purple-400/20">

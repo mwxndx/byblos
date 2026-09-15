@@ -23,7 +23,7 @@ export function MzigoJourneyStepper({ journey, compact = false }: { journey: Jou
           ? 'border-yellow-400/70 bg-yellow-400/20 text-yellow-300'
           : isCurrent
             ? currentTone
-            : 'border-white/15 bg-white/[0.03] text-label/40';
+            : 'border-white/15 bg-white/[0.03] text-label-2';
 
         return (
           <div key={step.key} className="flex flex-1 items-center last:flex-none">
@@ -46,7 +46,7 @@ export function MzigoJourneyStepper({ journey, compact = false }: { journey: Jou
               {!compact && (
                 <span
                   className={`text-[10px] font-semibold text-center ${
-                    isCurrent ? 'text-label' : isDone ? 'text-label/70' : 'text-label/35'
+                    isCurrent ? 'text-label' : isDone ? 'text-label-2' : 'text-label-2'
                   }`}
                 >
                   {step.label}

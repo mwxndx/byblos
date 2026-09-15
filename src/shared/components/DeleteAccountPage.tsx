@@ -31,7 +31,7 @@ export default function DeleteAccountPage() {
         <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
           Delete your Byblos account
         </h1>
-        <p className="mt-2 text-sm leading-6 text-white/70">
+        <p className="mt-2 text-sm leading-6 text-label-2">
           This page explains how to request deletion of your <strong className="text-white">Byblos</strong> account
           (operated by Byblos / ByblosHQ) and the personal data associated with it. It applies to buyer and seller
           accounts on the Byblos app and website (byblosafrica.site).
@@ -46,7 +46,7 @@ export default function DeleteAccountPage() {
 
           <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <p className="mb-3 text-sm font-semibold text-white">Option 1 — In the app (fastest)</p>
-            <ol className="list-decimal space-y-2 pl-5 text-sm leading-6 text-white/80">
+            <ol className="list-decimal space-y-2 pl-5 text-sm leading-6 text-label-2">
               <li>Open the Byblos app and sign in.</li>
               <li>
                 <span className="font-semibold text-white">Buyers:</span> tap <span className="font-semibold text-white">Profile</span> in the
@@ -63,7 +63,7 @@ export default function DeleteAccountPage() {
             <div className="my-5 h-px w-full bg-white/10" />
 
             <p className="mb-2 text-sm font-semibold text-white">Option 2 — By email</p>
-            <p className="text-sm leading-6 text-white/80">
+            <p className="text-sm leading-6 text-label-2">
               If you can’t access the app, email{' '}
               <a href={`mailto:${SUPPORT_EMAIL}?subject=Delete my account`} className="inline-flex items-center gap-1 font-semibold text-yellow-300 underline-offset-4 hover:underline">
                 <Mail size={14} /> {SUPPORT_EMAIL}
@@ -85,24 +85,24 @@ export default function DeleteAccountPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/[0.06] p-5">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-emerald-300">Deleted / anonymised</h3>
-              <ul className="mt-3 space-y-2 text-sm leading-6 text-white/80">
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-label-2">
                 <li>Your name</li>
                 <li>Email address and login credentials</li>
                 <li>Phone / WhatsApp and mobile-payment number</li>
                 <li>City, area and delivery / pickup location</li>
                 <li>Buyer profile, or seller shop details, banner, photo and social links</li>
               </ul>
-              <p className="mt-3 text-xs text-white/50">Your sign-in is disabled and these fields are erased or anonymised so you can no longer be identified from them.</p>
+              <p className="mt-3 text-xs text-label-2">Your sign-in is disabled and these fields are erased or anonymised so you can no longer be identified from them.</p>
             </div>
 
             <div className="rounded-2xl border border-yellow-400/20 bg-yellow-400/[0.06] p-5">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-yellow-300">Kept for a limited time</h3>
-              <ul className="mt-3 space-y-2 text-sm leading-6 text-white/80">
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-label-2">
                 <li>Transaction and order records</li>
                 <li>Payment / M-Pesa references, receipts and refunds</li>
                 <li>Seller settlement and withdrawal records</li>
               </ul>
-              <p className="mt-3 text-xs text-white/60">
+              <p className="mt-3 text-xs text-label-2">
                 These are retained in anonymised/transactional form for up to <span className="font-semibold text-white">7 years</span> to
                 meet Kenyan tax, accounting and anti-money-laundering obligations (Data Protection Act, 2019 and related law), after which
                 they are deleted.
@@ -111,14 +111,14 @@ export default function DeleteAccountPage() {
           </div>
         </section>
 
-        <p className="mt-8 text-sm leading-6 text-white/60">
+        <p className="mt-8 text-sm leading-6 text-label-2">
           Questions about your data? Contact{' '}
           <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold text-yellow-300 underline-offset-4 hover:underline">{SUPPORT_EMAIL}</a>.
           See also our <Link to="/privacy" className="font-semibold text-yellow-300 underline-offset-4 hover:underline">Privacy Policy</Link>.
         </p>
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs text-white/40">
+      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs text-label-2">
         &copy; 2026 Byblos. All rights reserved.
       </footer>
     </div>

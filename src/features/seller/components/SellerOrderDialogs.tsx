@@ -113,7 +113,7 @@ export function SellerOrderDialogs({
                                             lng: coordinates?.lng ?? null
                                         });
                                     }}
-                                    className="[&_label]:!text-slate-800 dark:[&_label]:!text-label [&_p]:!text-slate-600 dark:[&_p]:!text-label/70"
+                                    className="[&_label]:!text-slate-800 dark:[&_label]:!text-label [&_p]:!text-slate-600 dark:[&_p]:!text-label-2"
                                 />
                             </div>
 
