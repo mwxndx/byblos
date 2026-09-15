@@ -27,7 +27,7 @@
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "^8.0.0",
     "@capacitor-community/background-geolocation": "^1.2.26",
-    "@capacitor/android": "^8.4.0",
+    "@capacitor/android": "^8.5.1",
     "@capacitor/app": "^8.1.1",
     "@capacitor/core": "^8.4.0",
     "@capacitor/keyboard": "^8.0.5",
@@ -67,7 +67,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.4.0",
+    "@capacitor/cli": "^8.5.1",
     "@eslint/js": "^9.9.0",
     "@playwright/test": "^1.52.0",
     "@testing-library/dom": "^10.4.1",
