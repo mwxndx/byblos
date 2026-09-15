@@ -20,7 +20,7 @@ interface WithdrawalRequestFormProps {
 // No flat text-sm (14px): iOS Safari auto-zooms on focus for any input under
 // 16px. The shared Input component's own default (text-base, 16px on mobile;
 // md:text-sm, 14px on desktop) is already mobile-safe -- don't override it.
-const inputClass = 'h-10 sm:h-11 bg-neutral-50 border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-[#141414] dark:border-white/10 dark:text-white dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400';
+const inputClass = 'h-10 sm:h-11 bg-neutral-50 border-slate-200 text-slate-900 placeholder:text-slate-400 dark:bg-[#141414] dark:border-separator dark:text-white dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400';
 
 export function WithdrawalRequestForm({
   balance,
@@ -51,7 +51,7 @@ export function WithdrawalRequestForm({
             Request Withdrawal
           </Button>
         ) : (
-          <div className="border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+          <div className="border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
             <h4 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-4">Request Withdrawal</h4>
             <form onSubmit={handleWithdrawalRequest} className="space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -146,7 +146,7 @@ export function WithdrawalRequestForm({
                       mpesaName: ''
                     });
                   }}
-                  className="px-4 py-2 h-10 sm:h-8 text-xs rounded-lg border-slate-200 bg-slate-100 text-slate-900 hover:bg-slate-200 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/10 w-full sm:w-auto"
+                  className="px-4 py-2 h-10 sm:h-8 text-xs rounded-lg border-slate-200 bg-slate-100 text-slate-900 hover:bg-slate-200 dark:border-separator dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/10 w-full sm:w-auto"
                 >
                   Cancel
                 </Button>

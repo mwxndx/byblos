@@ -29,8 +29,8 @@ export function ProductsTab({
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       <div className="text-center px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-white mb-1.5">Product Management</h2>
-        <p className="text-white/60 text-xs sm:text-sm lg:text-base font-medium">Manage all your products in one place</p>
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-label mb-1.5">Product Management</h2>
+        <p className="text-label/60 text-xs sm:text-sm lg:text-base font-medium">Manage all your products in one place</p>
       </div>
 
       <div className="space-y-4">
@@ -41,7 +41,7 @@ export function ProductsTab({
 
         {/* Single controlled add-product dialog, opened from the header button or the empty-state plus. */}
         <Dialog open={isAddProductModalOpen} onOpenChange={setIsAddProductModalOpen}>
-          <DialogContent className="w-[92vw] max-w-lg sm:max-w-[540px] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
+          <DialogContent className="w-[92vw] max-w-lg sm:max-w-[540px] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
             <div className="product-modal-light flex h-full min-h-0 flex-col overflow-hidden">
               <AddProductForm
                 onSuccess={() => {
@@ -58,8 +58,8 @@ export function ProductsTab({
           <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
-                <h3 className="text-base sm:text-lg font-semibold text-white">All Products</h3>
-                <p className="text-white/60 text-xs sm:text-sm font-medium mt-1">Manage inventory and track stock levels</p>
+                <h3 className="text-base sm:text-lg font-semibold text-label">All Products</h3>
+                <p className="text-label/60 text-xs sm:text-sm font-medium mt-1">Manage inventory and track stock levels</p>
               </div>
 
               <Button
@@ -91,7 +91,7 @@ export function ProductsTab({
             >
               <Plus className="h-10 w-10" strokeWidth={2.5} />
             </button>
-            <p className="text-sm font-semibold text-white/80">Tap the plus to add your first product</p>
+            <p className="text-sm font-semibold text-label/80">Tap the plus to add your first product</p>
           </div>
         )}
       </div>

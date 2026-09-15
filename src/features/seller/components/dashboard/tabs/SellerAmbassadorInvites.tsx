@@ -14,7 +14,7 @@ interface SellerAmbassadorInvitesProps {
   toggleEdit: () => void;
 }
 
-const inputClass = 'h-10 border-slate-200 dark:border-white/10 bg-white dark:bg-[#141414] text-slate-900 dark:text-white placeholder:text-slate-500 dark:text-white/40';
+const inputClass = 'h-10 border-slate-200 dark:border-separator bg-white dark:bg-[#141414] text-slate-900 dark:text-white placeholder:text-slate-500 dark:text-white/40';
 
 export function SellerAmbassadorInvites({ formData, setFormData, isEditing, toggleEdit }: SellerAmbassadorInvitesProps) {
   const [creatorEmail, setCreatorEmail] = useState('');
@@ -51,7 +51,7 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
   const creatorCommissionLabel = `${Number(formData.creatorCommissionRate || 1).toFixed(2).replace(/\.?0+$/, '')}%`;
 
   return (
-      <section className="space-y-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-4 shadow-sm sm:p-5 lg:p-6">
+      <section className="space-y-4 rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-4 shadow-sm sm:p-5 lg:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="rounded-xl p-2" style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.15)' }}>
@@ -99,7 +99,7 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
                 type="button"
                 onClick={toggleEdit}
                 variant="outline"
-                className="h-10 border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
+                className="h-10 border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
               >
                 Set Commission
               </Button>
@@ -126,13 +126,13 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
           </Button>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator">
           {invites.length === 0 ? (
             <div className="bg-slate-100 dark:bg-white/[0.03] p-4 text-sm font-medium text-slate-500 dark:text-white/50">
               No creator invites yet.
             </div>
           ) : (
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-separator">
               {(invites as unknown[]).map((inviteItem) => {
                  const invite = inviteItem as { id: string | number; creatorName?: string; email?: string; status?: string; code?: string; commissionRate?: number; shopUrl?: string; shopName?: string };
                  return (
@@ -162,7 +162,7 @@ export function SellerAmbassadorInvites({ formData, setFormData, isEditing, togg
                        type="button"
                        variant="outline"
                        onClick={() => copyCreatorLink(invite.shopUrl, getShopUsername(invite.shopName || formData.shopName))}
-                       className="h-9 border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
+                       className="h-9 border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
                      >
                        <Copy className="mr-2 h-4 w-4" />
                        Copy Link

@@ -30,7 +30,7 @@ interface WithdrawalsTabProps {
 }
 
 // Card surface: light in light mode, the original near-black in dark mode.
-const cardClass = 'rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-6 border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-[0_12px_35px_rgba(0,0,0,0.45)]';
+const cardClass = 'rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-6 border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]';
 
 export function WithdrawalsTab({
   balance,
@@ -71,7 +71,7 @@ export function WithdrawalsTab({
       </div>
 
       {/* ── Primary Hero Balance ────────────────────────────────────────── */}
-      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -102,7 +102,7 @@ export function WithdrawalsTab({
 
       {/* ── Supporting Compact Balances ─────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 shadow-sm flex flex-col justify-between min-w-0">
           <div>
             <h4 className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-white/50 uppercase tracking-wider truncate" title="Preparing for Withdrawal">
               Preparing
@@ -119,7 +119,7 @@ export function WithdrawalsTab({
           </div>
         </div>
 
-        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 shadow-sm flex flex-col justify-between min-w-0">
           <div>
             <h4 className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-white/50 uppercase tracking-wider truncate" title="Being Sent to You">
               In Transit
@@ -133,7 +133,7 @@ export function WithdrawalsTab({
           </p>
         </div>
 
-        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 shadow-sm flex flex-col justify-between min-w-0">
           <div>
             <h4 className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-white/50 uppercase tracking-wider truncate" title="Held for Refunds">
               Held for Refunds
@@ -160,7 +160,7 @@ export function WithdrawalsTab({
           </p>
           <div className="mt-2 grid gap-1 text-[9px] sm:text-[10px] font-semibold text-slate-900 dark:text-white sm:grid-cols-3">
             {WITHDRAWAL_FEE_TIERS.map((tier) => (
-              <span key={tier.label} className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.05] px-2 py-1">
+              <span key={tier.label} className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.05] px-2 py-1">
                 {tier.label}: KSh {tier.fee}
               </span>
             ))}
@@ -183,7 +183,7 @@ export function WithdrawalsTab({
         />
       )}
 
-      <div className="rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+      <div className="rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
           <div>
             <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">Withdrawal Requests</h3>
@@ -198,7 +198,7 @@ export function WithdrawalsTab({
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="h-10 bg-neutral-50 border-slate-200 text-slate-900 dark:bg-[#141414] dark:border-white/10 dark:text-white focus:border-yellow-500/50 focus:ring-yellow-500/20"
+                className="h-10 bg-neutral-50 border-slate-200 text-slate-900 dark:bg-[#141414] dark:border-separator dark:text-white focus:border-yellow-500/50 focus:ring-yellow-500/20"
                 placeholder="Start date"
               />
             </div>
@@ -208,7 +208,7 @@ export function WithdrawalsTab({
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="h-10 bg-neutral-50 border-slate-200 text-slate-900 dark:bg-[#141414] dark:border-white/10 dark:text-white focus:border-yellow-500/50 focus:ring-yellow-500/20"
+                className="h-10 bg-neutral-50 border-slate-200 text-slate-900 dark:bg-[#141414] dark:border-separator dark:text-white focus:border-yellow-500/50 focus:ring-yellow-500/20"
                 placeholder="End date"
               />
             </div>
@@ -220,7 +220,7 @@ export function WithdrawalsTab({
                 }}
                 variant="outline"
                 aria-label="Clear date filters"
-                className="border-slate-200 bg-slate-100 text-slate-900 hover:bg-slate-200 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/10 h-11 w-full sm:w-11"
+                className="border-slate-200 bg-slate-100 text-slate-900 hover:bg-slate-200 dark:border-separator dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/10 h-11 w-full sm:w-11"
               >
                 <X className="h-4 w-4" />
               </IconButton>
@@ -230,7 +230,7 @@ export function WithdrawalsTab({
           <Button
             onClick={() => exportWithdrawalsToCSV(withdrawalRequests)}
             variant="outline"
-            className="border-slate-200 bg-slate-100 text-slate-900 hover:bg-slate-200 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/10 gap-2 h-10 w-full lg:w-auto"
+            className="border-slate-200 bg-slate-100 text-slate-900 hover:bg-slate-200 dark:border-separator dark:bg-white/[0.04] dark:text-white dark:hover:bg-white/10 gap-2 h-10 w-full lg:w-auto"
             disabled={withdrawalRequests.length === 0}
           >
             <Download className="h-4 w-4" />
@@ -246,7 +246,7 @@ export function WithdrawalsTab({
           </div>
         ) : (
           <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-8 border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.04] rounded-3xl flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-8 border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.04] rounded-3xl flex items-center justify-center">
               <Wallet className="h-12 w-12 text-slate-400 dark:text-white/40" />
             </div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">No withdrawal requests</h3>

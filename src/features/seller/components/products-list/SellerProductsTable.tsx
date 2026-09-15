@@ -30,34 +30,34 @@ export function SellerProductsTable({
   return (
     <div className="hidden overflow-hidden seller-card lg:block">
       <Table>
-        <TableHeader className="border-b border-white/10">
+        <TableHeader className="border-b border-separator">
           <TableRow className="bg-white/[0.03]">
-            <TableHead className="w-1/4 text-white/60 font-semibold">Product</TableHead>
-            <TableHead className="w-1/6 text-white/60 font-semibold">Aesthetic</TableHead>
-            <TableHead className="w-1/8 text-white/60 font-semibold">Price</TableHead>
-            <TableHead className="w-1/8 text-white/60 font-semibold">Stock</TableHead>
-            <TableHead className="w-1/8 text-white/60 font-semibold">Status</TableHead>
-            <TableHead className="w-1/6 text-right text-white/60 font-semibold">Actions</TableHead>
+            <TableHead className="w-1/4 text-label/60 font-semibold">Product</TableHead>
+            <TableHead className="w-1/6 text-label/60 font-semibold">Aesthetic</TableHead>
+            <TableHead className="w-1/8 text-label/60 font-semibold">Price</TableHead>
+            <TableHead className="w-1/8 text-label/60 font-semibold">Stock</TableHead>
+            <TableHead className="w-1/8 text-label/60 font-semibold">Status</TableHead>
+            <TableHead className="w-1/6 text-right text-label/60 font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.id} className="border-b border-white/10 transition-colors hover:bg-white/10">
+            <TableRow key={product.id} className="border-b border-separator transition-colors hover:bg-white/10">
               <TableCell className="font-medium">
                 <div className="flex items-center gap-3">
                   {product.image_url ? (
                     <img
                       src={product.image_url}
                       alt={product.name}
-                      className="h-10 w-10 rounded-lg object-cover border border-white/10"
+                      className="h-10 w-10 rounded-lg object-cover border border-separator"
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-lg seller-card-soft flex items-center justify-center">
-                      <EyeOff className="h-5 w-5 text-white/40" />
+                      <EyeOff className="h-5 w-5 text-label/40" />
                     </div>
                   )}
                   <div className="flex flex-col">
-                    <span className="line-clamp-2 text-white font-medium">{product.name}</span>
+                    <span className="line-clamp-2 text-label font-medium">{product.name}</span>
                     <div className="flex gap-1 mt-1">
                       {(product.product_type === 'digital' || product.productType === 'digital' || product.is_digital) && (
                         <Badge variant="outline" className="w-fit text-[10px] h-5 px-1.5 border-blue-500/30 text-blue-400 bg-blue-500/10">
@@ -74,8 +74,8 @@ export function SellerProductsTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="capitalize text-white/60">{product.aesthetic}</TableCell>
-              <TableCell className="text-white font-semibold">{formatCurrency(product.price)}</TableCell>
+              <TableCell className="capitalize text-label/60">{product.aesthetic}</TableCell>
+              <TableCell className="text-label font-semibold">{formatCurrency(product.price)}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   {product.track_inventory ? (
@@ -93,13 +93,13 @@ export function SellerProductsTable({
                       {product.quantity ?? 0}
                     </Badge>
                   ) : (
-                    <span className="text-xs text-white/60 italic">Not tracked</span>
+                    <span className="text-xs text-label/60 italic">Not tracked</span>
                   )}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onInventoryEdit(product)}
-                    className="h-8 px-2 text-xs text-white/60 hover:text-emerald-300 hover:bg-emerald-500/10"
+                    className="h-8 px-2 text-xs text-label/60 hover:text-emerald-300 hover:bg-emerald-500/10"
                   >
                     Edit
                   </Button>

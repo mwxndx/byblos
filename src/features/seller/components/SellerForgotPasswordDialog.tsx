@@ -17,7 +17,7 @@ export function SellerForgotPasswordDialog({ open, onOpenChange, email, onEmailC
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className="w-[90vw] sm:max-w-[340px] rounded-2xl border border-slate-200 dark:border-white/15 bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white shadow-2xl mx-4 sm:mx-auto"
+          className="w-[90vw] sm:max-w-[340px] rounded-2xl border border-slate-200 dark:border-white/15 bg-white dark:bg-surface-1 text-slate-950 dark:text-white shadow-2xl mx-4 sm:mx-auto"
         >
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-slate-950 dark:text-white tracking-tight">Forgot Password</DialogTitle>
@@ -36,7 +36,7 @@ export function SellerForgotPasswordDialog({ open, onOpenChange, email, onEmailC
                   id="forgot-email"
                   type="email"
                   placeholder="your@email.com"
-                  className="!pl-12 h-10 rounded-xl bg-white dark:bg-[#141414] border-slate-300 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
+                  className="!pl-12 h-10 rounded-xl bg-white dark:bg-[#141414] border-slate-300 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
                   value={email}
                   onChange={(e) => onEmailChange(e.target.value)}
                   required

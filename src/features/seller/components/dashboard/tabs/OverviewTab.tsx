@@ -42,7 +42,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
     <div className="space-y-3 sm:space-y-4">
       {/* Balance hero + Sales & Revenue companions */}
       <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,2fr)]">
-        <div className="seller-balance-hero relative overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 p-5 sm:p-6 flex flex-col justify-between">
+        <div className="seller-balance-hero relative overflow-hidden rounded-3xl border border-slate-200 dark:border-separator p-5 sm:p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-black/25">
@@ -65,7 +65,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
 
         {/* Total Sales & Total Revenue side-by-side on mobile/Android & desktop */}
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 min-w-0">
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 min-w-0">
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span
@@ -83,7 +83,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
             </p>
           </div>
 
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 min-w-0">
+          <div className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 min-w-0">
             <div>
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <span
@@ -111,7 +111,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
             { label: 'Clicks', value: clicks.toLocaleString(), icon: MousePointerClick },
             { label: 'Wishlist', value: wishlist.toLocaleString(), icon: Heart },
           ].map(({ label, value, icon: Icon }) => (
-            <div key={label} className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.02] px-3.5 py-3">
+            <div key={label} className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.02] px-3.5 py-3">
               <div className="flex items-center gap-1.5 text-slate-500 dark:text-white/45">
                 <Icon className="h-3.5 w-3.5" />
                 <span className="text-[10px] font-bold uppercase tracking-wide">{label}</span>
@@ -125,12 +125,12 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
       {/* Status chips — Live products is a state, not a KPI. Creator sales
           only appears once there is something to show. */}
       <div className="flex flex-wrap items-center gap-2.5">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] px-3.5 py-1.5 text-xs font-bold text-slate-500 dark:text-white/80">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] px-3.5 py-1.5 text-xs font-bold text-slate-500 dark:text-white/80">
           <Package className="h-3.5 w-3.5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
           {liveProducts.toLocaleString()} live {liveProducts === 1 ? 'product' : 'products'}
         </span>
         {creatorSales > 0 && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:text-white/80">
+          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:text-white/80">
             <Megaphone className="h-3 w-3" style={{ color: 'var(--theme-accent, #f5c518)' }} />
             {formatCurrency(creatorSales)} creator sales
           </span>
@@ -152,7 +152,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
         metricsBlock
       ) : (
         <>
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-6 text-center sm:p-8">
+          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] p-6 text-center sm:p-8">
             <span
               className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
               style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.16)' }}
@@ -188,7 +188,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
       )}
 
       <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
-        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a]">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1">
           <div className="flex items-center gap-3 p-4">
             <span
               className="flex h-9 w-9 items-center justify-center rounded-xl"
@@ -201,7 +201,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
           <div className="space-y-2 px-4 pb-4">
             {pendingOverviewOrders.length > 0 ? (
               pendingOverviewOrders.map((order) => (
-                <div key={order.id} className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-3 transition-colors hover:bg-slate-100 dark:bg-white/[0.06]">
+                <div key={order.id} className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] p-3 transition-colors hover:bg-slate-100 dark:bg-white/[0.06]">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
@@ -226,21 +226,21 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
                 </div>
               ))
             ) : (
-              <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-5 text-center">
+              <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] p-5 text-center">
                 <p className="text-sm text-slate-500 dark:text-white/70">No paid orders need action right now.</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a]">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1">
           <div className="p-4">
             <h3 className="text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Recent Activity</h3>
           </div>
           <div className="space-y-2 px-4 pb-4">
             {recentOrders.length > 0 ? (
               recentOrders.map((order) => (
-                <div key={order.id} className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] px-3 py-2">
+                <div key={order.id} className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] px-3 py-2">
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{order.orderNumber}</p>
                     <p className="shrink-0 text-xs font-semibold text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
@@ -256,7 +256,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
                 </div>
               ))
             ) : (
-              <p className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] px-3 py-4 text-center text-sm text-slate-500 dark:text-white/50">
+              <p className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.03] px-3 py-4 text-center text-sm text-slate-500 dark:text-white/50">
                 No paid order activity yet.
               </p>
             )}

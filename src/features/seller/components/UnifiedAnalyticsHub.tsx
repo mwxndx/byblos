@@ -89,13 +89,13 @@ export const UnifiedAnalyticsHub: React.FC<UnifiedAnalyticsHubProps> = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
+            className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-[0_18px_50px_rgba(0,0,0,0.45)]"
         >
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
                 {metrics.map(({ label, value, helper, icon: Icon, tone }, index) => (
                     <div
                         key={label}
-                        className={`group min-h-[128px] p-4 sm:p-5 lg:p-6 flex flex-col justify-between border-slate-200 dark:border-white/10 transition-colors hover:bg-slate-100 dark:bg-white/[0.06] ${index < metrics.length - 1 ? 'border-r' : ''} max-md:[&:nth-child(2n)]:border-r-0 max-md:[&:nth-child(-n+4)]:border-b md:max-xl:[&:nth-child(3n)]:border-r-0 md:max-xl:[&:nth-child(-n+3)]:border-b`}
+                        className={`group min-h-[128px] p-4 sm:p-5 lg:p-6 flex flex-col justify-between border-slate-200 dark:border-separator transition-colors hover:bg-slate-100 dark:bg-white/[0.06] ${index < metrics.length - 1 ? 'border-r' : ''} max-md:[&:nth-child(2n)]:border-r-0 max-md:[&:nth-child(-n+4)]:border-b md:max-xl:[&:nth-child(3n)]:border-r-0 md:max-xl:[&:nth-child(-n+3)]:border-b`}
                     >
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">

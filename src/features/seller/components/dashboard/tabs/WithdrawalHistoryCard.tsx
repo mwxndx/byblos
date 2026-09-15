@@ -7,7 +7,7 @@ import { getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 
 export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalRequest }) {
   return (
-    <Card key={request.id} className="group transition-all duration-300 bg-white border border-slate-200 text-slate-900 dark:bg-[#0a0a0a] dark:border-white/10 dark:text-white shadow-sm">
+    <Card key={request.id} className="group transition-all duration-300 bg-white border border-slate-200 text-slate-900 dark:bg-surface-1 dark:border-separator dark:text-white shadow-sm">
                 <CardContent className="p-3 sm:p-5 lg:p-6">
                   <div className="flex min-w-0 justify-between items-start">
                     <div className="space-y-2 min-w-0 w-full">
@@ -33,27 +33,27 @@ export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalReque
                         M-Pesa: {request.mpesaNumber} ({request.mpesaName})
                       </p>
                       <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
-                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.03] px-3 py-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.03] px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Requested</p>
                           <p className="text-xs font-semibold text-slate-900 dark:text-white">{new Date(request.createdAt).toLocaleString()}</p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.03] px-3 py-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.03] px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Processed</p>
                           <p className="text-xs font-semibold text-slate-900 dark:text-white">{request.processedAt ? new Date(request.processedAt).toLocaleString() : 'Pending'}</p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.03] px-3 py-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.03] px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Charge</p>
                           <p className="text-xs font-semibold text-slate-900 dark:text-white">{formatKes(request.withdrawalFee || getWithdrawalFee(request.amount))}</p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.03] px-3 py-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.03] px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Provider Ref</p>
                           <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{request.providerReference || 'Pending'}</p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.03] px-3 py-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.03] px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">M-Pesa Receipt</p>
                           <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{request.mpesaReceipt || 'Pending'}</p>
                         </div>
-                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-white/10 dark:bg-white/[0.03] px-3 py-2">
+                        <div className="rounded-lg border border-slate-200 bg-slate-100 dark:border-separator dark:bg-white/[0.03] px-3 py-2">
                           <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Processed By</p>
                           <p className="text-xs font-semibold text-slate-900 dark:text-white">{request.processedBy || 'System'}</p>
                         </div>

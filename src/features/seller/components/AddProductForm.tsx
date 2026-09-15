@@ -242,13 +242,13 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
       </div>
 
       {/* Footer Navigation */}
-      <div className="shrink-0 border-t border-slate-200 dark:border-white/10 bg-white/95 dark:bg-black/90 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:p-6">
+      <div className="shrink-0 border-t border-slate-200 dark:border-separator bg-white/95 dark:bg-black/90 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-xl sm:p-6">
         <div className="flex items-center justify-between gap-3 sm:gap-4">
         {step > 1 ? (
           <Button
             variant="outline"
             onClick={prevStep}
-            className="h-11 flex-1 rounded-xl border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-white/5 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 sm:h-12"
+            className="h-11 flex-1 rounded-xl border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-fill text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 sm:h-12"
           >
             <ArrowLeft className="mr-1.5 h-4 w-4 sm:mr-2" />
             Back

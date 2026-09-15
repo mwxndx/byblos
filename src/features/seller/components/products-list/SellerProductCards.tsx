@@ -36,7 +36,7 @@ function ProductWishlistButton({ product }: { product: ProductWithApiFields }) {
         'absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 active:scale-95',
         wishlisted
           ? 'bg-white/95 text-red-500 shadow-md dark:bg-zinc-900/90'
-          : 'bg-white/90 text-slate-400 hover:text-slate-600 dark:bg-black/60 dark:text-zinc-400 dark:hover:text-zinc-200 border border-black/5 dark:border-white/10'
+          : 'bg-white/90 text-slate-400 hover:text-slate-600 dark:bg-black/60 dark:text-zinc-400 dark:hover:text-zinc-200 border border-black/5 dark:border-separator'
       )}
     >
       <Heart
@@ -73,7 +73,7 @@ export function SellerProductCards({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
       {products.map((product) => (
-        <Card key={product.id} className="relative group bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-2xl hover:border-emerald-500/50 transition-all shadow-sm">
+        <Card key={product.id} className="relative group bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white rounded-2xl hover:border-emerald-500/50 transition-all shadow-sm">
           <div className="absolute right-2 top-2 z-10">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -81,7 +81,7 @@ export function SellerProductCards({
                   <MoreVertical className="h-4 w-4" />
                 </IconButton>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white">
+              <DropdownMenuContent align="end" className="bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white">
                 <DropdownMenuItem
                   onClick={() => onEdit(product.id)}
                   className="flex items-center gap-2 cursor-pointer text-slate-900 dark:text-white hover:bg-white/10"

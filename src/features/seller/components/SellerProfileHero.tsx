@@ -23,7 +23,7 @@ export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink,
   const initial = shopName.charAt(0).toUpperCase();
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-[0_18px_50px_rgba(0,0,0,0.5)]">
+    <div className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-[0_18px_50px_rgba(0,0,0,0.5)]">
       {/* Shop Accent Header */}
       <div className="relative h-20 w-full sm:h-28 lg:h-32">
         <div

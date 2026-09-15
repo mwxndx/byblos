@@ -66,7 +66,7 @@ export function SellerOrderDialogs({
     <>
             {/* Seller Pickup Payment Dialog */}
             <Dialog open={!!pickupOrder} onOpenChange={(open) => !open && closeRequestPickupDialog()}>
-                <DialogContent className="flex max-h-[82dvh] flex-col overflow-hidden w-[92vw] sm:max-w-md bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/15 text-slate-950 dark:text-white shadow-2xl">
+                <DialogContent className="flex max-h-[82dvh] flex-col overflow-hidden w-[92vw] sm:max-w-md bg-white dark:bg-surface-1 border border-slate-200 dark:border-white/15 text-slate-950 dark:text-white shadow-2xl">
                     <DialogHeader className="shrink-0">
                         <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
                             <div className="w-8 h-8 bg-yellow-400 text-black rounded-full flex items-center justify-center font-bold">
@@ -82,7 +82,7 @@ export function SellerOrderDialogs({
                     <form onSubmit={requestPickup} className="min-h-0 flex-1 overflow-y-auto pr-1">
                         <div className="space-y-4 py-2 pb-8">
                             {pickupOrder && (
-                                <div className="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-xs sm:grid-cols-3">
+                                <div className="grid grid-cols-1 gap-2 rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-fill p-3 text-xs sm:grid-cols-3">
                                     <div>
                                         <p className="text-slate-500 dark:text-white/60">Order</p>
                                         <p className="font-bold text-slate-900 dark:text-white">#{pickupOrder.orderNumber}</p>
@@ -100,7 +100,7 @@ export function SellerOrderDialogs({
                                 </div>
                             )}
 
-                            <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3">
+                            <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-fill p-3">
                                 <LocationPicker
                                     label="Pickup Location"
                                     detailedLabel="Full Pickup Address"
@@ -113,7 +113,7 @@ export function SellerOrderDialogs({
                                             lng: coordinates?.lng ?? null
                                         });
                                     }}
-                                    className="[&_label]:!text-slate-800 dark:[&_label]:!text-white [&_p]:!text-slate-600 dark:[&_p]:!text-white/70"
+                                    className="[&_label]:!text-slate-800 dark:[&_label]:!text-label [&_p]:!text-slate-600 dark:[&_p]:!text-label/70"
                                 />
                             </div>
 
@@ -126,7 +126,7 @@ export function SellerOrderDialogs({
                                         value={pickupPhone}
                                         onChange={(event) => setPickupPhone(event.target.value)}
                                         placeholder="0712345678"
-                                        className="bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400"
+                                        className="bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400"
                                         disabled={isRequestingPickup}
                                     />
                                 </div>
@@ -145,7 +145,7 @@ export function SellerOrderDialogs({
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3 text-xs text-slate-700 dark:text-white/75 font-medium">
+                            <div className="flex items-start gap-2 rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-fill p-3 text-xs text-slate-700 dark:text-white/75 font-medium">
                                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-300" />
                                 <span>After the pickup fee is paid, Mzigo Ego collects the package, secures it, and checks it against the order before delivery.</span>
                             </div>
@@ -157,7 +157,7 @@ export function SellerOrderDialogs({
                             )}
                         </div>
 
-                        <DialogFooter className="sticky bottom-0 z-20 mt-3 gap-2 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] py-3.5 px-1 shrink-0">
+                        <DialogFooter className="sticky bottom-0 z-20 mt-3 gap-2 border-t border-slate-200 dark:border-separator bg-white dark:bg-surface-1 py-3.5 px-1 shrink-0">
                             <Button
                                 type="button"
                                 variant="outline"
@@ -188,7 +188,7 @@ export function SellerOrderDialogs({
 
             {/* Ready for Pickup Confirmation Dialog */}
             < Dialog open={showPickupDialog} onOpenChange={setShowPickupDialog} >
-                <DialogContent className="w-[90vw] sm:max-w-sm bg-white dark:bg-[#0a0a0a] backdrop-blur-[12px] border border-slate-200 dark:border-white/15 shadow-xl text-slate-950 dark:text-white">
+                <DialogContent className="w-[90vw] sm:max-w-sm bg-white dark:bg-surface-1 backdrop-blur-[12px] border border-slate-200 dark:border-white/15 shadow-xl text-slate-950 dark:text-white">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
                             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-400/20 rounded-full flex items-center justify-center">
@@ -239,7 +239,7 @@ export function SellerOrderDialogs({
                         <Button
                             onClick={markAsReadyForPickup}
                             disabled={isUpdating}
-                            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold shadow-sm hover:shadow-md transition-all duration-200 h-8 text-xs"
+                            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200 h-8 text-xs"
                         >
                             {isUpdating ? (
                                 <>
@@ -259,7 +259,7 @@ export function SellerOrderDialogs({
 
             {/* Cancel Order Confirmation Dialog */}
             < Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog} >
-                <DialogContent className="w-[90vw] sm:max-w-[350px] bg-white dark:bg-[#0a0a0a] backdrop-blur-[12px] border border-slate-200 dark:border-white/15 shadow-xl text-slate-950 dark:text-white">
+                <DialogContent className="w-[90vw] sm:max-w-[350px] bg-white dark:bg-surface-1 backdrop-blur-[12px] border border-slate-200 dark:border-white/15 shadow-xl text-slate-950 dark:text-white">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
                             <div className="w-8 h-8 bg-red-100 dark:bg-red-500/10 border border-red-200 dark:border-red-400/20 rounded-full flex items-center justify-center">
@@ -292,7 +292,7 @@ export function SellerOrderDialogs({
                         <Button
                             onClick={cancelOrder}
                             disabled={isUpdating}
-                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold shadow-sm hover:shadow-md transition-all duration-200"
+                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
                         >
                             {isUpdating ? (
                                 <>

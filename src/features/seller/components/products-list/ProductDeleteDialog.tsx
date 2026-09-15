@@ -13,7 +13,7 @@ interface ProductDeleteDialogProps {
 export function ProductDeleteDialog({ open, deletingId, onOpenChange, onCancel, onConfirm }: ProductDeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] sm:max-w-[340px] bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white">
+      <DialogContent className="w-[90vw] sm:max-w-[340px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white">
         <DialogHeader>
           <DialogTitle className="text-slate-900 dark:text-white">Delete Product</DialogTitle>
           <DialogDescription className="text-slate-500 dark:text-white/60">
@@ -25,7 +25,7 @@ export function ProductDeleteDialog({ open, deletingId, onOpenChange, onCancel, 
             variant="outline"
             onClick={onCancel}
             disabled={!!deletingId}
-            className="bg-transparent border-slate-200 dark:border-white/10 text-slate-900 dark:text-white hover:bg-white/5 h-8 text-xs"
+            className="bg-transparent border-slate-200 dark:border-separator text-slate-900 dark:text-white hover:bg-fill h-8 text-xs"
           >
             Cancel
           </Button>

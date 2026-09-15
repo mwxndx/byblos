@@ -83,7 +83,7 @@ export function SettingsTab({
           setIsEditingContacts(false);
         }}
         disabled={isSaving}
-        className="h-8 rounded-lg border-slate-200 dark:border-white/15 bg-white/5 text-xs font-bold text-slate-900 dark:text-white hover:bg-white/10"
+        className="h-8 rounded-lg border-slate-200 dark:border-white/15 bg-fill text-xs font-bold text-slate-900 dark:text-white hover:bg-white/10"
       >
         Cancel
       </Button>
@@ -113,7 +113,7 @@ export function SettingsTab({
       size="sm"
       variant="outline"
       onClick={() => setIsEditingContacts(true)}
-      className="h-8 gap-1.5 rounded-lg border-slate-200 dark:border-white/15 bg-white/5 text-xs font-bold text-slate-900 dark:text-white hover:bg-white/10"
+      className="h-8 gap-1.5 rounded-lg border-slate-200 dark:border-white/15 bg-fill text-xs font-bold text-slate-900 dark:text-white hover:bg-white/10"
     >
       <Edit className="h-3.5 w-3.5 text-yellow-400" />
       Edit Contacts
@@ -238,14 +238,14 @@ export function SettingsTab({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
         <SectionHeader title="Legal" description="Review the documents you agreed to when you registered." />
         <div className="mt-4">
           <LegalLinks />
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
         <SectionHeader title="Account" description="Sign out of your seller account on this device." />
         <div className="mt-4">
           <Button
