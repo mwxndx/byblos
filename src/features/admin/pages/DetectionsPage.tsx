@@ -43,10 +43,10 @@ export default function DetectionsPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-semibold text-white tracking-tight italic">
+          <h1 className="text-4xl font-semibold text-label tracking-tight italic">
             DETECTIONS<span className="text-orange-500">.</span>
           </h1>
-          <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 ml-1">
+          <p className="text-label-3 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 ml-1">
             Creator self-dealing review queue — never shown to the creator or buyer
           </p>
         </div>
@@ -77,10 +77,10 @@ export default function DetectionsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
+          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">RELEASE<span className="text-green-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-label tracking-tight italic">RELEASE<span className="text-green-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedEarning && (
@@ -95,18 +95,18 @@ export default function DetectionsPage() {
                   Creator: {selectedEarning.creator_name || `#${selectedEarning.creator_id}`}
                 </p>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed px-2">
+              <p className="text-xs text-label-2 leading-relaxed px-2">
                 This clears the hold. The earning becomes subject to the normal T+2 clearing rule again — immediately withdrawable if that window has already passed.
               </p>
               <div className="space-y-4">
-                <Label htmlFor="releaseNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Review notes (optional)</Label>
+                <Label htmlFor="releaseNotes" className="text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-2 opacity-60">Review notes (optional)</Label>
                 <Textarea
                   id="releaseNotes"
                   placeholder="Why this is a false positive..."
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   rows={4}
-                  className="bg-white/[0.03] border-white/10 text-white placeholder:text-gray-700 rounded-[1.5rem] focus:border-green-500/50 p-6 font-medium"
+                  className="bg-white/[0.03] border-separator text-label placeholder:text-gray-700 rounded-[1.5rem] focus:border-green-500/50 p-6 font-medium"
                 />
               </div>
             </div>
@@ -117,7 +117,7 @@ export default function DetectionsPage() {
               variant="outline"
               onClick={() => { setIsReleaseDialogOpen(false); setReviewNotes(''); }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-separator text-label-3 hover:bg-fill hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Cancel
             </Button>
@@ -137,10 +137,10 @@ export default function DetectionsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
+          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">REVERSE<span className="text-red-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-label tracking-tight italic">REVERSE<span className="text-red-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedEarning && (
@@ -155,18 +155,18 @@ export default function DetectionsPage() {
                   Creator: {selectedEarning.creator_name || `#${selectedEarning.creator_id}`}
                 </p>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed px-2">
+              <p className="text-xs text-label-2 leading-relaxed px-2">
                 This claws back only this specific earning. If the creator's balance already covers it, it's deducted immediately; if they already withdrew it, a deficit is recorded for manual follow-up instead of a silent write-off.
               </p>
               <div className="space-y-4">
-                <Label htmlFor="reverseNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Review notes *</Label>
+                <Label htmlFor="reverseNotes" className="text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-2 opacity-60">Review notes *</Label>
                 <Textarea
                   id="reverseNotes"
                   placeholder="Evidence for confirmed self-dealing..."
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   rows={4}
-                  className="bg-white/[0.03] border-white/10 text-white placeholder:text-gray-700 rounded-[1.5rem] focus:border-red-500/50 p-6 font-medium"
+                  className="bg-white/[0.03] border-separator text-label placeholder:text-gray-700 rounded-[1.5rem] focus:border-red-500/50 p-6 font-medium"
                 />
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function DetectionsPage() {
               variant="outline"
               onClick={() => { setIsReverseDialogOpen(false); setReviewNotes(''); }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-separator text-label-3 hover:bg-fill hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Cancel
             </Button>

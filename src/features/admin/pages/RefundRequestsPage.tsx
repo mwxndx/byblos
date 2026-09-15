@@ -61,7 +61,7 @@ export default function RefundRequestsPage() {
           </Badge>
         );
       default:
-        return <Badge className="bg-gray-500/10 text-gray-400 border-white/10">{status}</Badge>;
+        return <Badge className="bg-gray-500/10 text-label-2 border-separator">{status}</Badge>;
     }
   };
 
@@ -84,19 +84,19 @@ export default function RefundRequestsPage() {
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-semibold text-white tracking-tight italic">REFUND<span className="text-red-500">.</span>PROTOCOL</h1>
-          <p className="text-gray-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 ml-1">Capital Reclamation Management</p>
+          <h1 className="text-4xl font-semibold text-label tracking-tight italic">REFUND<span className="text-red-500">.</span>PROTOCOL</h1>
+          <p className="text-label-3 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 ml-1">Capital Reclamation Management</p>
         </div>
 
-        <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/10 backdrop-blur-md flex-wrap gap-1">
+        <div className="flex bg-fill p-1.5 rounded-2xl border border-separator backdrop-blur-md flex-wrap gap-1">
           {['pending', 'manual_review', 'completed', 'rejected'].map((status) => (
             <Button
               key={status}
               variant="ghost"
               onClick={() => setStatusFilter(status)}
               className={`capitalize px-5 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all duration-300 ${statusFilter === status
-                ? 'bg-white/10 text-white shadow-inner'
-                : 'text-gray-500 hover:text-white hover:bg-white/5'
+                ? 'bg-white/10 text-label shadow-inner'
+                : 'text-label-3 hover:text-white hover:bg-fill'
                 }`}
             >
               {status === 'manual_review' ? 'Manual Review' : status}
@@ -131,10 +131,10 @@ export default function RefundRequestsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
+          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">AUTHORIZE<span className="text-green-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-label tracking-tight italic">AUTHORIZE<span className="text-green-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedRequest && (
@@ -151,14 +151,14 @@ export default function RefundRequestsPage() {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="confirmNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Operator Log (Optional)</Label>
+                <Label htmlFor="confirmNotes" className="text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-2 opacity-60">Operator Log (Optional)</Label>
                 <Textarea
                   id="confirmNotes"
                   placeholder="Record transmission details..."
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={4}
-                  className="bg-white/[0.03] border-white/10 text-white placeholder:text-gray-700 rounded-[1.5rem] focus:border-green-500/50 p-6 font-medium"
+                  className="bg-white/[0.03] border-separator text-label placeholder:text-gray-700 rounded-[1.5rem] focus:border-green-500/50 p-6 font-medium"
                 />
               </div>
             </div>
@@ -172,7 +172,7 @@ export default function RefundRequestsPage() {
                 setAdminNotes('');
               }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-separator text-label-3 hover:bg-fill hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Abort
             </Button>
@@ -192,10 +192,10 @@ export default function RefundRequestsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-[#0A0A0A] border border-white/10 text-white sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
+          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-semibold text-white tracking-tight italic">VETO<span className="text-red-500">.</span></DialogTitle>
+            <DialogTitle className="text-3xl font-semibold text-label tracking-tight italic">VETO<span className="text-red-500">.</span></DialogTitle>
           </DialogHeader>
 
           {selectedRequest && (
@@ -212,14 +212,14 @@ export default function RefundRequestsPage() {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="rejectNotes" className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest ml-2 opacity-60">Veto Rationale *</Label>
+                <Label htmlFor="rejectNotes" className="text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-2 opacity-60">Veto Rationale *</Label>
                 <Textarea
                   id="rejectNotes"
                   placeholder="Record rejection cause..."
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   rows={4}
-                  className="bg-white/[0.03] border-white/10 text-white placeholder:text-gray-700 rounded-[1.5rem] focus:border-red-500/50 p-6 font-medium"
+                  className="bg-white/[0.03] border-separator text-label placeholder:text-gray-700 rounded-[1.5rem] focus:border-red-500/50 p-6 font-medium"
                 />
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function RefundRequestsPage() {
                 setAdminNotes('');
               }}
               disabled={isProcessing}
-              className="flex-1 h-12 border-white/10 text-gray-500 hover:bg-white/5 hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
+              className="flex-1 h-12 border-separator text-label-3 hover:bg-fill hover:text-white bg-transparent rounded-2xl font-semibold text-[10px] uppercase tracking-widest"
             >
               Abort
             </Button>

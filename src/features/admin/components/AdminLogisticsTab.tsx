@@ -91,41 +91,41 @@ export function AdminLogisticsTab() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-white/10 bg-[#0A0A0A] text-white">
+        <Card className="border-separator bg-surface-1 text-label">
           <CardContent className="p-4">
             <Truck className="mb-3 h-5 w-5 text-yellow-300" />
-            <p className="text-xs uppercase tracking-widest text-white/50">Total</p>
+            <p className="text-xs uppercase tracking-widest text-label/50">Total</p>
             <p className="text-2xl font-semibold">{dashboard?.count || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-red-300/20 bg-red-500/10 text-white">
+        <Card className="border-red-300/20 bg-red-500/10 text-label">
           <CardContent className="p-4">
             <AlertTriangle className="mb-3 h-5 w-5 text-red-300" />
-            <p className="text-xs uppercase tracking-widest text-white/50">Failed</p>
+            <p className="text-xs uppercase tracking-widest text-label/50">Failed</p>
             <p className="text-2xl font-semibold">{dashboard?.summary?.failed || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-300/20 bg-yellow-300/10 text-white">
+        <Card className="border-yellow-300/20 bg-yellow-300/10 text-label">
           <CardContent className="p-4">
             <Clock className="mb-3 h-5 w-5 text-yellow-300" />
-            <p className="text-xs uppercase tracking-widest text-white/50">Delayed</p>
+            <p className="text-xs uppercase tracking-widest text-label/50">Delayed</p>
             <p className="text-2xl font-semibold">{dashboard?.summary?.delayed || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-cyan-300/20 bg-cyan-300/10 text-white">
+        <Card className="border-cyan-300/20 bg-cyan-300/10 text-label">
           <CardContent className="p-4">
             <ShieldCheck className="mb-3 h-5 w-5 text-cyan-200" />
-            <p className="text-xs uppercase tracking-widest text-white/50">Review</p>
+            <p className="text-xs uppercase tracking-widest text-label/50">Review</p>
             <p className="text-2xl font-semibold">{dashboard?.summary?.manualReview || 0}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="border-white/10 bg-[#0A0A0A]/70 text-white">
+      <Card className="border-separator bg-surface-1 text-label">
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <CardTitle className="text-2xl text-white">Logistics Oversight</CardTitle>
-            <p className="mt-1 text-sm text-white/60">Delivered completes logistics only. Escrow release stays under order completion rules.</p>
+            <CardTitle className="text-2xl text-label">Logistics Oversight</CardTitle>
+            <p className="mt-1 text-sm text-label/60">Delivered completes logistics only. Escrow release stays under order completion rules.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {STATUS_FILTERS.map((filter) => (
@@ -134,13 +134,13 @@ export function AdminLogisticsTab() {
                 type="button"
                 size="sm"
                 onClick={() => setStatus(filter.value)}
-                className={status === filter.value ? 'bg-yellow-300 text-black hover:bg-yellow-200' : 'bg-white/5 text-white hover:bg-white hover:text-black'}
+                className={status === filter.value ? 'bg-yellow-300 text-black hover:bg-yellow-200' : 'bg-fill text-label hover:bg-white hover:text-black'}
               >
                 {filter.label}
               </Button>
             ))}
             <select
-              className="h-9 rounded-xl border border-white/10 bg-black px-3 text-sm text-white"
+              className="h-9 rounded-xl border border-separator bg-black px-3 text-sm text-label"
               value={sort}
               onChange={(event) => setSort(event.target.value as LogisticsSort)}
             >
@@ -153,10 +153,10 @@ export function AdminLogisticsTab() {
         <CardContent className="space-y-5">
           {logisticsQuery.isLoading ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              {[0, 1].map((item) => <div key={item} className="h-80 animate-pulse rounded-3xl bg-white/5" />)}
+              {[0, 1].map((item) => <div key={item} className="h-80 animate-pulse rounded-3xl bg-fill" />)}
             </div>
           ) : requests.length === 0 ? (
-            <div className="rounded-3xl border border-white/10 bg-black p-8 text-center text-white/60">
+            <div className="rounded-3xl border border-separator bg-black p-8 text-center text-label/60">
               No logistics requests match this filter.
             </div>
           ) : (
