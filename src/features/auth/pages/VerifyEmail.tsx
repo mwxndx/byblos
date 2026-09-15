@@ -105,7 +105,7 @@ const VerifyEmail = () => {
             }}
         >
             <div
-                className="animate-in fade-in slide-in-from-bottom-5 duration-500 ease-out max-w-md w-full bg-white dark:bg-[#0a0a0a] border border-black/[0.08] dark:border-white/10 p-8 rounded-3xl shadow-[0_18px_45px_rgba(17,17,17,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] relative z-10 text-center transition-colors duration-200"
+                className="animate-in fade-in slide-in-from-bottom-5 duration-500 ease-out max-w-md w-full bg-white dark:bg-surface-1 border border-black/[0.08] dark:border-separator p-8 rounded-3xl shadow-[0_18px_45px_rgba(17,17,17,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] relative z-10 text-center transition-colors duration-200"
             >
                 <div className="mb-8 flex justify-center">
                     {status === 'loading' && (
@@ -147,7 +147,7 @@ const VerifyEmail = () => {
                             onClick={handleBackToLogin}
                             className={`w-full h-12 text-lg font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${status === 'success' || status === 'check-email'
                                 ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                                : 'bg-slate-100 dark:bg-white/[0.05] text-slate-950 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-300 dark:border-white/10'
+                                : 'bg-slate-100 dark:bg-white/[0.05] text-slate-950 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-300 dark:border-separator'
                                 }`}
                         >
                             {status === 'success' || status === 'check-email' ? 'Go to Login' : 'Try Again'}

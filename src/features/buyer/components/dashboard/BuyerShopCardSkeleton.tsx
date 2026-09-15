@@ -1,6 +1,6 @@
 export function BuyerShopCardSkeleton() {
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-3 overflow-hidden shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-colors duration-200">
+    <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-3 overflow-hidden shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-colors duration-200">
       <div className="flex gap-3">
         <div className="w-14 h-14 rounded-2xl bg-slate-200 dark:bg-[#232323] animate-pulse shrink-0" />
         <div className="flex-1 min-w-0">

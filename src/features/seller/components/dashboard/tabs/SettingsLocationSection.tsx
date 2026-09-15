@@ -46,7 +46,7 @@ export function SettingsLocationSection({
         variant="outline"
         onClick={onCancel || toggleEdit}
         disabled={isSaving}
-        className="h-8 rounded-lg border-white/15 bg-white/5 text-xs font-bold text-white hover:bg-white/10"
+        className="h-8 rounded-lg border-white/15 bg-fill text-xs font-bold text-label hover:bg-white/10"
       >
         Cancel
       </Button>
@@ -56,7 +56,7 @@ export function SettingsLocationSection({
           size="sm"
           onClick={onSave}
           disabled={isSaving}
-          className="h-8 rounded-lg bg-[var(--theme-button-bg,#f5c518)] text-xs font-black text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md"
+          className="h-8 rounded-lg bg-[var(--theme-button-bg,#f5c518)] text-xs font-semibold text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md"
         >
           {isSaving ? (
             <>
@@ -75,7 +75,7 @@ export function SettingsLocationSection({
       size="sm"
       variant="outline"
       onClick={toggleEdit}
-      className="h-8 gap-1.5 rounded-lg border-white/15 bg-white/5 text-xs font-bold text-white hover:bg-white/10"
+      className="h-8 gap-1.5 rounded-lg border-white/15 bg-fill text-xs font-bold text-label hover:bg-white/10"
     >
       <Edit className="h-3.5 w-3.5 text-yellow-400" />
       Edit Location
@@ -107,7 +107,7 @@ export function SettingsLocationSection({
                     ))}
                   </select>
                 ) : (
-                  <p className="text-xs sm:text-sm lg:text-base font-semibold text-white">
+                  <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
                     {sellerProfile?.city || 'Not set'}
                   </p>
                 )}
@@ -129,7 +129,7 @@ export function SettingsLocationSection({
                     ))}
                   </select>
                 ) : (
-                  <p className="text-xs sm:text-sm lg:text-base font-semibold text-white">
+                  <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
                     {sellerProfile?.location || 'Not set'}
                   </p>
                 )}
@@ -178,10 +178,10 @@ export function SettingsLocationSection({
                   {sellerProfile?.physicalAddress ? (
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div>
-                        <p className="text-xs sm:text-sm lg:text-base font-semibold text-white">
+                        <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
                           {sellerProfile.physicalAddress}
                         </p>
-                        <p className="text-xs text-white/40">
+                        <p className="text-xs text-label-2">
                           {sellerProfile.latitude && sellerProfile.longitude
                             ? `Coordinates: ${Number(sellerProfile.latitude).toFixed(6)}, ${Number(sellerProfile.longitude).toFixed(6)}`
                             : 'No map location pinned'}
@@ -205,7 +205,7 @@ export function SettingsLocationSection({
                       </Button>
                     </div>
                   ) : (
-                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-white/40 italic">
+                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-label-2 italic">
                       No physical address set
                     </p>
                   )}

@@ -24,7 +24,9 @@ body,
     overscroll-behavior-y: none !important;
     overscroll-behavior-x: none !important;
     background: #000000;
-    font-family: 'Nunito Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    /* SF Pro on Apple (via -apple-system) → Inter on web/Android. -apple-system
+       is ignored on Android/Windows so Inter is used there, not Roboto. */
+    font-family: -apple-system, 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -34,6 +36,17 @@ body,
     --sab: max(env(safe-area-inset-bottom, 0px), 0px);
     --sal: max(env(safe-area-inset-left, 0px), 0px);
     --sar: max(env(safe-area-inset-right, 0px), 0px);
+
+    /* ── Apple design foundation — theme-invariant tokens (radii, motion) ─────
+       Colour tokens with light/dark values live in the dark :root and the
+       [data-theme="light"] blocks below. Continuous corners retire the old
+       40px card radii; iOS easing + ~0.28s is the standard motion. */
+    --r-control: 10px;
+    --r-card: 14px;
+    --r-sheet: 20px;
+    --r-pill: 999px;
+    --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+    --dur: 0.28s;
 }
 
 /* ── Capacitor Native Mobile (Android & iOS) Safe Area Overrides ── */
@@ -104,6 +117,30 @@ body.android-native {
     --radius-lg: 18px;
     --nav-h: 56px;
     --tab-h: 40px;
+
+    /* ── Apple semantic layer — DARK (this :root is the dark default) ─────────
+       Additive: the shared primitives migrate onto these; existing pages keep
+       using --byblos-* until each portal is converted. */
+    --label: #f5f5f7;
+    --label-2: #a1a1a8;
+    --label-3: #8e8e93;
+    --surface-1: #1c1c1e;
+    --surface-2: #2c2c2e;
+    --separator: rgba(84, 84, 88, 0.55);
+    --separator-strong: rgba(120, 120, 128, 0.6);
+    --fill: rgba(120, 120, 128, 0.24);
+    --fill-2: rgba(120, 120, 128, 0.16);
+    --brand: #f5c518;          /* restrained accent — fills & selection */
+    --brand-press: #ffd426;
+    --on-brand: #1d1d1f;
+    --brand-text: #f5c518;     /* accent-as-text is legible on dark */
+    --sys-red: #ff453a;
+    --sys-green: #30d158;
+    --sys-orange: #ff9f0a;
+    --sys-blue: #0a84ff;
+    --chrome: rgba(28, 28, 30, 0.72);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 .page-enter {
@@ -128,7 +165,7 @@ body.android-native {
 
 @layer base {
     :root {
-        --font-byblos: 'Nunito Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-byblos: -apple-system, 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
     }
 
     * {
@@ -206,8 +243,8 @@ body.android-native {
         --popover: 240 10% 3.9%;
         --popover-foreground: 0 0% 100%;
 
-        --primary: 142 72% 50%;
-        --primary-foreground: 0 0% 0%;
+        --primary: 47 91% 53%;
+        --primary-foreground: 240 6% 12%;
 
         --secondary: 240 3.7% 15.9%;
         --secondary-foreground: 0 0% 100%;
@@ -223,7 +260,7 @@ body.android-native {
 
         --border: 240 3.7% 15.9%;
         --input: 240 3.7% 15.9%;
-        --ring: 142 76% 36%;
+        --ring: 47 91% 53%;
         --sidebar-background: 0 0% 0%;
         --sidebar-foreground: 0 0% 95%;
         --sidebar-primary: 45 100% 60%;
@@ -931,8 +968,8 @@ body.dashboard-active .seller-tab-selected {
     --card-foreground: 30 4% 6%;
     --popover: 0 0% 100%;
     --popover-foreground: 30 4% 6%;
-    --primary: 42 85% 45%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 47 91% 53%;
+    --primary-foreground: 240 6% 12%;
     --secondary: 36 10% 92%;
     --secondary-foreground: 30 4% 12%;
     --muted: 36 10% 92%;
@@ -943,15 +980,37 @@ body.dashboard-active .seller-tab-selected {
     --destructive-foreground: 0 0% 100%;
     --border: 36 10% 84%;
     --input: 36 10% 84%;
-    --ring: 42 85% 45%;
+    --ring: 47 91% 53%;
     --sidebar-background: 36 12% 98%;
     --sidebar-foreground: 30 4% 8%;
-    --sidebar-primary: 42 85% 45%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 47 91% 53%;
+    --sidebar-primary-foreground: 240 6% 12%;
     --sidebar-accent: 36 10% 92%;
     --sidebar-accent-foreground: 30 4% 10%;
     --sidebar-border: 36 10% 86%;
-    --sidebar-ring: 42 85% 45%;
+    --sidebar-ring: 47 91% 53%;
+
+    /* ── Apple semantic layer — LIGHT ──────────────────────────────────────── */
+    --label: #1d1d1f;
+    --label-2: #6e6e73;
+    --label-3: #a0a0a6;
+    --surface-1: #ffffff;
+    --surface-2: #fafaf8;
+    --separator: rgba(60, 60, 67, 0.16);
+    --separator-strong: rgba(60, 60, 67, 0.29);
+    --fill: rgba(118, 118, 128, 0.12);
+    --fill-2: rgba(118, 118, 128, 0.08);
+    --brand: #f5c518;
+    --brand-press: #e0b10e;
+    --on-brand: #1d1d1f;
+    --brand-text: #9a7b0a;     /* accent-as-text darkened for 4.5:1 on light */
+    --sys-red: #ff3b30;
+    --sys-green: #34c759;
+    --sys-orange: #ff9500;
+    --sys-blue: #007aff;
+    --chrome: rgba(255, 255, 255, 0.72);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
+    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.14);
 }
 
 /* html/body background in light mode */

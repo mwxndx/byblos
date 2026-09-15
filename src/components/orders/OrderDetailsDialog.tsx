@@ -17,7 +17,7 @@ interface OrderDetailsDialogProps {
 export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage, onConfirmReceiptClick }: OrderDetailsDialogProps) {
   return (
       <Dialog open={!!order} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="w-[92vw] sm:max-w-xl bg-white dark:bg-[#0d0d0d] border border-slate-200 dark:border-white/10 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+        <DialogContent className="w-[92vw] sm:max-w-xl bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           {order && (
             <>
               <DialogHeader>
@@ -37,7 +37,7 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
                         type="button"
                         onClick={() => onViewImage(getImageUrl(item.imageUrl))}
                         aria-label={`View full-size image of ${item.name}`}
-                        className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
+                        className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-fill overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
                       >
                         <img
                           src={getImageUrl(item.imageUrl)}
@@ -46,7 +46,7 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
                         />
                       </button>
                     ) : (
-                      <div className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 flex items-center justify-center">
+                      <div className="h-20 w-20 rounded-xl bg-slate-100 dark:bg-fill overflow-hidden border border-slate-200 dark:border-white/15 flex-shrink-0 flex items-center justify-center">
                         <Package className="h-8 w-8 text-slate-400 dark:text-white/60" />
                       </div>
                     )}
@@ -62,9 +62,9 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
                   </div>
                 ))}
 
-                <div className="border-t border-slate-200 dark:border-white/10 my-4" />
+                <div className="border-t border-slate-200 dark:border-separator my-4" />
 
-                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-3">
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-fill border border-slate-200 dark:border-separator space-y-3">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     <p className="text-xs text-slate-500 dark:text-white/60 uppercase tracking-wider font-semibold">Shop Details</p>
@@ -93,7 +93,7 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
                   </div>
 
                   {order.shippingAddress && (
-                    <div className="pt-2 border-t border-slate-200 dark:border-white/10 mt-2">
+                    <div className="pt-2 border-t border-slate-200 dark:border-separator mt-2">
                       <p className="text-xs text-slate-500 dark:text-white/60 mb-1">Shipping To:</p>
                       <p className="text-sm text-slate-800 dark:text-white/80">
                         {order.shippingAddress.address}
@@ -124,7 +124,7 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
               <DialogFooter className="gap-2">
                 {canConfirmOrderReceipt(order) && (
                   <Button
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-label font-bold"
                     onClick={() => {
                       onConfirmReceiptClick(order.id);
                       onClose();

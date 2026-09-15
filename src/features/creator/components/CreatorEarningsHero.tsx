@@ -75,13 +75,13 @@ export function CreatorEarningsHero({
   const [showExplain, setShowExplain] = useState(false);
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-[#0a0a0a] p-5 shadow-sm transition-colors duration-200 sm:p-6">
+    <section className="relative overflow-hidden rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-surface-1 p-5 shadow-sm transition-colors duration-200 sm:p-6">
       {/* Ambient gold glow */}
       <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-yellow-400/10 blur-3xl" aria-hidden="true" />
 
       <div className="relative">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-600 dark:text-yellow-300">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-600 dark:text-yellow-300">
             Creator · {name}
           </p>
 
@@ -113,7 +113,7 @@ export function CreatorEarningsHero({
 
         {hasEarnings ? (
           <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-2">
-            <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
               You&apos;ve earned{' '}
               <span className="text-yellow-600 dark:text-yellow-300 tabular-nums">
                 KSh {Math.round(animatedEarnings).toLocaleString()}
@@ -129,7 +129,7 @@ export function CreatorEarningsHero({
           </div>
         ) : (
           <div className="mt-2">
-            <h1 className="text-2xl font-black tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
               {name}, your creator earnings hub
             </h1>
             <p className="mt-1 text-sm font-medium text-slate-600 dark:text-white/50">
@@ -153,13 +153,13 @@ export function CreatorEarningsHero({
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h2 className="text-base font-black text-slate-900 dark:text-white">
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-white">
                     Add a Seller · Lifetime Referral Link
                   </h2>
-                  <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black px-2 py-0.5 uppercase tracking-wide">
+                  <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wide">
                     KSh 3 Per Sale
                   </span>
-                  <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-700 dark:text-yellow-300 text-[10px] font-black px-2 py-0.5 uppercase tracking-wide flex items-center gap-1">
+                  <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-700 dark:text-yellow-300 text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wide flex items-center gap-1">
                     <Infinity className="h-3 w-3" />
                     Lifetime
                   </span>
@@ -189,7 +189,7 @@ export function CreatorEarningsHero({
             <Button
               type="button"
               onClick={onCopyLink}
-              className="h-9 shrink-0 bg-yellow-400 font-black text-black hover:bg-yellow-300 text-xs px-4 shadow-sm"
+              className="h-9 shrink-0 bg-yellow-400 font-semibold text-black hover:bg-yellow-300 text-xs px-4 shadow-sm"
             >
               <Share2 className="mr-1.5 h-3.5 w-3.5" />
               Copy seller invite link
@@ -198,11 +198,11 @@ export function CreatorEarningsHero({
 
           {/* Explanatory Breakdown: How it works & Difference from Shop Collaborations */}
           {showExplain && (
-            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-white/10 space-y-4 animate-in fade-in duration-200 text-xs">
+            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-separator space-y-4 animate-in fade-in duration-200 text-xs">
               {/* 3 Steps to Lifetime Royalties */}
               <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20 p-3">
-                  <div className="flex items-center gap-1.5 font-black text-slate-900 dark:text-white mb-1">
+                <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/20 p-3">
+                  <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white mb-1">
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 font-bold text-[9px] text-black">1</span>
                     Share with Store Owners
                   </div>
@@ -211,8 +211,8 @@ export function CreatorEarningsHero({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20 p-3">
-                  <div className="flex items-center gap-1.5 font-black text-slate-900 dark:text-white mb-1">
+                <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/20 p-3">
+                  <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white mb-1">
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 font-bold text-[9px] text-black">2</span>
                     Permanent Attribution
                   </div>
@@ -221,8 +221,8 @@ export function CreatorEarningsHero({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20 p-3">
-                  <div className="flex items-center gap-1.5 font-black text-slate-900 dark:text-white mb-1">
+                <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/20 p-3">
+                  <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white mb-1">
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 font-bold text-[9px] text-white">3</span>
                     Earn KSh 3 on Every Sale
                   </div>
@@ -234,7 +234,7 @@ export function CreatorEarningsHero({
 
               {/* Comparison: Add a Seller vs Shop Collaboration */}
               <div className="rounded-xl border border-yellow-400/25 bg-yellow-400/5 p-3.5 space-y-2">
-                <p className="font-black text-slate-900 dark:text-white flex items-center gap-1.5 text-xs">
+                <p className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5 text-xs">
                   <Sparkles className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400" />
                   Understanding the Difference: 2 Ways to Earn as a Creator
                 </p>
@@ -242,7 +242,7 @@ export function CreatorEarningsHero({
                   <div className="rounded-lg bg-white/70 dark:bg-black/40 p-3 border border-yellow-400/20">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Store className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-400" />
-                      <span className="font-black text-yellow-700 dark:text-yellow-300">
+                      <span className="font-semibold text-yellow-700 dark:text-yellow-300">
                         Method 1: Add a Seller (This Section)
                       </span>
                     </div>
@@ -257,7 +257,7 @@ export function CreatorEarningsHero({
                   <div className="rounded-lg bg-white/70 dark:bg-black/40 p-3 border border-yellow-400/20">
                     <div className="flex items-center gap-1.5 mb-1">
                       <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span className="font-black text-emerald-600 dark:text-emerald-400">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                         Method 2: Shop Collaborations (Marketplace Below)
                       </span>
                     </div>

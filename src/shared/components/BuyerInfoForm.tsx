@@ -50,7 +50,7 @@ export function BuyerInfoForm({
           <User className="h-7 w-7 text-yellow-400" />
         </div>
         <div className="space-y-2">
-          <DialogTitle className="text-2xl font-black text-center text-slate-950 dark:text-white">PAYMENT DETAILS</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-center text-slate-950 dark:text-white">PAYMENT DETAILS</DialogTitle>
           <p className="text-[11px] text-center font-bold text-slate-600 dark:text-white uppercase tracking-wider opacity-80 leading-relaxed px-4">
             Your payment details are safe and are only collected once
           </p>
@@ -67,7 +67,7 @@ export function BuyerInfoForm({
       >
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="firstName" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+            <Label htmlFor="firstName" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               First Name *
             </Label>
             <div className="relative">
@@ -91,7 +91,7 @@ export function BuyerInfoForm({
             )}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="lastName" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+            <Label htmlFor="lastName" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               Last Name *
             </Label>
             <div className="relative">
@@ -118,7 +118,7 @@ export function BuyerInfoForm({
 
         {/* Email */}
         <div className="space-y-1.5">
-          <Label htmlFor="email" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+          <Label htmlFor="email" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
             Email Address *
           </Label>
           <div className="relative">
@@ -147,7 +147,7 @@ export function BuyerInfoForm({
         {/* Phone numbers */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="mobilePayment" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+            <Label htmlFor="mobilePayment" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               M-Pesa *
             </Label>
             <div className="relative">
@@ -167,7 +167,7 @@ export function BuyerInfoForm({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="whatsappNumber" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+            <Label htmlFor="whatsappNumber" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               WhatsApp *
             </Label>
             <div className="relative">
@@ -192,7 +192,7 @@ export function BuyerInfoForm({
         {/* City & Area in a grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="city" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+            <Label htmlFor="city" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               City *
             </Label>
             <div className="relative">
@@ -228,7 +228,7 @@ export function BuyerInfoForm({
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="location" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+            <Label htmlFor="location" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               Area *
             </Label>
             <div className="relative">
@@ -264,7 +264,7 @@ export function BuyerInfoForm({
 
         {/* Password */}
         <div className="space-y-2 pt-2">
-          <Label htmlFor="password" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+          <Label htmlFor="password" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
             Set Password *
           </Label>
           <div className="relative">
@@ -289,7 +289,7 @@ export function BuyerInfoForm({
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
               aria-pressed={showPassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-2 hover:text-white transition-colors"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -315,7 +315,7 @@ export function BuyerInfoForm({
                     <div className={`p-0.5 rounded-full ${req.met ? 'bg-green-500/20 text-green-400' : 'bg-slate-50 text-slate-400'}`}>
                       <CheckCircle2 className="h-3 w-3" />
                     </div>
-                    <span className={`text-[10px] uppercase font-black ${req.met ? 'text-green-400' : 'text-slate-400'}`}>
+                    <span className={`text-[10px] uppercase font-semibold ${req.met ? 'text-green-400' : 'text-slate-400'}`}>
                       {req.label}
                     </span>
                   </div>
@@ -331,7 +331,7 @@ export function BuyerInfoForm({
 
         {/* Confirm Password */}
         <div className="space-y-1.5 pb-2">
-          <Label htmlFor="confirmPassword" className={`text-xs font-black uppercase tracking-wider ${themeClasses.label}`}>
+          <Label htmlFor="confirmPassword" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
             Verify Password *
           </Label>
           <div className="relative">
@@ -356,7 +356,7 @@ export function BuyerInfoForm({
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
               aria-pressed={showConfirmPassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-2 hover:text-white transition-colors"
             >
               {showConfirmPassword ? (
                 <EyeOff className="w-5 h-5" />
@@ -400,7 +400,7 @@ export function BuyerInfoForm({
         <Button
           type="submit"
           disabled={isLoading || !termsAccepted}
-          className={`w-full h-12 rounded-xl font-black text-base shadow-lg transition-all bg-yellow-400 hover:bg-yellow-500 text-black active:scale-[0.98] ${
+          className={`w-full h-12 rounded-xl font-semibold text-base shadow-lg transition-all bg-yellow-400 hover:bg-yellow-500 text-black active:scale-[0.98] ${
             !termsAccepted ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >

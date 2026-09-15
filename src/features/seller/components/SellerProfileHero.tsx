@@ -23,7 +23,7 @@ export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink,
   const initial = shopName.charAt(0).toUpperCase();
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-[0_18px_50px_rgba(0,0,0,0.5)]">
+    <div className="relative w-full overflow-hidden rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-[0_18px_50px_rgba(0,0,0,0.5)]">
       {/* Shop Accent Header */}
       <div className="relative h-20 w-full sm:h-28 lg:h-32">
         <div
@@ -47,7 +47,7 @@ export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink,
               <img src={avatar} alt={shopName} className="h-full w-full object-cover" />
             ) : (
               <div
-                className="flex h-full w-full items-center justify-center text-2xl sm:text-3xl font-black"
+                className="flex h-full w-full items-center justify-center text-2xl sm:text-3xl font-semibold"
                 style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
               >
                 {initial}
@@ -73,7 +73,7 @@ export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink,
           <button
             type="button"
             onClick={() => onCopyShopLink()}
-            className="mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-black shadow-[0_8px_22px_rgba(0,0,0,0.4)] transition-transform active:scale-95"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold shadow-[0_8px_22px_rgba(0,0,0,0.4)] transition-transform active:scale-95"
             style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
           >
             <Link2 className="h-3.5 w-3.5" />
@@ -82,7 +82,7 @@ export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink,
         )}
 
         {/* Shop name */}
-        <h2 className="mt-3 text-center text-xl font-black tracking-tight text-slate-900 dark:text-white sm:text-2xl [overflow-wrap:anywhere]">
+        <h2 className="mt-3 text-center text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl [overflow-wrap:anywhere]">
           {shopName}
         </h2>
 

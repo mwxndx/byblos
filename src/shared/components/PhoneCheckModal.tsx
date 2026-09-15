@@ -183,7 +183,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
                               onLocationChange={(address, coordinates) => {
                                 setDeliveryLocation(createOptionalBuyerLocation(address, coordinates));
                               }}
-                              className="[&_label]:!text-slate-700 dark:[&_label]:!text-slate-200 [&_p]:!text-slate-500 dark:[&_p]:!text-white/50 [&_input]:!bg-white dark:[&_input]:!bg-[#141414] [&_input]:!text-slate-950 dark:[&_input]:!text-white [&_input]:!border-slate-200 dark:[&_input]:!border-white/10 [&_input::placeholder]:!text-slate-400 dark:[&_input::placeholder]:!text-white/40"
+                              className="[&_label]:!text-slate-700 dark:[&_label]:!text-slate-200 [&_p]:!text-slate-500 dark:[&_p]:!text-label-2 [&_input]:!bg-white dark:[&_input]:!bg-[#141414] [&_input]:!text-slate-950 dark:[&_input]:!text-white [&_input]:!border-slate-200 dark:[&_input]:!border-white/10 [&_input::placeholder]:!text-slate-400 dark:[&_input::placeholder]:!text-label-2"
                             />
                           </div>
 

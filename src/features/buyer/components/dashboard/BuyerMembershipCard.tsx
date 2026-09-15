@@ -66,15 +66,15 @@ export function BuyerMembershipCard() {
   if (isLoading) return null;
 
   return (
-    <section className="mt-4 space-y-3 rounded-2xl border border-white/10 bg-[#0a0a0a] p-4 shadow-sm">
+    <section className="mt-4 space-y-3 rounded-2xl border border-separator bg-surface-1 p-4 shadow-sm">
       <div className="flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-[#F5C518]" />
-        <h3 className="text-sm font-semibold text-white">Founder card</h3>
+        <h3 className="text-sm font-semibold text-label">Founder card</h3>
       </div>
 
       {isMember ? (
         <>
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-label-2">
             You're member No. {String(displayNumber).padStart(6, '0')} — share your card anytime.
           </p>
 
@@ -96,7 +96,7 @@ export function BuyerMembershipCard() {
               type="button"
               onClick={() => share('wa')}
               disabled={sharing !== null}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] text-sm font-bold text-white transition hover:bg-white/12 disabled:opacity-70"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] text-sm font-bold text-label transition hover:bg-white/12 disabled:opacity-70"
             >
               {sharing === 'wa' ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
               WhatsApp
@@ -126,7 +126,7 @@ export function BuyerMembershipCard() {
         </>
       ) : (
         <>
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-label-2">
             Get your own numbered founder card — proof you shop protected, and one of the first to do it.
           </p>
           <button

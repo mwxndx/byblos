@@ -160,7 +160,7 @@ export default function CreatorRegister() {
   if (token && inviteLoading) {
     return (
       <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex items-center justify-center px-4 transition-colors duration-200">
-        <div className="flex items-center gap-3 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-5 py-3 shadow-xl">
+        <div className="flex items-center gap-3 rounded-full border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 px-5 py-3 shadow-xl">
           <Loader2 className="h-5 w-5 animate-spin text-yellow-500" />
           <span className="text-sm font-semibold text-slate-800 dark:text-white/80">Validating invite link...</span>
         </div>
@@ -174,9 +174,9 @@ export default function CreatorRegister() {
     const isAlreadyUsed = errorMsg.toLowerCase().includes('already been used') || errorMsg.toLowerCase().includes('already used');
     return (
       <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex items-center justify-center px-4 transition-colors duration-200">
-        <div className="max-w-md w-full rounded-3xl border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-8 text-center space-y-4 shadow-2xl">
+        <div className="max-w-md w-full rounded-3xl border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-8 text-center space-y-4 shadow-2xl">
           <div className="text-4xl">{isAlreadyUsed ? '✅' : '🔗'}</div>
-          <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
             {isAlreadyUsed ? 'Invite Already Used' : 'Invalid invite link'}
           </h1>
           <p className="text-sm text-slate-600 dark:text-white/55 leading-relaxed">
@@ -187,7 +187,7 @@ export default function CreatorRegister() {
           <button
             type="button"
             onClick={() => navigate('/creator/login')}
-            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-yellow-400 text-sm font-black text-black hover:bg-yellow-300 transition"
+            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-yellow-400 text-sm font-semibold text-black hover:bg-yellow-300 transition"
           >
             Go to creator login
           </button>
@@ -198,7 +198,7 @@ export default function CreatorRegister() {
 
   return (
     <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-white/10 bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">
@@ -226,10 +226,10 @@ export default function CreatorRegister() {
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-5xl flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <div className="grid flex-1 items-center gap-6 py-6 lg:grid-cols-[0.85fr_1.15fr]">
         <section className="space-y-4">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">
             {token ? 'Creator invite' : 'Byblos creators'}
           </p>
-          <h1 className="text-4xl font-black tracking-tight sm:text-5xl text-slate-900 dark:text-white">Earn when your audience buys safely.</h1>
+          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl text-slate-900 dark:text-white">Earn when your audience buys safely.</h1>
           <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">
             {invite
               ? `${invite.shopName} invited you to sell through Byblos.`
@@ -237,9 +237,9 @@ export default function CreatorRegister() {
           </p>
         </section>
 
-        <form onSubmit={handleSubmit} className="grid gap-3 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:grid-cols-2 transition-colors duration-200">
-          <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
-          <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+        <form onSubmit={handleSubmit} className="grid gap-3 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:grid-cols-2 transition-colors duration-200">
+          <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <Input
             value={form.email}
             readOnly={Boolean(token)}
@@ -250,13 +250,13 @@ export default function CreatorRegister() {
             autoComplete="email"
             aria-label="Email"
             placeholder="Email"
-            className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white/70 placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2"
+            className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white/70 placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2"
             required
           />
-          <Input value={form.mpesaNumber} onChange={(e) => updateForm('mpesaNumber', e.target.value)} aria-label="M-Pesa number" placeholder="M-Pesa number" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" required />
-          <Input value={form.whatsappNumber} onChange={(e) => updateForm('whatsappNumber', e.target.value)} aria-label="WhatsApp number (optional)" placeholder="WhatsApp number (Optional)" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" />
+          <Input value={form.mpesaNumber} onChange={(e) => updateForm('mpesaNumber', e.target.value)} aria-label="M-Pesa number" placeholder="M-Pesa number" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" required />
+          <Input value={form.whatsappNumber} onChange={(e) => updateForm('whatsappNumber', e.target.value)} aria-label="WhatsApp number (optional)" placeholder="WhatsApp number (Optional)" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" />
           <div className="relative sm:col-span-2">
-            <Input value={form.password} onChange={(e) => updateForm('password', e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="new-password" aria-label="Password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
+            <Input value={form.password} onChange={(e) => updateForm('password', e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="new-password" aria-label="Password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
@@ -267,7 +267,7 @@ export default function CreatorRegister() {
             </button>
           </div>
           <div className="relative sm:col-span-2">
-            <Input value={form.confirmPassword} onChange={(e) => updateForm('confirmPassword', e.target.value)} type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" autoComplete="new-password" aria-label="Confirm password" placeholder="Confirm password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
+            <Input value={form.confirmPassword} onChange={(e) => updateForm('confirmPassword', e.target.value)} type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" autoComplete="new-password" aria-label="Confirm password" placeholder="Confirm password" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowConfirmPassword((current) => !current)}
@@ -278,8 +278,8 @@ export default function CreatorRegister() {
             </button>
           </div>
           {form.password && (
-            <div className="rounded-2xl border border-black/[0.08] dark:border-white/10 bg-slate-100 dark:bg-black/30 p-3 sm:col-span-2 transition-colors duration-200">
-              <p className="mb-2 text-xs font-black uppercase tracking-wide text-slate-500 dark:text-white/50">Password checklist</p>
+            <div className="rounded-2xl border border-black/[0.08] dark:border-separator bg-slate-100 dark:bg-black/30 p-3 sm:col-span-2 transition-colors duration-200">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Password checklist</p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {[
                   { label: '8+ characters', met: passwordStrength.minLength },
@@ -299,7 +299,7 @@ export default function CreatorRegister() {
             </div>
           )}
           <div className="sm:col-span-2">
-            <div className="flex items-start space-x-2 rounded-xl border border-black/[0.08] dark:border-white/10 bg-slate-50 dark:bg-white/5 p-3">
+            <div className="flex items-start space-x-2 rounded-xl border border-black/[0.08] dark:border-separator bg-slate-50 dark:bg-fill p-3">
               <input
                 type="checkbox"
                 id="termsAccepted"
@@ -307,7 +307,7 @@ export default function CreatorRegister() {
                 onChange={(e) => setTermsAccepted(e.target.checked)}
                 className="mt-0.5 rounded accent-yellow-400 cursor-pointer"
               />
-              <Label htmlFor="termsAccepted" className="text-xs font-medium text-slate-600 dark:text-gray-300 cursor-pointer">
+              <Label htmlFor="termsAccepted" className="text-xs font-medium text-slate-600 dark:text-label-2 cursor-pointer">
                 I agree to the{' '}
                 <button
                   type="button"
@@ -320,10 +320,10 @@ export default function CreatorRegister() {
             </div>
           </div>
           <div className="grid gap-3 sm:col-span-2 sm:grid-cols-2">
-            <Button disabled={loading || !passwordsMatch || !termsAccepted} className="h-12 rounded-2xl bg-yellow-400 font-black text-black hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50">
+            <Button disabled={loading || !passwordsMatch || !termsAccepted} className="h-12 rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create creator account'}
             </Button>
-            <Link to="/creator/login" className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/[0.08] dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] px-4 text-sm font-black text-slate-900 dark:text-white transition hover:bg-slate-200 dark:hover:bg-white/10">
+            <Link to="/creator/login" className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/[0.08] dark:border-separator bg-slate-100 dark:bg-white/[0.03] px-4 text-sm font-semibold text-slate-900 dark:text-white transition hover:bg-slate-200 dark:hover:bg-white/10">
               Creator login
             </Link>
           </div>
@@ -344,13 +344,13 @@ export default function CreatorRegister() {
           below) is unaffected -- it drives the same existingAccountPrompt
           state Dialog's open prop now also reads. */}
       <Dialog open={existingAccountPrompt} onOpenChange={(open) => !open && setExistingAccountPrompt(false)}>
-        <DialogContent className="w-[92vw] sm:max-w-md rounded-3xl border border-black/[0.08] dark:border-white/15 bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white p-6 shadow-2xl transition-colors duration-200">
-          <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 text-yellow-500 dark:text-yellow-400 flex items-center justify-center text-2xl font-black">
+        <DialogContent className="w-[92vw] sm:max-w-md rounded-3xl border border-black/[0.08] dark:border-white/15 bg-white dark:bg-surface-1 text-slate-950 dark:text-white p-6 shadow-2xl transition-colors duration-200">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 text-yellow-500 dark:text-yellow-400 flex items-center justify-center text-2xl font-semibold">
             !
           </div>
 
           <DialogHeader>
-            <DialogTitle className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+            <DialogTitle className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
               You already have a Byblos account
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
@@ -363,7 +363,7 @@ export default function CreatorRegister() {
               <Button
                 type="button"
                 onClick={() => navigate('/seller/login')}
-                className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+                className="h-11 flex-1 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
               >
                 Log in as Seller
               </Button>
@@ -371,7 +371,7 @@ export default function CreatorRegister() {
               <Button
                 type="button"
                 onClick={() => navigate('/buyer/login')}
-                className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+                className="h-11 flex-1 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
               >
                 Log in as Buyer
               </Button>
@@ -380,7 +380,7 @@ export default function CreatorRegister() {
                 <Button
                   type="button"
                   onClick={() => navigate('/buyer/login')}
-                  className="h-11 flex-1 rounded-xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+                  className="h-11 flex-1 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
                 >
                   Buyer Login
                 </Button>

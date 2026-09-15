@@ -81,7 +81,7 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
   }
 
   return (
-    <div className="sticky top-14 z-40 -mx-4 mb-5 border-y border-white/10 bg-[var(--byblos-surface,#0a0a0a)]/95 px-4 py-2 backdrop-blur sm:top-16 sm:-mx-6 sm:mb-7 sm:px-6 lg:static lg:mx-auto lg:mb-8 lg:w-full lg:max-w-4xl lg:rounded-2xl lg:border lg:border-white/10 lg:bg-[var(--byblos-surface,#0a0a0a)] lg:p-1.5 lg:shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+    <div className="sticky top-14 z-40 -mx-4 mb-5 border-y border-separator bg-[var(--byblos-surface,#0a0a0a)]/95 px-4 py-2 backdrop-blur sm:top-16 sm:-mx-6 sm:mb-7 sm:px-6 lg:static lg:mx-auto lg:mb-8 lg:w-full lg:max-w-4xl lg:rounded-2xl lg:border lg:border-separator lg:bg-[var(--byblos-surface,#0a0a0a)] lg:p-1.5 lg:shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
       <div className="flex items-center justify-start gap-2 overflow-x-auto pb-1 sm:gap-3 lg:justify-center lg:overflow-visible lg:pb-0">
         {tabs.map(({ id, label }) => {
           const Icon = tabIcons[id];
@@ -92,7 +92,7 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
               onClick={() => onSelectTab(id)}
               className={`relative flex min-h-10 flex-shrink-0 items-center justify-center space-x-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition-all duration-300 sm:space-x-2 sm:px-4 sm:text-sm lg:min-h-0 lg:px-5 lg:py-2.5 ${activeTab === id
                 ? 'bg-[var(--theme-button-bg,#facc15)] text-[var(--theme-button-text,#000000)] border-[var(--theme-accent,#facc15)] shadow-[0_8px_22px_rgba(0,0,0,0.18)]'
-                : 'text-white/60 border-transparent hover:text-white hover:bg-white/[0.06]'
+                : 'text-label-2 border-transparent hover:text-white hover:bg-white/[0.06]'
                 } ${activeTab === id ? 'seller-tab-selected' : ''}`}
             >
               <Icon className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
@@ -102,7 +102,7 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
                 <span className="absolute -top-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 bg-red-500 rounded-full border-2 border-black animate-pulse" />
               )}
               {id === 'creators' && pendingCreatorsCount > 0 && (
-                <span className="ml-1.5 rounded-full bg-yellow-400 px-1.5 py-0.2 text-[10px] font-black text-black">
+                <span className="ml-1.5 rounded-full bg-yellow-400 px-1.5 py-0.2 text-[10px] font-semibold text-black">
                   {pendingCreatorsCount}
                 </span>
               )}

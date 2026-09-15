@@ -28,14 +28,14 @@ export default function LegalPage() {
 
       <main className="px-4 py-8">
         <div className="mx-auto max-w-3xl rounded-2xl bg-white p-6 text-gray-800 shadow-[0_18px_60px_rgba(0,0,0,0.5)] sm:p-10">
-          <h1 className="mb-6 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
+          <h1 className="mb-6 text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl">
             Privacy Policy &amp; Terms
           </h1>
           <TermsContent />
         </div>
       </main>
 
-      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs text-white/40">
+      <footer className="border-t border-white/10 px-4 py-6 text-center text-xs text-label-2">
         &copy; 2026 Byblos. All rights reserved.
       </footer>
     </div>

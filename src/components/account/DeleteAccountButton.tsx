@@ -50,14 +50,14 @@ export function DeleteAccountButton({ deleteAccount, onDeleted }: DeleteAccountB
 
   return (
     <div className="space-y-2 rounded-xl border border-red-500/30 bg-red-500/[0.06] p-3">
-      <p className="text-xs font-semibold text-white/80">
+      <p className="text-xs font-semibold text-label-2">
         Permanently delete your account and personal data? This can’t be undone.
       </p>
       <div className="flex gap-2">
         <Button
           onClick={handleDelete}
           disabled={busy}
-          className="h-9 flex-1 bg-red-600 font-bold text-white hover:bg-red-500"
+          className="h-9 flex-1 bg-red-600 font-bold text-label hover:bg-red-500"
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Yes, delete'}
         </Button>
@@ -65,7 +65,7 @@ export function DeleteAccountButton({ deleteAccount, onDeleted }: DeleteAccountB
           variant="outline"
           onClick={() => setConfirming(false)}
           disabled={busy}
-          className="h-9 flex-1 border-white/10 bg-white/[0.04] text-white hover:bg-white/10"
+          className="h-9 flex-1 border-separator bg-white/[0.04] text-label hover:bg-white/10"
         >
           Cancel
         </Button>

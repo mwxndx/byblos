@@ -69,7 +69,7 @@ export const AddProductFormSteps = ({
               "relative flex min-h-[92px] flex-col items-center justify-center rounded-2xl border-2 p-2 text-center transition-all duration-300 group sm:min-h-[120px] sm:p-4",
               formData.product_type === type.id
                 ? "bg-yellow-400/20 border-yellow-500 text-slate-950 dark:text-white shadow-[0_0_20px_rgba(250,204,21,0.15)] font-bold"
-                : "bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-200/60 dark:hover:bg-white/10"
+                : "bg-slate-100 dark:bg-fill border-slate-200 dark:border-separator text-slate-800 dark:text-white/80 hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-200/60 dark:hover:bg-white/10"
             )}
           >
             <type.icon className={cn("h-6 w-6 mb-2 transition-transform group-hover:scale-110 sm:h-8 sm:w-8", formData.product_type === type.id ? "text-yellow-600 dark:text-yellow-400" : "text-slate-600 dark:text-white/60")} />
@@ -93,13 +93,13 @@ export const AddProductFormSteps = ({
             value={formData.name}
             onChange={handleChange}
             placeholder="e.g. Vintage Leather Watch"
-            className="h-12 bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="h-12 bg-slate-50 dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
         <div className="space-y-2">
           <Label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">Category</Label>
           <Select value={formData.aesthetic} onValueChange={v => setFormData(p => ({ ...p, aesthetic: v }))}>
-            <SelectTrigger className="h-12 bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl">
+            <SelectTrigger className="h-12 bg-slate-50 dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl">
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="rounded-xl border-slate-200 dark:border-yellow-400/40 bg-white dark:bg-zinc-950 text-slate-950 dark:text-white shadow-2xl">
@@ -144,7 +144,7 @@ export const AddProductFormSteps = ({
               ) : (
                 <label className={cn(
                   "flex flex-col items-center justify-center h-full border-2 border-dashed rounded-2xl cursor-pointer transition-all",
-                  isDisabled ? "opacity-30 cursor-not-allowed border-slate-200 dark:border-white/5" : "border-slate-300 dark:border-white/10 hover:border-yellow-500 hover:bg-slate-100 dark:hover:bg-white/5 bg-slate-50 dark:bg-white/5"
+                  isDisabled ? "opacity-30 cursor-not-allowed border-slate-200 dark:border-separator" : "border-slate-300 dark:border-separator hover:border-yellow-500 hover:bg-slate-100 dark:hover:bg-fill bg-slate-50 dark:bg-fill"
                 )}>
                   {!isDisabled && <input type="file" className="hidden" onChange={e => handleImageChange(e, slot)} accept="image/*" />}
                   <ImagePlus className="mb-1 h-5 w-5 text-slate-700 dark:text-white sm:h-6 sm:w-6" />
@@ -167,7 +167,7 @@ export const AddProductFormSteps = ({
             value={formData.description}
             onChange={handleChange}
             placeholder="Describe what makes this product special..."
-            className="bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl min-h-[100px] focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="bg-slate-50 dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl min-h-[100px] focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
       </div>
@@ -191,12 +191,12 @@ export const AddProductFormSteps = ({
             value={formData.price}
             onChange={handleChange}
             placeholder="0.00"
-            className="h-12 bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="h-12 bg-slate-50 dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
         {formData.product_type === 'digital' && (
-          <div className="p-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl space-y-3">
+          <div className="p-4 bg-slate-50 dark:bg-fill border border-slate-200 dark:border-separator rounded-2xl space-y-3">
             <div className="flex justify-between items-center">
               <Label className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">Upload Digital Content</Label>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Max 500MB</span>
@@ -209,13 +209,13 @@ export const AddProductFormSteps = ({
                   const file = e.target.files?.[0];
                   if (file) setFormData(p => ({ ...p, digital_file: file }));
                 }}
-                className="bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white h-12 pt-2.5 rounded-xl cursor-pointer"
+                className="bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white h-12 pt-2.5 rounded-xl cursor-pointer"
               />
               <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 ml-1">
                 Supported: Images (PNG, JPG, SVG, WebP, etc.), PDFs, Archives (ZIP, RAR), Audio, eBooks
               </p>
               {uploadProgress > 0 && (
-                <div className="mt-2 h-1.5 w-full bg-slate-200 dark:bg-white/5 rounded-full overflow-hidden">
+                <div className="mt-2 h-1.5 w-full bg-slate-200 dark:bg-fill rounded-full overflow-hidden">
                   <div className="h-full bg-yellow-400 transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                 </div>
               )}
@@ -224,15 +224,15 @@ export const AddProductFormSteps = ({
         )}
 
         {formData.product_type === 'service' && (
-          <div className="space-y-4 p-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl sm:p-4">
+          <div className="space-y-4 p-3 bg-slate-50 dark:bg-fill border border-slate-200 dark:border-separator rounded-2xl sm:p-4">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">Start Time</Label>
-                <Input type="time" value={formData.service_options.start_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, start_time: e.target.value } }))} className="bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl" />
+                <Input type="time" value={formData.service_options.start_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, start_time: e.target.value } }))} className="bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">End Time</Label>
-                <Input type="time" value={formData.service_options.end_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, end_time: e.target.value } }))} className="bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl" />
+                <Input type="time" value={formData.service_options.end_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, end_time: e.target.value } }))} className="bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl" />
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
@@ -247,7 +247,7 @@ export const AddProductFormSteps = ({
                   }}
                   className={cn(
                     "px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                    formData.service_options.availability_days.includes(day) ? "bg-yellow-400 text-black shadow-sm" : "bg-slate-200 dark:bg-white/5 text-slate-800 dark:text-white border border-slate-300 dark:border-white/10"
+                    formData.service_options.availability_days.includes(day) ? "bg-yellow-400 text-black shadow-sm" : "bg-slate-200 dark:bg-fill text-slate-800 dark:text-white border border-slate-300 dark:border-separator"
                   )}
                 >
                   {day}
@@ -258,7 +258,7 @@ export const AddProductFormSteps = ({
         )}
 
         {formData.product_type === 'physical' && (
-          <div className="space-y-4 p-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl sm:p-4">
+          <div className="space-y-4 p-3 bg-slate-50 dark:bg-fill border border-slate-200 dark:border-separator rounded-2xl sm:p-4">
             <label className="flex items-start justify-between gap-3 cursor-pointer">
               <span className="min-w-0 flex-1">
                 <span className="block text-xs font-bold text-slate-900 dark:text-white uppercase">Custom product</span>
@@ -298,7 +298,7 @@ export const AddProductFormSteps = ({
                 <div className="space-y-2">
                   <Label className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">Production days</Label>
                   <Select value={formData.production_days} onValueChange={value => setFormData(p => ({ ...p, production_days: value }))}>
-                    <SelectTrigger className="h-11 bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl">
+                    <SelectTrigger className="h-11 bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-yellow-400/40 bg-white dark:bg-zinc-950 text-slate-950 dark:text-white shadow-2xl">
@@ -315,7 +315,7 @@ export const AddProductFormSteps = ({
                   <Textarea
                     value={formData.customization_prompt}
                     onChange={event => setFormData(p => ({ ...p, customization_prompt: event.target.value }))}
-                    className="bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl min-h-[72px] focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl min-h-[72px] focus:ring-yellow-400 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     placeholder="Tell the seller exactly what you want customized."
                   />
                 </div>
@@ -330,7 +330,7 @@ export const AddProductFormSteps = ({
                 <div className="space-y-2">
                   <Label className="text-[10px] font-bold text-slate-800 dark:text-slate-200 uppercase">Estimated ready time</Label>
                   <Select value={formData.import_days} onValueChange={value => setFormData(p => ({ ...p, import_days: value }))}>
-                    <SelectTrigger className="h-11 bg-white dark:bg-white/5 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white rounded-xl">
+                    <SelectTrigger className="h-11 bg-white dark:bg-fill border-slate-300 dark:border-separator text-slate-950 dark:text-white rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-yellow-400/40 bg-white dark:bg-zinc-950 text-slate-950 dark:text-white shadow-2xl">
@@ -369,17 +369,17 @@ export const AddProductFormSteps = ({
         <p className="text-slate-600 dark:text-slate-300 text-sm font-medium">Everything look correct?</p>
       </div>
 
-      <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl sm:rounded-[2rem] overflow-hidden">
+      <div className="bg-slate-50 dark:bg-fill border border-slate-200 dark:border-separator rounded-2xl sm:rounded-[2rem] overflow-hidden">
         <div className="relative aspect-[4/3] sm:aspect-video">
           <img src={imagePreview} alt="preview" className="w-full h-full object-cover" />
           <div className="absolute top-3 left-3 flex gap-2">
-            <span className="bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">{formData.product_type}</span>
+            <span className="bg-black/80 backdrop-blur-md text-label text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">{formData.product_type}</span>
           </div>
         </div>
         <div className="space-y-3 p-4 sm:p-5">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
             <h3 className="break-words text-lg font-bold text-slate-900 dark:text-white sm:text-xl">{formData.name}</h3>
-            <span className="shrink-0 text-lg font-black text-yellow-600 dark:text-yellow-400 sm:text-xl">KES {formData.price}</span>
+            <span className="shrink-0 text-lg font-semibold text-yellow-600 dark:text-yellow-400 sm:text-xl">KES {formData.price}</span>
           </div>
           <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{formData.description}</p>
           <div className="flex items-center gap-2 pt-2 text-[10px] text-slate-700 dark:text-white uppercase font-bold">

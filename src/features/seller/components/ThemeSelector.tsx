@@ -69,7 +69,7 @@ export const ThemeSelector = ({ currentTheme = 'default', onThemeChange }: Theme
           <Palette className="h-5 w-5 text-[var(--theme-accent,#f5c518)]" />
         </div>
         <div>
-          <h3 className="text-base font-black tracking-tight text-slate-950 dark:text-white sm:text-lg">Shop Theme</h3>
+          <h3 className="text-base font-semibold tracking-tight text-slate-950 dark:text-white sm:text-lg">Shop Theme</h3>
           <p className="mt-0.5 seller-subtext">Choose a color theme for your shop page</p>
         </div>
       </div>
@@ -109,7 +109,7 @@ export const ThemeSelector = ({ currentTheme = 'default', onThemeChange }: Theme
         <Button
           onClick={saveTheme}
           disabled={isSaving || selectedTheme === currentTheme}
-          className="h-10 w-full bg-[var(--theme-button-bg,#f5c518)] px-6 text-sm font-black text-[var(--theme-button-text,#000000)] hover:opacity-90 sm:w-auto"
+          className="h-10 w-full bg-[var(--theme-button-bg,#f5c518)] px-6 text-sm font-semibold text-[var(--theme-button-text,#000000)] hover:opacity-90 sm:w-auto"
         >
           {isSaving ? (
             <>

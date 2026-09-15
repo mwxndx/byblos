@@ -19,9 +19,9 @@ const hasChartData = (data: Record<string, unknown>[] = []) => data.some(item =>
 
 export const StatsCard = ({ title, value, icon, description, trend }: StatsCardProps) => (
   <div className="relative group">
-    <Card className="relative bg-[#0A0A0A]/70 border border-white/10 shadow-xl rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-yellow-500/30">
+    <Card className="relative bg-surface-1 border border-separator shadow-xl rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-yellow-500/30">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-        <CardTitle className="text-sm font-semibold text-gray-400 tracking-wide">
+        <CardTitle className="text-sm font-semibold text-label-2 tracking-wide">
           {title}
         </CardTitle>
         <div className="h-12 w-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 transition-all duration-500">
@@ -30,7 +30,7 @@ export const StatsCard = ({ title, value, icon, description, trend }: StatsCardP
       </CardHeader>
 
       <CardContent className="relative z-10 pt-0">
-        <div className="text-3xl font-semibold text-white tracking-tight tabular-nums">
+        <div className="text-3xl font-semibold text-label tracking-tight tabular-nums">
           {value}
         </div>
         <div className="mt-3 flex items-center gap-2">
@@ -40,7 +40,7 @@ export const StatsCard = ({ title, value, icon, description, trend }: StatsCardP
               {Math.abs(trend)}%
             </div>
           )}
-          <span className="text-xs text-gray-500 font-medium truncate">{description}</span>
+          <span className="text-xs text-label-3 font-medium truncate">{description}</span>
         </div>
       </CardContent>
     </Card>
@@ -48,10 +48,10 @@ export const StatsCard = ({ title, value, icon, description, trend }: StatsCardP
 );
 
 export const ChartContainer = ({ title, description, children, className = '' }: { title: string, description: string, children: ReactNode, className?: string }) => (
-  <Card className={`${className} bg-[#0A0A0A]/70 border border-white/10 shadow-xl rounded-2xl overflow-hidden group hover:border-yellow-500/30 transition-all duration-300`}>
+  <Card className={`${className} bg-surface-1 border border-separator shadow-xl rounded-2xl overflow-hidden group hover:border-yellow-500/30 transition-all duration-300`}>
     <CardHeader className="relative z-10 pb-2">
-      <CardTitle className="text-xl font-semibold text-white transition-colors">{title}</CardTitle>
-      <CardDescription className="text-gray-400 font-medium">{description}</CardDescription>
+      <CardTitle className="text-xl font-semibold text-label transition-colors">{title}</CardTitle>
+      <CardDescription className="text-label-2 font-medium">{description}</CardDescription>
     </CardHeader>
     <CardContent className="relative z-10 h-[350px] w-full pt-4">
       {children}
@@ -162,7 +162,7 @@ export const ProductStatusChart = ({ data }: { data: Record<string, unknown>[] }
       </ResponsiveContainer>
     ) : (
       <div className="flex h-full items-center justify-center text-center">
-        <p className="text-sm font-semibold text-gray-500">No catalog distribution yet</p>
+        <p className="text-sm font-semibold text-label-3">No catalog distribution yet</p>
       </div>
     )}
   </ChartContainer>
@@ -188,7 +188,7 @@ export const GeoDistributionChart = ({ data }: { data: Record<string, unknown>[]
       </ResponsiveContainer>
     ) : (
       <div className="flex h-full items-center justify-center text-center">
-        <p className="text-sm font-semibold text-gray-500">No geographic activity yet</p>
+        <p className="text-sm font-semibold text-label-3">No geographic activity yet</p>
       </div>
     )}
   </ChartContainer>

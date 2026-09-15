@@ -113,7 +113,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <div className="w-20 h-20 mx-auto mb-6 bg-red-500/10 border border-red-500/30 rounded-3xl flex items-center justify-center">
                 <AlertTriangle className="h-10 w-10 text-red-400" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-black text-white mb-4">
+              <h1 className="text-3xl md:text-4xl font-semibold text-white mb-4">
                 Oops! Something went wrong
               </h1>
               <p className="text-gray-300 text-lg mb-8 max-w-md mx-auto">
@@ -216,7 +216,7 @@ export function RootErrorElement() {
         <div className="w-16 h-16 mx-auto mb-6 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center">
           <AlertTriangle className="h-8 w-8 text-red-400" />
         </div>
-        <h1 className="text-2xl font-black text-white mb-3">Page Error</h1>
+        <h1 className="text-2xl font-semibold text-white mb-3">Page Error</h1>
         <p className="text-gray-400 mb-6">An unexpected routing error occurred.</p>
         <Button onClick={() => window.location.href = '/'} variant="byblos" size="lg" className="gap-2">
           <Home className="h-5 w-5" />

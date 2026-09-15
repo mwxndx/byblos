@@ -45,13 +45,13 @@ export function SellerDashboardErrorState({ error, onRetry }: SellerDashboardErr
         <div className="w-24 h-24 mx-auto bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center justify-center">
           <RefreshCw className="h-12 w-12 text-red-500" />
         </div>
-        <h3 className="text-2xl font-black text-[var(--byblos-text,#ffffff)] mb-3">Unable to load dashboard</h3>
+        <h3 className="text-2xl font-semibold text-[var(--byblos-text,#ffffff)] mb-3">Unable to load dashboard</h3>
         <p className="text-[var(--byblos-muted,#94a3b8)] text-base font-medium max-w-md mx-auto mb-6">
           {error || 'Something went wrong while loading your dashboard data. Please try again.'}
         </p>
         <Button
           onClick={onRetry}
-          className="px-8 py-3 rounded-xl font-black shadow-md hover:shadow-lg transition-all"
+          className="px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
           style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
         >
           <RefreshCw className="h-5 w-5 mr-2" />

@@ -74,10 +74,10 @@ export function BagSheet() {
           className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <span className="relative z-10 -mb-4 flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-black shadow-lg" style={{ backgroundColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-button-text, #111)' }}>
+          <span className="relative z-10 -mb-4 flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-semibold shadow-lg" style={{ backgroundColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-button-text, #111)' }}>
             {bag.count}
           </span>
-          <span className="flex w-full items-center justify-center gap-2 rounded-t-3xl border-t px-6 pb-3 pt-5 text-sm font-black uppercase tracking-wide shadow-[0_-10px_30px_rgba(0,0,0,0.15)]" style={{ backgroundColor: 'var(--byblos-surface, #ffffff)', color: 'var(--byblos-text, #0f0f0e)', borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
+          <span className="flex w-full items-center justify-center gap-2 rounded-t-3xl border-t px-6 pb-3 pt-5 text-sm font-semibold uppercase tracking-wide shadow-[0_-10px_30px_rgba(0,0,0,0.15)]" style={{ backgroundColor: 'var(--byblos-surface, #ffffff)', color: 'var(--byblos-text, #0f0f0e)', borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
             <ShoppingBag className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} />
             Tap to view bag
           </span>
@@ -97,7 +97,7 @@ export function BagSheet() {
             <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="shrink-0 cursor-grab px-5 pt-2.5">
               <span className="mx-auto block h-1.5 w-10 rounded-full bg-black/20 dark:bg-white/25" />
               <div className="mt-2 flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-base font-black"><ShoppingBag className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} /> Your bag</h3>
+                <h3 className="flex items-center gap-2 text-base font-semibold"><ShoppingBag className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} /> Your bag</h3>
                 <button type="button" onClick={bag.close} aria-label="Collapse bag" className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10"><ChevronDown className="h-5 w-5" /></button>
               </div>
             </div>
@@ -116,7 +116,7 @@ export function BagSheet() {
                     {!checkout.hasService && (
                       <div className="flex items-center gap-1.5">
                         <button type="button" aria-label="Decrease" onClick={() => bag.setQuantity(line.product.id, line.quantity - 1)} className="flex h-7 w-7 items-center justify-center rounded-full border" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.15))' }}><Minus className="h-3.5 w-3.5" /></button>
-                        <span className="w-5 text-center text-sm font-black tabular-nums">{line.quantity}</span>
+                        <span className="w-5 text-center text-sm font-semibold tabular-nums">{line.quantity}</span>
                         <button type="button" aria-label="Increase" onClick={() => bag.setQuantity(line.product.id, line.quantity + 1)} className="flex h-7 w-7 items-center justify-center rounded-full border" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.15))' }}><Plus className="h-3.5 w-3.5" /></button>
                       </div>
                     )}
@@ -131,7 +131,7 @@ export function BagSheet() {
                 <div className="flex justify-between opacity-80"><dt>Subtotal</dt><dd className="font-semibold tabular-nums">{formatCurrency(bag.subtotal)}</dd></div>
                 <div className="flex justify-between opacity-80"><dt>Byblos service charge (2%)</dt><dd className="font-semibold tabular-nums">{formatCurrency(bag.serviceCharge)}</dd></div>
                 {phoneCheck.doorDeliveryEnabled && <div className="flex justify-between opacity-80"><dt>Delivery fee</dt><dd className="font-semibold tabular-nums">{phoneCheck.isQuoteLoading ? '…' : formatCurrency(phoneCheck.displayedDeliveryFee)}</dd></div>}
-                <div className="flex justify-between text-base font-black"><dt>Total</dt><dd className="tabular-nums">{formatCurrency(phoneCheck.displayedTotal)}</dd></div>
+                <div className="flex justify-between text-base font-semibold"><dt>Total</dt><dd className="tabular-nums">{formatCurrency(phoneCheck.displayedTotal)}</dd></div>
               </dl>
             </div>
 
@@ -195,7 +195,7 @@ export function BagSheet() {
                       Change
                     </button>
                   </div>
-                  <p className="text-base font-black tracking-wide font-mono text-[var(--byblos-text)]">
+                  <p className="text-base font-semibold tracking-wide font-mono text-[var(--byblos-text)]">
                     {checkout.registeredPaystackPhone}
                   </p>
                 </div>
@@ -235,7 +235,7 @@ export function BagSheet() {
 
             {/* Pinned Pay. */}
             <div className="shrink-0 border-t px-5 pb-4 pt-3" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
-              <button type="submit" disabled={checkout.isProcessingPurchase} className="flex h-12 w-full items-center justify-center gap-2 rounded-full text-sm font-black shadow-lg transition-transform active:scale-[0.99] disabled:opacity-60" style={{ backgroundColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-button-text, #111)' }}>
+              <button type="submit" disabled={checkout.isProcessingPurchase} className="flex h-12 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold shadow-lg transition-transform active:scale-[0.99] disabled:opacity-60" style={{ backgroundColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-button-text, #111)' }}>
                 {checkout.isProcessingPurchase ? <Loader2 className="h-5 w-5 animate-spin" /> : `Pay ${formatCurrency(phoneCheck.displayedTotal)}`}
               </button>
             </div>

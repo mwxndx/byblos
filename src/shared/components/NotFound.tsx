@@ -22,7 +22,7 @@ const NotFound = () => {
         {/* 404 Glyph */}
         <div className="mb-8">
           <span
-            className="text-[10rem] font-black leading-none"
+            className="text-[10rem] font-semibold leading-none"
             style={{
               background: 'linear-gradient(135deg, #facc15 0%, #d97706 100%)',
               WebkitBackgroundClip: 'text',

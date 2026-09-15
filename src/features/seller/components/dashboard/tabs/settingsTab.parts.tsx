@@ -6,7 +6,7 @@ export function SectionHeader({ title, description, action }: { title: string; d
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
-        <h3 className="text-base font-black tracking-tight text-white sm:text-lg">{title}</h3>
+        <h3 className="text-base font-semibold tracking-tight text-label sm:text-lg">{title}</h3>
         <p className="mt-1 seller-subtext">{description}</p>
       </div>
       {action && <div className="self-start sm:self-auto shrink-0">{action}</div>}
@@ -90,7 +90,7 @@ export function SocialInput({ displayValue, kind, iconPath, isEditing, label, on
               )}
             </>
           ) : (
-            <p className="text-sm sm:text-base font-semibold text-white/40 italic">Not set</p>
+            <p className="text-sm sm:text-base font-semibold text-label-2 italic">Not set</p>
           )}
         </div>
       )}

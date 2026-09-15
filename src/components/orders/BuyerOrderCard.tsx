@@ -77,24 +77,24 @@ export function BuyerOrderCard({
             {mainImage ? (
               <img src={mainImage} alt={summaryName} className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-white/40">
+              <div className="flex h-full w-full items-center justify-center text-label-2">
                 <Package className="h-5 w-5" />
               </div>
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white sm:text-base">
+            <p className="truncate text-sm font-semibold text-label sm:text-base">
               {summaryName}
-              {extraCount > 0 && <span className="text-white/60"> +{extraCount} more</span>}
+              {extraCount > 0 && <span className="text-label-2"> +{extraCount} more</span>}
             </p>
-            <p className="text-[11px] text-white/60 sm:text-xs">{formatOrderDate(order)}</p>
+            <p className="text-[11px] text-label-2 sm:text-xs">{formatOrderDate(order)}</p>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
-            className="shrink-0 gap-1 rounded-lg border border-white/15 px-2.5 text-xs font-semibold text-white hover:bg-white/10 hover:text-white sm:px-3"
+            className="shrink-0 gap-1 rounded-lg border border-white/15 px-2.5 text-xs font-semibold text-label hover:bg-white/10 hover:text-white sm:px-3"
           >
             <span className="hidden sm:inline">{expanded ? 'Hide details' : 'View details'}</span>
             <span className="sm:hidden">{expanded ? 'Hide' : 'Details'}</span>
@@ -104,11 +104,11 @@ export function BuyerOrderCard({
 
         {expanded && (
         <>
-        <div className="p-4 sm:p-6 border-b border-white/10">
+        <div className="p-4 sm:p-6 border-b border-separator">
           <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                <h3 className="text-lg sm:text-xl font-bold text-white">
+                <h3 className="text-lg sm:text-xl font-bold text-label">
                   #{order.orderNumber || order.id.slice(0, 8).toUpperCase()}
                 </h3>
                 <div className="flex gap-1.5 sm:gap-2">
@@ -118,11 +118,11 @@ export function BuyerOrderCard({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs text-white/70 uppercase tracking-wider mb-1">Total</p>
-              <p className="text-xl sm:text-2xl font-bold text-white">
+              <p className="text-xs text-label-2 uppercase tracking-wider mb-1">Total</p>
+              <p className="text-xl sm:text-2xl font-bold text-label">
                 {formatOrderCurrency((order as unknown as Record<string, unknown>).total_amount as number || order.totalAmount, order.currency)}
               </p>
-              <p className="mt-1 text-[11px] font-medium text-white/60">
+              <p className="mt-1 text-[11px] font-medium text-label-2">
                 Includes 2% Byblos charge{buyerServiceCharge > 0 ? ` (${formatOrderCurrency(buyerServiceCharge, order.currency)})` : ''}
               </p>
             </div>
@@ -163,14 +163,14 @@ export function BuyerOrderCard({
           {order.items.slice(0, 2).map((item, idx) => (
             <div key={idx} className={itemClasses}>
               <div className="flex-1 min-w-0">
-                <p className="text-sm sm:text-base font-semibold text-white truncate">{item.name}</p>
-                <p className="text-xs text-white/70">Qty {item.quantity || 1}</p>
+                <p className="text-sm sm:text-base font-semibold text-label truncate">{item.name}</p>
+                <p className="text-xs text-label-2">Qty {item.quantity || 1}</p>
               </div>
-              <p className="shrink-0 text-sm font-semibold text-white">{formatOrderCurrency(item.price || 0, order.currency)}</p>
+              <p className="shrink-0 text-sm font-semibold text-label">{formatOrderCurrency(item.price || 0, order.currency)}</p>
             </div>
           ))}
           {order.items.length > 2 && (
-            <p className="text-xs sm:text-sm text-center text-white/70 py-1 sm:py-2">
+            <p className="text-xs sm:text-sm text-center text-label-2 py-1 sm:py-2">
               + {order.items.length - 2} more item{order.items.length - 2 > 1 ? 's' : ''}
             </p>
           )}
@@ -184,8 +184,8 @@ export function BuyerOrderCard({
               </div>
             )}
             <div>
-              <p className="text-xs text-white/70">Seller</p>
-              <p className="text-sm sm:text-base font-semibold text-white">
+              <p className="text-xs text-label-2">Seller</p>
+              <p className="text-sm sm:text-base font-semibold text-label">
                 {order.seller?.shopName || order.seller?.name || 'Store'}
               </p>
             </div>
@@ -195,7 +195,7 @@ export function BuyerOrderCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 sm:flex-none border-white/20 hover:bg-white/10 text-white text-xs sm:text-sm"
+              className="flex-1 sm:flex-none border-white/20 hover:bg-white/10 text-label text-xs sm:text-sm"
               onClick={() => onViewDetails(order)}
             >
               View Details
@@ -204,7 +204,7 @@ export function BuyerOrderCard({
             {canConfirmReceipt && (
               <Button
                 size="sm"
-                className="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs sm:text-sm"
+                className="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-label font-semibold text-xs sm:text-sm"
                 onClick={() => onConfirmReceipt(order.id)}
               >
                 {getConfirmReceiptLabel(order)}

@@ -138,7 +138,7 @@ export const BusinessPhotoUpload = ({ currentPhotoUrl, fallbackInitials, onPhoto
     <div className="space-y-4">
       <div className="flex flex-col gap-4">
         <div className="flex items-start gap-3">
-          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-yellow-200 to-yellow-400 border border-slate-200 overflow-hidden flex items-center justify-center text-xl font-black text-black shrink-0 shadow-sm">
+          <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-yellow-200 to-yellow-400 border border-slate-200 overflow-hidden flex items-center justify-center text-xl font-semibold text-black shrink-0 shadow-sm">
           {imageSrc ? (
             <img src={imageSrc} alt="Business photo preview" className="h-full w-full object-cover" />
           ) : (

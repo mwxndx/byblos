@@ -100,7 +100,7 @@ export function BuyerLogin() {
 
   return (
     <main className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-white/10 bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">
@@ -127,10 +127,10 @@ export function BuyerLogin() {
       </header>
 
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
-        <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+        <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Byblos Marketplace</p>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Byblos Marketplace</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Browse products, manage orders, and track deliveries.</p>
           </div>
 
@@ -142,7 +142,7 @@ export function BuyerLogin() {
             name="email"
             autoComplete="email"
             placeholder="Email"
-            className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400"
+            className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400"
             required
             disabled={isLoading}
           />
@@ -156,7 +156,7 @@ export function BuyerLogin() {
               name="password"
               autoComplete="current-password"
               placeholder="Password"
-              className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12"
+              className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12"
               required
               disabled={isLoading}
             />
@@ -173,7 +173,7 @@ export function BuyerLogin() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="h-12 w-full rounded-2xl bg-yellow-400 font-black text-black hover:bg-yellow-300"
+            className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300"
           >
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign In'}
           </Button>
@@ -185,7 +185,7 @@ export function BuyerLogin() {
           </p>
           <p className="text-center text-sm font-medium text-slate-500 dark:text-white/50">
             New to Byblos?{' '}
-            <Link to="/buyer/register" className="font-black text-yellow-500 dark:text-yellow-300 hover:text-yellow-400 dark:hover:text-yellow-200">
+            <Link to="/buyer/register" className="font-semibold text-yellow-500 dark:text-yellow-300 hover:text-yellow-400 dark:hover:text-yellow-200">
               Create an account
             </Link>
           </p>

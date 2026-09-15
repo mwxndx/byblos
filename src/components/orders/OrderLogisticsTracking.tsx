@@ -56,7 +56,7 @@ function addHours(value: string | Date | undefined, hours: number) {
 function Timeline({ events }: { events: NonNullable<ApiOrder['logistics']>['events'] }) {
   if (!events?.length) {
     return (
-      <p className="rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white/65">
+      <p className="rounded-lg border border-separator bg-black/40 px-3 py-2 text-xs text-label-2">
         Updates will appear here as fulfillment progresses.
       </p>
     );
@@ -65,12 +65,12 @@ function Timeline({ events }: { events: NonNullable<ApiOrder['logistics']>['even
   return (
     <div className="space-y-2">
       {events.slice(-5).reverse().map((event) => (
-        <div key={`${event.id}-${event.createdAt}`} className="flex gap-2 rounded-lg border border-white/10 bg-black/40 p-2">
+        <div key={`${event.id}-${event.createdAt}`} className="flex gap-2 rounded-lg border border-separator bg-black/40 p-2">
           <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-yellow-300" />
           <div className="min-w-0">
-            <p className="text-xs font-semibold capitalize text-white">{label(event.status || event.type)}</p>
-            {event.message && <p className="text-xs text-white/70">{event.message}</p>}
-            <p className="mt-0.5 text-[10px] text-white/45">{formatDateTime(event.createdAt)}</p>
+            <p className="text-xs font-semibold capitalize text-label">{label(event.status || event.type)}</p>
+            {event.message && <p className="text-xs text-label-2">{event.message}</p>}
+            <p className="mt-0.5 text-[10px] text-label-2">{formatDateTime(event.createdAt)}</p>
           </div>
         </div>
       ))}
@@ -164,14 +164,14 @@ export function OrderLogisticsTracking({
   );
 
   return (
-    <section className="mt-4 overflow-hidden rounded-xl border border-yellow-400/30 bg-yellow-400/[0.08] text-white">
+    <section className="mt-4 overflow-hidden rounded-xl border border-yellow-400/30 bg-yellow-400/[0.08] text-label">
       {/* ── Single Master Dropdown Header ── */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-controls={`logistics-unified-${order.id}`}
-        className="flex w-full items-center gap-2 p-3 text-left transition-colors hover:bg-white/5"
+        className="flex w-full items-center gap-2 p-3 text-left transition-colors hover:bg-fill"
       >
         <span className="text-yellow-600 dark:text-yellow-400">{headerIcon}</span>
         <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">{headerTitle}</span>
@@ -196,7 +196,7 @@ export function OrderLogisticsTracking({
               {isSeller ? 'Waiting for Buyer' : 'Ready for Pickup'}
             </span>
           ) : (
-            <span className="rounded-full border border-slate-200 bg-white/90 text-slate-800 dark:border-white/10 dark:bg-black/70 dark:text-yellow-100 px-2.5 py-0.5 text-[11px] font-semibold">
+            <span className="rounded-full border border-slate-200 bg-white/90 text-slate-800 dark:border-separator dark:bg-black/70 dark:text-yellow-100 px-2.5 py-0.5 text-[11px] font-semibold">
               {journey.label}
             </span>
           )}
@@ -207,9 +207,9 @@ export function OrderLogisticsTracking({
 
       {/* ── Unified Dropdown Body ── */}
       {isOpen && (
-        <div id={`logistics-unified-${order.id}`} className="space-y-3 border-t border-slate-200/60 dark:border-white/10 p-3 pt-3.5">
+        <div id={`logistics-unified-${order.id}`} className="space-y-3 border-t border-slate-200/60 dark:border-separator p-3 pt-3.5">
           {/* Tier 1: Visual Stepper */}
-          <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-black/40 px-3 py-3">
+          <div className="rounded-xl border border-slate-200/80 dark:border-separator bg-white/70 dark:bg-black/40 px-3 py-3">
             <MzigoJourneyStepper journey={journey} />
           </div>
 
@@ -233,7 +233,7 @@ export function OrderLogisticsTracking({
           </div>
 
           {/* Live ETA & Status Headline Card */}
-          <div className="flex flex-col gap-2 rounded-lg border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-black/40 px-3 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 rounded-lg border border-slate-200/80 dark:border-separator bg-white/70 dark:bg-black/40 px-3 py-2.5 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 shrink-0 text-yellow-600 dark:text-yellow-300" />
               <span className="text-slate-900 dark:text-white font-medium text-xs sm:text-sm">
@@ -286,7 +286,7 @@ export function OrderLogisticsTracking({
           {/* Tier 2: Specs Strip (Door Delivery vs. Hub Collection) */}
           {isDoorDelivery && (
             <div className="grid gap-2 grid-cols-1 sm:grid-cols-3">
-              <div className="rounded-lg border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-black/40 p-2.5 sm:p-3">
+              <div className="rounded-lg border border-slate-200/80 dark:border-separator bg-white/70 dark:bg-black/40 p-2.5 sm:p-3">
                 <p className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/55">
                   <Truck className="h-3 w-3 text-yellow-600 dark:text-yellow-300" />
                   {isSeller ? 'Logistics Type' : 'Fulfillment Mode'}
@@ -297,7 +297,7 @@ export function OrderLogisticsTracking({
                 </p>
               </div>
 
-              <div className="rounded-lg border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-black/40 p-2.5 sm:p-3">
+              <div className="rounded-lg border border-slate-200/80 dark:border-separator bg-white/70 dark:bg-black/40 p-2.5 sm:p-3">
                 <p className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/55">
                   <Store className="h-3 w-3 text-yellow-600 dark:text-yellow-300" />
                   Central Transit Hub
@@ -306,7 +306,7 @@ export function OrderLogisticsTracking({
                 <p className="text-[11px] text-slate-600 dark:text-white/70 truncate">{MZIGO_CBD_HUB.address}</p>
               </div>
 
-              <div className="rounded-lg border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-black/40 p-2.5 sm:p-3">
+              <div className="rounded-lg border border-slate-200/80 dark:border-separator bg-white/70 dark:bg-black/40 p-2.5 sm:p-3">
                 <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-white/55">
                   {isSeller ? 'Escrow Status' : 'Delivery Fee'}
                 </p>
@@ -330,7 +330,7 @@ export function OrderLogisticsTracking({
 
           {/* Central Hub Collection Point Card if pickup */}
           {isPickup && (
-            <div className="rounded-lg border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-black/40 p-3">
+            <div className="rounded-lg border border-slate-200/80 dark:border-separator bg-white/70 dark:bg-black/40 p-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
                   <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-yellow-700 dark:text-yellow-300">
@@ -368,14 +368,14 @@ export function OrderLogisticsTracking({
 
           {/* Tier 3: Milestones Timeline & Security Notice */}
           {isPhysical && (
-            <div className="rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-black/35 p-3">
+            <div className="rounded-xl border border-slate-200/80 dark:border-separator bg-white/60 dark:bg-black/35 p-3">
               <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-white/55">
                 <Clock className="h-3.5 w-3.5 text-yellow-600 dark:text-yellow-300" />
                 {isSeller ? 'Dispatch & Audit Trail' : isDoorDelivery ? 'Fulfillment Milestones' : 'Collection Timeline'}
               </p>
               <Timeline events={logistics?.events || []} />
 
-              <p className="mt-3 flex items-start gap-2 text-xs text-slate-600 dark:text-white/70 border-t border-slate-200/60 dark:border-white/5 pt-2.5">
+              <p className="mt-3 flex items-start gap-2 text-xs text-slate-600 dark:text-white/70 border-t border-slate-200/60 dark:border-separator pt-2.5">
                 <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-300" />
                 {isSeller
                   ? 'Settlement Notice: Your earnings unlock automatically upon verified delivery receipt.'

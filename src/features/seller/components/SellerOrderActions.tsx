@@ -49,11 +49,11 @@ export function SellerOrderActions({
                                             <div className="flex flex-col items-stretch gap-3 xl:min-w-[220px]">
                                                 {/* Total Amount */}
                                                 <div className="rounded-xl border border-white/15 bg-white/8 px-4 py-3 w-full">
-                                                    <p className="font-bold text-lg sm:text-xl text-white">
+                                                    <p className="font-bold text-lg sm:text-xl text-label">
                                                         {formatCurrency(order.totalAmount, order.currency)}
                                                     </p>
-                                                    <p className="text-xs text-white/70">Total Amount</p>
-                                                    <p className="mt-1 text-xs text-white/70">Payment: {order.paymentStatus || 'Pending'}</p>
+                                                    <p className="text-xs text-label-2">Total Amount</p>
+                                                    <p className="mt-1 text-xs text-label-2">Payment: {order.paymentStatus || 'Pending'}</p>
                                                 </div>
 
                                                 {/* Action Buttons */}
@@ -83,7 +83,7 @@ export function SellerOrderActions({
                                                                 <Truck className="h-3 w-3 mr-1.5" />
                                                                 Request Mzigo pickup
                                                             </Button>
-                                                            <p className="text-[10px] leading-relaxed text-white/60">
+                                                            <p className="text-[10px] leading-relaxed text-label-2">
                                                                 Choose one handoff method. Mzigo Ego secures the package and checks it against the order.
                                                             </p>
                                                         </div>
@@ -127,7 +127,7 @@ export function SellerOrderActions({
                                                         <div className="space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
                                                                 onClick={() => onConfirmBooking(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -150,7 +150,7 @@ export function SellerOrderActions({
                                                         <div className="space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
                                                                 onClick={() => onMarkServiceReady(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -163,7 +163,7 @@ export function SellerOrderActions({
                                                         <div className="space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
                                                                 onClick={() => onReadyForPickup(order.id, 'shop_ready')}
                                                                 disabled={isUpdating}
                                                             >
@@ -177,7 +177,7 @@ export function SellerOrderActions({
                                                             <div className="space-y-1.5">
                                                                 <Button
                                                                     size="sm"
-                                                                    className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                    className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
                                                                     onClick={() => onReadyForPickup(order.id, 'shop_ready')}
                                                                     disabled={isUpdating}
                                                                 >
@@ -199,7 +199,7 @@ export function SellerOrderActions({
                                                         )}
                                                     {order.status === 'CONFIRMED' && (
                                                         <div className="space-y-2">
-                                                            <Badge className="w-full justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-sm">
+                                                            <Badge className="w-full justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-label text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-sm">
                                                                 <Clock className="h-3 w-3 mr-1" />
                                                                 Pending Buyer Completion
                                                             </Badge>

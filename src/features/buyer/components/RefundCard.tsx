@@ -59,7 +59,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
   if (compact) {
     return (
       <>
-        <Card className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
+        <Card className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
           <CardContent className="space-y-4 p-4">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
@@ -68,10 +68,10 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
                 </div>
                 <div className="min-w-0">
                   <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Refund balance</p>
-                  <p className="mt-1 text-xl font-black leading-none text-slate-950 dark:text-white">{formatCurrency(totalRefunds)}</p>
+                  <p className="mt-1 text-xl font-semibold leading-none text-slate-950 dark:text-white">{formatCurrency(totalRefunds)}</p>
                 </div>
               </div>
-              <Badge className="shrink-0 border-slate-200 dark:border-white/10 bg-slate-200 dark:bg-zinc-800 text-[10px] font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-800">
+              <Badge className="shrink-0 border-slate-200 dark:border-separator bg-slate-200 dark:bg-zinc-800 text-[10px] font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-zinc-800">
                 {isLoadingPending
                   ? 'Checking'
                   : hasPendingRequest
@@ -147,7 +147,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
             <Button
               onClick={handleWithdrawClick}
               disabled={hasPendingRequest || isLoadingPending || (availableBalance < minWithdrawalAmount && clearingBalance === 0) || (availableBalance < minWithdrawalAmount && isClearing)}
-              className="h-10 w-full bg-[#F5C518] text-xs font-black text-black hover:bg-yellow-300 disabled:opacity-50"
+              className="h-10 w-full bg-[#F5C518] text-xs font-semibold text-black hover:bg-yellow-300 disabled:opacity-50"
             >
               {isLoadingPending ? (
                 <>
@@ -209,12 +209,12 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
                 <Wallet className="h-5 w-5 text-green-600 dark:text-green-400" />
-                <p className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wide">
+                <p className="text-sm font-bold text-gray-700 dark:text-label-2 uppercase tracking-wide">
                   Refund Balance
                 </p>
               </div>
               <div className="flex items-baseline gap-2">
-                <p className="text-4xl font-black text-green-600 dark:text-green-400">
+                <p className="text-4xl font-semibold text-green-600 dark:text-green-400">
                   {formatCurrency(totalRefunds)}
                 </p>
               </div>
@@ -230,7 +230,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
                     Clearing under T+2 (unlocks {formattedClearingDate})
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1.5 text-gray-400">
+                  <span className="flex items-center gap-1.5 text-label-2">
                     <AlertCircle className="h-4 w-4" />
                     No refunds available
                   </span>
@@ -238,7 +238,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
               </div>
             </div>
             <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <DollarSign className="h-8 w-8 text-white" />
+              <DollarSign className="h-8 w-8 text-label" />
             </div>
           </div>
 
@@ -282,14 +282,14 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
               {pendingRequests.map((request) => (
                 <div key={request.id} className="space-y-2 bg-white/60 dark:bg-zinc-800/60 rounded-lg p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Amount:</span>
+                    <span className="text-xs font-medium text-gray-700 dark:text-label-2">Amount:</span>
                     <span className="text-sm font-bold text-green-600 dark:text-green-400">
                       {formatCurrency(parseFloat(request.amount.toString()))}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">Requested:</span>
-                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-gray-700 dark:text-label-2">Requested:</span>
+                    <span className="text-xs text-gray-600 dark:text-label-2">
                       {formatRequestDate(request.createdAt)}
                     </span>
                   </div>
@@ -314,7 +314,7 @@ export default function RefundCard({ refundAmount, compact = false, onRefundRequ
           <Button
             onClick={handleWithdrawClick}
             disabled={pendingRequests.length > 0 || isLoadingPending || (availableBalance < minWithdrawalAmount && isClearing) || availableBalance < minWithdrawalAmount}
-            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed h-12 text-base group/btn"
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-label font-semibold shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed h-12 text-base group/btn"
           >
             {pendingRequests.length > 0 ? (
               <>

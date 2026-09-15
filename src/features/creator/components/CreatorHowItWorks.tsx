@@ -38,14 +38,14 @@ export function CreatorHowItWorks() {
   ];
 
   return (
-    <section className="rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-[#0a0a0a] p-4 sm:p-6 shadow-sm transition-colors duration-200">
+    <section className="rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-surface-1 p-4 sm:p-6 shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-yellow-400/15 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400">
             <Sparkles className="h-5 w-5" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-950 dark:text-white">
+            <h2 className="text-base sm:text-lg font-semibold tracking-tight text-slate-950 dark:text-white">
               How Byblos Creators Works
             </h2>
             <p className="text-xs text-slate-500 dark:text-white/50">
@@ -57,7 +57,7 @@ export function CreatorHowItWorks() {
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] transition-colors"
+          className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.03] transition-colors"
           aria-label={isExpanded ? 'Collapse guide' : 'Expand guide'}
         >
           <span>{isExpanded ? 'Hide' : 'Show Guide'}</span>
@@ -72,16 +72,16 @@ export function CreatorHowItWorks() {
             return (
               <div
                 key={item.step}
-                className="relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-4 shadow-sm"
+                className="relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 shadow-sm"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 font-black text-[11px] text-black">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 font-semibold text-[11px] text-black">
                       {item.step}
                     </span>
                     <Icon className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                     {item.title}
                   </h3>
                   <p className="mt-1.5 text-xs text-slate-600 dark:text-white/60 leading-relaxed">

@@ -28,13 +28,13 @@ interface ReminderCardProps {
 
 function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismiss }: ReminderCardProps) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+    <div className="relative overflow-hidden rounded-2xl border border-separator bg-white/[0.03] p-4 sm:p-5">
       <button
         type="button"
         onClick={onDismiss}
         aria-label="Do not show this again"
         title="Do not show this again"
-        className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/10 hover:text-white/80"
+        className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-label-2 transition-colors hover:bg-white/10 hover:text-white/80"
       >
         <X className="h-4 w-4" />
       </button>
@@ -47,14 +47,14 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
           <Icon className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-black text-white sm:text-base">{title}</p>
-          <p className="mt-1 text-xs leading-5 text-white/60 sm:text-sm">{description}</p>
+          <p className="text-sm font-semibold text-label sm:text-base">{title}</p>
+          <p className="mt-1 text-xs leading-5 text-label-2 sm:text-sm">{description}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={onCta}
-              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform active:scale-95 sm:text-sm"
+              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform active:scale-95 sm:text-sm"
               style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
             >
               {ctaLabel}
@@ -63,7 +63,7 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
             <button
               type="button"
               onClick={onDismiss}
-              className="text-[11px] font-semibold text-white/40 underline-offset-2 transition-colors hover:text-white/70 hover:underline"
+              className="text-[11px] font-semibold text-label-2 underline-offset-2 transition-colors hover:text-white/70 hover:underline"
             >
               Do not show this again
             </button>

@@ -53,7 +53,7 @@ export function RefundConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[92vw] sm:max-w-[480px] max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d0d] text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+      <DialogContent className="w-[92vw] sm:max-w-[480px] max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5C518]/20 text-[#F5C518]">
@@ -158,7 +158,7 @@ export function RefundConfirmDialog({
                 <span>Withdrawal charge</span>
                 <span className="font-bold">+{formatCurrency(withdrawalFee)}</span>
               </div>
-              <div className="border-t border-amber-400/20 pt-2 flex items-center justify-between text-sm font-black text-slate-950 dark:text-white">
+              <div className="border-t border-amber-400/20 pt-2 flex items-center justify-between text-sm font-semibold text-slate-950 dark:text-white">
                 <span>Total deducted from refund balance</span>
                 <span className="text-amber-600 dark:text-amber-400">{formatCurrency(totalDeducted)}</span>
               </div>
@@ -193,7 +193,7 @@ export function RefundConfirmDialog({
           </div>
 
           {/* Processing time notice */}
-          <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-zinc-900/60 p-3">
+          <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-zinc-900/60 p-3">
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-slate-500 dark:text-slate-400" />
               <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">

@@ -91,7 +91,7 @@ export function AccountSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56 border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white"
+        className="w-56 border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-900 dark:text-white"
       >
         <div className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/40">
           {owned.length > 1 ? 'Switch account' : 'Active Account'}

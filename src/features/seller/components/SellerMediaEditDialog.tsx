@@ -77,7 +77,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] max-w-sm sm:max-w-[380px] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white">
+      <DialogContent className="w-[90vw] max-w-sm sm:max-w-[380px] border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white">
         <DialogHeader>
           <DialogTitle className="text-slate-950 dark:text-white font-bold">Edit Business Photo</DialogTitle>
           <DialogDescription className="text-slate-600 dark:text-white/55 font-medium">Update how your shop logo/photo looks to buyers.</DialogDescription>
@@ -94,7 +94,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
                 <img src={photoPreview} alt="Business photo" className="h-full w-full object-cover" />
               ) : (
                 <div
-                  className="flex h-full w-full items-center justify-center text-xl font-black"
+                  className="flex h-full w-full items-center justify-center text-xl font-semibold"
                   style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
                 >
                   {fallbackInitial}
@@ -102,7 +102,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-black text-slate-900 dark:text-white">Business photo</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white">Business photo</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <Button
                   size="sm"
@@ -124,7 +124,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-8 border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
+                    className="h-8 border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
                     disabled={busy === 'photo'}
                     onClick={() => runRemove((b) => photoMutation.mutateAsync(b), 'Business photo')}
                   >

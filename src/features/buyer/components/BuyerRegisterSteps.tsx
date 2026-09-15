@@ -57,7 +57,7 @@ export const BuyerRegisterSteps = ({
                             value={formData.firstName}
                             onChange={handleInputChange}
                             required
-                            className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.firstName ? 'border-red-500' : ''}`}
+                            className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.firstName ? 'border-red-500' : ''}`}
                           />
                         </div>
                         {errors.firstName && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.firstName}</p>}
@@ -79,7 +79,7 @@ export const BuyerRegisterSteps = ({
                             value={formData.lastName}
                             onChange={handleInputChange}
                             required
-                            className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.lastName ? 'border-red-500' : ''}`}
+                            className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.lastName ? 'border-red-500' : ''}`}
                           />
                         </div>
                         {errors.lastName && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.lastName}</p>}
@@ -103,7 +103,7 @@ export const BuyerRegisterSteps = ({
                           value={formData.email}
                           onChange={handleInputChange}
                           required
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.email ? 'border-red-500' : ''}`}
+                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.email ? 'border-red-500' : ''}`}
                         />
                       </div>
                       {errors.email && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.email}</p>}
@@ -126,7 +126,7 @@ export const BuyerRegisterSteps = ({
                           value={formData.mobilePayment}
                           onChange={handleInputChange}
                           required
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.mobilePayment ? 'border-red-500' : ''}`}
+                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.mobilePayment ? 'border-red-500' : ''}`}
                         />
                       </div>
                       {errors.mobilePayment && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.mobilePayment}</p>}
@@ -148,7 +148,7 @@ export const BuyerRegisterSteps = ({
                           placeholder="e.g. 0712345678 (Optional)"
                           value={formData.whatsappNumber}
                           onChange={handleInputChange}
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.whatsappNumber ? 'border-red-500' : ''}`}
+                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.whatsappNumber ? 'border-red-500' : ''}`}
                         />
                       </div>
                       {errors.whatsappNumber && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.whatsappNumber}</p>}
@@ -177,7 +177,7 @@ export const BuyerRegisterSteps = ({
                             }));
                           }}
                         >
-                          <SelectTrigger className="!pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm">
+                          <SelectTrigger className="!pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm">
                             <SelectValue placeholder="Nairobi" />
                           </SelectTrigger>
                           <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
@@ -207,7 +207,7 @@ export const BuyerRegisterSteps = ({
                           }}
                           disabled={!formData.city}
                         >
-                          <SelectTrigger className="!pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 disabled:opacity-50 text-[10px] sm:text-sm">
+                          <SelectTrigger className="!pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 disabled:opacity-50 text-[10px] sm:text-sm">
                             <SelectValue placeholder={formData.city ? "Select your area" : "Select city first"} />
                           </SelectTrigger>
                           <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
@@ -243,7 +243,7 @@ export const BuyerRegisterSteps = ({
                           value={formData.password}
                           onChange={handleInputChange}
                           required
-                          className={`input-mobile !pl-8 sm:!pl-14 !pr-8 sm:!pr-12 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.password ? 'border-red-500' : ''}`}
+                          className={`input-mobile !pl-8 sm:!pl-14 !pr-8 sm:!pr-12 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.password ? 'border-red-500' : ''}`}
                         />
                         <button
                           type="button"
@@ -261,7 +261,7 @@ export const BuyerRegisterSteps = ({
 
                     {/* Password Strength Checklist */}
                     {formData.password && (
-                      <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10">
+                      <div className="p-3 bg-slate-100 dark:bg-fill rounded-xl border border-slate-200 dark:border-separator">
                         <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">Password Requirements:</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {[
@@ -277,10 +277,10 @@ export const BuyerRegisterSteps = ({
                                 </div>
                               ) : (
                                 <div className="bg-slate-300 dark:bg-gray-700 p-0.5 rounded-full">
-                                  <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-600 dark:text-gray-300" />
+                                  <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-600 dark:text-label-2" />
                                 </div>
                               )}
-                              <span className={`text-[10px] sm:text-xs ${req.met ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-slate-600 dark:text-gray-300'}`}>
+                              <span className={`text-[10px] sm:text-xs ${req.met ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-slate-600 dark:text-label-2'}`}>
                                 {req.label}
                               </span>
                             </div>
@@ -306,7 +306,7 @@ export const BuyerRegisterSteps = ({
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
                           required
-                          className={`input-mobile !pl-8 sm:!pl-14 !pr-8 sm:!pr-12 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                          className={`input-mobile !pl-8 sm:!pl-14 !pr-8 sm:!pr-12 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.confirmPassword ? 'border-red-500' : ''}`}
                         />
                         <button
                           type="button"
@@ -324,7 +324,7 @@ export const BuyerRegisterSteps = ({
                     </div>
 
                     <div className="pt-2">
-                      <div className="flex items-start space-x-2 bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200 dark:border-white/10">
+                      <div className="flex items-start space-x-2 bg-slate-50 dark:bg-fill p-3 rounded-xl border border-slate-200 dark:border-separator">
                         <input
                           type="checkbox"
                           id="termsAccepted"
@@ -332,7 +332,7 @@ export const BuyerRegisterSteps = ({
                           onChange={(e) => setTermsAccepted(e.target.checked)}
                           className="mt-0.5 rounded accent-yellow-400 cursor-pointer"
                         />
-                        <Label htmlFor="termsAccepted" className="text-[10px] sm:text-xs text-slate-600 dark:text-gray-300 font-medium cursor-pointer">
+                        <Label htmlFor="termsAccepted" className="text-[10px] sm:text-xs text-slate-600 dark:text-label-2 font-medium cursor-pointer">
                           I agree to the{' '}
                           <button
                             type="button"

@@ -53,7 +53,7 @@ export function ProductEditDialog({
 }: ProductEditDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white w-[90vw] max-w-sm sm:max-w-[400px] max-h-[78dvh] overflow-y-auto p-3 sm:p-4 rounded-xl shadow-2xl">
+      <DialogContent className="bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white w-[90vw] max-w-sm sm:max-w-[400px] max-h-[78dvh] overflow-y-auto p-3 sm:p-4 rounded-xl shadow-2xl">
         <DialogHeader className="flex flex-row items-center gap-2 space-y-0 text-left mb-2">
           <IconButton
             variant="ghost"
@@ -122,7 +122,7 @@ export function ProductEditDialog({
                   <SelectTrigger className="seller-field h-9 rounded-lg">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-[#0a0a0a] border-slate-200 dark:border-white/10 text-slate-900 dark:text-white z-[110]">
+                  <SelectContent className="bg-white dark:bg-surface-1 border-slate-200 dark:border-separator text-slate-900 dark:text-white z-[110]">
                     {aestheticCategories.map((category) => (
                       <SelectItem key={category.id} value={category.id} className="text-slate-900 dark:text-white focus:bg-[var(--theme-button-bg,#f5c518)] focus:text-[var(--theme-button-text,#000000)]">
                         {category.title}
@@ -158,7 +158,7 @@ export function ProductEditDialog({
                             <img
                               src={preview}
                               alt={`Photo ${slot + 1}`}
-                              className="w-full h-full object-cover rounded-lg border border-slate-200 dark:border-white/10"
+                              className="w-full h-full object-cover rounded-lg border border-slate-200 dark:border-separator"
                             />
                             {isFirst && (
                               <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-emerald-600 text-slate-900 dark:text-white px-1 rounded-sm">Main</span>
@@ -174,8 +174,8 @@ export function ProductEditDialog({
                         ) : (
                           <label
                             className={`w-full h-full flex flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors duration-200 ${isDisabled
-                              ? 'border-slate-200 dark:border-white/5 bg-slate-100 dark:bg-white/[0.02] cursor-not-allowed opacity-40'
-                              : 'border-slate-200 dark:border-white/20 bg-white/5 hover:border-emerald-500 hover:bg-emerald-400/5 cursor-pointer'
+                              ? 'border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.02] cursor-not-allowed opacity-40'
+                              : 'border-slate-200 dark:border-white/20 bg-fill hover:border-emerald-500 hover:bg-emerald-400/5 cursor-pointer'
                               }`}
                           >
                             <ImagePlus className={`h-4 w-4 mb-1 ${isDisabled ? 'text-slate-500 dark:text-white/40' : 'text-slate-900 dark:text-white'}`} />

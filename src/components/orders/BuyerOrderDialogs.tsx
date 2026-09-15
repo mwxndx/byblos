@@ -51,7 +51,7 @@ export function BuyerOrderDialogs({
   const confirmationContent = currentIsService ? (
     <div className="space-y-4">
       <p>By clicking <strong>"Mark Service Completed"</strong>, you agree that the service has been completed to your satisfaction.</p>
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-label-2">
         Once confirmed, funds will be released to the provider.
       </p>
     </div>
@@ -63,7 +63,7 @@ export function BuyerOrderDialogs({
           "{currentIsHubCollection ? 'Dynamic Mall, Tom Mboya St, Nairobi | Shop SL 32' : currentOrder?.seller?.physicalAddress || currentOrder?.seller?.shopName || 'the seller'}"
         </strong>?
       </p>
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-label-2">
         Please only confirm after you have physically received and inspected your package.
       </p>
     </div>
@@ -72,11 +72,11 @@ export function BuyerOrderDialogs({
   return (
     <>
       <Dialog open={showCancelDialog} onOpenChange={onCancelDialogChange}>
-        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-[#0d0d0d] border border-slate-200 dark:border-white/10 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
               <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                <XCircle className="h-4 w-4 text-white" />
+                <XCircle className="h-4 w-4 text-label" />
               </div>
               Cancel Order
             </DialogTitle>
@@ -103,7 +103,7 @@ export function BuyerOrderDialogs({
             <Button
               onClick={onCancelOrder}
               disabled={isCancelling === currentOrderId}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
             >
               {isCancelling === currentOrderId ? (
                 <>
@@ -121,11 +121,11 @@ export function BuyerOrderDialogs({
       <OrderDetailsDialog order={selectedOrderForDetails} serviceCharge={selectedOrderServiceCharge} onClose={() => onSelectedOrderChange(null)} onViewImage={onViewingImageChange} onConfirmReceiptClick={onConfirmReceiptClick} />
 
       <Dialog open={showReceiptDialog} onOpenChange={onReceiptDialogChange}>
-        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-[#0d0d0d] border border-slate-200 dark:border-white/10 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
               <div className={`w-8 h-8 bg-gradient-to-r ${currentIsService ? 'from-purple-500 to-indigo-500' : 'from-green-500 to-emerald-500'} rounded-full flex items-center justify-center`}>
-                <CheckCircle className="h-4 w-4 text-white" />
+                <CheckCircle className="h-4 w-4 text-label" />
               </div>
               {currentIsService ? 'Confirm Service Completion' : 'Confirm Package Receipt'}
             </DialogTitle>
@@ -138,7 +138,7 @@ export function BuyerOrderDialogs({
             <div className="bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-400/30 rounded-xl p-4 my-3">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Package className="h-4 w-4 text-white" />
+                  <Package className="h-4 w-4 text-label" />
                 </div>
                 <div>
                   <h5 className="text-sm font-bold text-blue-900 dark:text-blue-100">Delivery Confirmation</h5>
@@ -162,7 +162,7 @@ export function BuyerOrderDialogs({
             <Button
               onClick={onConfirmReceipt}
               disabled={isConfirming === currentOrderId}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
             >
               {isConfirming === currentOrderId ? (
                 <>
@@ -182,7 +182,7 @@ export function BuyerOrderDialogs({
           <div className="relative w-full h-full flex items-center justify-center pointer-events-auto">
             <button
               onClick={() => onViewingImageChange(null)}
-              className="absolute -top-10 right-0 sm:-right-10 z-50 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors border border-white/20"
+              className="absolute -top-10 right-0 sm:-right-10 z-50 p-2 bg-black/50 hover:bg-black/70 rounded-full text-label transition-colors border border-white/20"
             >
               <XCircle className="h-6 w-6" />
             </button>

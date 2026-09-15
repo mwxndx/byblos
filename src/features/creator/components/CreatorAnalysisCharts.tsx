@@ -49,10 +49,10 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
   }, [periods, businessEarnings, selectedBusiness]);
 
   return (
-    <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
+    <div className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-black text-slate-950 dark:text-white">How you're doing</h2>
-        <div className="grid grid-cols-4 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-200/60 dark:bg-black/30 p-1 text-xs font-black">
+        <h2 className="text-xl font-semibold text-slate-950 dark:text-white">How you're doing</h2>
+        <div className="grid grid-cols-4 rounded-2xl border border-slate-200 dark:border-separator bg-slate-200/60 dark:bg-black/30 p-1 text-xs font-semibold">
           {PERIODS.map((period) => (
             <button
               key={period}
@@ -71,7 +71,7 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
       </div>
 
       {/* Commission earnings */}
-      <div className="mt-4 h-56 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 p-3">
+      <div className="mt-4 h-56 rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/20 p-3">
         <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-white/40">Commission earnings</p>
         <ResponsiveContainer width="100%" height="88%">
           <LineChart data={commissionData}>
@@ -85,14 +85,14 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
       </div>
 
       {/* Invited-business earnings (KSh 3) with business + period switching */}
-      <div className="mt-4 h-64 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 p-3">
+      <div className="mt-4 h-64 rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/20 p-3">
         <div className="mb-2 flex items-center justify-between gap-2">
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-white/40">Invited-business earnings</p>
           <select
             value={selectedBusiness}
             onChange={(e) => setSelectedBusiness(e.target.value)}
             aria-label="Filter by business"
-            className="h-8 rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#141414] px-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400"
+            className="h-8 rounded-lg border border-slate-300 dark:border-separator bg-white dark:bg-[#141414] px-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400"
           >
             <option value="all">All businesses</option>
             {businesses.map((b) => (

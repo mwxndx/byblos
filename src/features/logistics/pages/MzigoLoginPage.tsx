@@ -64,7 +64,7 @@ const MzigoLoginPage = () => {
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-black/10 dark:border-white/10 bg-white/80 dark:bg-black/80 backdrop-blur-md pt-safe-top">
+      <header className="sticky top-0 z-30 border-b border-black/10 dark:border-separator bg-white/80 dark:bg-black/80 backdrop-blur-md pt-safe-top">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">
@@ -94,11 +94,11 @@ const MzigoLoginPage = () => {
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <form
           onSubmit={handleSubmit}
-          className="my-auto w-full space-y-5 rounded-[2rem] border border-black/10 dark:border-white/10 bg-white dark:bg-white/[0.04] p-6 shadow-xl dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)]"
+          className="my-auto w-full space-y-5 rounded-[2rem] border border-black/10 dark:border-separator bg-white dark:bg-white/[0.04] p-6 shadow-xl dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)]"
         >
           <div className="space-y-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Logistics</p>
-            <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Logistics</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Door-to-door logistics dashboard.</p>
           </div>
 
@@ -110,7 +110,7 @@ const MzigoLoginPage = () => {
             name="email"
             autoComplete="email"
             placeholder="Email"
-            className="h-12 rounded-2xl border-black/10 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
+            className="h-12 rounded-2xl border-black/10 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
             required
             disabled={isSubmitting}
           />
@@ -124,7 +124,7 @@ const MzigoLoginPage = () => {
               name="password"
               autoComplete="current-password"
               placeholder="Password"
-              className="h-12 rounded-2xl border-black/10 dark:border-white/10 bg-slate-50 dark:bg-black/45 pr-12 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
+              className="h-12 rounded-2xl border-black/10 dark:border-separator bg-slate-50 dark:bg-black/45 pr-12 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
               required
               disabled={isSubmitting}
             />

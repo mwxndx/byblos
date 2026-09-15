@@ -60,7 +60,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
       }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-white/10 bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             {/* Left: Back Button */}
@@ -92,27 +92,27 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
 
       {/* Main Content */}
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
-        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Seller Community</p>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">Create Account</h2>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Seller Community</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
             <p className="text-xs font-medium text-slate-600 dark:text-white/55">Join our seller community</p>
 
             {/* Progress Indicator */}
             <div className="pt-2 flex items-center justify-center gap-2">
-              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${currentStep >= 1 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                 1
               </div>
               <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'bg-yellow-400' : 'bg-slate-200 dark:bg-white/10'}`} />
-              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${currentStep >= 2 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                 2
               </div>
               <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'bg-yellow-400' : 'bg-slate-200 dark:bg-white/10'}`} />
-              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${currentStep >= 3 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                 3
               </div>
               <div className={`h-0.5 w-6 ${currentStep >= 4 ? 'bg-yellow-400' : 'bg-slate-200 dark:bg-white/10'}`} />
-              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-black ${currentStep >= 4 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 4 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                 4
               </div>
             </div>
@@ -124,7 +124,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                 <Mail className="h-14 w-14 text-yellow-400 animate-pulse" />
               </div>
               <div className="space-y-1.5">
-                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">Check your email</h3>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Check your email</h3>
                 <p className="text-slate-600 dark:text-white/60 text-xs leading-relaxed max-w-[280px] mx-auto">
                   We've sent a verification link to <span className="text-yellow-600 dark:text-yellow-300 font-semibold">{formData.email}</span>.
                   Please click the link to activate your shop.
@@ -133,7 +133,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
               <div className="pt-3 space-y-2.5">
                 <Button
                   onClick={() => navigate('/seller/login')}
-                  className="h-12 w-full rounded-2xl bg-yellow-400 font-black text-black transition hover:bg-yellow-300"
+                  className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black transition hover:bg-yellow-300"
                 >
                   Go to Login
                 </Button>
@@ -141,7 +141,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                   onClick={handleResend}
                   disabled={resendCooldown > 0 || isResending}
                   variant="ghost"
-                  className="h-11 w-full rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2"
+                  className="h-11 w-full rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-fill text-xs text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2"
                 >
                   {isResending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
                   {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Didn't receive it? Resend"}
@@ -176,7 +176,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                   <Button
                     type="button"
                     onClick={() => setCurrentStep(currentStep - 1)}
-                    className="h-12 flex-1 rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 text-xs font-semibold text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 transition"
+                    className="h-12 flex-1 rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-white/10 text-xs font-semibold text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 transition"
                   >
                     Back
                   </Button>
@@ -211,14 +211,14 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                       }
                       setCurrentStep(currentStep + 1);
                     }}
-                    className="h-12 flex-1 rounded-2xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+                    className="h-12 flex-1 rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="h-12 flex-1 rounded-2xl bg-yellow-400 font-black text-black hover:bg-yellow-300 transition"
+                    className="h-12 flex-1 rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
                     disabled={isLoading || !termsAccepted}
                   >
                     {isLoading ? (

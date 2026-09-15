@@ -109,22 +109,22 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="border-white/10 bg-[#0a0a0a] text-white sm:rounded-3xl">
+      <DialogContent className="border-separator bg-surface-1 text-label sm:rounded-3xl">
         {step === 'invite' ? (
           <div className="flex flex-col items-center gap-5 py-2 text-center">
             <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f5c518]/12">
               <Sparkles className="h-7 w-7 text-[#f5c518]" />
             </span>
             <div className="space-y-2">
-              <DialogTitle className="text-xl font-black tracking-tight text-white">
+              <DialogTitle className="text-xl font-semibold tracking-tight text-label">
                 Become a Byblos member
               </DialogTitle>
-              <p className="mx-auto max-w-xs text-sm leading-relaxed text-white/60">
+              <p className="mx-auto max-w-xs text-sm leading-relaxed text-label-2">
                 Get your own numbered founder card — proof you shop protected, and
                 one of the first to do it. Yours to show off.
               </p>
             </div>
-            <div className="flex items-center gap-2 text-xs font-medium text-white/45">
+            <div className="flex items-center gap-2 text-xs font-medium text-label-2">
               <ShieldCheck className="h-4 w-4 text-[#f5c518]" />
               Every order held safe until it shows up
             </div>
@@ -144,7 +144,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-white/50 transition hover:text-white/80"
+                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-label-2 transition hover:text-white/80"
               >
                 Maybe later
               </button>
@@ -152,10 +152,10 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
           </div>
         ) : (
           <div className="flex flex-col items-center gap-4 py-1 text-center">
-            <DialogTitle className="text-lg font-black tracking-tight text-white">
+            <DialogTitle className="text-lg font-semibold tracking-tight text-label">
               You’re member No. {String(displayNumber).padStart(6, '0')} 🎉
             </DialogTitle>
-            <p className="-mt-1 text-xs text-white/55">Share your card and show you shop protected.</p>
+            <p className="-mt-1 text-xs text-label-2">Share your card and show you shop protected.</p>
 
             {/* min-w-0 is mandatory here: this div is a direct grid-item of
                 DialogContent (display:grid). Without it the grid column's
@@ -180,7 +180,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
                 type="button"
                 onClick={() => share('wa')}
                 disabled={sharing !== null}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] text-sm font-bold text-white transition hover:bg-white/12 disabled:opacity-70"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.06] text-sm font-bold text-label transition hover:bg-white/12 disabled:opacity-70"
               >
                 {sharing === 'wa' ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
                 Share to WhatsApp
@@ -188,7 +188,7 @@ export function MembershipGate({ enabled }: MembershipGateProps) {
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-white/45 transition hover:text-white/75"
+                className="inline-flex h-10 items-center justify-center rounded-xl text-sm font-semibold text-label-2 transition hover:text-white/75"
               >
                 Done
               </button>

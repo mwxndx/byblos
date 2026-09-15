@@ -43,7 +43,7 @@ export function BuyerBottomNav({ activeNav, navItems, onSelect }: BuyerBottomNav
               </span>
               {item.badge && (
                 item.count && item.count > 0 ? (
-                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[15px] h-[15px] px-1 rounded-full text-[9px] font-black flex items-center justify-center bg-[#F5C518] text-black shadow-sm">
+                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[15px] h-[15px] px-1 rounded-full text-[9px] font-semibold flex items-center justify-center bg-[#F5C518] text-black shadow-sm">
                     {item.count > 99 ? '99+' : item.count}
                   </span>
                 ) : (

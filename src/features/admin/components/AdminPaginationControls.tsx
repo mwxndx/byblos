@@ -17,7 +17,7 @@ export const AdminPaginationControls = ({ pagination, onPageChange }: AdminPagin
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
-      <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
+      <p className="text-xs font-semibold text-label-3 uppercase tracking-widest">
         {total === 0 ? 'No results' : `Showing ${rangeStart.toLocaleString()}-${rangeEnd.toLocaleString()} of ${total.toLocaleString()}`}
       </p>
       <div className="flex items-center gap-2">
@@ -26,18 +26,18 @@ export const AdminPaginationControls = ({ pagination, onPageChange }: AdminPagin
           size="sm"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="h-9 px-3 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 font-black uppercase tracking-widest text-[9px] border transition-all disabled:opacity-40 disabled:pointer-events-none"
+          className="h-9 px-3 rounded-xl border-separator bg-fill text-label hover:bg-white/10 font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-40 disabled:pointer-events-none"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           <span className="ml-1">Prev</span>
         </Button>
-        <span className="text-xs font-bold text-gray-400 tabular-nums px-1">Page {page}</span>
+        <span className="text-xs font-bold text-label-2 tabular-nums px-1">Page {page}</span>
         <Button
           variant="outline"
           size="sm"
           disabled={!hasMore}
           onClick={() => onPageChange(page + 1)}
-          className="h-9 px-3 rounded-xl border-white/10 bg-white/5 text-white hover:bg-white/10 font-black uppercase tracking-widest text-[9px] border transition-all disabled:opacity-40 disabled:pointer-events-none"
+          className="h-9 px-3 rounded-xl border-separator bg-fill text-label hover:bg-white/10 font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-40 disabled:pointer-events-none"
         >
           <span className="mr-1">Next</span>
           <ChevronRight className="h-3.5 w-3.5" />

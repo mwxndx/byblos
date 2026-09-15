@@ -134,7 +134,7 @@ export default function CreatorDashboard() {
   if (loading) {
     return (
       <main className="dashboard-layout flex min-h-screen items-center justify-center bg-[var(--byblos-bg,#000000)] px-4 text-slate-950 dark:text-white transition-colors duration-200">
-        <div className="flex items-center gap-3 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-5 py-3 shadow-xl">
+        <div className="flex items-center gap-3 rounded-full border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 px-5 py-3 shadow-xl">
           <Loader2 className="h-5 w-5 animate-spin text-yellow-500" />
           <span className="text-sm font-semibold text-slate-700 dark:text-white/80">Loading creator dashboard...</span>
         </div>
@@ -173,7 +173,7 @@ export default function CreatorDashboard() {
     <button
       type="button"
       onClick={() => setTab(value)}
-      className={`relative flex-1 rounded-xl px-4 py-2.5 text-sm font-black capitalize transition-all ${
+      className={`relative flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold capitalize transition-all ${
         tab === value
           ? 'bg-yellow-400 text-black shadow-sm'
           : 'text-slate-600 dark:text-white/50 hover:text-slate-900 dark:hover:text-white'
@@ -209,7 +209,7 @@ export default function CreatorDashboard() {
       </header>
 
       <div className="px-4 pt-3 sm:px-6 lg:px-8">
-        <div className="flex gap-1 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-black/30 p-1">
+        <div className="flex gap-1 rounded-2xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-black/30 p-1">
           {tabButton('performance', 'Performance')}
           {tabButton('shops', 'Shops', shopRequests.length)}
         </div>
@@ -243,10 +243,10 @@ export default function CreatorDashboard() {
               setAnalysisPeriod={setAnalysisPeriod}
             />
 
-            <section className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
+            <section className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-black text-slate-950 dark:text-white">Invited businesses</h2>
-                <span className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-white/60">
+                <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Invited businesses</h2>
+                <span className="rounded-full border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-white/60">
                   {invitedBusinesses.length}/{MAX_INVITED_BUSINESSES} invited
                 </span>
               </div>
@@ -255,17 +255,17 @@ export default function CreatorDashboard() {
               </p>
               <div className="mt-4 grid gap-3">
                 {invitedBusinesses.length === 0 ? (
-                  <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-4 text-sm font-medium text-slate-500 dark:text-white/45">
+                  <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/30 p-4 text-sm font-medium text-slate-500 dark:text-white/45">
                     Share your referral link (in the earnings card above) to invite up to {MAX_INVITED_BUSINESSES} businesses.
                   </div>
                 ) : invitedBusinesses.map((biz) => {
                   const sid = Number(biz.id);
                   const isLeaving = leavingBusinessSellerId === sid;
                   return (
-                    <div key={biz.id} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-4 text-slate-950 dark:text-white">
+                    <div key={biz.id} className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/30 p-4 text-slate-950 dark:text-white">
                       <div className="flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate font-black text-slate-950 dark:text-white">{biz.shop_name || `Business ${biz.id}`}</p>
+                          <p className="truncate font-semibold text-slate-950 dark:text-white">{biz.shop_name || `Business ${biz.id}`}</p>
                           <p className="mt-0.5 text-xs font-semibold text-slate-500 dark:text-white/40">Earned {money(biz.earnings)}</p>
                         </div>
                         <Button
@@ -287,14 +287,14 @@ export default function CreatorDashboard() {
           <>
             {shopRequests.length > 0 && (
               <section className="rounded-3xl border border-yellow-400/30 bg-yellow-400/10 p-4">
-                <h2 className="text-xl font-black text-slate-950 dark:text-white">Shop requests</h2>
+                <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Shop requests</h2>
                 <p className="mt-1 text-sm font-medium text-yellow-700 dark:text-yellow-100/70">Accept a seller request to start earning on that shop.</p>
                 <div className="mt-4 grid gap-3">
                   {shopRequests.map((request) => (
                     <div key={request.id} className="rounded-2xl border border-yellow-400/30 bg-white dark:bg-black/30 p-4 text-slate-950 dark:text-white">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <p className="font-black">{request.shop_name}</p>
+                          <p className="font-semibold">{request.shop_name}</p>
                           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-white/40">
                             Invited by {request.seller_name || 'seller'}
                           </p>
@@ -304,7 +304,7 @@ export default function CreatorDashboard() {
                             type="button"
                             onClick={() => handleShopRequest(request.id, 'accept')}
                             disabled={respondingRequestId === request.id}
-                            className="h-9 bg-yellow-400 font-black text-black hover:bg-yellow-300"
+                            className="h-9 bg-yellow-400 font-semibold text-black hover:bg-yellow-300"
                           >
                             {respondingRequestId === request.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Accept'}
                           </Button>
@@ -313,7 +313,7 @@ export default function CreatorDashboard() {
                             variant="outline"
                             onClick={() => handleShopRequest(request.id, 'deny')}
                             disabled={respondingRequestId === request.id}
-                            className="h-9 border-slate-300 dark:border-white/10 bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                            className="h-9 border-slate-300 dark:border-separator bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-fill"
                           >
                             Deny
                           </Button>

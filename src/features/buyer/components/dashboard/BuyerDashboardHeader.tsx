@@ -12,7 +12,7 @@ export function BuyerDashboardHeader() {
       <div className="w-full px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center justify-between gap-3">
           {/* City selector — with a single supported city it renders disabled (null behavior). */}
-          <div className="relative inline-flex items-center rounded-full border border-slate-200 bg-slate-100 text-slate-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white">
+          <div className="relative inline-flex items-center rounded-full border border-slate-200 bg-slate-100 text-slate-900 dark:border-separator dark:bg-white/[0.04] dark:text-white">
             <MapPin className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-slate-500 dark:text-white/60" aria-hidden="true" />
             <select
               aria-label="City"

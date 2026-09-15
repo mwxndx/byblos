@@ -46,7 +46,7 @@ export const AdminLoginPage = () => {
   return (
     <div className="auth-page flex min-h-[100svh] items-start justify-center overflow-x-hidden bg-[var(--byblos-bg,#000000)] px-4 py-6 text-[var(--byblos-text,#f5f5f5)] sm:items-center sm:p-6 transition-colors duration-200">
       <div className="w-full max-w-md animate-in fade-in zoom-in-95 duration-500">
-        <Card className="overflow-hidden rounded-[2rem] border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-xl dark:shadow-[0_22px_60px_rgba(0,0,0,0.45)]">
+        <Card className="overflow-hidden rounded-[2rem] border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-xl dark:shadow-[0_22px_60px_rgba(0,0,0,0.45)]">
           <CardHeader className="px-6 pb-7 pt-10 text-center md:px-10">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-yellow-500/30 bg-yellow-500/15 text-yellow-500">
               <Shield className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
@@ -82,7 +82,7 @@ export const AdminLoginPage = () => {
                     placeholder="admin@byblos.hq"
                     required
                     autoComplete="email"
-                    className="h-12 rounded-2xl border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/45 pl-11 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400/20"
+                    className="h-12 rounded-2xl border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/45 pl-11 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400/20"
                   />
                 </div>
               </div>
@@ -102,7 +102,7 @@ export const AdminLoginPage = () => {
                     placeholder="Enter password"
                     required
                     autoComplete="current-password"
-                    className="h-12 rounded-2xl border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/45 pl-11 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400/20"
+                    className="h-12 rounded-2xl border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/45 pl-11 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400/20"
                   />
                 </div>
               </div>

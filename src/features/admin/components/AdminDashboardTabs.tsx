@@ -14,7 +14,7 @@ const ADMIN_TABS = [
 
 export function AdminDashboardTabs() {
   return (
-    <div className="bg-[#0A0A0A]/70 border border-white/10 rounded-2xl p-1 md:p-2 shadow-xl sticky top-4 z-40 overflow-hidden backdrop-blur-xl">
+    <div className="bg-surface-1 border border-separator rounded-2xl p-1 md:p-2 shadow-xl sticky top-4 z-40 overflow-hidden backdrop-blur-xl">
       <TabsList className="bg-transparent border-0 p-0 h-auto flex flex-nowrap overflow-x-auto no-scrollbar gap-1 md:gap-2">
         {ADMIN_TABS.map((tab) => (
           <TabsTrigger
@@ -22,7 +22,7 @@ export function AdminDashboardTabs() {
             value={tab.id}
             className={`flex-shrink-0 min-w-[100px] md:flex-1 rounded-xl px-4 md:px-6 py-2.5 md:py-3.5 text-xs md:text-sm font-semibold transition-all duration-300
             data-[state=active]:bg-yellow-400 data-[state=active]:text-black data-[state=active]:shadow-sm
-            data-[state=inactive]:text-gray-400 data-[state=inactive]:hover:text-white data-[state=inactive]:hover:bg-white/5`}
+            data-[state=inactive]:text-label-2 data-[state=inactive]:hover:text-white data-[state=inactive]:hover:bg-fill`}
           >
             {tab.label}
           </TabsTrigger>

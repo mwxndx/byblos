@@ -362,7 +362,7 @@ const SectionHeading = ({ number, title }: { number: string; title: string }) =>
 
 const Sub = ({ title, children }: { title: string; children: React.ReactNode }) => (
   <div className="mb-5">
-    <h3 className="font-semibold text-white/95 mb-2 text-[13px]">{title}</h3>
+    <h3 className="font-semibold text-label-2 mb-2 text-[13px]">{title}</h3>
     <div className="text-slate-300 leading-relaxed">{children}</div>
   </div>
 );

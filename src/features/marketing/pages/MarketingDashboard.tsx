@@ -33,8 +33,8 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }: CustomTooltipProps) => {
     if (!active || !payload?.length) return null;
     return (
-        <div className="bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-lg p-3 text-xs shadow-xl text-slate-900 dark:text-white">
-            <p className="text-slate-500 dark:text-gray-400 mb-2 font-medium">{label}</p>
+        <div className="bg-white dark:bg-surface-1 border border-black/10 dark:border-separator rounded-lg p-3 text-xs shadow-xl text-slate-900 dark:text-white">
+            <p className="text-slate-500 dark:text-label-2 mb-2 font-medium">{label}</p>
             {payload.map((entry) => (
                 <p key={entry.name} style={{ color: entry.color }} className="mb-0.5 font-medium">
                     {entry.name}: <span className="font-bold">{prefix}{Number(entry.value).toLocaleString()}{suffix}</span>
@@ -120,14 +120,14 @@ export default function MarketingDashboard() {
     }, [fetchAll]);
 
     if (loading) return (
-        <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[#050505]">
+        <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)]">
             <LoadingSpinner />
         </div>
     );
 
     if (error) return (
-        <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[#050505] p-4">
-            <div className="text-red-400 text-center rounded-3xl border border-white/10 bg-[#0A0A0A]/70 p-8 shadow-xl">
+        <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4">
+            <div className="text-red-400 text-center rounded-3xl border border-separator bg-surface-1 p-8 shadow-xl">
                 <p>{error}</p>
                 <button onClick={fetchAll} className="mt-4 text-yellow-500 underline text-sm">Try again</button>
             </div>
@@ -135,16 +135,16 @@ export default function MarketingDashboard() {
     );
 
     return (
-        <div className="min-h-[100svh] overflow-x-hidden bg-[#050505] p-3 text-white selection:bg-yellow-500/30 sm:p-4 md:p-8 lg:p-12 space-y-8 md:space-y-12">
+        <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] p-3 text-label selection:bg-yellow-500/30 sm:p-4 md:p-8 lg:p-12 space-y-8 md:space-y-12">
             {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#0A0A0A]/70 border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden group">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden group">
                 <div className="relative z-10 flex items-center gap-5 md:gap-8">
                     <div className="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm">
                         <span className="text-black font-semibold text-2xl md:text-3xl">B</span>
                     </div>
                     <div>
-                        <h1 className="text-2xl md:text-4xl font-semibold tracking-tight text-white">Marketing Dashboard<span className="text-yellow-500">.</span></h1>
-                        <p className="text-gray-400 text-xs md:text-sm font-medium mt-1">Platform growth and acquisition.</p>
+                        <h1 className="text-2xl md:text-4xl font-semibold tracking-tight text-label">Marketing Dashboard<span className="text-yellow-500">.</span></h1>
+                        <p className="text-label-2 text-xs md:text-sm font-medium mt-1">Platform growth and acquisition.</p>
                     </div>
                 </div>
 
@@ -152,7 +152,7 @@ export default function MarketingDashboard() {
                     <select
                         value={period}
                         onChange={(e) => setPeriod(Number(e.target.value))}
-                        className="bg-[#171717] border border-white/10 text-xs font-semibold rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-yellow-500 transition-colors cursor-pointer"
+                        className="bg-[#171717] border border-separator text-xs font-semibold rounded-xl px-4 py-2.5 text-label focus:outline-none focus:border-yellow-500 transition-colors cursor-pointer"
                     >
                         <option value={3}>Last 3 Months</option>
                         <option value={6}>Last 6 Months</option>
@@ -164,7 +164,7 @@ export default function MarketingDashboard() {
                             await logout();
                             navigate('/admin/marketing/login');
                         }}
-                        className="bg-white/5 hover:bg-white/10 text-xs font-semibold rounded-xl px-4 py-2.5 text-gray-300 border border-white/10 transition-colors"
+                        className="bg-fill hover:bg-white/10 text-xs font-semibold rounded-xl px-4 py-2.5 text-label-2 border border-separator transition-colors"
                     >
                         Sign out
                     </button>
@@ -282,13 +282,13 @@ export default function MarketingDashboard() {
                     <ChartCard title="Top Buyer Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
                             {geography.map((item: any, i: number) => (
-                                <div key={item.city || i} className="flex items-center justify-between border-b border-white/5 pb-2">
-                                    <span className="text-xs font-medium text-gray-300">{item.city}</span>
+                                <div key={item.city || i} className="flex items-center justify-between border-b border-separator pb-2">
+                                    <span className="text-xs font-medium text-label-2">{item.city}</span>
                                     <div className="flex items-center gap-3">
                                         <div className="w-24 bg-white/10 h-2 rounded-full overflow-hidden">
                                             <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${item.percentage || 0}%` }} />
                                         </div>
-                                        <span className="text-xs font-bold text-white w-10 text-right">{item.percentage}%</span>
+                                        <span className="text-xs font-bold text-label w-10 text-right">{item.percentage}%</span>
                                     </div>
                                 </div>
                             ))}
@@ -300,19 +300,19 @@ export default function MarketingDashboard() {
             {/* Section 3: Top Performers & Referrals */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 {Array.isArray(topPerfs?.sellers) && topPerfs.sellers.length > 0 && (
-                    <div className="bg-[#0A0A0A]/70 border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Top Performing Shops" subtitle="Highest GMV sellers this month" />
-                        <div className="divide-y divide-white/5">
+                        <div className="divide-y divide-separator">
                             {topPerfs.sellers.map((s: any, idx: number) => (
                                 <div key={s.id || idx} className="py-3 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs font-bold text-yellow-500 w-5">#{idx + 1}</span>
                                         <div>
-                                            <p className="text-sm font-semibold text-white">{s.shopName || s.name}</p>
-                                            <p className="text-xs text-gray-400">{s.category || 'General'}</p>
+                                            <p className="text-sm font-semibold text-label">{s.shopName || s.name}</p>
+                                            <p className="text-xs text-label-2">{s.category || 'General'}</p>
                                         </div>
                                     </div>
-                                    <span className="text-sm font-bold text-white">KSh {Number(s.gmvKsh || 0).toLocaleString()}</span>
+                                    <span className="text-sm font-bold text-label">KSh {Number(s.gmvKsh || 0).toLocaleString()}</span>
                                 </div>
                             ))}
                         </div>
@@ -320,16 +320,16 @@ export default function MarketingDashboard() {
                 )}
 
                 {Array.isArray(referrals?.creators) && referrals.creators.length > 0 && (
-                    <div className="bg-[#0A0A0A]/70 border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Creator Referrals" subtitle="Top performing growth ambassadors" />
-                        <div className="divide-y divide-white/5">
+                        <div className="divide-y divide-separator">
                             {referrals.creators.map((c: any, idx: number) => (
                                 <div key={c.id || idx} className="py-3 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs font-bold text-yellow-500 w-5">#{idx + 1}</span>
                                         <div>
-                                            <p className="text-sm font-semibold text-white">{c.name}</p>
-                                            <p className="text-xs text-gray-400">{c.referredSellersCount || 0} sellers invited</p>
+                                            <p className="text-sm font-semibold text-label">{c.name}</p>
+                                            <p className="text-xs text-label-2">{c.referredSellersCount || 0} sellers invited</p>
                                         </div>
                                     </div>
                                     <span className="text-sm font-bold text-yellow-400">KSh {Number(c.earnedKsh || 0).toLocaleString()}</span>
@@ -342,16 +342,16 @@ export default function MarketingDashboard() {
 
             {/* Section 4: Live Activity Log */}
             {activity?.length > 0 && (
-                <div className="bg-[#0A0A0A]/70 border border-white/10 rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
+                <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
                     <SectionTitle title="Live Platform Activity" subtitle="Recent signups, orders, and referrals" />
                     <div className="space-y-3 mt-4">
                         {activity.map((item: any, idx: number) => (
-                            <div key={item.id || idx} className="flex items-center justify-between text-xs py-2 border-b border-white/5 last:border-0">
+                            <div key={item.id || idx} className="flex items-center justify-between text-xs py-2 border-b border-separator last:border-0">
                                 <div className="flex items-center gap-3">
                                     <span className="w-2 h-2 rounded-full bg-yellow-400" />
-                                    <span className="text-gray-300 font-medium">{item.description}</span>
+                                    <span className="text-label-2 font-medium">{item.description}</span>
                                 </div>
-                                <span className="text-gray-500 font-mono">{item.timeAgo || 'Just now'}</span>
+                                <span className="text-label-3 font-mono">{item.timeAgo || 'Just now'}</span>
                             </div>
                         ))}
                     </div>

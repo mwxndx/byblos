@@ -70,7 +70,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                 && ['PAID', 'AWAITING_SELLER_ACTION', 'DELIVERY_PENDING'].includes(order.status);
 
                             let cardClasses = "transition-all duration-300 bg-black border shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40 ";
-                            let itemClasses = "text-xs sm:text-sm text-white rounded-lg px-3 py-2 border ";
+                            let itemClasses = "text-xs sm:text-sm text-label rounded-lg px-3 py-2 border ";
 
                             if (isService) {
                                 cardClasses += "border-purple-400/45";
@@ -92,24 +92,24 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                 {firstItem?.imageUrl ? (
                                                     <img src={firstItem.imageUrl} alt={firstItem.name} className="h-full w-full object-cover" />
                                                 ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-white/40">
+                                                    <div className="flex h-full w-full items-center justify-center text-label-2">
                                                         <Package className="h-5 w-5" />
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="truncate text-sm font-semibold text-white sm:text-base">
+                                                <p className="truncate text-sm font-semibold text-label sm:text-base">
                                                     {firstItem?.name || `Order #${order.orderNumber}`}
-                                                    {extraCount > 0 && <span className="text-white/60"> +{extraCount} more</span>}
+                                                    {extraCount > 0 && <span className="text-label-2"> +{extraCount} more</span>}
                                                 </p>
-                                                <p className="text-[11px] text-white/60 sm:text-xs">{formatDate(order.createdAt)}</p>
+                                                <p className="text-[11px] text-label-2 sm:text-xs">{formatDate(order.createdAt)}</p>
                                             </div>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => setExpanded((v) => !v)}
                                                 aria-expanded={expanded}
-                                                className="shrink-0 gap-1 rounded-lg border border-white/15 px-2.5 text-xs font-semibold text-white hover:bg-white/10 hover:text-white sm:px-3"
+                                                className="shrink-0 gap-1 rounded-lg border border-white/15 px-2.5 text-xs font-semibold text-label hover:bg-white/10 hover:text-white sm:px-3"
                                             >
                                                 <span className="hidden sm:inline">{expanded ? 'Hide details' : 'View details'}</span>
                                                 <span className="sm:hidden">{expanded ? 'Hide' : 'Details'}</span>
@@ -124,7 +124,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                 {/* Order Header */}
                                                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                                                     <div className="flex-1 min-w-0">
-                                                        <h3 className="font-bold text-sm sm:text-lg text-white truncate pr-2">Order #{order.orderNumber}</h3>
+                                                        <h3 className="font-bold text-sm sm:text-lg text-label truncate pr-2">Order #{order.orderNumber}</h3>
                                                     </div>
                                                     {/* Status Badge - positioned for mobile */}
                                                     <div className="flex-none">
@@ -178,19 +178,19 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
 
                                                 {/* Products Section */}
                                                 <div>
-                                                    <h4 className="text-sm sm:text-base font-semibold text-white mb-3">Products</h4>
+                                                    <h4 className="text-sm sm:text-base font-semibold text-label mb-3">Products</h4>
                                                     <ul className="space-y-2">
                                                         {order.items && order.items.length > 0 ? (
                                                             order.items.map((item) => (
                                                                 <li key={item.id} className={itemClasses}>
                                                                     <div className="flex items-center justify-between gap-3 min-w-0">
                                                                         <span className="font-semibold truncate min-w-0 flex-1">{item.name}</span>
-                                                                        <span className="shrink-0 text-white/70">Qty {item.quantity}</span>
+                                                                        <span className="shrink-0 text-label-2">Qty {item.quantity}</span>
                                                                     </div>
                                                                 </li>
                                                             ))
                                                         ) : (
-                                                            <li className="text-xs sm:text-sm text-white/70 bg-white/8 rounded-lg px-3 py-2 border border-white/12">No items in this order</li>
+                                                            <li className="text-xs sm:text-sm text-label-2 bg-white/8 rounded-lg px-3 py-2 border border-white/12">No items in this order</li>
                                                         )}
                                                     </ul>
                                                 </div>
@@ -198,21 +198,21 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                 {/* Service Booking Details */}
                                                 {(order.metadata?.booking_date || order.metadata?.service_location || order.metadata?.service_requirements) && (
                                                     <div className="mt-4 p-3 bg-purple-500/10 rounded-lg border border-purple-400/25 shadow-sm">
-                                                        <h4 className="flex items-center text-sm font-semibold text-white mb-2">
+                                                        <h4 className="flex items-center text-sm font-semibold text-label mb-2">
                                                             <Calendar className="h-4 w-4 mr-2 text-purple-200" />
                                                             Service Booking Details
                                                         </h4>
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                                             <div className="bg-black/60 p-2 rounded border border-purple-400/20">
                                                                 <p className="text-purple-200 text-xs font-medium mb-1">Date & Time</p>
-                                                                <p className="font-semibold text-white">
+                                                                <p className="font-semibold text-label">
                                                                     {order.metadata.booking_date ? formatDate(order.metadata.booking_date as string) : 'N/A'}
-                                                                    {order.metadata.booking_time && <span className="text-white/70 font-normal"> at {String(order.metadata.booking_time)}</span>}
+                                                                    {order.metadata.booking_time && <span className="text-label-2 font-normal"> at {String(order.metadata.booking_time)}</span>}
                                                                 </p>
                                                             </div>
                                                             <div className="bg-black/60 p-2 rounded border border-purple-400/20">
                                                                 <p className="text-purple-200 text-xs font-medium mb-1">Location</p>
-                                                                <div className="font-semibold text-white break-words">
+                                                                <div className="font-semibold text-label break-words">
                                                                     {(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }) ? (
                                                                         <div className="space-y-1">
                                                                             <p>{(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).fullAddress || 'Buyer Coordinates Provided'}</p>
@@ -236,7 +236,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                         {order.metadata?.service_requirements && (
                                                             <div className="mt-3 bg-black/60 p-2 rounded border border-purple-400/20">
                                                                 <p className="text-purple-200 text-xs font-medium mb-1">Special Requirements</p>
-                                                                <p className="text-sm text-white break-words">
+                                                                <p className="text-sm text-label break-words">
                                                                     {String(order.metadata.service_requirements || '')}
                                                                 </p>
                                                             </div>
