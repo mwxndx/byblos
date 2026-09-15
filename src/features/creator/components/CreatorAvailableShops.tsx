@@ -28,7 +28,7 @@ export function CreatorAvailableShops() {
   };
 
   return (
-    <section className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-5 sm:p-6 shadow-sm transition-colors duration-200">
+    <section className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-5 sm:p-6 shadow-sm transition-colors duration-200">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
@@ -57,7 +57,7 @@ export function CreatorAvailableShops() {
             <Loader2 className="h-6 w-6 animate-spin text-yellow-500" />
           </div>
         ) : shops.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-8 text-center">
+          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-8 text-center">
             <Store className="h-10 w-10 mx-auto text-slate-400 dark:text-white/20 mb-2" />
             <p className="text-sm font-semibold text-slate-900 dark:text-white">No shops currently listed</p>
             <p className="mt-1 text-xs text-slate-500 dark:text-white/50 max-w-sm mx-auto">
@@ -74,7 +74,7 @@ export function CreatorAvailableShops() {
               return (
                 <div
                   key={shop.id}
-                  className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-4 sm:p-5 shadow-sm hover:border-yellow-400/40 transition-colors"
+                  className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 sm:p-5 shadow-sm hover:border-yellow-400/40 transition-colors"
                 >
                   <div>
                     {/* Top Row: Shop Avatar / Icon & Commission Badge */}
@@ -84,7 +84,7 @@ export function CreatorAvailableShops() {
                           <img
                             src={getImageUrl(shop.logoUrl)}
                             alt={shop.shopName}
-                            className="h-11 w-11 rounded-xl object-cover border border-black/10 dark:border-white/10"
+                            className="h-11 w-11 rounded-xl object-cover border border-black/10 dark:border-separator"
                           />
                         ) : (
                           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-yellow-400/20 text-yellow-600 dark:text-yellow-400 border border-yellow-400/30">
@@ -124,12 +124,12 @@ export function CreatorAvailableShops() {
                   </div>
 
                   {/* Actions */}
-                  <div className="mt-5 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center gap-2">
+                  <div className="mt-5 pt-3 border-t border-slate-100 dark:border-separator flex items-center gap-2">
                     {/* Preview button */}
                     <Button
                       asChild
                       variant="outline"
-                      className="h-9 flex-1 border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 text-xs font-bold"
+                      className="h-9 flex-1 border-slate-200 dark:border-separator bg-slate-50 dark:bg-white/[0.03] text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 text-xs font-bold"
                     >
                       <Link to={previewUrl} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="mr-1.5 h-3.5 w-3.5" />

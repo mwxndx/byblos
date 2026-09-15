@@ -65,7 +65,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
   };
 
   return (
-    <section className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-5 sm:p-6 shadow-sm transition-colors duration-200">
+    <section className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-5 sm:p-6 shadow-sm transition-colors duration-200">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
@@ -94,7 +94,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
       <form onSubmit={handleSave} className="mt-5 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Instagram input */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-4 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 shadow-sm">
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2 min-w-0">
                 <img src={instagramLogo} alt="Instagram" className="h-5 w-5 object-contain shrink-0" />
@@ -132,7 +132,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
               placeholder="@yourhandle or instagram.com/username"
-              className="h-10 text-xs sm:text-sm bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/10 rounded-xl"
+              className="h-10 text-xs sm:text-sm bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-separator rounded-xl"
             />
             <p className="mt-1.5 text-[11px] text-slate-500 dark:text-white/40">
               Enter your handle with @ or your full profile URL
@@ -140,7 +140,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
           </div>
 
           {/* TikTok input */}
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-4 shadow-sm">
+          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 shadow-sm">
             <div className="flex items-center justify-between gap-2 mb-2">
               <div className="flex items-center gap-2 min-w-0">
                 <img src={tiktokLogo} alt="TikTok" className="h-5 w-5 object-contain shrink-0" />
@@ -178,7 +178,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
               value={tiktok}
               onChange={(e) => setTiktok(e.target.value)}
               placeholder="@yourhandle or tiktok.com/@username"
-              className="h-10 text-xs sm:text-sm bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/10 rounded-xl"
+              className="h-10 text-xs sm:text-sm bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-separator rounded-xl"
             />
             <p className="mt-1.5 text-[11px] text-slate-500 dark:text-white/40">
               Enter your TikTok username or profile link
@@ -197,7 +197,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
                 setTiktok(profile?.tiktokLink || '');
               }}
               disabled={updateMutation.isPending}
-              className="h-9 border-slate-200 dark:border-white/10 text-xs font-bold"
+              className="h-9 border-slate-200 dark:border-separator text-xs font-bold"
             >
               Reset
             </Button>

@@ -75,7 +75,7 @@ export function CreatorEarningsHero({
   const [showExplain, setShowExplain] = useState(false);
 
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-[#0a0a0a] p-5 shadow-sm transition-colors duration-200 sm:p-6">
+    <section className="relative overflow-hidden rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-surface-1 p-5 shadow-sm transition-colors duration-200 sm:p-6">
       {/* Ambient gold glow */}
       <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-yellow-400/10 blur-3xl" aria-hidden="true" />
 
@@ -198,10 +198,10 @@ export function CreatorEarningsHero({
 
           {/* Explanatory Breakdown: How it works & Difference from Shop Collaborations */}
           {showExplain && (
-            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-white/10 space-y-4 animate-in fade-in duration-200 text-xs">
+            <div className="mt-4 pt-4 border-t border-slate-200/80 dark:border-separator space-y-4 animate-in fade-in duration-200 text-xs">
               {/* 3 Steps to Lifetime Royalties */}
               <div className="grid gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20 p-3">
+                <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/20 p-3">
                   <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white mb-1">
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 font-bold text-[9px] text-black">1</span>
                     Share with Store Owners
@@ -211,7 +211,7 @@ export function CreatorEarningsHero({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20 p-3">
+                <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/20 p-3">
                   <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white mb-1">
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 font-bold text-[9px] text-black">2</span>
                     Permanent Attribution
@@ -221,7 +221,7 @@ export function CreatorEarningsHero({
                   </p>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-black/20 p-3">
+                <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black/20 p-3">
                   <div className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white mb-1">
                     <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 font-bold text-[9px] text-white">3</span>
                     Earn KSh 3 on Every Sale

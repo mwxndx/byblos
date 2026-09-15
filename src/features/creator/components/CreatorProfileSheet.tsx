@@ -25,7 +25,7 @@ interface CreatorProfileSheetProps {
 
 function ReadOnlyDetail({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value?: string | null }) {
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100/70 dark:bg-white/[0.04] p-3">
+    <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100/70 dark:bg-white/[0.04] p-3">
       <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-white/70">
         <span className="flex items-center gap-2"><Icon className="h-3.5 w-3.5 text-yellow-500" />{label}</span>
         <span className="flex items-center gap-1 text-slate-400 dark:text-white/40 normal-case font-semibold"><Lock className="h-3 w-3" />Read-only</span>
@@ -77,7 +77,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md overflow-y-auto border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white p-0"
+        className="w-full sm:max-w-md overflow-y-auto border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white p-0"
       >
         <SheetHeader className="px-4 pt-6 pb-2 text-left">
           <SheetTitle className="text-slate-950 dark:text-white">Profile</SheetTitle>
@@ -85,18 +85,18 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
 
         <div className="space-y-4 px-4 pb-8">
           {/* Theme */}
-          <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-4">
+          <section className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-white/[0.03] p-4">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">Theme</span>
             <ThemeSegmentedPill value={theme} onChange={setTheme} className="mt-2 flex w-full [&>button]:flex-1" />
           </section>
 
           {/* Personal details */}
-          <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-4">
+          <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-white/[0.03] p-4">
             <h3 className="text-sm font-semibold text-slate-950 dark:text-white">Personal details</h3>
             <ReadOnlyDetail icon={UserRound} label="Full name" value={fullName} />
             <ReadOnlyDetail icon={Mail} label="Email" value={creator.email} />
 
-            <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] p-3">
+            <div className="rounded-xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.04] p-3">
               <label className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-white/70">
                 <Phone className="h-3.5 w-3.5 text-yellow-500" />M-Pesa number
               </label>
@@ -105,12 +105,12 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
                 onChange={(e) => setMpesa(e.target.value)}
                 placeholder="0712345678"
                 inputMode="tel"
-                className="mt-2 h-9 border border-slate-300 dark:border-white/10 bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
+                className="mt-2 h-9 border border-slate-300 dark:border-separator bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
               />
               <p className="mt-1 text-[10px] text-slate-400 dark:text-white/40">Where your withdrawals are paid.</p>
             </div>
 
-            <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] p-3">
+            <div className="rounded-xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.04] p-3">
               <label className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-white/70">
                 <MessageCircle className="h-3.5 w-3.5 text-yellow-500" />WhatsApp number
               </label>
@@ -119,7 +119,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
                 onChange={(e) => setWhatsapp(e.target.value)}
                 placeholder="0712345678"
                 inputMode="tel"
-                className="mt-2 h-9 border border-slate-300 dark:border-white/10 bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
+                className="mt-2 h-9 border border-slate-300 dark:border-separator bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40"
               />
             </div>
 
@@ -152,7 +152,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
             type="button"
             variant="outline"
             onClick={onLogout}
-            className="h-10 w-full border-slate-300 dark:border-white/10 bg-white dark:bg-white/[0.03] text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 font-bold"
+            className="h-10 w-full border-slate-300 dark:border-separator bg-white dark:bg-white/[0.03] text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 font-bold"
           >
             <LogOut className="mr-2 h-4 w-4" />Logout
           </Button>

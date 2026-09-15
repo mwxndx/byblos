@@ -47,7 +47,7 @@ export function BuyerRegister() {
       }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-white/10 bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             {/* Left: Back Button */}
@@ -79,7 +79,7 @@ export function BuyerRegister() {
 
       {/* Main Content */}
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
-        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Buyer Community</p>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
@@ -129,7 +129,7 @@ export function BuyerRegister() {
                   onClick={handleResend}
                   disabled={resendCooldown > 0 || isResending}
                   variant="ghost"
-                  className="h-11 w-full rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-xs text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2"
+                  className="h-11 w-full rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-fill text-xs text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2"
                 >
                   {isResending ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -165,7 +165,7 @@ export function BuyerRegister() {
                   <Button
                     type="button"
                     onClick={() => setCurrentStep(currentStep - 1)}
-                    className="h-12 flex-1 rounded-2xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/10 text-xs font-semibold text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 transition"
+                    className="h-12 flex-1 rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-white/10 text-xs font-semibold text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 transition"
                   >
                     Back
                   </Button>

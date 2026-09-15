@@ -64,7 +64,7 @@ function ProfileDetail({
 }) {
   const isInput = Boolean(editable && editing);
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100/70 dark:bg-white/[0.04] p-3 transition-colors">
+    <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100/70 dark:bg-white/[0.04] p-3 transition-colors">
       <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-white/70">
         <Icon className="h-3.5 w-3.5 text-[#F5C518]" />
         {label}
@@ -76,7 +76,7 @@ function ProfileDetail({
           placeholder={placeholder}
           inputMode="tel"
           autoComplete="tel"
-          className="mt-2 h-9 border border-slate-300 dark:border-white/10 bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white/40 focus-visible:ring-[#F5C518]"
+          className="mt-2 h-9 border border-slate-300 dark:border-separator bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white/40 focus-visible:ring-[#F5C518]"
         />
       ) : (
         <div className="mt-2 break-words text-sm font-bold leading-5 text-slate-950 dark:text-white">
@@ -105,12 +105,12 @@ export function BuyerProfileContent({
   return (
     <div className="w-full space-y-4">
       {/* App Theme Picker Pill - Positioned Above Account Details */}
-      <section className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
         <BuyerThemePillPicker />
       </section>
 
       {/* Account Details Section */}
-      <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 shadow-sm">
+      <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-bold text-slate-950 dark:text-white">Account Details</h3>
@@ -122,7 +122,7 @@ export function BuyerProfileContent({
             type="button"
             onClick={onToggleEdit}
             variant="outline"
-            className="h-9 shrink-0 gap-2 border-slate-300 dark:border-white/10 bg-white dark:bg-white/[0.04] px-3 text-xs font-semibold text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+            className="h-9 shrink-0 gap-2 border-slate-300 dark:border-separator bg-white dark:bg-white/[0.04] px-3 text-xs font-semibold text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
           >
             <Edit3 className="h-3.5 w-3.5" />
             {isEditingProfile ? 'Cancel' : 'Edit'}
@@ -184,7 +184,7 @@ export function BuyerProfileContent({
         <LegalLinks />
       </section>
 
-      <div className="space-y-2 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black p-4">
+      <div className="space-y-2 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black p-4">
         <Button
           onClick={onLogout}
           className="h-10 w-full justify-center gap-2 bg-red-600 font-bold text-slate-900 dark:text-white hover:bg-red-500"

@@ -149,13 +149,13 @@ export function ResetPasswordPage() {
   if (!isValidToken) {
     return (
       <div className="auth-page min-h-screen flex items-center justify-center p-4 bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
-        <div className="w-full max-w-md rounded-2xl border border-black/[0.08] dark:border-white/15 p-6 bg-white dark:bg-[#0a0a0a] shadow-xl transition-colors duration-200">
+        <div className="w-full max-w-md rounded-2xl border border-black/[0.08] dark:border-white/15 p-6 bg-white dark:bg-surface-1 shadow-xl transition-colors duration-200">
           <div className="text-center mb-6">
             <div className="w-12 h-12 mx-auto mb-3 bg-red-500/20 rounded-xl flex items-center justify-center border border-red-500/30">
               <Lock className="h-6 w-6 text-red-500" />
             </div>
             <h1 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">Invalid or Expired Link</h1>
-            <p className="text-sm text-slate-600 dark:text-gray-400">The password reset link is invalid or has expired.</p>
+            <p className="text-sm text-slate-600 dark:text-label-2">The password reset link is invalid or has expired.</p>
           </div>
           <div className="space-y-3">
             <Button className="w-full bg-yellow-400 text-black hover:bg-yellow-300 font-bold rounded-xl" onClick={() => navigate('/seller/login', { state: { openForgotPassword: true } })}>
@@ -192,13 +192,13 @@ export function ResetPasswordPage() {
 
       <div className="flex-1 flex items-center justify-center py-8 px-4">
         <div className="w-full max-w-[400px]">
-          <div className="rounded-2xl border border-black/[0.08] dark:border-white/15 shadow-xl p-6 bg-white dark:bg-[#0a0a0a] transition-colors duration-200">
+          <div className="rounded-2xl border border-black/[0.08] dark:border-white/15 shadow-xl p-6 bg-white dark:bg-surface-1 transition-colors duration-200">
             <div className="text-center mb-6">
               <div className="w-12 h-12 mx-auto mb-3 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
                 <Lock className="h-6 w-6 text-black" />
               </div>
               <h1 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">Reset Password</h1>
-              <p className="text-sm text-slate-600 dark:text-gray-400">Set a strong new password for your account</p>
+              <p className="text-sm text-slate-600 dark:text-label-2">Set a strong new password for your account</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -214,9 +214,9 @@ export function ResetPasswordPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="New Password"
                     required
-                    className="pl-4 pr-11 h-11 rounded-xl bg-slate-50 dark:bg-black/45 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
+                    className="pl-4 pr-11 h-11 rounded-xl bg-slate-50 dark:bg-black/45 border-slate-300 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-label-3 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
                   />
-                  <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={() => setShowPassword(!showPassword)}>
+                  <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-label-2 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
@@ -224,8 +224,8 @@ export function ResetPasswordPage() {
 
               {/* Password Requirements */}
               {password && (
-                <div className="mt-2 p-3 bg-slate-100 dark:bg-black/30 rounded-xl border border-black/[0.08] dark:border-white/10 transition-colors duration-200">
-                  <p className="text-[10px] font-semibold text-slate-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Security Requirements:</p>
+                <div className="mt-2 p-3 bg-slate-100 dark:bg-black/30 rounded-xl border border-black/[0.08] dark:border-separator transition-colors duration-200">
+                  <p className="text-[10px] font-semibold text-slate-500 dark:text-label-2 mb-2 uppercase tracking-wider">Security Requirements:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { label: "8+ chars", met: strength.minLength },
@@ -240,10 +240,10 @@ export function ResetPasswordPage() {
                           </div>
                         ) : (
                           <div className="bg-slate-300 dark:bg-gray-700 p-0.5 rounded-full">
-                            <X className="h-2.5 w-2.5 text-slate-500 dark:text-gray-400" />
+                            <X className="h-2.5 w-2.5 text-slate-500 dark:text-label-2" />
                           </div>
                         )}
-                        <span className={`text-[10px] ${req.met ? 'text-green-600 dark:text-green-400 font-medium' : 'text-slate-600 dark:text-gray-400'}`}>{req.label}</span>
+                        <span className={`text-[10px] ${req.met ? 'text-green-600 dark:text-green-400 font-medium' : 'text-slate-600 dark:text-label-2'}`}>{req.label}</span>
                       </div>
                     ))}
                   </div>
@@ -262,9 +262,9 @@ export function ResetPasswordPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm Password"
                     required
-                    className="pl-4 pr-11 h-11 rounded-xl bg-slate-50 dark:bg-black/45 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
+                    className="pl-4 pr-11 h-11 rounded-xl bg-slate-50 dark:bg-black/45 border-slate-300 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-label-3 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
                   />
-                  <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-label-2 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>

@@ -166,7 +166,7 @@ function BuyerDashboard() {
               <NotificationList
                 variant="default"
                 scrollClassName=""
-                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
               />
             </div>
           )}

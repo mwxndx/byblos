@@ -31,9 +31,9 @@ export function BuyerResetPassword() {
     // Show error state if token is invalid
     if (isValidToken === false) {
         return (
-            <div className="auth-page min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-[#080808] text-slate-950 dark:text-white transition-colors duration-200">
+            <div className="auth-page min-h-screen flex items-center justify-center p-4 bg-slate-50 dark:bg-surface-1 text-slate-950 dark:text-white transition-colors duration-200">
                 <div
-                    className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/12 p-6 bg-white dark:bg-[#0d0d0d] shadow-xl text-slate-950 dark:text-white"
+                    className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-white/12 p-6 bg-white dark:bg-surface-1 shadow-xl text-slate-950 dark:text-white"
                 >
                     <div className="text-center mb-6">
                         <div className="w-12 h-12 mx-auto mb-3 bg-red-500/20 rounded-xl flex items-center justify-center border border-red-500/30">
@@ -54,13 +54,13 @@ export function BuyerResetPassword() {
     }
 
     return (
-        <div className="auth-page min-h-screen w-full bg-slate-50 dark:bg-[#080808] text-slate-950 dark:text-white flex flex-col relative transition-colors duration-200"
+        <div className="auth-page min-h-screen w-full bg-slate-50 dark:bg-surface-1 text-slate-950 dark:text-white flex flex-col relative transition-colors duration-200"
             style={{
                 fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
             }}
         >
             {/* Header */}
-            <header className="bg-white/90 dark:bg-[#0d0d0d]/90 backdrop-blur-md border-b border-slate-200 dark:border-white/10 sticky top-0 z-30 pt-safe-top">
+            <header className="bg-white/90 dark:bg-surface-1/90 backdrop-blur-md border-b border-slate-200 dark:border-separator sticky top-0 z-30 pt-safe-top">
                 <div className="w-full px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
                     <Button
                         variant="ghost"
@@ -89,7 +89,7 @@ export function BuyerResetPassword() {
             <div className="flex-1 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
                 <div className="w-full max-w-[400px]">
                     <div
-                        className="rounded-2xl border border-slate-200 dark:border-white/12 shadow-2xl p-6 bg-white dark:bg-[#0d0d0d] text-slate-950 dark:text-white transition-colors duration-200"
+                        className="rounded-2xl border border-slate-200 dark:border-white/12 shadow-2xl p-6 bg-white dark:bg-surface-1 text-slate-950 dark:text-white transition-colors duration-200"
                     >
                         <div className="text-center mb-6">
                             <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
@@ -112,7 +112,7 @@ export function BuyerResetPassword() {
                                         type={showPassword ? 'text' : 'password'}
                                         autoComplete="new-password"
                                         placeholder="••••••••"
-                                        className="!pl-12 !pr-11 h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
+                                        className="!pl-12 !pr-11 h-11 rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
                                         value={formData.password}
                                         onChange={handleInputChange}
                                         required
@@ -133,7 +133,7 @@ export function BuyerResetPassword() {
 
                             {/* Password Requirements */}
                             {formData.password && (
-                                <div className="p-3 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10">
+                                <div className="p-3 bg-slate-100 dark:bg-fill rounded-xl border border-slate-200 dark:border-separator">
                                     <p className="text-[10px] font-semibold text-slate-800 dark:text-slate-200 mb-2 uppercase tracking-wider">Security Requirements:</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {[
@@ -149,10 +149,10 @@ export function BuyerResetPassword() {
                                                     </div>
                                                 ) : (
                                                     <div className="bg-slate-300 dark:bg-gray-700 p-0.5 rounded-full">
-                                                        <X className="h-2.5 w-2.5 text-slate-600 dark:text-gray-300" />
+                                                        <X className="h-2.5 w-2.5 text-slate-600 dark:text-label-2" />
                                                     </div>
                                                 )}
-                                                <span className={`text-[10px] ${req.met ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-slate-600 dark:text-gray-300'}`}>{req.label}</span>
+                                                <span className={`text-[10px] ${req.met ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-slate-600 dark:text-label-2'}`}>{req.label}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -171,7 +171,7 @@ export function BuyerResetPassword() {
                                         type={showConfirmPassword ? 'text' : 'password'}
                                         autoComplete="new-password"
                                         placeholder="••••••••"
-                                        className="!pl-12 !pr-11 h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
+                                        className="!pl-12 !pr-11 h-11 rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
                                         value={formData.confirmPassword}
                                         onChange={handleInputChange}
                                         required

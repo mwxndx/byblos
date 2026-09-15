@@ -38,7 +38,7 @@ export function CreatorHowItWorks() {
   ];
 
   return (
-    <section className="rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-[#0a0a0a] p-4 sm:p-6 shadow-sm transition-colors duration-200">
+    <section className="rounded-3xl border border-yellow-400/30 bg-slate-50 dark:bg-surface-1 p-4 sm:p-6 shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-yellow-400/15 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400">
@@ -57,7 +57,7 @@ export function CreatorHowItWorks() {
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] transition-colors"
+          className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-900 dark:text-white/50 dark:hover:text-white px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.03] transition-colors"
           aria-label={isExpanded ? 'Collapse guide' : 'Expand guide'}
         >
           <span>{isExpanded ? 'Hide' : 'Show Guide'}</span>
@@ -72,7 +72,7 @@ export function CreatorHowItWorks() {
             return (
               <div
                 key={item.step}
-                className="relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.02] p-4 shadow-sm"
+                className="relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 shadow-sm"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">

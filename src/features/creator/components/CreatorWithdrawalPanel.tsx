@@ -77,7 +77,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
   };
 
   return (
-    <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-4 sm:p-5 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
+    <div className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-4 sm:p-5 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-yellow-400/30 bg-yellow-400/15">
@@ -98,12 +98,12 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
           the withdrawable balance (which nets out past withdrawals + T+2 holds). */}
       <p className="mt-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-white/40">Earned to date</p>
       <div className="mt-1.5 grid grid-cols-2 gap-2">
-        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-white/[0.03] p-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Commission</p>
           <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">{money(commissionEarnings)}</p>
           <p className="text-[10px] text-slate-400 dark:text-white/40">From promoted shops</p>
         </div>
-        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] p-3">
+        <div className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-white/[0.03] p-3">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50">Invited business</p>
           <p className="mt-0.5 text-sm font-semibold text-slate-900 dark:text-white">{money(referralEarnings)}</p>
           <p className="text-[10px] text-slate-400 dark:text-white/40">From businesses you invited</p>
@@ -160,7 +160,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
             value={withdrawalAmount}
             onChange={(event) => setWithdrawalAmount(event.target.value)}
             placeholder="Amount in KSh"
-            className="h-11 pr-16 border-slate-300 dark:border-white/10 bg-white dark:bg-black/40 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 font-bold"
+            className="h-11 pr-16 border-slate-300 dark:border-separator bg-white dark:bg-black/40 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 font-bold"
           />
           {maxWithdrawable > 0 && (
             <button
@@ -218,7 +218,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
                 ? 'text-amber-600 dark:text-amber-300'
                 : 'text-yellow-600 dark:text-yellow-200';
           return (
-            <div key={item.id} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-3 text-xs text-slate-950 dark:text-white">
+            <div key={item.id} className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/30 p-3 text-xs text-slate-950 dark:text-white">
               <div className="flex justify-between gap-3 font-bold">
                 <span>{money(item.amount)}</span>
                 <span className={`uppercase ${toneClass}`}>{getWithdrawalStatusLabel(item.status)}</span>

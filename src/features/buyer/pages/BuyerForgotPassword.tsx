@@ -45,7 +45,7 @@ export function BuyerForgotPassword() {
             }}
         >
             {/* Header */}
-            <header className="bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md border-b border-black/[0.08] dark:border-white/10 sticky top-0 z-30 pt-safe-top transition-colors duration-200">
+            <header className="bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md border-b border-black/[0.08] dark:border-separator sticky top-0 z-30 pt-safe-top transition-colors duration-200">
                 <div className="w-full px-4 sm:px-6 lg:px-8">
                     <div className="relative flex items-center justify-between h-20">
                         {/* Left: Back Button */}
@@ -82,7 +82,7 @@ export function BuyerForgotPassword() {
             {/* Main Content */}
             <div className="flex-1 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
                 <div className="w-full max-w-[400px]">
-                    <div className="bg-white dark:bg-[#0a0a0a] border border-black/[0.08] dark:border-white/10 rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] p-6 sm:p-8 transition-colors duration-200">
+                    <div className="bg-white dark:bg-surface-1 border border-black/[0.08] dark:border-separator rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] p-6 sm:p-8 transition-colors duration-200">
                         {/* Title Section */}
                         <div className="text-center mb-6">
                             <div className="w-12 h-12 mx-auto mb-3 bg-yellow-400 rounded-xl flex items-center justify-center shadow-lg">
@@ -110,7 +110,7 @@ export function BuyerForgotPassword() {
                                         id="email"
                                         type="email"
                                         placeholder="Enter your email"
-                                        className="!pl-12 h-11 rounded-xl bg-slate-50 dark:bg-black/45 border-slate-300 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
+                                        className="!pl-12 h-11 rounded-xl bg-slate-50 dark:bg-black/45 border-slate-300 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 text-sm"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
@@ -133,7 +133,7 @@ export function BuyerForgotPassword() {
                         </form>
 
                         <div className="mt-6 text-center">
-                            <p className="text-slate-600 dark:text-gray-400 font-normal text-sm">
+                            <p className="text-slate-600 dark:text-label-2 font-normal text-sm">
                                 Remember your password?{' '}
                                 <button
                                     onClick={() => navigate('/buyer/login')}

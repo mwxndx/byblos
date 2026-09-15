@@ -93,7 +93,7 @@ export default function CreatorLogin() {
 
   return (
     <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-white/10 bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">
@@ -119,15 +119,15 @@ export default function CreatorLogin() {
       </header>
 
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
-        <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+        <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Creator program</p>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h1>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Track shop links, sales, seller referrals, and M-Pesa withdrawals.</p>
           </div>
-          <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" id="email" name="email" autoComplete="email" aria-label="Email" placeholder="Email" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" id="email" name="email" autoComplete="email" aria-label="Email" placeholder="Email" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <div className="relative">
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="current-password" aria-label="Password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
+            <Input value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="current-password" aria-label="Password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}

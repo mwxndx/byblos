@@ -14,16 +14,16 @@ interface CreatorLinkedShopsProps {
 
 export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, maxPromotions }: CreatorLinkedShopsProps) {
   return (
-    <section className="rounded-3xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a] p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
+    <section className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Your links</h2>
-        <span className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-white/60">
+        <span className="rounded-full border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-white/60">
           {shops.length}/{maxPromotions} promoting
         </span>
       </div>
       <div className="mt-4 grid gap-3">
         {shops.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-4 text-sm font-medium text-slate-500 dark:text-white/45">
+          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/30 p-4 text-sm font-medium text-slate-500 dark:text-white/45">
             Accept a shop request to get your first shareable link.
           </div>
         ) : shops.map((shop) => {
@@ -36,10 +36,10 @@ export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, ma
           const sellerId = Number(shop.seller_id);
           const isLeaving = leavingSellerId === sellerId;
           return (
-            <div key={shop.id} className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/30 p-4 text-slate-950 dark:text-white">
+            <div key={shop.id} className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/30 p-4 text-slate-950 dark:text-white">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.04]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04]">
                     {shop.avatar_url ? (
                       <img src={getImageUrl(shop.avatar_url)} alt={shop.shop_name || 'Shop'} className="h-full w-full object-cover" />
                     ) : (
@@ -63,7 +63,7 @@ export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, ma
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Button variant="outline" onClick={() => onCopy(link, shopUsername)} className="border-slate-300 dark:border-white/10 bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/5">
+                  <Button variant="outline" onClick={() => onCopy(link, shopUsername)} className="border-slate-300 dark:border-separator bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-fill">
                     <Copy className="mr-2 h-4 w-4" />
                     Copy link
                   </Button>
