@@ -1,5 +1,5 @@
 import { Button } from '@/shared/ui/button';
-import { Badge } from '@/shared/ui/badge';
+import { Input } from '@/shared/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Loader2, Package } from 'lucide-react';
 import type { Product } from '@/shared/types';
@@ -19,6 +19,12 @@ interface ProductInventoryDialogProps {
   onSave: () => void;
 }
 
+const STATUS_META = {
+  out: { label: 'Out of stock', className: 'text-sys-red bg-[color-mix(in_srgb,var(--sys-red)_16%,transparent)]' },
+  low: { label: 'Low stock', className: 'text-sys-orange bg-[color-mix(in_srgb,var(--sys-orange)_16%,transparent)]' },
+  ok: { label: 'In stock', className: 'text-sys-green bg-[color-mix(in_srgb,var(--sys-green)_16%,transparent)]' },
+} as const;
+
 export function ProductInventoryDialog({
   open,
   selectedProduct,
@@ -30,39 +36,43 @@ export function ProductInventoryDialog({
   onStockQuantityChange,
   onLowStockThresholdChange,
   onTrackInventoryChange,
-  onSave
+  onSave,
 }: ProductInventoryDialogProps) {
+  const status = stockQuantity === 0 ? 'out' : stockQuantity <= lowStockThreshold ? 'low' : 'ok';
+  const statusMeta = STATUS_META[status];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white w-[90vw] max-w-sm sm:max-w-[360px]">
+      <DialogContent className="w-[90vw] max-w-sm sm:max-w-[380px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Package className="h-5 w-5 text-emerald-400" />
-            Manage Inventory
+          <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
+            <Package className="h-5 w-5 text-label-2" />
+            Manage inventory
           </DialogTitle>
-          <DialogDescription className="text-slate-500 dark:text-white/60">
-            Update stock levels for {selectedProduct?.name}
-          </DialogDescription>
+          <DialogDescription>Update stock for {selectedProduct?.name}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          <div className="flex items-center justify-between p-4 seller-card-soft rounded-xl">
-            <div>
-              <label className="text-sm font-semibold text-slate-900 dark:text-white">Track Inventory</label>
-              <p className="text-xs text-slate-500 dark:text-white/60 mt-1 font-medium">Enable stock tracking for this product</p>
+        <div className="space-y-4 py-1">
+          <div className="flex items-center justify-between gap-3 rounded-card border border-separator bg-surface-1 p-4">
+            <div className="min-w-0">
+              <span className="block text-sm font-medium text-label">Track inventory</span>
+              <span className="mt-0.5 block text-[13px] text-label-3">Enable stock tracking for this product.</span>
             </div>
             <button
               type="button"
+              role="switch"
+              aria-checked={trackInventory}
+              aria-label="Track inventory"
               onClick={() => onTrackInventoryChange(!trackInventory)}
               className={cn(
-                'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-                trackInventory ? 'bg-emerald-500' : 'bg-zinc-700'
+                'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ease-ios',
+                trackInventory ? 'bg-brand' : 'bg-fill-2'
               )}
             >
               <span
                 className={cn(
-                  'inline-block h-4 w-4 transform rounded-full bg-white/95 transition-transform shadow-md',
-                  trackInventory ? 'translate-x-6' : 'translate-x-1'
+                  'inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ease-ios',
+                  trackInventory ? 'translate-x-[22px]' : 'translate-x-0.5'
                 )}
               />
             </button>
@@ -70,72 +80,51 @@ export function ProductInventoryDialog({
 
           {trackInventory && (
             <>
-              <div className="space-y-2">
-                <label className="seller-label text-sm font-semibold">Current Stock</label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    min="0"
-                    value={stockQuantity}
-                    onChange={(event) => onStockQuantityChange(Math.max(0, Number.parseInt(event.target.value, 10) || 0))}
-                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-separator rounded-xl text-slate-900 dark:text-white font-mono text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50"
-                    placeholder="0"
-                  />
-                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <Badge
-                      className={cn(
-                        'font-bold',
-                        stockQuantity === 0
-                          ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                          : stockQuantity <= lowStockThreshold
-                            ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                            : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                      )}
-                    >
-                      {stockQuantity === 0 ? 'OUT' : stockQuantity <= lowStockThreshold ? 'LOW' : 'OK'}
-                    </Badge>
-                  </div>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="inv-stock" className="text-sm font-medium text-label-2">Current stock</label>
+                  <span className={cn('rounded-full px-2 py-0.5 text-[12px] font-medium', statusMeta.className)}>
+                    {statusMeta.label}
+                  </span>
                 </div>
+                <Input
+                  id="inv-stock"
+                  type="number"
+                  min="0"
+                  value={stockQuantity}
+                  onChange={(event) => onStockQuantityChange(Math.max(0, Number.parseInt(event.target.value, 10) || 0))}
+                  placeholder="0"
+                />
               </div>
 
-              <div className="space-y-2">
-                <label className="seller-label text-sm font-semibold">Low Stock Alert Threshold</label>
-                <input
+              <div className="space-y-1.5">
+                <label htmlFor="inv-threshold" className="text-sm font-medium text-label-2">Low-stock alert</label>
+                <Input
+                  id="inv-threshold"
                   type="number"
                   min="1"
                   value={lowStockThreshold}
                   onChange={(event) => onLowStockThresholdChange(Math.max(1, Number.parseInt(event.target.value, 10) || 5))}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-separator rounded-xl text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50"
                   placeholder="5"
                 />
-                <p className="text-xs text-slate-500 dark:text-white/60 font-medium">
-                  You'll receive an email alert when stock falls to or below this level
-                </p>
+                <p className="text-[13px] text-label-3">Email alert when stock falls to or below this level.</p>
               </div>
             </>
           )}
         </div>
 
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            className="border-slate-200 dark:border-separator bg-transparent text-zinc-300 hover:bg-fill font-semibold"
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={onSave}
-            disabled={updatingStock}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-slate-900 dark:text-white hover:from-emerald-600 hover:to-emerald-700 font-bold shadow-md"
-          >
+          <Button onClick={onSave} disabled={updatingStock}>
             {updatingStock ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Updating...
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Updating…
               </>
             ) : (
-              'Save Changes'
+              'Save changes'
             )}
           </Button>
         </DialogFooter>
@@ -143,5 +132,3 @@ export function ProductInventoryDialog({
     </Dialog>
   );
 }
-
-
