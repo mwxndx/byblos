@@ -5,6 +5,19 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Apple-feel icons ──────────────────────────────────────────────
+   Byblos ships lucide (Apple's SF Symbols can't be licensed off-Apple).
+   Refine every lucide glyph app-wide toward SF Symbols' rounded, slightly
+   lighter line work with one rule instead of touching 130+ call sites.
+   Scoped to .lucide so recharts lines and hand-rolled SVGs are untouched;
+   the CSS stroke-width overrides lucide's default 2 and is inherited by the
+   child paths, so one declaration re-weights the whole icon set. */
+svg.lucide {
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 html {
     font-size: 14px;
 }
