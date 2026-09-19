@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { cn } from '@/shared/utils/formatting';
 import { money, type AnalysisPeriod, type AnalysisRow, type BusinessEarningRow } from '@/features/creator/utils/creatorDashboardUtils';
 
 interface CreatorAnalysisChartsProps {
@@ -11,13 +12,13 @@ interface CreatorAnalysisChartsProps {
 
 const PERIODS: AnalysisPeriod[] = ['daily', 'weekly', 'monthly', 'yearly'];
 
-const axisStroke = 'var(--byblos-subtext, rgba(255,255,255,0.45))';
-const gridStroke = 'var(--byblos-border, rgba(255,255,255,0.08))';
+const axisStroke = 'var(--label-3)';
+const gridStroke = 'var(--separator)';
 const tooltipStyle = {
-  background: 'var(--byblos-card-bg, #050505)',
-  border: '1px solid var(--byblos-border, rgba(255,255,255,0.12))',
-  color: 'var(--byblos-text, #ffffff)',
-  borderRadius: 12
+  background: 'var(--surface-2)',
+  border: '1px solid var(--separator)',
+  color: 'var(--label)',
+  borderRadius: 12,
 };
 
 export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeriod, setAnalysisPeriod }: CreatorAnalysisChartsProps) {
@@ -49,20 +50,19 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
   }, [periods, businessEarnings, selectedBusiness]);
 
   return (
-    <div className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 text-slate-950 dark:text-white shadow-sm transition-colors duration-200">
+    <section className="rounded-card border border-separator bg-surface-1 p-4 text-label">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold text-slate-950 dark:text-white">How you're doing</h2>
-        <div className="grid grid-cols-4 rounded-2xl border border-slate-200 dark:border-separator bg-slate-200/60 dark:bg-black/30 p-1 text-xs font-semibold">
+        <h2 className="text-base font-semibold">Performance</h2>
+        <div className="grid grid-cols-4 gap-1 rounded-control bg-fill p-1 text-xs font-medium">
           {PERIODS.map((period) => (
             <button
               key={period}
               type="button"
               onClick={() => setAnalysisPeriod(period)}
-              className={`rounded-xl px-2.5 py-2 capitalize transition-all ${
-                analysisPeriod === period
-                  ? 'bg-yellow-400 text-black font-extrabold shadow-sm'
-                  : 'text-slate-600 dark:text-white/50 hover:text-slate-900 dark:hover:text-white'
-              }`}
+              className={cn(
+                'rounded-[7px] px-2.5 py-1.5 capitalize transition-colors ease-ios',
+                analysisPeriod === period ? 'bg-brand text-brand-on' : 'text-label-2 hover:text-label'
+              )}
             >
               {period}
             </button>
@@ -70,29 +70,27 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
         </div>
       </div>
 
-      {/* Commission earnings */}
-      <div className="mt-4 h-56 rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/20 p-3">
-        <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-white/40">Commission earnings</p>
+      <div className="mt-4 h-56 rounded-control border border-separator bg-surface-2 p-3">
+        <p className="mb-2 text-xs font-medium text-label-3">Commission earnings</p>
         <ResponsiveContainer width="100%" height="88%">
           <LineChart data={commissionData}>
             <CartesianGrid stroke={gridStroke} vertical={false} />
             <XAxis dataKey="period" stroke={axisStroke} fontSize={11} />
             <YAxis stroke={axisStroke} fontSize={11} />
             <Tooltip formatter={(value) => money(value as number)} contentStyle={tooltipStyle} />
-            <Line type="monotone" dataKey="commission" name="Commission" stroke="#38bdf8" strokeWidth={3} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="commission" name="Commission" stroke="var(--sys-blue)" strokeWidth={2.5} dot={{ r: 3 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Invited-business earnings (KSh 3) with business + period switching */}
-      <div className="mt-4 h-64 rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-black/20 p-3">
+      <div className="mt-4 h-64 rounded-control border border-separator bg-surface-2 p-3">
         <div className="mb-2 flex items-center justify-between gap-2">
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-slate-500 dark:text-white/40">Invited-business earnings</p>
+          <p className="text-xs font-medium text-label-3">Invited-business earnings</p>
           <select
             value={selectedBusiness}
             onChange={(e) => setSelectedBusiness(e.target.value)}
             aria-label="Filter by business"
-            className="h-8 rounded-lg border border-slate-300 dark:border-separator bg-white dark:bg-[#141414] px-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-yellow-400"
+            className="h-8 rounded-control border border-separator-strong bg-surface-1 px-2 text-xs font-medium text-label focus:outline-none focus:ring-2 focus:ring-yellow-400/60"
           >
             <option value="all">All businesses</option>
             {businesses.map((b) => (
@@ -101,7 +99,7 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
           </select>
         </div>
         {businesses.length === 0 ? (
-          <div className="flex h-[80%] items-center justify-center text-center text-xs font-medium text-slate-400 dark:text-white/40">
+          <div className="flex h-[80%] items-center justify-center text-center text-xs font-medium text-label-3">
             Invite a business with your referral link to start earning KSh 3 per sale.
           </div>
         ) : (
@@ -111,11 +109,11 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
               <XAxis dataKey="period" stroke={axisStroke} fontSize={11} />
               <YAxis stroke={axisStroke} fontSize={11} />
               <Tooltip formatter={(value) => money(value as number)} contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="earnings" name="Invited-business" stroke="#22c55e" strokeWidth={3} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="earnings" name="Invited-business" stroke="var(--sys-green)" strokeWidth={2.5} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
-    </div>
+    </section>
   );
 }
