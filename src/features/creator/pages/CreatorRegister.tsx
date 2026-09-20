@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Check, Eye, EyeOff, Loader2, X } from 'lucide-react';
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, X } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { useCreatorRegisterMutation } from '@/features/creator/hooks/mutations/useCreatorAuthMutations';
 import { useCreatorInviteQuery } from '@/features/creator/hooks/queries/useCreatorInviteQuery';

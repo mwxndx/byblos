@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, ArrowRight, Mail } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { toast } from 'sonner';
 import { useBuyerVerifyEmailMutation, useBuyerResendVerificationMutation } from '@/features/buyer/hooks/mutations/useBuyerAuthMutations';

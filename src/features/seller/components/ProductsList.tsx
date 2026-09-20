@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
-import { Loader2, Plus, Search } from 'lucide-react';
+import { Loader2, Plus, Search } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { useToast } from '@/shared/hooks/use-toast';

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Instagram, Loader2, MessageCircle, Sparkles } from 'lucide-react';
+import { Instagram, Loader2, MessageCircle, Sparkles } from '@/shared/ui/icons';
 import { ScaledFounderCard, StoryShareFrame, exportCardAsPng } from '@/features/membership/components/FounderCard';
 import { useMembership, useJoinMembership } from '@/features/membership/hooks/useMembership';
 import { shareCardToInstagram, shareCardToWhatsApp } from '@/shared/utils/socialShare';

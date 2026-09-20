@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { Loader2, Store, Package, ExternalLink, Sparkles } from 'lucide-react';
+import { Loader2, Store, Package, ExternalLink, Sparkles } from '@/shared/ui/icons';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
 import { BagProvider } from '@/features/shop/bag/BagContext';
 import { BagSheet } from '@/features/shop/components/BagSheet';

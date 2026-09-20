@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { AlertCircle, CheckCircle2, Loader2, Wallet, Info } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Wallet, Info } from '@/shared/ui/icons';
 
 interface RefundConfirmDialogProps {
   open: boolean;

@@ -1,5 +1,5 @@
 import { type ChangeEvent } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
 import type { AppTheme } from '@/shared/hooks/useAppTheme';
 

@@ -6,7 +6,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
 import { useToast } from '@/shared/hooks/use-toast';
-import { Mail, ArrowLeft, Loader2, ShoppingBag, KeyRound } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2, ShoppingBag, KeyRound } from '@/shared/ui/icons';
 
 export function BuyerForgotPassword() {
     const { toast } = useToast();

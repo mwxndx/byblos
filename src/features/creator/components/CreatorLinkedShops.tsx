@@ -1,4 +1,4 @@
-import { Copy, LogOut, Loader2, Store, ExternalLink } from 'lucide-react';
+import { Copy, LogOut, Loader2, Store, ExternalLink } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { getCreatorShopUrl, getShopUsername, resolveShareOrigin } from '@/shared/utils/shopLinks';
 import { getImageUrl } from '@/shared/utils/formatting';

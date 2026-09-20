@@ -14,7 +14,7 @@ import {
   type AddProductFormData,
   type FormErrors,
 } from '../utils/addProductFormUtils';
-import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles } from '@/shared/ui/icons';
 
 const TOTAL_STEPS = 2;
 

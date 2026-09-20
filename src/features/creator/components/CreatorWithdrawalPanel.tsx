@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Clock, Info, Loader2, Wallet } from 'lucide-react';
+import { Clock, Info, Loader2, Wallet } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

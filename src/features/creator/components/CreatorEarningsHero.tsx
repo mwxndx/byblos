@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowUpRight, ChevronRight, Clock, Share2, Store, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ChevronRight, Clock, Share2, Store, ChevronDown, ChevronUp, Sparkles } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { money, formatSettlementDate } from '@/features/creator/utils/creatorDashboardUtils';
 

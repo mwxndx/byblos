@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { ArrowLeft, Eye, EyeOff, Loader2, Store } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Loader2, Store } from '@/shared/ui/icons';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { getFreshCsrfToken } from '@/infrastructure/http/apiClient';
 import { VerifyEmailModal } from '@/features/auth/components/VerifyEmailModal';

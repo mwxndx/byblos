@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseDashboardLayout } from './BaseDashboardLayout';
-import { LayoutDashboard, Megaphone, TrendingUp, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Megaphone, TrendingUp, BarChart3 } from '@/shared/ui/icons';
 
 export function MarketingLayout() {
   const marketingNavItems = [

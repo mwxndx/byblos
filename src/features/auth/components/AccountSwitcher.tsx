@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronDown, Loader2, Megaphone, Plus, ShoppingBag, Store, type LucideIcon } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Megaphone, Plus, ShoppingBag, Store, type LucideIcon } from '@/shared/ui/icons';
 import {
   DropdownMenu,
   DropdownMenuContent,

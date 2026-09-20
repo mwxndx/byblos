@@ -1,4 +1,4 @@
-import { Search, Activity, DollarSign, TrendingUp, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Search, Activity, DollarSign, TrendingUp, CheckCircle, XCircle, Loader2 } from '@/shared/ui/icons';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';

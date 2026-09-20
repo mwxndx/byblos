@@ -1,4 +1,4 @@
-import { Search, Users2, Store, Mail } from 'lucide-react';
+import { Search, Users2, Store, Mail } from '@/shared/ui/icons';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { AdminPaginationControls } from './AdminPaginationControls';

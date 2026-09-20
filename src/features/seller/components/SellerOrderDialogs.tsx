@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { Truck, RefreshCw, CheckCircle, XCircle, Package, MapPin, CreditCard } from 'lucide-react';
+import { Truck, RefreshCw, CheckCircle, XCircle, Package, MapPin, CreditCard } from '@/shared/ui/icons';
 import LocationPicker from '@/shared/components/LocationPicker';
 import type { ApiOrder } from '@/shared/types';
 import { formatCurrency, HUB_DROPOFF_LOCATION } from '../utils/sellerOrders.utils';

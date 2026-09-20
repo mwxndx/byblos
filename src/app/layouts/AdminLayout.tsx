@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseDashboardLayout } from './BaseDashboardLayout';
-import { LayoutDashboard, Users, ShoppingBag, ShieldCheck, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, ShoppingBag, ShieldCheck, Settings } from '@/shared/ui/icons';
 
 export function AdminLayout() {
   const adminNavItems = [

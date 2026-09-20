@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseDashboardLayout } from './BaseDashboardLayout';
-import { LayoutDashboard, Share2, DollarSign, Award } from 'lucide-react';
+import { LayoutDashboard, Share2, DollarSign, Award } from '@/shared/ui/icons';
 
 export function CreatorLayout() {
   const creatorNavItems = [

@@ -1,4 +1,4 @@
-import { Bell } from 'lucide-react';
+import { Bell } from '@/shared/ui/icons';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { IconButton } from '@/shared/ui/icon-button';
 import { cn } from '@/shared/utils/formatting';

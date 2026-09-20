@@ -2,7 +2,7 @@ import { Button } from '@/shared/ui/button';
 import { IconButton } from '@/shared/ui/icon-button';
 import { Badge } from '@/shared/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table';
-import { Edit, EyeOff, Handshake, Loader2, Package, Trash2 } from 'lucide-react';
+import { Edit, EyeOff, Handshake, Loader2, Package, Trash2 } from '@/shared/ui/icons';
 import type { Product } from '@/shared/types';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 type ProductWithApiFields = Product & Partial<ApiSellerProduct>;

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { toast } from '@/shared/hooks/use-toast';
-import { Loader2, UploadCloud, X, Image as ImageIcon } from 'lucide-react';
+import { Loader2, UploadCloud, X, Image as ImageIcon } from '@/shared/ui/icons';
 import { useUploadBusinessPhotoMutation } from '@/features/seller/hooks/useSellerProfile';
 import { getImageUrl } from '@/shared/utils/formatting';
 

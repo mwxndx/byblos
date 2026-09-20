@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import { DollarSign, Loader2, Clock, Wallet, TrendingUp, CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { DollarSign, Loader2, Clock, Wallet, TrendingUp, CheckCircle2, AlertCircle, Info } from '@/shared/ui/icons';
 import { RefundConfirmDialog } from './RefundConfirmDialog';
 import { useRefundCard } from '@/features/buyer/hooks/useRefundCard';
 import { formatSettlementDate, formatSettlementTimeOnly } from '@/features/buyer/utils/refundUtils';

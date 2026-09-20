@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, Package, RefreshCw, Search } from 'lucide-react';
+import { ArrowRight, Package, RefreshCw, Search } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { EmptyState } from '@/shared/ui/empty-state';

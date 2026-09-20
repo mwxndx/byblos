@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronDown, Moon, Sun } from 'lucide-react';
+import { ChevronDown, Moon, Sun } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
 
 export type ShopPageTheme = 'system' | 'light' | 'dark';

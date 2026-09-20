@@ -1,4 +1,4 @@
-import { Shield } from 'lucide-react';
+import { Shield } from '@/shared/ui/icons';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 
 export function AdminDashboardHeader() {

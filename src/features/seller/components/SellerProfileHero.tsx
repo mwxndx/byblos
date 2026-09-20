@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link2, Pencil } from 'lucide-react';
+import { Link2, Pencil } from '@/shared/ui/icons';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 import { SellerMediaEditDialog } from './SellerMediaEditDialog';
 

@@ -3,7 +3,7 @@ import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
 import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Calendar as CalendarIcon, Clock, MapPin, Edit2, Loader2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, MapPin, Edit2, Loader2 } from '@/shared/ui/icons';
 import LocationPicker from '@/shared/components/LocationPicker';
 import { Product } from '@/shared/types';
 import { hasPreciseLocation, type BuyerLocationPayload } from '@/infrastructure/location/location';

@@ -1,5 +1,5 @@
 import { useRef, useState, type TouchEvent } from 'react';
-import { Calendar, ChevronDown, Loader2, MapPin, Minus, Plus, ShoppingBag, Trash2, Truck } from 'lucide-react';
+import { Calendar, ChevronDown, Loader2, MapPin, Minus, Plus, ShoppingBag, Trash2, Truck } from '@/shared/ui/icons';
 import { format } from 'date-fns';
 import { formatCurrency, getImageUrl } from '@/shared/utils/formatting';
 import { Input } from '@/shared/ui/input';

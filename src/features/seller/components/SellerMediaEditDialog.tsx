@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Trash2, UploadCloud } from 'lucide-react';
+import { Loader2, Trash2, UploadCloud } from '@/shared/ui/icons';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { toast } from '@/shared/hooks/use-toast';

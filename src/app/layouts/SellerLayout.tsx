@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { SellerDashboardLayout } from '@/app/layouts/BaseDashboardLayout';
-import { Home, ShoppingBag, Settings } from 'lucide-react';
+import { Home, ShoppingBag, Settings } from '@/shared/ui/icons';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 

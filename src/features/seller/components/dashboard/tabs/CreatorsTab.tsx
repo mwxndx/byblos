@@ -14,7 +14,7 @@ import {
   Instagram,
   Info,
   Trash2
-} from 'lucide-react';
+} from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

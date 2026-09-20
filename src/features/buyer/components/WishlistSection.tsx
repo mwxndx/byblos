@@ -1,4 +1,4 @@
-import { Heart, Search } from 'lucide-react';
+import { Heart, Search } from '@/shared/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useWishlist } from '@/features/buyer/hooks/useWishlist';

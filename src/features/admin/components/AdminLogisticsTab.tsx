@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Clock, ShieldCheck, Truck } from 'lucide-react';
+import { AlertTriangle, Clock, ShieldCheck, Truck } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { adminApi, type AdminLogisticsStatusFilter } from '@/features/admin/api';
 import { adminQueryKeys } from '@/features/admin/api/queryKeys';

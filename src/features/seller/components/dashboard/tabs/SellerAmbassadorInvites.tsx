@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Copy, MailPlus } from 'lucide-react';
+import { Copy, MailPlus } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

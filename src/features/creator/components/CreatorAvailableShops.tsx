@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Store, ExternalLink, Send, Check, Clock, Loader2, MapPin, Package } from 'lucide-react';
+import { Store, ExternalLink, Send, Check, Clock, Loader2, MapPin, Package } from '@/shared/ui/icons';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';

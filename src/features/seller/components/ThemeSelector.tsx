@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/shared/ui/button';
-import { Palette, Loader2 } from 'lucide-react';
+import { Palette, Loader2 } from '@/shared/ui/icons';
 import type { Theme } from '@/features/seller/api';
 import { useUpdateThemeMutation } from '@/features/seller/hooks/useSellerProfile';
 import { useToast } from '@/shared/hooks/use-toast';

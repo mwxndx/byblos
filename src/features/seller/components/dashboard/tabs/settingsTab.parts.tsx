@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Trash2 } from '@/shared/ui/icons';
 import { Input } from '@/shared/ui/input';
 import { socialUrl } from '@/features/shop/utils/socialLinks';
 

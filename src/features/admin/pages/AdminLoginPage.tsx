@@ -4,7 +4,7 @@ import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
-import { Loader2, Shield, Lock, Mail } from 'lucide-react';
+import { Loader2, Shield, Lock, Mail } from '@/shared/ui/icons';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 
 export const AdminLoginPage = () => {

@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
-import { Edit, EyeOff, Handshake, Heart, Loader2, MoreVertical, Package, Trash2 } from 'lucide-react';
+import { Edit, EyeOff, Handshake, Heart, Loader2, MoreVertical, Package, Trash2 } from '@/shared/ui/icons';
 import type { Product } from '@/shared/types';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 type ProductWithApiFields = Product & Partial<ApiSellerProduct>;

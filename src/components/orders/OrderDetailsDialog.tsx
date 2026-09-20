@@ -1,6 +1,6 @@
 import { Button } from '@/shared/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { Package, Users } from 'lucide-react';
+import { Package, Users } from '@/shared/ui/icons';
 import type { ApiOrder } from '@/shared/types';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { canConfirmOrderReceipt, formatOrderCurrency, formatOrderDate, getConfirmReceiptLabel, getPaymentStatusBadge } from '@/features/orders/utils/ordersSectionUtils';

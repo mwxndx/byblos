@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { LogOut, ArrowLeft, Menu, X } from 'lucide-react';
+import { LogOut, ArrowLeft, Menu, X } from '@/shared/ui/icons';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { cn } from '@/shared/utils/formatting';
 import { useGlobalAuth, UserRole } from '@/features/auth/contexts';

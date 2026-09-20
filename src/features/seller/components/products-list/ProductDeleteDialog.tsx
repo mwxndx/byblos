@@ -1,6 +1,6 @@
 import { Button } from '@/shared/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@/shared/ui/icons';
 
 interface ProductDeleteDialogProps {
   open: boolean;

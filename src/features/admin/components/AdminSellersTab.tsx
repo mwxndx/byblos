@@ -1,4 +1,4 @@
-import { Search, Store, MapPin, Eye, XCircle, Loader2 } from 'lucide-react';
+import { Search, Store, MapPin, Eye, XCircle, Loader2 } from '@/shared/ui/icons';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Badge } from '@/shared/ui/badge';

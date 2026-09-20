@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck } from 'lucide-react';
+import { Bell, CheckCheck } from '@/shared/ui/icons';
 import { useNotifications, type AppNotification } from '@/features/notifications/hooks/useNotifications';
 
 function timeAgo(iso: string): string {

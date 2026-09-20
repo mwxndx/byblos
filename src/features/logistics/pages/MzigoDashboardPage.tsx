@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarClock, CheckCircle2, LogOut, PackageCheck, RefreshCw, Truck } from 'lucide-react';
+import { ArrowLeft, CalendarClock, CheckCircle2, LogOut, PackageCheck, RefreshCw, Truck } from '@/shared/ui/icons';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';

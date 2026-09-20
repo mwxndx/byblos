@@ -12,7 +12,7 @@ import { format, isValid, parseISO } from 'date-fns';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { SellerOrderCard } from './SellerOrderCard';
 
-import { Clock, Package, Truck, CheckCircle, RefreshCw, XCircle, Calendar, User, Download, MapPin, CreditCard } from 'lucide-react';
+import { Clock, Package, Truck, CheckCircle, RefreshCw, XCircle, Calendar, User, Download, MapPin, CreditCard } from '@/shared/ui/icons';
 import { useToast } from '@/shared/hooks/use-toast';
 import { exportOrdersToCSV } from '@/shared/utils/exportUtils';
 import {

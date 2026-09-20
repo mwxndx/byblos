@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Store,
   Truck,
-} from 'lucide-react';
+} from '@/shared/ui/icons';
 import type { ApiOrder, ApiOrderLogisticsDeliveryLeg } from '@/shared/types';
 import {
   MZIGO_CBD_HUB,

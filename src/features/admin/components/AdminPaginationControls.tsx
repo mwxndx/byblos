@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import type { PaginationMeta } from '../types/dashboard';
 

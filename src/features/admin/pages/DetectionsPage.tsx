@@ -3,7 +3,7 @@ import { EmptyState } from '@/shared/ui/empty-state';
 import { Textarea } from '@/shared/ui/textarea';
 import { Label } from '@/shared/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/ui/dialog';
-import { ShieldAlert, Loader2 } from 'lucide-react';
+import { ShieldAlert, Loader2 } from '@/shared/ui/icons';
 import { DetectionCard } from '../components/DetectionCard';
 import { useDetections } from '../hooks/useDetections';
 

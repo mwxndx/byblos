@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { OrderStatusBadge } from '@/shared/ui/OrderStatusBadge';
-import { ChevronDown, Download, Loader2, Package } from 'lucide-react';
+import { ChevronDown, Download, Loader2, Package } from '@/shared/ui/icons';
 import type { ApiOrder } from '@/shared/types';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
 import { getOrderInstruction } from '@/features/orders/utils/orderInstructions';

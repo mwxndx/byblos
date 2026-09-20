@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Calendar, CheckCircle, ChevronDown, Clock, MapPin, Package, Truck, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle, ChevronDown, Clock, MapPin, Package, Truck, XCircle } from '@/shared/ui/icons';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/utils/formatting';

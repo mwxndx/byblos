@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { toast } from '@/shared/hooks/use-toast';
 

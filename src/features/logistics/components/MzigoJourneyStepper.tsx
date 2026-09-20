@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, Clock } from 'lucide-react';
+import { AlertTriangle, Check, Clock } from '@/shared/ui/icons';
 import { JOURNEY_STEPS, type Journey } from '../utils/mzigoJourney';
 
 /**

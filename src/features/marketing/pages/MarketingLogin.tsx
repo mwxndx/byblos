@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, Loader2, Lock, Mail } from 'lucide-react';
+import { BarChart3, Loader2, Lock, Mail } from '@/shared/ui/icons';
 import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';
 import { getFreshCsrfToken } from '@/infrastructure/http/apiClient';
 import { classifyApiError } from '@/shared/utils/errorClassification';

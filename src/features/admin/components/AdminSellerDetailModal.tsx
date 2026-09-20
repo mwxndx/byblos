@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
 import { AdminSellerRecentOrders } from './AdminSellerRecentOrders';
 import { format } from 'date-fns';
-import { Activity, ArrowUpRight, Calendar, DollarSign, Facebook, Globe, Heart, Instagram, Loader2, Mail, MapPin, Music2, Package, Percent, ShoppingBag, ShoppingCart, Store, TrendingUp, User, UserCircle, Users2, X } from 'lucide-react';
+import { Activity, ArrowUpRight, Calendar, DollarSign, Facebook, Globe, Heart, Instagram, Loader2, Mail, MapPin, Music2, Package, Percent, ShoppingBag, ShoppingCart, Store, TrendingUp, User, UserCircle, Users2, X } from '@/shared/ui/icons';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
 
 export interface SellerDetail {

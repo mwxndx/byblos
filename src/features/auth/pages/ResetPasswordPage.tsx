@@ -5,7 +5,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { useToast } from '@/shared/hooks/use-toast';
 import { useResetPasswordMutation } from '@/features/seller/hooks/mutations/useSellerAuthMutations';
-import { Loader2, ArrowLeft, Eye, EyeOff, Lock, Check, X, ShieldCheck } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, EyeOff, Lock, Check, X, ShieldCheck } from '@/shared/ui/icons';
 import { LoadingScreen as RouteFallback } from '@/shared/components/LoadingScreen';
 
 export function ResetPasswordPage() {

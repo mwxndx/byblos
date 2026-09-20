@@ -1,6 +1,6 @@
 import { format, isValid } from 'date-fns';
 import { Badge } from '@/shared/ui/badge';
-import { CheckCircle, Clock, Package, Truck, XCircle } from 'lucide-react';
+import { CheckCircle, Clock, Package, Truck, XCircle } from '@/shared/ui/icons';
 import type { PaymentStatus, ApiOrder, ApiOrderItem } from '@/shared/types';
 
 type DateLike = string | Date | { createdAt?: string | Date; created_at?: string | Date };

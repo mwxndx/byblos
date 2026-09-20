@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { ArrowLeft, Eye, EyeOff, Loader2, Truck } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Loader2, Truck } from '@/shared/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';

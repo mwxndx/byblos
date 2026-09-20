@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, ShieldCheck } from 'lucide-react';
+import { FileText, ShieldCheck } from '@/shared/ui/icons';
 import TermsModal from './TermsModal';
 
 /**

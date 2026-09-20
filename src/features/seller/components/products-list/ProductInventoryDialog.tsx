@@ -1,7 +1,7 @@
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { Loader2, Package } from 'lucide-react';
+import { Loader2, Package } from '@/shared/ui/icons';
 import type { Product } from '@/shared/types';
 import { cn } from '@/shared/utils/formatting';
 

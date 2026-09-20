@@ -2,7 +2,7 @@ import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff, Check, X } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff, Check, X } from '@/shared/ui/icons';
 import { locationData } from '@/shared/utils/constants';
 import { checkPasswordStrength, type BuyerRegisterFormData } from '@/features/buyer/utils/buyerRegisterUtils';
 

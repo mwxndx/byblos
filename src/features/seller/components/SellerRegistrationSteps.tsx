@@ -3,7 +3,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Store, Globe, Check, X, Eye, EyeOff } from 'lucide-react';
+import { Store, Globe, Check, X, Eye, EyeOff } from '@/shared/ui/icons';
 import ShopLocationPicker from '@/shared/components/ShopLocationPicker';
 import { checkPasswordStrength, locationData, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
 

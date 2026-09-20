@@ -1,4 +1,4 @@
-import { ChevronDown, MapPin } from 'lucide-react';
+import { ChevronDown, MapPin } from '@/shared/ui/icons';
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 
 const SUPPORTED_CITIES = ['Nairobi'] as const;

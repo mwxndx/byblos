@@ -1,4 +1,4 @@
-import { Download, Info, Wallet, X } from 'lucide-react';
+import { Download, Info, Wallet, X } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { IconButton } from '@/shared/ui/icon-button';
 import { Input } from '@/shared/ui/input';

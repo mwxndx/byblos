@@ -98,7 +98,7 @@ export default defineConfig(({ command, mode }) => {
         output: {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-slot', 'lucide-react', 'class-variance-authority', 'clsx', 'tailwind-merge'],
+            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-slot', '@phosphor-icons/react', 'class-variance-authority', 'clsx', 'tailwind-merge'],
             // lodash removed: declared as a dependency but never imported
             // anywhere in src/ -- confirmed via grep. Dead weight in both
             // package.json and this chunking config.

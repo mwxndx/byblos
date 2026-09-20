@@ -1,4 +1,4 @@
-import { Instagram } from 'lucide-react';
+import { Instagram } from '@/shared/ui/icons';
 
 const Footer = () => {
   return (

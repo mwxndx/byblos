@@ -1,4 +1,4 @@
-import { BarChart3, Package, Settings, ShoppingBag, Users, Wallet } from 'lucide-react';
+import { BarChart3, Package, Settings, ShoppingBag, Users, Wallet } from '@/shared/ui/icons';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import type { SellerTabId } from '../types';
 

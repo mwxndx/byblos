@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowUpRight, BadgeDollarSign, Clock, Heart, Megaphone, MousePointerClick, Package, PackagePlus, ShoppingBag, Wallet } from 'lucide-react';
+import { ArrowUpRight, BadgeDollarSign, Clock, Heart, Megaphone, MousePointerClick, Package, PackagePlus, ShoppingBag, Wallet } from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
 import { Badge } from '@/shared/ui/badge';
 import { formatOrderStatusLabel, getPendingStatusStyles } from '../dashboardUtils';

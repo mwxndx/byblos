@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, ShieldCheck, Trash2 } from 'lucide-react';
+import { ArrowLeft, Mail, ShieldCheck, Trash2 } from '@/shared/ui/icons';
 
 const SUPPORT_EMAIL = 'bybloshqke@zohomail.com';
 

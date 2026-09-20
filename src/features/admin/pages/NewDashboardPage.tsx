@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent } from "@/shared/ui/tabs";
 import { Spinner } from "@/shared/ui/spinner";
-import { Package, ShoppingCart, UserPlus, UserCircle, DollarSign, Activity, Users, XCircle } from 'lucide-react';
+import { Package, ShoppingCart, UserPlus, UserCircle, DollarSign, Activity, Users, XCircle } from '@/shared/ui/icons';
 import RefundRequestsPage from './RefundRequestsPage';
 import DetectionsPage from './DetectionsPage';
 import { AdminEntityModals } from '../components/AdminEntityModals';

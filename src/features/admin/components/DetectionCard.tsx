@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { Card, CardContent, CardHeader } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import { ShieldAlert, CheckCircle2, Undo2, User, Package } from 'lucide-react';
+import { ShieldAlert, CheckCircle2, Undo2, User, Package } from '@/shared/ui/icons';
 import type { FlaggedEarning } from '../types/detections';
 
 interface DetectionCardProps {

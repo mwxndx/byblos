@@ -1,5 +1,5 @@
 import { useState, type MouseEvent } from 'react';
-import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Info, Package, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Info, Package, X } from '@/shared/ui/icons';
 import { Card } from '@/shared/ui/card';
 import type { Product } from '@/shared/types';
 import { cn, formatCurrency, getImageUrl } from '@/shared/utils/formatting';

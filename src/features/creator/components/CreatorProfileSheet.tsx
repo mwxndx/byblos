@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LogOut, Mail, MessageCircle, Phone, UserRound, Loader2, Lock } from 'lucide-react';
+import { LogOut, Mail, MessageCircle, Phone, UserRound, Loader2, Lock } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import { Button } from '@/shared/ui/button';

@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
-import { Mail, Loader2, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { Mail, Loader2, RefreshCw, CheckCircle2 } from '@/shared/ui/icons';
 
 export interface VerifyEmailModalViewProps {
   isOpen: boolean;

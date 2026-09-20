@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { Eye, EyeOff, Loader2, Lock, ArrowLeft, ShoppingBag, Check, X } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, ArrowLeft, ShoppingBag, Check, X } from '@/shared/ui/icons';
 import { LoadingScreen as RouteFallback } from '@/shared/components/LoadingScreen';
 import { useBuyerResetPassword } from '@/features/buyer/hooks/useBuyerResetPassword';
 

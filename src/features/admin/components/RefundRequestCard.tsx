@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
-import { CheckCircle, User, Phone, XCircle } from 'lucide-react';
+import { CheckCircle, User, Phone, XCircle } from '@/shared/ui/icons';
 import type { ReactNode } from 'react';
 import type { RefundRequest } from '../types/refunds';
 

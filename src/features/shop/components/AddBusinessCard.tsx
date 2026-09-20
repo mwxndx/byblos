@@ -1,6 +1,6 @@
 import { useRef, type TouchEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp } from '@/shared/ui/icons';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 
 const SWIPE_UP_THRESHOLD_PX = 40;

@@ -7,7 +7,7 @@ import {
     Users,
     MousePointerClick,
     Heart
-} from 'lucide-react';
+} from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
 
 interface AnalyticsData {

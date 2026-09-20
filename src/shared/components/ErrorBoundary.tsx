@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 

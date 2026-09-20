@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Store, UserMinus } from 'lucide-react';
+import { MapPin, Store, UserMinus } from '@/shared/ui/icons';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
 import { useKnockSellerMutation } from '@/features/shop/hooks/useShopQueries';
 import type { ApiPublicSeller } from '@/shared/types/api/seller';

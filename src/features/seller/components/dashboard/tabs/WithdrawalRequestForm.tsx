@@ -1,4 +1,4 @@
-import { Loader2, Wallet } from 'lucide-react';
+import { Loader2, Wallet } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';

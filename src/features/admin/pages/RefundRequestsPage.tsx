@@ -4,7 +4,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Textarea } from '@/shared/ui/textarea';
 import { Label } from '@/shared/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/ui/dialog';
-import { CheckCircle, XCircle, Clock, DollarSign, Loader2, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, DollarSign, Loader2, AlertTriangle } from '@/shared/ui/icons';
 import { RefundRequestCard } from '../components/RefundRequestCard';
 import type { RefundRequest } from '../types/refunds';
 import { useRefundRequests } from '../hooks/useRefundRequests';

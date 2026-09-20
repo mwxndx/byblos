@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseDashboardLayout } from './BaseDashboardLayout';
-import { LayoutDashboard, Truck, MapPin, PackageCheck } from 'lucide-react';
+import { LayoutDashboard, Truck, MapPin, PackageCheck } from '@/shared/ui/icons';
 
 export function MzigoLayout() {
   const mzigoNavItems = [

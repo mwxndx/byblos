@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, UserRound } from 'lucide-react';
+import { ChevronDown, ChevronUp, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, UserRound } from '@/shared/ui/icons';
 import { LogisticsLegType, LogisticsRequestCard, LogisticsStatusUpdate } from '@/features/logistics/api';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { deadlineText, formatCurrency, formatDate, statusLabel } from '../utils/mzigoDashboard.utils';

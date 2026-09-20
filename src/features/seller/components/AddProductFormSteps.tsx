@@ -5,7 +5,7 @@ import { Textarea } from '@/shared/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { cn } from '@/shared/utils/formatting';
 import { aestheticCategories } from '@/features/shop/utils/aestheticCategoriesData';
-import { Package, FileText, Sparkles, X, ImagePlus, Info, MapPin, CheckCircle2 } from 'lucide-react';
+import { Package, FileText, Sparkles, X, ImagePlus, Info, MapPin, CheckCircle2 } from '@/shared/ui/icons';
 import type { AddProductFormData, FormErrors } from '../utils/addProductFormUtils';
 
 interface AddProductFormStepsProps {

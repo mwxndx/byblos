@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { Mail, Loader2 } from 'lucide-react';
+import { Mail, Loader2 } from '@/shared/ui/icons';
 
 interface SellerForgotPasswordDialogProps {
   open: boolean;

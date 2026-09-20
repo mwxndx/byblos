@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Clock, MapPin, Package, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, Package, ShieldCheck, Truck } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { fetchPublicTracking, type PublicTrackingLeg } from '@/features/shop/api';
 import { logisticsQueryKeys } from '@/features/logistics/api/queryKeys';

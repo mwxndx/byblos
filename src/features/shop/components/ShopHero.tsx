@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin } from '@/shared/ui/icons';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { socialUrl, coordsMapUrl } from '../utils/socialLinks';
 import { SocialButtons } from './SocialButtons';

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArrowRight, PackagePlus, Sparkles, UserRoundPen, X } from 'lucide-react';
+import { ArrowRight, PackagePlus, Sparkles, UserRoundPen, X } from '@/shared/ui/icons';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 import type { SellerTabId } from '../types';
 

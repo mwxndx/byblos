@@ -6,7 +6,7 @@ const OrdersSection = lazy(() => import('@/features/orders/components/OrdersSect
 import {
   Heart, User,
   Store, ShoppingBag, Bell
-} from 'lucide-react';
+} from '@/shared/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { useWishlist } from '@/features/buyer/hooks/useWishlist';
 import { useGlobalAuth } from '@/features/auth/contexts';

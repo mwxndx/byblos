@@ -1,4 +1,4 @@
-import { Edit, Loader2, Trash2 } from 'lucide-react';
+import { Edit, Loader2, Trash2 } from '@/shared/ui/icons';
 import ShopLocationPicker from '@/shared/components/ShopLocationPicker';
 import { Button } from '@/shared/ui/button';
 import type { SellerSettingsFormData } from '../types';

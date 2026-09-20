@@ -1,6 +1,6 @@
 import { Badge } from '@/shared/ui/badge';
 import { Card } from '@/shared/ui/card';
-import { ShoppingBag, User } from 'lucide-react';
+import { ShoppingBag, User } from '@/shared/ui/icons';
 import type { SellerDetail } from './AdminSellerDetailModal';
 
 interface AdminSellerRecentOrdersProps {

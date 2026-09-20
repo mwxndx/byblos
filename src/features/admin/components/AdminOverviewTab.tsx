@@ -2,7 +2,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
 import { StatCard } from '@/shared/ui/stat-card';
-import { AlertTriangle, Package, Store, WalletCards } from 'lucide-react';
+import { AlertTriangle, Package, Store, WalletCards } from '@/shared/ui/icons';
 import {
   ChartContainer,
   GeoDistributionChart,

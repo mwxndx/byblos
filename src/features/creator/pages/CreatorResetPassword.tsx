@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Check, Eye, EyeOff, Loader2, Lock, X } from 'lucide-react';
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Lock, X } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

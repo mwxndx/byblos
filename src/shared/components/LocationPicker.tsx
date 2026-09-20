@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { Loader2, Search, X } from 'lucide-react';
+import { Loader2, Search, X } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
 import {
     DEFAULT_MAP_CENTER,

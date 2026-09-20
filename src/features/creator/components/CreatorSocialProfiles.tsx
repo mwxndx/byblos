@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Check, Loader2, Sparkles, X } from 'lucide-react';
+import { ExternalLink, Check, Loader2, Sparkles, X } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';

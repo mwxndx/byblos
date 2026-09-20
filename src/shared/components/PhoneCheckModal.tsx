@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Textarea } from '@/shared/ui/textarea';
-import { Phone, Loader2, MapPin, Truck, ShieldCheck } from 'lucide-react';
+import { Phone, Loader2, MapPin, Truck, ShieldCheck } from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
 import { createOptionalBuyerLocation, type BuyerLocationPayload } from '@/infrastructure/location/location';
 import LocationPicker from '@/shared/components/LocationPicker';

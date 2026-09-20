@@ -1,6 +1,6 @@
 import { Button } from '@/shared/ui/button';
 import { Badge } from '@/shared/ui/badge';
-import { MapPin, Truck, Package, XCircle, CheckCircle, Clock } from 'lucide-react';
+import { MapPin, Truck, Package, XCircle, CheckCircle, Clock } from '@/shared/ui/icons';
 import type { ApiOrder } from '@/shared/types';
 import { formatCurrency, HUB_DROPOFF_LOCATION } from '../utils/sellerOrders.utils';
 

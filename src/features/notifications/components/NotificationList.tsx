@@ -1,4 +1,4 @@
-import { CheckCheck, Clock } from 'lucide-react';
+import { CheckCheck, Clock } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
 import { useNotifications, type NotificationVariant } from '../hooks/useNotifications';
 
