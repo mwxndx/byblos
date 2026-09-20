@@ -111,7 +111,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Add cookie parser middleware
 import cookieParser from 'cookie-parser';
-// @ts-ignore - TypeScript has issues with cookie-parser's default export
+// @ts-expect-error - TypeScript has issues with cookie-parser's default export
 app.use(cookieParser());
 
 // Log CORS origin for debugging
