@@ -431,6 +431,14 @@ class ProductService {
             throw new Error('Invalid digital file path: expected a Cloudinary public_id');
         }
 
+        // Reject absolute/protocol-relative URLs. A public_id never has a scheme;
+        // accepting a URL here lets a seller point the download endpoint at an
+        // arbitrary host (SSRF — see downloadDigitalProduct). The download path
+        // has its own Cloudinary-host allowlist as a second layer for legacy rows.
+        if (/^[a-z][a-z0-9+.-]*:\/\//i.test(filePath) || filePath.startsWith('//')) {
+            throw new Error('Invalid digital file path: expected a Cloudinary public_id, not a URL');
+        }
+
         return filePath;
     }
 }

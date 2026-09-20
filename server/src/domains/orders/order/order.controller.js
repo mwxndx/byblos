@@ -17,6 +17,7 @@ import path from 'path';
 import https from 'node:https';
 import http from 'node:http';
 import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
+import { isCloudinaryAssetUrl } from '../../../shared/utils/assetUrlGuard.js';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
 import { generateSignedDownloadUrl, getDigitalAssetUrls } from '../../../shared/utils/cloudinary.js';
@@ -425,6 +426,12 @@ export const downloadDigitalProduct = async (req, res) => {
             }
 
             const currentUrl = candidateUrls[index];
+            // SSRF guard: only ever fetch Cloudinary-hosted assets. A seller-supplied
+            // digital_file_path can reach here as a verbatim URL to an arbitrary host.
+            if (!isCloudinaryAssetUrl(currentUrl)) {
+                logger.warn(`[DOWNLOAD] Refusing non-Cloudinary candidate for ${digitalFilePath}, trying next...`);
+                return tryStream(index + 1);
+            }
             const requester = currentUrl.startsWith('https:') ? https : http;
 
             const reqStream = requester.get(currentUrl, (streamRes) => {
@@ -441,6 +448,11 @@ export const downloadDigitalProduct = async (req, res) => {
                 // If redirected (301/302/307/308), follow redirect
                 if ([301, 302, 307, 308].includes(streamRes.statusCode) && streamRes.headers.location) {
                     const redirectUrl = streamRes.headers.location;
+                    // SSRF guard: a redirect Location must also stay on Cloudinary.
+                    if (!isCloudinaryAssetUrl(redirectUrl)) {
+                        logger.warn(`[DOWNLOAD] Refusing non-Cloudinary redirect for ${digitalFilePath}, trying next...`);
+                        return tryStream(index + 1);
+                    }
                     const redirRequester = redirectUrl.startsWith('https:') ? https : http;
                     return redirRequester.get(redirectUrl, (redirRes) => {
                         if (redirRes.statusCode === 200) {
