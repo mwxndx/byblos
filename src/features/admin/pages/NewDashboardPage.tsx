@@ -15,7 +15,6 @@ import { AdminSellersTab } from '../components/AdminSellersTab';
 import { AdminCreatorsTab } from '../components/AdminCreatorsTab';
 import { AdminBuyersTab } from '../components/AdminBuyersTab';
 import { AdminWithdrawalsTab } from '../components/AdminWithdrawalsTab';
-import { AdminClientsTab } from '../components/AdminClientsTab';
 import { useAdminDashboard } from '../hooks/useAdminDashboard';
 import {
   StatsCard,
@@ -38,7 +37,6 @@ const NewAdminDashboard = () => {
     creatorsList,
     buyersList,
     withdrawalsList,
-    clientsList,
     paginationState,
     safeFormatDate,
     formatProviderBalance,
@@ -140,7 +138,7 @@ const NewAdminDashboard = () => {
       title: 'Pending Payouts',
       value: dashboardState.analytics.pendingWithdrawals?.toLocaleString() || '0',
       icon: <Users className="h-4 w-4 text-blue-400" />,
-      description: `${dashboardState.analytics.totalClients?.toLocaleString() || '0'} paying clients`,
+      description: 'Awaiting processing',
       trend: null
     }
   ];
@@ -304,18 +302,6 @@ const NewAdminDashboard = () => {
               <div className="bg-white/80 dark:bg-surface-1 backdrop-blur-2xl border border-black/10 dark:border-separator rounded-card p-8 shadow-xl dark:shadow-2xl">
                 <DetectionsPage />
               </div>
-            </TabsContent>
-
-            {/* Clients Tab */}
-            <TabsContent value="clients" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <AdminClientsTab
-                clients={dashboardState.clients}
-                searchQuery={clientsList.search}
-                onSearchChange={clientsList.setSearch}
-                pagination={paginationState.clients}
-                onPageChange={clientsList.setPage}
-                formatDate={safeFormatDate}
-              />
             </TabsContent>
           </Tabs>
         </div>

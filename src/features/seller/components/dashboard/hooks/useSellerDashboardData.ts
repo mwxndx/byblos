@@ -98,7 +98,6 @@ export function useSellerDashboardData({ navigate, locationPathname, toast }: Us
         totalRevenue: 0,
         totalPayout: 0,
         balance: 0,
-        clientCount: 0,
         creatorCount: 0,
         creatorGeneratedSales: 0,
         wishlistCount: 0,

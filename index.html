@@ -29,7 +29,6 @@
 
         var key = 'byblos-theme-' + scope;
         var pref = localStorage.getItem(key);
-        if (!pref && scope === 'creator') pref = localStorage.getItem('byblos-theme-ambassador');
         if (!pref) pref = localStorage.getItem('byblos-app-theme') || localStorage.getItem('byblos-theme-default') || 'system';
 
         var isDark = true;

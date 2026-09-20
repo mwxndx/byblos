@@ -34,8 +34,6 @@ export interface ApiPublicSeller {
   longitude?: number;
   totalWishlistCount?: number;
   wishlistCount?: number;
-  clientCount?: number;
-  client_count?: number;
   knockCount?: number;
   knock_count?: number;
 }
@@ -78,8 +76,6 @@ export interface ApiSeller {
   creatorCommissionRate?: number;
   creator_commission_rate?: number;
   is_verified: boolean;
-  clientCount?: number;
-  client_count?: number;
 }
 
 

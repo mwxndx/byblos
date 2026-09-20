@@ -42,7 +42,6 @@ export interface ShopSeller extends Omit<Seller, 'bannerUrl'> {
   instagramLink?: string;
   tiktokLink?: string;
   facebookLink?: string;
-  clientCount?: number;
   bio?: string;
   avatarUrl?: string;
   avatar_url?: string;

@@ -48,7 +48,6 @@ export const transformSeller = (data: unknown): ApiSeller => {
     facebookLink: str(seller.facebookLink || seller.facebook_link),
     creatorCommissionRate: Number(seller.creatorCommissionRate ?? seller.creator_commission_rate ?? 0.01),
     is_verified: !!(seller.is_verified || seller.isVerified || user?.is_verified),
-    clientCount: seller.clientCount !== undefined ? optNum(seller.clientCount) : optNum(seller.client_count),
     totalSales: optNum(seller.totalSales || seller.total_sales) ?? 0,
     createdAt: str(seller.createdAt || seller.created_at, new Date().toISOString()),
     updatedAt: str(seller.updatedAt || seller.updated_at, new Date().toISOString())
@@ -301,7 +300,6 @@ export const sellerProfileApi = {
         totalRevenue: 0,
         totalPayout: 0,
         balance: 0,
-        clientCount: 0,
         creatorCount: 0,
         creatorGeneratedSales: 0,
         wishlistCount: 0,

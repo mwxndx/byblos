@@ -1,5 +1,5 @@
 // Account-switching handlers. Let a user who owns more than one profile type
-// (buyer / seller / ambassador[creator]) move between those accounts without
+// (buyer / seller / creator) move between those accounts without
 // re-entering their password. Ownership is derived from req.user, which the
 // `protect` middleware already resolves from the buyers/sellers/creators tables.
 import { AppError } from '../../shared/utils/errorHandler.js';

@@ -4,7 +4,6 @@ import { getDashboardStats } from './dashboard';
 import { getAnalytics, getMonthlyMetrics } from './analytics';
 import { getBuyers, getBuyerById, deleteUser } from './buyers';
 import { getSellers, getSellerById } from './sellers';
-import { getClients } from './clients';
 import { getCreators, deleteCreator } from './creators';
 import { getWithdrawalRequests, updateWithdrawalRequestStatus } from './withdrawals';
 import { getFinancialMetrics, getMonthlyFinancialData, getPaymentProviderBalances, getRefundRequests, confirmRefund, rejectRefund } from './financial';
@@ -17,7 +16,6 @@ export * from './dashboard';
 export * from './analytics';
 export * from './buyers';
 export * from './sellers';
-export * from './clients';
 export * from './creators';
 export * from './withdrawals';
 export * from './financial';
@@ -36,7 +34,6 @@ export const adminApi = {
   deleteCreator,
   getSellerById,
   getMonthlyMetrics,
-  getClients,
   deleteUser,
   getWithdrawalRequests,
   updateWithdrawalRequestStatus,

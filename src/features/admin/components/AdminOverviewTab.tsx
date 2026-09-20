@@ -80,7 +80,7 @@ export function AdminOverviewTab({ dashboardState, safeFormatDate, onShowSellers
       <GeoDistributionChart data={asChartData(analytics.geoDistribution)} />
       <ProductStatusChart data={asChartData(analytics.productStatus)} />
 
-      <ChartContainer title="Top Shops" description="Highest client conversion" className="col-span-4 lg:col-span-2">
+      <ChartContainer title="Top Shops" description="Highest total sales" className="col-span-4 lg:col-span-2">
         <div className="space-y-4 h-full flex flex-col justify-center">
           {dashboardState.topShops?.length ? dashboardState.topShops.slice(0, 3).map((shop: Record<string, unknown>, index: number) => (
             <div key={String(shop.id)} className="flex items-center justify-between p-5 bg-white/[0.03] rounded-[1.5rem] border border-separator hover:bg-white/10 transition-all duration-500 group/shop">
@@ -98,8 +98,8 @@ export function AdminOverviewTab({ dashboardState, safeFormatDate, onShowSellers
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-semibold text-label tracking-tight tabular-nums group-hover/shop:text-yellow-500 transition-colors">{String(shop.clientCount ?? '')}</p>
-                <p className="text-[10px] text-label-3 uppercase font-semibold tracking-widest opacity-50">Clients</p>
+                <p className="text-3xl font-semibold text-label tracking-tight tabular-nums group-hover/shop:text-yellow-500 transition-colors">{`KES ${Number(shop.totalSales ?? 0).toLocaleString()}`}</p>
+                <p className="text-[10px] text-label-3 uppercase font-semibold tracking-widest opacity-50">Sales</p>
               </div>
             </div>
           )) : (

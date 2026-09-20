@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
 import { AdminSellerRecentOrders } from './AdminSellerRecentOrders';
 import { format } from 'date-fns';
-import { Activity, ArrowUpRight, Calendar, DollarSign, Facebook, Globe, Heart, Instagram, Loader2, Mail, MapPin, Music2, Package, Percent, ShoppingBag, ShoppingCart, Store, TrendingUp, User, UserCircle, Users2, X } from '@/shared/ui/icons';
+import { Activity, ArrowUpRight, Calendar, DollarSign, Facebook, Globe, Heart, Instagram, Loader2, Mail, MapPin, Music2, Package, Percent, ShoppingBag, ShoppingCart, Store, TrendingUp, User, UserCircle, X } from '@/shared/ui/icons';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
 
 export interface SellerDetail {
@@ -23,7 +23,6 @@ export interface SellerDetail {
   facebook_link?: string;
   tiktok_link?: string;
   bio?: string;
-  client_count?: number;
   metrics?: {
     wishlistCount?: number;
     totalProducts?: number;
@@ -198,15 +197,6 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                 </h4>
                                 <div className="flex-1 flex flex-col justify-center gap-6">
                                   <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                      <div className="h-10 w-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20">
-                                        <Users2 className="h-5 w-5 text-purple-500" />
-                                      </div>
-                                      <div>
-                                        <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest">Active Clients</p>
-                                        <p className="text-2xl font-semibold text-label">{seller.client_count || 0}</p>
-                                      </div>
-                                    </div>
                                     <div className="flex items-center gap-3">
                                       <div className="h-10 w-10 rounded-xl bg-pink-500/10 flex items-center justify-center border border-pink-500/20">
                                         <Heart className="h-5 w-5 text-pink-500" />

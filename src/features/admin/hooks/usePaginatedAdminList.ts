@@ -15,8 +15,8 @@ export interface PaginatedAdminListControls {
 }
 
 /**
- * Page + search state for one admin directory tab (buyers/sellers/clients/
- * creators/withdrawal requests), now that each fetches a server-paginated,
+ * Page + search state for one admin directory tab (buyers/sellers/creators/
+ * withdrawal requests), now that each fetches a server-paginated,
  * server-searched page instead of a full unpaginated table.
  */
 export function usePaginatedAdminList(): PaginatedAdminListControls {

@@ -8,8 +8,7 @@ const ADMIN_TABS = [
   { id: 'detections', label: 'Detections', color: 'from-orange-400 to-red-500' },
   { id: 'sellers', label: 'Sellers', color: 'from-blue-400 to-cyan-500' },
   { id: 'creators', label: 'Creators', color: 'from-yellow-300 to-lime-500' },
-  { id: 'buyers', label: 'Buyers', color: 'from-purple-400 to-indigo-500' },
-  { id: 'clients', label: 'Clients', color: 'from-pink-400 to-fuchsia-500' }
+  { id: 'buyers', label: 'Buyers', color: 'from-purple-400 to-indigo-500' }
 ];
 
 export function AdminDashboardTabs() {

@@ -32,7 +32,6 @@ export interface AnalyticsData {
   withdrawalReservedBalance?: number;
   refundReservedBalance?: number;
   nextSettlementAt?: string | null;
-  clientCount: number;
   creatorCount: number;
   creatorGeneratedSales: number;
   wishlistCount: number;

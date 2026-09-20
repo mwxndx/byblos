@@ -10,7 +10,6 @@ export interface SellerAnalytics {
   totalRevenue: number;
   totalPayout: number;
   balance: number;
-  clientCount: number;
   creatorCount: number;
   creatorGeneratedSales: number;
   wishlistCount: number;

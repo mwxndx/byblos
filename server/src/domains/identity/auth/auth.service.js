@@ -293,7 +293,7 @@ class AuthService {
                         const firstName = user.email ? user.email.split('@')[0] : 'Creator';
                         const newCreatorRes = await pool.query(
                             `INSERT INTO creators (user_id, first_name, last_name, email, mpesa_number, whatsapp_number, status)
-                             VALUES ($1, $2, 'Ambassador', $3, '0700000000', '0700000000', 'active')
+                             VALUES ($1, $2, 'Creator', $3, '0700000000', '0700000000', 'active')
                              ON CONFLICT (user_id) DO UPDATE SET updated_at = NOW()
                              RETURNING *`,
                             [user.id, firstName, user.email]

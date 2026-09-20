@@ -321,7 +321,7 @@ export default function MarketingDashboard() {
 
                 {Array.isArray(referrals?.creators) && referrals.creators.length > 0 && (
                     <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
-                        <SectionTitle title="Creator Referrals" subtitle="Top performing growth ambassadors" />
+                        <SectionTitle title="Creator Referrals" subtitle="Top performing creators" />
                         <div className="divide-y divide-separator">
                             {referrals.creators.map((c: any, idx: number) => (
                                 <div key={c.id || idx} className="py-3 flex items-center justify-between">

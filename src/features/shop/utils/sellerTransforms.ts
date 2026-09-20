@@ -32,8 +32,6 @@ export function transformSeller(seller: unknown): ApiPublicSeller | null {
     ...((sObj.instagramLink || sObj.instagram_link) ? { instagramLink: str(sObj.instagramLink || sObj.instagram_link) } : {}),
     ...((sObj.tiktokLink || sObj.tiktok_link) ? { tiktokLink: str(sObj.tiktokLink || sObj.tiktok_link) } : {}),
     ...((sObj.facebookLink || sObj.facebook_link) ? { facebookLink: str(sObj.facebookLink || sObj.facebook_link) } : {}),
-    ...(sObj.clientCount !== undefined ? { clientCount: Number(sObj.clientCount) } : {}),
-    ...(sObj.client_count !== undefined ? { clientCount: Number(sObj.client_count) } : {}),
     ...(sObj.totalWishlistCount !== undefined ? { totalWishlistCount: Number(sObj.totalWishlistCount) } : {}),
     ...(sObj.total_wishlist_count !== undefined ? { totalWishlistCount: Number(sObj.total_wishlist_count) } : {}),
     ...(sObj.wishlistCount !== undefined ? { wishlistCount: Number(sObj.wishlistCount) } : {}),

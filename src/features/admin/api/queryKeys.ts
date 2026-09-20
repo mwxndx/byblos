@@ -19,8 +19,6 @@ export const adminQueryKeys = {
   creators: (page = 1, search = '') => [...adminQueryKeys.creatorsAll(), page, search] as const,
   buyersAll: () => [...adminQueryKeys.all, 'buyers'] as const,
   buyers: (page = 1, search = '') => [...adminQueryKeys.buyersAll(), page, search] as const,
-  clientsAll: () => [...adminQueryKeys.all, 'clients'] as const,
-  clients: (page = 1, search = '') => [...adminQueryKeys.clientsAll(), page, search] as const,
   financials: () => [...adminQueryKeys.all, 'financials'] as const,
   balances: () => [...adminQueryKeys.all, 'balances'] as const,
   dashboardStats: () => [...adminQueryKeys.all, 'dashboardStats'] as const,

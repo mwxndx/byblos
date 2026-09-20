@@ -23,7 +23,6 @@ export interface DashboardAnalytics {
   totalSellers?: number;
   totalCreators?: number;
   totalBuyers?: number;
-  totalClients?: number;
   monthlyGrowth?: {
     revenue?: number;
     products?: number;
@@ -143,19 +142,17 @@ export interface DashboardState {
   monthlyMetrics: MonthlyMetricsData[];
   financialMetrics: FinancialMetrics;
   monthlyFinancialData: MonthlyFinancialData[];
-  clients: unknown[];
   topShops: unknown[];
   providerHealth: unknown;
 }
 
-// One pagination meta per paginated admin list -- these 5 endpoints (buyers,
-// sellers, clients, creators, withdrawal requests) are the ones that moved
-// from "fetch the whole table" to real page/limit/search pagination.
+// One pagination meta per paginated admin list -- these 4 endpoints (buyers,
+// sellers, creators, withdrawal requests) are the ones that moved from
+// "fetch the whole table" to real page/limit/search pagination.
 export interface DashboardPaginationState {
   sellers: PaginationMeta;
   creators: PaginationMeta;
   buyers: PaginationMeta;
-  clients: PaginationMeta;
   withdrawalRequests: PaginationMeta;
 }
 

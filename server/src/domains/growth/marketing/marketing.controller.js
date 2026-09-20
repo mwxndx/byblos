@@ -267,7 +267,7 @@ export const getReferralPerformance = async (req, res, next) => {
       data: {
         creators: topReferrers.map((r, idx) => ({
           id: r.id || String(idx + 1),
-          name: r.shop_name || 'Ambassador',
+          name: r.shop_name || 'Creator',
           referredSellersCount: Number.parseInt(r.referrals_made || 0),
           earnedKsh: Number.parseFloat(r.total_earned || 0)
         }))

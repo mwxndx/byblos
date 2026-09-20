@@ -7,8 +7,8 @@ interface AdminPaginationControlsProps {
   onPageChange: (page: number) => void;
 }
 
-// Shared Prev/Next + "showing X-Y of Z" footer for the 5 admin directory
-// tabs (buyers/sellers/clients/creators/withdrawals), now that each fetches
+// Shared Prev/Next + "showing X-Y of Z" footer for the 4 admin directory
+// tabs (buyers/sellers/creators/withdrawals), now that each fetches
 // one server-paginated page instead of its full table.
 export const AdminPaginationControls = ({ pagination, onPageChange }: AdminPaginationControlsProps) => {
   const { total, page, pageSize, hasMore } = pagination;

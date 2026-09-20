@@ -79,7 +79,6 @@ export function useShopPage() {
       instagramLink: seller.instagramLink || '',
       tiktokLink: seller.tiktokLink || '',
       facebookLink: seller.facebookLink || '',
-      clientCount: seller.clientCount || seller.client_count || 0,
       bio: seller.bio || '',
       avatarUrl: seller.avatarUrl || seller.avatar_url || '',
       hasPhysicalShop: !!seller.physicalAddress,

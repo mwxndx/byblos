@@ -104,17 +104,6 @@ export function useAdminDashboardStatsQuery(enabled = true) {
   });
 }
 
-export function useAdminClientsQuery({ page, search }: PaginatedQueryParams, enabled = true) {
-  return useQuery({
-    queryKey: adminQueryKeys.clients(page, search),
-    queryFn: () => adminApi.getClients({ page, search }),
-    staleTime: 60 * 1000,
-    gcTime: 5 * 60 * 1000,
-    placeholderData: keepPreviousData,
-    enabled,
-  });
-}
-
 export function useAdminBalancesQuery(enabled = true) {
   return useQuery({
     queryKey: adminQueryKeys.balances(),

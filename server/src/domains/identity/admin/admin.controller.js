@@ -409,23 +409,6 @@ const getBuyerById = async (req, res, next) => {
   }
 };
 
-// Get all clients
-const getAllClients = async (req, res, next) => {
-  try {
-    const { page, limit, offset } = parsePaginationParams(req.query);
-    const clients = await AdminService.getAllClients({ limit, offset, search: req.query.search });
-    res.status(200).json({
-      status: 'success',
-      results: clients.length,
-      pagination: buildPaginationMeta({ rows: clients, page, limit, offset }),
-      data: clients
-    });
-  } catch (error) {
-    console.error('Error fetching clients:', error);
-    next(new AppError('Failed to fetch clients', 500));
-  }
-};
-
 // Delete user (Block action)
 const deleteUser = async (req, res, next) => {
   try {
@@ -675,7 +658,6 @@ export {
   getAllWithdrawalRequests,
   updateWithdrawalRequestStatus,
   getAnalytics,
-  getAllClients,
   deleteUser,
   getAdminLogisticsRequests,
   adminUpdateLogisticsLegStatus,

@@ -557,54 +557,6 @@ class AdminService {
     return res.rows[0];
   }
 
-  async getAllClients({ limit, offset, search } = {}) {
-    const params = [];
-    const searchClause = buildSearchClause(['b.full_name', 'b.email'], search, params);
-
-    let sql = `
-      SELECT
-        b.id,
-        b.full_name AS name,
-        b.email,
-        b.mobile_payment AS phone,
-        b.city,
-        b.location,
-        MAX(po.created_at) AS created_at,
-        COUNT(po.id) AS order_count,
-        COALESCE(SUM(CASE WHEN po.payment_status = 'completed' THEN po.total_amount ELSE 0 END), 0) AS total_spend,
-        s.id AS seller_id,
-        s.full_name AS seller_name,
-        s.shop_name AS seller_shop_name,
-        COUNT(*) OVER() AS total_count
-      FROM buyers b
-      JOIN product_orders po ON po.buyer_id = b.id
-      LEFT JOIN sellers s ON s.id = po.seller_id
-      WHERE b.user_id IS NOT NULL
-    `;
-    if (searchClause) sql += ` AND ${searchClause}`;
-    sql += ` GROUP BY b.id, s.id, s.full_name, s.shop_name`;
-
-    params.push(limit, offset);
-    sql += ` ORDER BY MAX(po.created_at) DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
-
-    const { rows } = await pool.query(sql, params);
-
-    return rows.map(row => ({
-      id: row.id,
-      name: row.name,
-      email: row.email,
-      phone: row.phone,
-      city: row.city,
-      location: row.location,
-      created_at: row.created_at,
-      orderCount: Number.parseInt(row.order_count, 10) || 0,
-      totalSpend: Number.parseFloat(row.total_spend) || 0,
-      sellerId: row.seller_id,
-      sellerName: row.seller_shop_name || row.seller_name || 'Unassigned',
-      total_count: row.total_count
-    }));
-  }
-
   async deleteUser(userId) {
     const client = await pool.connect();
     try {

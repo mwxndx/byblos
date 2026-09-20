@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getMyAccounts } from '@/features/auth/api/account';
 
 /**
- * Fetches which account types (buyer / seller / ambassador) the signed-in user
+ * Fetches which account types (buyer / seller / creator) the signed-in user
  * owns. Used to decide whether to show the account switcher and which options
  * to offer. Keyed globally and cleared on login/logout/switch alongside the
  * rest of the auth cache.

@@ -15,7 +15,6 @@ import {
   useAdminFinancialsQuery,
   useAdminMonthlyFinancialDataQuery,
   useAdminDashboardStatsQuery,
-  useAdminClientsQuery,
   useAdminBalancesQuery
 } from '@/features/admin/hooks/queries/useAdminQueries';
 import { usePaginatedAdminList } from '@/features/admin/hooks/usePaginatedAdminList';
@@ -35,16 +34,15 @@ export function useAdminDashboard() {
   const updateWithdrawalRequestStatusMutation = useUpdateWithdrawalRequestStatusMutation();
 
   const [activeTab, setActiveTab] = useState('overview');
-  // Each paginated admin directory tab (sellers/creators/buyers/withdrawals/
-  // clients) now fetches its own server-paginated, server-searched page, so
-  // each needs independent page/search state -- a single shared searchQuery
-  // previously meant typing in one tab's search box silently carried over
-  // and filtered whichever tab you switched to next.
+  // Each paginated admin directory tab (sellers/creators/buyers/withdrawals)
+  // now fetches its own server-paginated, server-searched page, so each needs
+  // independent page/search state -- a single shared searchQuery previously
+  // meant typing in one tab's search box silently carried over and filtered
+  // whichever tab you switched to next.
   const sellersList = usePaginatedAdminList();
   const creatorsList = usePaginatedAdminList();
   const buyersList = usePaginatedAdminList();
   const withdrawalsList = usePaginatedAdminList();
-  const clientsList = usePaginatedAdminList();
   const [isInitialized, setIsInitialized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const inspectionSessionId = useMemo(() => {
@@ -106,7 +104,6 @@ export function useAdminDashboard() {
       netRevenue: 0
     },
     monthlyFinancialData: [],
-    clients: [],
     topShops: [],
     providerHealth: null
   });
@@ -121,7 +118,6 @@ export function useAdminDashboard() {
   const financialsQuery = useAdminFinancialsQuery(isEnabled);
   const monthlyFinancialDataQuery = useAdminMonthlyFinancialDataQuery(isEnabled);
   const dashboardStatsQuery = useAdminDashboardStatsQuery(isEnabled);
-  const clientsQuery = useAdminClientsQuery({ page: clientsList.page, search: clientsList.debouncedSearch }, isEnabled);
   const balancesQuery = useAdminBalancesQuery(isEnabled);
 
   // Pagination meta for the 5 paginated directory tabs -- read directly off
@@ -132,13 +128,11 @@ export function useAdminDashboard() {
     sellers: sellersQuery.data?.pagination ?? EMPTY_PAGINATION,
     creators: creatorsQuery.data?.pagination ?? EMPTY_PAGINATION,
     buyers: buyersQuery.data?.pagination ?? EMPTY_PAGINATION,
-    clients: clientsQuery.data?.pagination ?? EMPTY_PAGINATION,
     withdrawalRequests: withdrawalsQuery.data?.pagination ?? EMPTY_PAGINATION,
   }), [
     sellersQuery.data?.pagination,
     creatorsQuery.data?.pagination,
     buyersQuery.data?.pagination,
-    clientsQuery.data?.pagination,
     withdrawalsQuery.data?.pagination,
   ]);
 
@@ -162,7 +156,6 @@ export function useAdminDashboard() {
       financialsQuery.refetch(),
       monthlyFinancialDataQuery.refetch(),
       dashboardStatsQuery.refetch(),
-      clientsQuery.refetch(),
       balancesQuery.refetch()
     ]);
     setIsLoading(false);
@@ -176,7 +169,6 @@ export function useAdminDashboard() {
     financialsQuery,
     monthlyFinancialDataQuery,
     dashboardStatsQuery,
-    clientsQuery,
     balancesQuery
   ]);
 
@@ -204,7 +196,6 @@ export function useAdminDashboard() {
       || financialsQuery.isLoading
       || monthlyFinancialDataQuery.isLoading
       || dashboardStatsQuery.isLoading
-      || clientsQuery.isLoading
       || balancesQuery.isLoading;
     if (stillOnFirstFetch) return;
 
@@ -223,7 +214,6 @@ export function useAdminDashboard() {
         const financialMetrics = financialsQuery.data || null;
         const monthlyFinancialData = monthlyFinancialDataQuery.data || [];
         const dashboardStats = dashboardStatsQuery.data || null;
-        const clients = clientsQuery.data?.items || [];
         const providerHealth = balancesQuery.data || null;
 
         // Real directory totals, not just this page's row count -- each
@@ -240,7 +230,6 @@ export function useAdminDashboard() {
           totalSellers: dashboardStats?.totalSellers || totalSellersCount,
           totalCreators: dashboardStats?.totalCreators || totalCreatorsCount,
           totalBuyers: dashboardStats?.totalBuyers || totalBuyersCount,
-          totalClients: dashboardStats?.totalClients || 0,
           totalWishlists: dashboardStats?.totalWishlists || 0,
           activeOrders: dashboardStats?.activeOrders || 0,
           lowStockProducts: dashboardStats?.lowStockProducts || 0,
@@ -299,7 +288,6 @@ export function useAdminDashboard() {
             netRevenue: 0
           },
           monthlyFinancialData: Array.isArray(monthlyFinancialData) ? monthlyFinancialData : [],
-          clients: Array.isArray(clients) ? clients : [],
           topShops: dashboardStats?.topShops || [],
           providerHealth
         });
@@ -322,7 +310,6 @@ export function useAdminDashboard() {
         if (financialsQuery.isError) failedSections.push('financial metrics');
         if (monthlyFinancialDataQuery.isError) failedSections.push('monthly financial data');
         if (dashboardStatsQuery.isError) failedSections.push('dashboard stats');
-        if (clientsQuery.isError) failedSections.push('clients');
 
         const failureSignature = failedSections.join(',');
         if (failureSignature && failureSignature !== lastReportedFailureRef.current) {
@@ -372,9 +359,6 @@ export function useAdminDashboard() {
     dashboardStatsQuery.data,
     dashboardStatsQuery.isError,
     dashboardStatsQuery.isLoading,
-    clientsQuery.data,
-    clientsQuery.isError,
-    clientsQuery.isLoading,
     balancesQuery.data,
     balancesQuery.isLoading
   ]);
@@ -620,7 +604,6 @@ export function useAdminDashboard() {
     creatorsList,
     buyersList,
     withdrawalsList,
-    clientsList,
     paginationState,
     safeFormatDate,
     formatProviderBalance,

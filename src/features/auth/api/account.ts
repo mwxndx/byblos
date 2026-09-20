@@ -7,7 +7,7 @@ export interface MyAccounts {
   accounts: Record<SwitchableRole, boolean>;
 }
 
-/** Which account types (buyer / seller / ambassador) the signed-in user owns. */
+/** Which account types (buyer / seller / creator) the signed-in user owns. */
 export const getMyAccounts = async (): Promise<MyAccounts> => {
   const res = await apiClient.get('/auth/accounts');
   return res.data?.data as MyAccounts;

@@ -168,10 +168,10 @@ export const resendVerification = async (req, res, next) => {
 };
 
 /**
- * @desc    Forgot password — emails an ambassador a reset link
+ * @desc    Forgot password — emails a creator a reset link
  * @route   POST /api/creators/forgot-password
  * @access  Public
- * Ambassadors authenticate via the unified `users` table, so the role-agnostic
+ * Creators authenticate via the unified `users` table, so the role-agnostic
  * AuthService drives this exactly like buyer/seller. Responds uniformly to avoid
  * account enumeration.
  */
