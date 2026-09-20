@@ -6131,6 +6131,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (104, '20260911130000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (105, '20260913120000_add_product_orders_status_check_constraint', '2026-09-13 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (106, '20260913130000_add_withdrawal_status_check_constraints', '2026-09-13 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (107, '20260913140000_drop_orphaned_creator_withdrawal_requests', '2026-09-13 14:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (108, '20260914120000_add_admin_directory_created_at_indexes', '2026-09-14 12:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
