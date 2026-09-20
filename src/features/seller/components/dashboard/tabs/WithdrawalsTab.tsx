@@ -196,6 +196,7 @@ export function WithdrawalsTab({
             <div className="relative flex-1">
               <Input
                 type="date"
+                aria-label="Start date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="h-10 bg-neutral-50 border-slate-200 text-slate-900 dark:bg-[#141414] dark:border-separator dark:text-white focus:border-yellow-500/50 focus:ring-yellow-500/20"
@@ -206,6 +207,7 @@ export function WithdrawalsTab({
             <div className="relative flex-1">
               <Input
                 type="date"
+                aria-label="End date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="h-10 bg-neutral-50 border-slate-200 text-slate-900 dark:bg-[#141414] dark:border-separator dark:text-white focus:border-yellow-500/50 focus:ring-yellow-500/20"

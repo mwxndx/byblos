@@ -200,7 +200,7 @@ export const confirmRefundRequest = async (req, res, next) => {
         full_name: requestWithBuyer?.buyer_name || null,
         whatsapp_number: requestWithBuyer?.buyer_phone || null
       }
-    }, 'RefundController.confirmRefundRequest').catch(() => {});
+    }, 'RefundController.confirmRefundRequest').catch((err) => logger.warn(`[REFUND] Failed to dispatch REFUND.COMPLETED for ${id} (buyer already credited):`, err?.message));
 
     res.status(200).json({
       status: 'success',
@@ -266,7 +266,7 @@ export const rejectRefundRequest = async (req, res, next) => {
         full_name,
         whatsapp_number
       }
-    }, 'RefundController.rejectRefundRequest').catch(() => {});
+    }, 'RefundController.rejectRefundRequest').catch((err) => logger.warn(`[REFUND] Failed to dispatch REFUND.REJECTED for ${id}:`, err?.message));
 
     res.status(200).json({
       status: 'success',

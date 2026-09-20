@@ -44,6 +44,11 @@ export const PaymentStatusModal = ({
   // Store the latest mutateAsync in a ref so the polling effect doesn't need it as a dep
   const getOrderStatusRef = useRef(getOrderStatusMutation.mutateAsync);
   getOrderStatusRef.current = getOrderStatusMutation.mutateAsync;
+  // Same ref pattern for onSuccess: keeping it out of the effect deps means a
+  // parent passing an inline (non-memoized) callback can't tear down and
+  // restart the 5s polling interval on every re-render.
+  const onSuccessRef = useRef(onSuccess);
+  onSuccessRef.current = onSuccess;
   const MAX_ATTEMPTS = 60;
 
 
@@ -105,7 +110,7 @@ export const PaymentStatusModal = ({
             await handleAutoLogin(res.autoLoginToken);
           }
 
-          onSuccess?.();
+          onSuccessRef.current?.();
           return;
         }
 
@@ -141,7 +146,7 @@ export const PaymentStatusModal = ({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isOpen, invoiceId, state, isGuest, checkoutToken, onSuccess, handleAutoLogin]);
+  }, [isOpen, invoiceId, state, isGuest, checkoutToken, handleAutoLogin]);
 
 
 

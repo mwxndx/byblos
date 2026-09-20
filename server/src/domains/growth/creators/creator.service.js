@@ -1284,7 +1284,13 @@ class CreatorService {
            FROM creator_referral_earnings WHERE referrer_creator_id = $1 AND status = 'credited'`,
         [creatorId]
       )
-    ]).catch(() => [{ rows: [{ s: 0 }] }, { rows: [{ s: 0 }] }]);
+    ]).catch((err) => {
+      // Keep the dashboard rendering, but don't let a DB failure masquerade as
+      // "creator has earned 0" with no trace — log so operators can tell a
+      // genuine zero from a query failure.
+      logger.warn(`[CreatorClearance] lifetime earnings sum failed for creator ${creatorId}, showing 0:`, err?.message);
+      return [{ rows: [{ s: 0 }] }, { rows: [{ s: 0 }] }];
+    });
     const commissionEarnings = roundMoney(Number(commissionSumRes.rows[0].s));
     const referralEarnings = roundMoney(Number(referralSumRes.rows[0].s));
 

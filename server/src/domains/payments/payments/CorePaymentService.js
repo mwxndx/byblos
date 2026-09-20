@@ -583,7 +583,19 @@ const CorePaymentService = {
                                             reason: 'late_payment_on_cancelled_order'
                                         })
                                     ]
-                                ).catch(err => logger.error('[CorePaymentService] Failed to record manual review refund request:', err.message));
+                                ).catch(err => {
+                                    // Kept non-fatal: the order is already flagged COMPENSATION_REQUIRED
+                                    // in this transaction and the payment must still complete. But a
+                                    // failed insert means the manual-review queue can miss this
+                                    // compensation, so alert instead of only logging.
+                                    logger.error('[CorePaymentService] Failed to record manual review refund request:', err.message);
+                                    reportAlert({
+                                        level: 'error',
+                                        title: 'Late-payment compensation refund_request insert failed',
+                                        message: `Order ${orderId} is COMPENSATION_REQUIRED but its refund_requests row failed to insert (${err.message}); it may be missing from the manual-review queue.`,
+                                        context: { orderId, paymentId: paymentRow.id }
+                                    });
+                                });
                             }
                         } else {
                             const customProductionPatch = resolveCustomProductionPatch(orderRow, completedAt);

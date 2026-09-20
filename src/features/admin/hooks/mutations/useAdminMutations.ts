@@ -34,7 +34,8 @@ export function useDeleteUserMutation() {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.buyersAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.sellersAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
-      toast.success('User deleted successfully');
+      // Success toast is fired by the calling handler (more specific wording);
+      // firing one here too produced two stacked toasts per action.
     },
     onError: (error) => {
       toast.error(classifyApiError(error, 'Failed to delete user').message);
@@ -49,7 +50,7 @@ export function useDeleteCreatorMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.creatorsAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
-      toast.success('Creator deleted successfully');
+      // Success toast fired by the calling handler (see useDeleteUserMutation).
     },
     onError: (error) => {
       toast.error(classifyApiError(error, 'Failed to delete creator').message);
@@ -65,7 +66,7 @@ export function useUpdateWithdrawalRequestStatusMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.withdrawalsAll() });
       queryClient.invalidateQueries({ queryKey: adminQueryKeys.analytics() });
-      toast.success('Withdrawal request status updated');
+      // Success toast fired by the calling handler ("...has been approved/rejected").
     },
     onError: (error) => {
       toast.error(classifyApiError(error, 'Failed to update withdrawal request status').message);

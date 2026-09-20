@@ -1,4 +1,5 @@
 import logger from '../../../shared/utils/logger.js';
+import { reportAlert } from '../../../shared/utils/alerting.js';
 import CreatorService from '../../growth/creators/creator.service.js';
 import settlementService from './settlement.service.js';
 import {
@@ -103,6 +104,15 @@ class EscrowManager {
                 orderId,
                 totalAmount,
                 sellerPayoutAmount
+            });
+            // Surface it operationally — a negative fee means seller payout > order
+            // total, i.e. inconsistent pricing upstream, and would otherwise zero
+            // out platform revenue on this order silently. reportAlert dedupes.
+            reportAlert({
+                level: 'warn',
+                title: 'Negative platform fee on escrow release',
+                message: `Order ${orderId}: seller payout (${sellerPayoutAmount}) exceeds order total (${totalAmount}); platform fee clamped to 0. Check order pricing.`,
+                context: { orderId, totalAmount, sellerPayoutAmount }
             });
         }
         const sellerId = order.seller_id ?? order.sellerId;

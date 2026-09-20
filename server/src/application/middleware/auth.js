@@ -5,6 +5,7 @@ import ProductPolicy from './policies/ProductPolicy.js';
 import OrderPolicy from './policies/OrderPolicy.js';
 import CacheService from '../../shared/utils/cache.service.js';
 import logger from '../../shared/utils/logger.js';
+import { reportAlert } from '../../shared/utils/alerting.js';
 import TokenBlacklistService from '../../domains/identity/tokens/tokenBlacklist.service.js';
 import * as userRepository from '../../domains/identity/users/user.repository.js';
 
@@ -114,8 +115,18 @@ export const protect = async (req, res, next) => {
         return next(new AppError('Your session has been invalidated. Please log in again.', 401));
       }
     } catch (blacklistErr) {
-      // Redis unavailable — fall through (fail open, log the issue)
+      // Redis unavailable — fall through (fail open, log the issue). Failing
+      // open is the deliberate availability choice (password-change revocation
+      // is enforced separately via password_changed_at), but a persistent
+      // outage means explicit token revocations aren't honored, so alert on it
+      // rather than only logging. reportAlert dedupes (60s), safe on this path.
       logger.warn(`[AUTH][Request ID: ${req.id || 'N/A'}] Token blacklist check failed (Redis unavailable):`, blacklistErr.message);
+      reportAlert({
+        level: 'warn',
+        title: 'Token blacklist check failing open',
+        message: `Auth token blacklist lookup errored (${blacklistErr.message}); requests are being allowed through without revocation enforcement. Check Redis.`,
+        context: { requestId: req.id || null }
+      });
     }
 
     // 2) Verify token
