@@ -246,7 +246,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
         className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
         style={isNativeApp() ? { paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' } : undefined}
       >
-        <div className="mb-6 sm:mb-7 md:mb-8">
+        <div className="mb-5 mt-1 sm:mb-6">
           <SellerProfileHero
             sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
             shopUsername={getShopUsername(sellerProfile?.shopName)}
