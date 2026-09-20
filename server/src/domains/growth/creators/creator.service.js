@@ -1220,15 +1220,24 @@ class CreatorService {
     // drift degrades gracefully instead of 500-ing the entire creator
     // dashboard. Self-heals once the migration is applied — the durable fix is
     // running `npm run migrate` against the affected database.
-    const loadEarnings = async (columns) => {
+    // Fetch every row that could still be held rather than a fixed-size sample:
+    // anything inside the T+2 window (2 business days is ~4 calendar days at
+    // most, so 10 days is a safe superset) OR any row flagged for review (held
+    // indefinitely). A prior `ORDER BY created_at DESC LIMIT 50` dropped the
+    // 51st+ still-holding row for high-volume creators and could release an old
+    // flagged row's hold once 50 newer rows accrued. The flag clause is only
+    // added when the metadata column is present (see the 42703 fallback below).
+    const loadEarnings = async (columns, hasMetadata) => {
+      const holdFilter = hasMetadata
+        ? `AND (created_at >= NOW() - INTERVAL '10 days' OR (metadata->>'flagged_for_review') = 'true')`
+        : `AND created_at >= NOW() - INTERVAL '10 days'`;
       const [salesEarningsResult, referralEarningsResult] = await Promise.all([
         pool.query(
           `SELECT ${columns}
            FROM creator_earnings
            WHERE creator_id = $1
              AND status = 'credited'
-           ORDER BY created_at DESC
-           LIMIT 50`,
+             ${holdFilter}`,
           [creatorId]
         ),
         pool.query(
@@ -1236,8 +1245,7 @@ class CreatorService {
            FROM creator_referral_earnings
            WHERE referrer_creator_id = $1
              AND status = 'credited'
-           ORDER BY created_at DESC
-           LIMIT 50`,
+             ${holdFilter}`,
           [creatorId]
         )
       ]);
@@ -1249,10 +1257,10 @@ class CreatorService {
 
     let allEarnings;
     try {
-      allEarnings = await loadEarnings('id, amount, created_at, metadata');
+      allEarnings = await loadEarnings('id, amount, created_at, metadata', true);
     } catch (err) {
       if (err && err.code === '42703') {
-        allEarnings = await loadEarnings('id, amount, created_at');
+        allEarnings = await loadEarnings('id, amount, created_at', false);
       } else {
         throw err;
       }

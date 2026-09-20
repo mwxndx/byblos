@@ -78,15 +78,24 @@ class OrderDeadlineService {
             const expiredOrders = result.rows;
             logger.info(`Found ${expiredOrders.length} orders with expired seller drop-off deadlines`);
 
+            // Per-order isolation: one order's failure must not abort the batch
+            // (and, via runAllChecks, every subsequent deadline sweep). Matches
+            // the try/catch pattern in checkExpiredReservations et al.
+            let processedCount = 0;
             for (const order of expiredOrders) {
-                await this.cancelOrderAndRefund(
-                    order,
-                    'Seller failed to drop off items within 48 hours'
-                );
+                try {
+                    await this.cancelOrderAndRefund(
+                        order,
+                        'Seller failed to drop off items within 48 hours'
+                    );
+                    processedCount++;
+                } catch (orderErr) {
+                    logger.error(`Error auto-cancelling order ${order.order_number || order.id} on expired seller deadline:`, orderErr.message);
+                }
             }
 
             return {
-                processedCount: expiredOrders.length,
+                processedCount,
                 orders: expiredOrders.map((o) => o.order_number)
             };
         } catch (error) {
@@ -115,15 +124,22 @@ class OrderDeadlineService {
             const expiredOrders = result.rows;
             logger.info(`Found ${expiredOrders.length} orders with expired buyer pickup deadlines`);
 
+            // Per-order isolation (see checkExpiredSellerDeadlines).
+            let processedCount = 0;
             for (const order of expiredOrders) {
-                await this.cancelOrderAndRefund(
-                    order,
-                    'Buyer failed to pick up order within 24 hours'
-                );
+                try {
+                    await this.cancelOrderAndRefund(
+                        order,
+                        'Buyer failed to pick up order within 24 hours'
+                    );
+                    processedCount++;
+                } catch (orderErr) {
+                    logger.error(`Error auto-cancelling order ${order.order_number || order.id} on expired buyer deadline:`, orderErr.message);
+                }
             }
 
             return {
-                processedCount: expiredOrders.length,
+                processedCount,
                 orders: expiredOrders.map((/** @type {any} */ o) => o.order_number)
             };
         } catch (error) {

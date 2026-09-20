@@ -72,19 +72,28 @@ async function computeCreatorClearingBalance(client, creatorId, lockedBalance) {
         createdAt: new Date(e.created_at),
         flaggedForReview: (e.metadata || {}).flagged_for_review === true
     });
+    // Fetch every row that could still be held: anything inside the T+2 window
+    // (2 business days spans at most ~4 calendar days, so 10 days is a safe
+    // superset) OR any row flagged for self-dealing review (held indefinitely).
+    // Rows older than the window and unflagged are already cleared and add 0 to
+    // the hold. A previous `ORDER BY created_at DESC LIMIT 50` silently dropped
+    // the 51st+ still-holding row for high-volume creators — and could release
+    // an old flagged row's fraud hold once 50 newer rows accrued.
     const [salesResult, referralResult] = await Promise.all([
         client.query(
             `SELECT id, amount, created_at, metadata
                FROM creator_earnings
               WHERE creator_id = $1 AND status = 'credited'
-              ORDER BY created_at DESC LIMIT 50`,
+                AND (created_at >= NOW() - INTERVAL '10 days'
+                     OR (metadata->>'flagged_for_review') = 'true')`,
             [creatorId]
         ),
         client.query(
             `SELECT id, amount, created_at, metadata
                FROM creator_referral_earnings
               WHERE referrer_creator_id = $1 AND status = 'credited'
-              ORDER BY created_at DESC LIMIT 50`,
+                AND (created_at >= NOW() - INTERVAL '10 days'
+                     OR (metadata->>'flagged_for_review') = 'true')`,
             [creatorId]
         )
     ]);

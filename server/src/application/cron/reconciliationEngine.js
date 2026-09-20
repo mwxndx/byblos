@@ -348,6 +348,12 @@ class ReconciliationEngine {
 
                 // 3. Ensure order is marked refunded and reverse seller settlement if applicable
                 if (locked.order_id) {
+                    // No `.catch(() => {})`: if this fails, let it throw so the
+                    // outer catch rolls back this refund's credit. Because the
+                    // buyer credit + credited_to_buyer flag are then never
+                    // committed, the worker re-selects this refund next run and
+                    // retries — self-healing. Swallowing it committed the credit
+                    // with a stale order and permanently excluded it from re-runs.
                     await client.query(
                         `UPDATE product_orders
                          SET status = 'REFUNDED'::order_status,
@@ -355,7 +361,7 @@ class ReconciliationEngine {
                              updated_at = NOW()
                          WHERE id = $1 AND status != 'REFUNDED'`,
                         [locked.order_id]
-                    ).catch(() => {});
+                    );
 
                     try {
                         await settlementService.reverseOrderSettlementForRefund(

@@ -145,14 +145,19 @@ export const confirmRefundRequest = async (req, res, next) => {
           ]
         );
       } catch (orderErr) {
-        logger.warn(`[REFUND] Order ${lockedRequest.order_id} status update fallback:`, orderErr.message);
+        // Primary (full) update failed; retry a minimal status-only update. If
+        // that ALSO fails, let it throw — the outer catch rolls the whole refund
+        // back (including the buyer credit above), so we never commit a refund
+        // with the order left un-refunded. Previously this was `.catch(() => {})`
+        // and the transaction committed regardless, silently stranding the order.
+        logger.warn(`[REFUND] Order ${lockedRequest.order_id} full status update failed, retrying minimal update:`, orderErr.message);
         await client.query(
           `UPDATE product_orders
            SET status = 'REFUNDED'::order_status,
                updated_at = NOW()
            WHERE id = $1`,
           [lockedRequest.order_id]
-        ).catch(() => {});
+        );
       }
 
       try {
