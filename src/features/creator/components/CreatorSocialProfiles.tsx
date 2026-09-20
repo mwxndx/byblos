@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Check, Loader2, Sparkles, Link2, X } from 'lucide-react';
+import { ExternalLink, Check, Loader2, Sparkles, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -43,11 +43,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
       toast.success('Social profiles saved successfully!');
     } catch (err: unknown) {
       // classifyApiError distinguishes network/timeout/HTTP-body failures,
-      // matching every sibling handler in this feature (CreatorDashboard,
-      // CreatorAvailableShops, CreatorWithdrawalPanel, CreatorProfileSheet)
-      // -- this one previously hand-rolled the same
-      // err.response?.data?.message chain, so a timeout/offline failure here
-      // showed a raw/generic message instead of the standardized copy.
+      // matching every sibling handler in this feature.
       toast.error(classifyApiError(err, 'Could not update social profiles.').message);
     }
   };
@@ -65,51 +61,45 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
   };
 
   return (
-    <section className="rounded-3xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-5 sm:p-6 shadow-sm transition-colors duration-200">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <section className="rounded-card border border-separator bg-surface-1 p-5 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-semibold tracking-tight text-slate-950 dark:text-white">
-              Social Media Accounts
-            </h2>
-            <span className="rounded-full bg-yellow-400/20 border border-yellow-400/30 text-yellow-600 dark:text-yellow-400 text-xs font-semibold px-2.5 py-0.5 flex items-center gap-1">
+            <h2 className="text-base font-semibold text-label">Social media accounts</h2>
+            <span className="flex items-center gap-1 rounded-full bg-[color-mix(in_srgb,var(--brand)_16%,transparent)] px-2.5 py-0.5 text-xs font-medium text-brand-text">
               <Sparkles className="h-3 w-3" />
-              Creator Reach
+              Creator reach
             </span>
           </div>
-          <p className="mt-1 text-xs sm:text-sm text-slate-600 dark:text-white/50">
+          <p className="mt-1 text-xs text-label-3 sm:text-sm">
             Connect your Instagram and TikTok so shop sellers can verify your audience and approve collaboration requests faster.
           </p>
         </div>
 
         {(profile?.instagramLink || profile?.tiktokLink) && (
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-              <Check className="h-3.5 w-3.5" /> Profiles Linked
-            </span>
-          </div>
+          <span className="flex items-center gap-1 text-xs font-medium text-sys-green">
+            <Check className="h-3.5 w-3.5" /> Profiles linked
+          </span>
         )}
       </div>
 
       <form onSubmit={handleSave} className="mt-5 space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
           {/* Instagram input */}
-          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <img src={instagramLogo} alt="Instagram" className="h-5 w-5 object-contain shrink-0" />
-                <label className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                  Instagram Profile
-                </label>
+          <div className="rounded-control border border-separator bg-surface-2 p-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <img src={instagramLogo} alt="Instagram" className="h-5 w-5 shrink-0 object-contain" />
+                <label className="truncate text-xs font-medium text-label">Instagram profile</label>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex shrink-0 items-center gap-1">
                 {instagramHref && (
                   <a
                     href={instagramHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Open Instagram link"
-                    className="rounded-md p-1 text-pink-600 hover:bg-pink-500/10 transition-colors"
+                    className="rounded-md p-1 text-label-2 transition-colors hover:bg-fill hover:text-label"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
@@ -120,7 +110,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
                     onClick={() => handleRemove('instagram')}
                     disabled={updateMutation.isPending}
                     aria-label="Remove Instagram link"
-                    className="rounded-md p-1 text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                    className="rounded-md p-1 text-sys-red transition-colors hover:bg-[color-mix(in_srgb,var(--sys-red)_14%,transparent)] disabled:opacity-50"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -132,30 +122,26 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
               placeholder="@yourhandle or instagram.com/username"
-              className="h-10 text-xs sm:text-sm bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-separator rounded-xl"
+              className="h-10 text-xs sm:text-sm"
             />
-            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-white/40">
-              Enter your handle with @ or your full profile URL
-            </p>
+            <p className="mt-1.5 text-[11px] text-label-3">Enter your handle with @ or your full profile URL</p>
           </div>
 
           {/* TikTok input */}
-          <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-white/[0.02] p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <img src={tiktokLogo} alt="TikTok" className="h-5 w-5 object-contain shrink-0" />
-                <label className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                  TikTok Profile
-                </label>
+          <div className="rounded-control border border-separator bg-surface-2 p-4">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <img src={tiktokLogo} alt="TikTok" className="h-5 w-5 shrink-0 object-contain" />
+                <label className="truncate text-xs font-medium text-label">TikTok profile</label>
               </div>
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex shrink-0 items-center gap-1">
                 {tiktokHref && (
                   <a
                     href={tiktokHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Open TikTok link"
-                    className="rounded-md p-1 text-cyan-600 hover:bg-cyan-500/10 transition-colors"
+                    className="rounded-md p-1 text-label-2 transition-colors hover:bg-fill hover:text-label"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
                   </a>
@@ -166,7 +152,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
                     onClick={() => handleRemove('tiktok')}
                     disabled={updateMutation.isPending}
                     aria-label="Remove TikTok link"
-                    className="rounded-md p-1 text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+                    className="rounded-md p-1 text-sys-red transition-colors hover:bg-[color-mix(in_srgb,var(--sys-red)_14%,transparent)] disabled:opacity-50"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -178,11 +164,9 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
               value={tiktok}
               onChange={(e) => setTiktok(e.target.value)}
               placeholder="@yourhandle or tiktok.com/@username"
-              className="h-10 text-xs sm:text-sm bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-separator rounded-xl"
+              className="h-10 text-xs sm:text-sm"
             />
-            <p className="mt-1.5 text-[11px] text-slate-500 dark:text-white/40">
-              Enter your TikTok username or profile link
-            </p>
+            <p className="mt-1.5 text-[11px] text-label-3">Enter your TikTok username or profile link</p>
           </div>
         </div>
 
@@ -197,7 +181,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
                 setTiktok(profile?.tiktokLink || '');
               }}
               disabled={updateMutation.isPending}
-              className="h-9 border-slate-200 dark:border-separator text-xs font-bold"
+              className="h-9 text-xs"
             >
               Reset
             </Button>
@@ -205,15 +189,15 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
           <Button
             type="submit"
             disabled={!hasChanges || updateMutation.isPending}
-            className="h-9 px-5 bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition-colors text-xs disabled:opacity-50"
+            className="h-9 px-5 text-xs"
           >
             {updateMutation.isPending ? (
               <>
                 <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Saving...
+                Saving…
               </>
             ) : (
-              'Save Social Links'
+              'Save social links'
             )}
           </Button>
         </div>
