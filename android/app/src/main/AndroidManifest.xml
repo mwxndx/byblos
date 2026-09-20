@@ -45,10 +45,6 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
-        <!-- Remove plugin background service to satisfy Google Play foreground location policy -->
-        <service
-            android:name="com.equimaps.capacitor_background_geolocation.BackgroundGeolocationService"
-            tools:node="remove" />
     </application>
 
     <!-- Permissions -->
