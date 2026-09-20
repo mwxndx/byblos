@@ -363,15 +363,17 @@ class ReconciliationEngine {
                         [locked.order_id]
                     );
 
-                    try {
-                        await settlementService.reverseOrderSettlementForRefund(
-                            client,
-                            locked.order_id,
-                            'reconciliation_worker_refund'
-                        );
-                    } catch (settleErr) {
-                        logger.warn(`[RECON] Settlement reversal for order ${locked.order_id} failed:`, settleErr.message);
-                    }
+                    // Bare (no swallow): reverseOrderSettlementForRefund returns
+                    // result objects for business cases and is safe to re-run
+                    // (already-refunded payouts no-op), so it only throws on a
+                    // real DB error — which must roll this refund back (credit +
+                    // credited_to_buyer undone) so the worker retries it, rather
+                    // than crediting the buyer while leaving the seller settled.
+                    await settlementService.reverseOrderSettlementForRefund(
+                        client,
+                        locked.order_id,
+                        'reconciliation_worker_refund'
+                    );
                 }
 
                 await client.query('COMMIT');

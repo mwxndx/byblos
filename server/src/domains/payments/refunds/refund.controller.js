@@ -160,11 +160,14 @@ export const confirmRefundRequest = async (req, res, next) => {
         );
       }
 
-      try {
-        await settlementService.reverseOrderSettlementForRefund(client, lockedRequest.order_id, 'manual_admin_refund');
-      } catch (settleErr) {
-        logger.warn(`[REFUND] Order ${lockedRequest.order_id} settlement reversal fallback:`, settleErr.message);
-      }
+      // No try/catch: both reversals return result objects for business cases
+      // (no payout, already-withdrawn balance recorded as *_compensation_required
+      // in-DB) and only throw on a genuine DB error. Swallowing that error
+      // committed the buyer refund while silently leaving the seller settlement
+      // un-reversed / creator commission un-clawed — a platform loss. Letting it
+      // propagate rolls the whole refund back (buyer credit undone), retryable.
+      // Mirror OrderService.executeExceptionalReversal, which calls both bare.
+      await settlementService.reverseOrderSettlementForRefund(client, lockedRequest.order_id, 'manual_admin_refund');
 
       // FIX (audit P1-1): this endpoint previously reversed the seller's escrow
       // settlement but never clawed back the creator commission / referral
@@ -172,11 +175,7 @@ export const confirmRefundRequest = async (req, res, next) => {
       // buyer in full while still paying the creator for a sale that no
       // longer exists. Mirror OrderService.executeExceptionalReversal, which
       // already performs both reversals together.
-      try {
-        await settlementService.reverseCreatorEarningsForRefund(client, lockedRequest.order_id, 'manual_admin_refund');
-      } catch (creatorReversalErr) {
-        logger.warn(`[REFUND] Order ${lockedRequest.order_id} creator earnings reversal fallback:`, creatorReversalErr.message);
-      }
+      await settlementService.reverseCreatorEarningsForRefund(client, lockedRequest.order_id, 'manual_admin_refund');
     }
 
     await client.query('COMMIT');
