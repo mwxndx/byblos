@@ -121,6 +121,12 @@ jobs:
       # test schema is provisioned from the committed snapshot (server/test/
       # schema.sql). db:test:setup creates the DB if needed, then applies it.
       - name: Provision test schema
+        # db:test:* scripts only load server/.env.test when NODE_ENV=test (or
+        # DOTENV_CONFIG_PATH is set); without it they fall back to the absent
+        # server/.env and the safety guard aborts on an empty DB_NAME. The test
+        # steps below set NODE_ENV themselves via test/setup.js.
+        env:
+          NODE_ENV: test
         run: npm run db:test:setup
 
       - name: Run unit/contract tests
