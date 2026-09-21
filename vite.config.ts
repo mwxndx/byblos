@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'node:path';
-import { componentTagger } from 'lovable-tagger';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 // https://vitejs.dev/config/
@@ -23,8 +22,7 @@ export default defineConfig(({ command, mode }) => {
     },
     plugins: [
       react(),
-      mode === 'development' && componentTagger(),
-    ].filter(Boolean),
+    ],
     server: {
       host: '::',
       port: 3000,

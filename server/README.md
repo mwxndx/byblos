@@ -1,294 +1,123 @@
-RESTful API server for the BYBLOS marketplace, built with Node.js, Express, and PostgreSQL. This API powers both the customer-facing e-commerce platform and the seller dashboard.
+# Byblos API
 
-## 🚀 Features
+The backend for the [Byblos](../README.md) marketplace: a Node.js + Express + PostgreSQL service (ESM, `"type": "module"`, entry `src/index.js`) that handles authentication, seller/creator/buyer accounts, products, orders and escrow-style fulfilment, Paystack payments (M‑Pesa STK + card), settlement and seller withdrawals, the creator affiliate programme, delivery tracking, and the scheduled jobs that reconcile all of it.
 
-### Payment Processing System
+## Tech stack
 
-The payment processing system handles the complete lifecycle of payments, from initiation to completion, including automated ticket generation and email notifications.
+- **Runtime:** Node.js 22, Express
+- **Database:** PostgreSQL 17, accessed via `pg`; migrations with `node-pg-migrate` (forward-only `.sql` files)
+- **Cache/queues:** Redis via `ioredis`
+- **Scheduling:** `node-cron`
+- **Payments:** Paystack (payments + payouts)
+- **Media/email:** Cloudinary, Resend/Nodemailer
+- **Auth:** JWT access + refresh tokens, `bcryptjs`
+- **Tests:** Node’s built-in `node:test` runner
 
-#### Key Features
+## Prerequisites
 
-- **Webhook Integration**
-  - Processes payment status updates from payment providers
-  - Handles both successful and failed payments
-  - Implements idempotency to prevent duplicate processing
+- Node.js **22**
+- PostgreSQL 17 and Redis 7 (the repo’s Docker compose files provide both)
 
-- **Automated Ticket Generation**
-  - Creates tickets automatically upon successful payment
-  - Generates unique QR codes for each ticket
-  - Updates payment records with ticket references
+## Quick start
 
-- **Email Notifications**
-  - Sends confirmation emails with ticket details
-  - Includes QR codes for event access
-  - Implements retry logic for failed email deliveries
+```bash
+cd server
+npm install
+cp .env.example .env            # then fill in the values below
 
-- **Cron Jobs**
-  - Processes pending payments every 5 minutes
-  - Retries failed email deliveries
-  - Logs all processing attempts for auditing
+# start Postgres + Redis (from the repo root compose file)
+docker compose -f ../docker-compose.yml up -d
 
-#### Admin Endpoints
+npm run migrate                 # apply all migrations
+npm run dev                     # nodemon, http://localhost:3002
+```
 
-- `POST /api/v1/admin/process-payments` - Manually trigger payment processing
-  - Query Parameters:
-    - `hours` (optional): Process payments from last X hours (default: 24)
-    - `limit` (optional): Maximum number of payments to process (default: 50)
+The API is served under `/api`. In development the web app proxies `/api/*` here, so you normally hit it through `http://localhost:3000`.
 
-#### Environment Variables
+### Environment variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ENABLE_PAYMENT_CRON` | Enable/disable automatic payment processing | `true` |
-| `PAYMENT_WEBHOOK_SECRET` | Secret for verifying webhook signatures | - |
-| `EMAIL_FROM_EMAIL` | Sender email for ticket confirmations | - |
-| `EMAIL_FROM_NAME` | Sender name for ticket confirmations | - |
+Fill `server/.env` (see `.env.example` for the complete list). The essentials:
 
-#### Monitoring and Logging
+| Group | Variables |
+|-------|-----------|
+| Server | `NODE_ENV`, `PORT` (default 3002), `APP_NAME`, `BYBLOS_PROCESS_ROLE` |
+| Database | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_SSL` |
+| Redis | `REDIS_URL` |
+| Auth | `JWT_SECRET`, `JWT_REFRESH_SECRET`, `JWT_EXPIRES_IN`, `JWT_REFRESH_EXPIRES_IN` |
+| CORS/URLs | `FRONTEND_URL`, `BACKEND_URL`, `ALLOWED_ORIGINS` |
+| Payments | `PAYMENT_PROVIDER`, `PAYOUT_PROVIDER`, `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_BASE_URL` |
+| Email | `EMAIL_FROM_EMAIL`, `EMAIL_FROM_NAME` |
+| Cron toggles | `ENABLE_PAYMENT_CRON`, `ENABLE_PAYOUT_RECONCILIATION`, `ENABLE_SETTLEMENT_PROMOTION_CRON`, `ENABLE_ORDER_DEADLINE_CRON`, `ENABLE_CLEANUP_CRON`, `ENABLE_REFERRAL_CRON` (all default on) |
 
-- All payment processing activities are logged with detailed context
-- Failed payment processing attempts are automatically retried
-- Admin dashboard provides visibility into payment processing status
+Never commit real secrets. Any credential that lands in the repo (or its git history) must be rotated.
 
-- **Authentication & Authorization**
-  - JWT-based authentication
-  - Role-based access control
-  - Refresh token rotation
+## Scripts
 
-- **Product Management**
-  - CRUD operations for products
-  - Product categorization by aesthetics
-  - Image upload and management
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Start with nodemon + `dotenv/config` |
+| `npm start` | Start the API (`src/index.js`) |
+| `npm run start:worker` | Start a standalone worker process (`src/worker.js`) |
+| `npm run migrate` | Apply pending migrations |
+| `npm run migrate:create <name>` | Scaffold a new migration |
+| `npm run seed` | Seed development data |
+| `npm test` | Unit/contract tests (`test/*.test.js`) |
+| `npm run test:integration` | DB-backed integration tests (`test/**/*.integration.test.js`) |
+| `npm run test:all` | Both suites |
+| `npm run lint` / `npm run format` | ESLint / Prettier |
 
-- **Order Processing**
-  - Shopping cart functionality
-  - Order creation and tracking
-  - Payment processing integration
-  - Automated ticket generation
-  - Email notifications with QR codes
+## Database migrations
 
-- **Seller Management**
-  - Seller registration and authentication
-  - Product inventory management
-  - Sales analytics and reporting
+Migrations are **forward-only** `.sql` files applied by `node-pg-migrate`; there are no down migrations. Roll a schema change forward with a new migration — never edit an applied one. Because there is no automated rollback, recovery from a bad migration is a point-in-time database restore followed by a redeploy, so stage destructive changes carefully.
 
-## ⚙️ Process Roles & Background Jobs
+```bash
+npm run migrate:create add_widgets_table   # create server/migrations/<ts>_add_widgets_table.sql
+npm run migrate                             # apply
+```
 
-This server is a single Express app (`src/index.js`) that can run in one of
-two roles, controlled by the `BYBLOS_PROCESS_ROLE` environment variable:
+## Testing
+
+Tests use `node:test` and need a disposable Postgres + Redis. The `db:test:*` scripts are guarded so they can only ever touch a database whose name contains `test`.
+
+```bash
+cd server
+npm run db:test:up        # Postgres + Redis via ../docker-compose.test.yml
+npm run db:test:setup     # create the test DB and load test/schema.sql
+npm test                  # unit/contract
+npm run test:integration  # integration
+npm run db:test:down      # tear down
+```
+
+`test/schema.sql` is a committed snapshot of the full schema (the incremental migrations can’t build from an empty DB in CI), kept in sync by `schemaSnapshotSync.test.js`. CI runs the same flow on Node 22 against service containers.
+
+## Process roles & background jobs
+
+The server is a single Express app (`src/index.js`) that runs in one of two roles, set by `BYBLOS_PROCESS_ROLE`:
 
 | `BYBLOS_PROCESS_ROLE` | What runs |
 |---|---|
-| unset, or `all` (**the default**) | API routes **and** every cron job / background worker, all in one process |
-| `api` or `web` | API routes only — cron jobs and workers are skipped (`application/bootstrap/index.js`); expected to run separately via `src/worker.js` |
+| unset, or `all` (**default**) | API routes **and** every cron/background worker, in one process |
+| `api` or `web` | API routes only — crons/workers are skipped (`application/bootstrap/index.js`); run them separately via `src/worker.js` |
 
-**In production today, `BYBLOS_PROCESS_ROLE` is unset**, so the single
-deployed web process (Render service `byblos-backend`) runs both the API
-*and* every background job below. There is no separate worker service
-actually deployed — `server/render.yaml` describes a two-service split
-(`api` role + a dedicated worker service) as a *possible* target
-architecture, but that file is not the live Render config for this project's
-services (it was written for a differently-named service and never applied
-via "New from Blueprint"); it's aspirational, not a description of what's
-running. If you're reading only this README and wondering where cron jobs
-run: **they run inside the same process as the API**, right now.
+**In production the single web service runs with role `all`**, so one process serves the API and every job below. `server/render.yaml` also describes a two-service split (API + dedicated worker) as a possible target architecture; it is not required for the current single-service deployment. If you scale the web service beyond one instance, first set `BYBLOS_PROCESS_ROLE=api` on it and run `src/worker.js` as its own service — otherwise every instance starts its own copy of every cron.
 
-This is safe by design at the current scale (see `shouldStartWorkers` in
-`application/bootstrap/index.js`), but it means:
-- Scaling the web service to more than one instance would start every cron
-  job on every instance — set `BYBLOS_PROCESS_ROLE=api` on the web service
-  and run `node src/worker.js` as a separate service before doing that.
-- A deploy that restarts the process also restarts every cron job's schedule
-  (there's no separate worker uptime to rely on).
+Because crons live in the web process, a free-tier instance that sleeps also pauses its schedules; an uptime pinger keeps it warm. Each job is individually toggleable via its `ENABLE_*_CRON` variable (see `application/bootstrap/cron.js`):
 
-### Background jobs that start when the worker role is active (`all`, or a dedicated `worker.js` process)
-
-Each is individually toggleable via its own `ENABLE_*_CRON` env var
-(default: enabled) — see `application/bootstrap/cron.js`:
-
-- **Payment processing** (`ENABLE_PAYMENT_CRON`) — reconciles pending payments with the provider, every 5 minutes
-- **Reconciliation Engine** — self-healing pass over payout/withdrawal state
-- **Fulfillment Worker** — processes the order-fulfillment queue
+- **Payment processing** (`ENABLE_PAYMENT_CRON`) — reconciles pending payments with Paystack (every ~5 min)
+- **Reconciliation engine** — self-healing pass over payout/withdrawal state
+- **Fulfilment worker** — processes the order-fulfilment queue
 - **Payout reconciliation** (`ENABLE_PAYOUT_RECONCILIATION`)
-- **Settlement promotion** (`ENABLE_SETTLEMENT_PROMOTION_CRON`) — promotes Paystack-settled seller earnings into withdrawable balance
+- **Settlement promotion** (`ENABLE_SETTLEMENT_PROMOTION_CRON`) — promotes Paystack-settled earnings into withdrawable balance
 - **Order deadline checks** (`ENABLE_ORDER_DEADLINE_CRON`) — custom-production SLA reminders/refunds
-- **Cleanup job** (`ENABLE_CLEANUP_CRON`) — daily housekeeping
-- **Referral rewards** (`ENABLE_REFERRAL_CRON`) — monthly referral payout
+- **Cleanup** (`ENABLE_CLEANUP_CRON`) — daily housekeeping
+- **Referral rewards** (`ENABLE_REFERRAL_CRON`) — periodic referral payouts
 
-## 🛠 Tech Stack
+## Deployment
 
-- **Runtime**: Node.js 18+ with Express
-- **Database**: PostgreSQL 13+ with node-pg-migrate
-- **Authentication**: JWT with refresh tokens
-- **Validation**: Express Validator
-- **Logging**: Winston
-- **Testing**: Jest & Supertest
+Deployed on **Render** (`server/render.yaml`): a web service with `preDeployCommand: npm run migrate` and `startCommand: npm start`, plus managed PostgreSQL and Redis. Migrations run before each deploy; keep them forward-only and backwards-compatible so a deploy can roll without downtime.
 
-## 📋 Prerequisites
+## Security notes
 
-- Node.js 18+ (LTS recommended)
-- PostgreSQL 13+
-- npm 9+ or yarn 1.22+
-- Git
-
-## 🚀 Quick Start
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/yourusername/byblos.git
-cd byblos/server
-```
-
-### 2. Install dependencies
-
-```bash
-npm install
-```
-
-### 3. Set up environment variables
-
-Create a `.env` file in the server directory:
-
-```env
-# Server Configuration
-PORT=3002
-NODE_ENV=development
-
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=byblos
-DB_USER=your_db_user
-DB_PASSWORD=your_secure_password
-
-# JWT Configuration
-JWT_SECRET=generate_a_strong_secret_here
-JWT_EXPIRES_IN=24h
-JWT_REFRESH_EXPIRES_IN=7d
-
-# Optional: Email configuration
-# SMTP_HOST=smtp.example.com
-# SMTP_PORT=587
-# SMTP_USER=your_email@example.com
-# SMTP_PASS=your_email_password
-# EMAIL_FROM=noreply@bybloshq.space
-```
-
-### 4. Set up the database
-
-1. **Create a new PostgreSQL database**:
-   ```sql
-   CREATE DATABASE byblos;
-   CREATE USER your_db_user WITH PASSWORD 'your_secure_password';
-   GRANT ALL PRIVILEGES ON DATABASE byblos TO your_db_user;
-   ```
-
-2. **Run migrations**:
-   ```bash
-   # Run all pending migrations
-   npm run migrate
-   
-   # Seed the database with sample data (optional)
-   npm run seed
-   ```
-
-### 5. Start the server
-
-```bash
-# Development mode with hot-reload
-npm run dev
-
-# Production mode
-npm start
-```
-
-The API will be available at `http://localhost:3002/api`
-
-## 📚 API Documentation
-
-### Base URL
-All API endpoints are prefixed with `/api`
-
-### Authentication
-Most endpoints require authentication. Include the JWT token in the `Authorization` header:
-```
-Authorization: Bearer <your_jwt_token>
-```
-
-### Available Endpoints
-
-#### Authentication
-- `POST /auth/register` - Register a new user
-- `POST /auth/login` - Login user
-- `POST /auth/refresh-token` - Refresh access token
-- `POST /auth/logout` - Invalidate refresh token
-
-#### Products
-- `GET /products` - List all products (with filtering)
-- `GET /products/:id` - Get product details
-- `POST /products` - Create new product (seller only)
-- `PUT /products/:id` - Update product (seller only)
-- `DELETE /products/:id` - Delete product (seller only)
-
-#### Orders
-- `GET /orders` - List user's orders
-- `GET /orders/:id` - Get order details
-- `POST /orders` - Create new order
-- `PATCH /orders/:id/status` - Update order status (seller/admin only)
-
-#### Sellers
-- `GET /sellers` - List all sellers
-- `GET /sellers/:id` - Get seller details
-- `GET /sellers/me` - Get current seller profile
-- `PATCH /sellers/me` - Update seller profile
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm test -- --watch
-
-# Run specific test file
-npm test -- tests/controllers/product.test.js
-```
-
-## 🔧 Database Migrations
-
-```bash
-# Create new migration file
-npm run migrate:create migration_name
-
-# Run pending migrations
-npm run migrate
-
-# Rollback last migration
-npm run migrate:down
-
-# Run seeds
-npm run seed
-```
-
-## 🔒 Security Considerations
-
-- Always use HTTPS in production
-- Keep your `.env` file secure and never commit it to version control
-- Use strong, unique passwords for database users
-- Regularly update dependencies to patch security vulnerabilities
-- Implement rate limiting for authentication endpoints
-- Use CORS to restrict API access to trusted domains
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Express.js](https://expressjs.com/) - Fast, unopinionated web framework for Node.js
-- [node-pg-migrate](https://salsita.github.io/node-pg-migrate/) - SQL migration tool for Node.js
-- [JWT](https://jwt.io/) - JSON Web Tokens for authentication
-- [Winston](https://github.com/winstonjs/winston) - Logging library
-- [Jest](https://jestjs.io/) - JavaScript Testing Framework
+- Enforce HTTPS; keep `.env` out of version control; rotate any exposed secret.
+- Auth endpoints are rate-limited (IP- and account-keyed); parameterise every query; verify Paystack webhook signatures before trusting payloads.
+- Money paths use row locks (`FOR UPDATE`), `ON CONFLICT` idempotency, `NUMERIC(15,2)` columns, and non-negative check constraints — preserve these when changing them.
