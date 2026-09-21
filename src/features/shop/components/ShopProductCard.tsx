@@ -22,8 +22,9 @@ interface ShopProductCardProps {
 
 /**
  * Minimal product card (spec §17): image, product name, price, description, and images button.
- * The card adopts the seller's shop theme — surface follows the shop's dark/light theme (--theme-*),
- * and the name/price/description/images carry the seller's accent colour (--product-card-accent).
+ * The card surface follows the shop's dark/light theme (--theme-*), but the name, price, and the
+ * image/description icons use the app's theme-aware label colour (text-label: near-black in light,
+ * near-white in dark) rather than the seller's accent, so they stay readable across shop themes.
  */
 export function ShopProductCard({
   product,
@@ -169,13 +170,12 @@ export function ShopProductCard({
           )}
         </div>
 
-        {/* Name, price, description & images buttons — themed with the seller's accent. */}
+        {/* Name, price, description & images buttons — theme-aware label colour (black/white by light/dark). */}
         <div className="flex flex-1 flex-col justify-between gap-1 p-2 sm:p-2.5">
           {/* Product name on left, image icon to the right */}
           <div className="flex items-center justify-between gap-1.5">
             <h3
-              className="min-w-0 flex-1 truncate text-xs font-normal tracking-tight sm:text-sm"
-              style={{ color: 'var(--product-card-accent)' }}
+              className="min-w-0 flex-1 truncate text-xs font-normal tracking-tight text-label sm:text-sm"
               title={product.name}
             >
               {product.name}
@@ -185,8 +185,7 @@ export function ShopProductCard({
               type="button"
               onClick={(e) => { stop(e); setActiveImageIndex(0); setShowImages(true); }}
               aria-label={`View ${product.name} images`}
-              className="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer hover:opacity-75 transition-opacity shrink-0"
-              style={{ color: 'var(--product-card-accent)' }}
+              className="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer text-label hover:opacity-75 transition-opacity shrink-0"
             >
               <ImageIcon className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
             </button>
@@ -194,7 +193,7 @@ export function ShopProductCard({
 
           {/* Price on left, description icon on right */}
           <div className="mt-auto flex items-center justify-between gap-1 pt-1">
-            <p className="text-sm font-normal tabular-nums sm:text-base" style={{ color: 'var(--product-card-accent)' }}>
+            <p className="text-sm font-normal tabular-nums text-label sm:text-base">
               {formatCurrency(product.price)}
             </p>
 
@@ -202,8 +201,7 @@ export function ShopProductCard({
               type="button"
               onClick={(e) => { stop(e); setShowDescription(true); }}
               aria-label={`View ${product.name} description`}
-              className="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer hover:opacity-75 transition-opacity shrink-0"
-              style={{ color: 'var(--product-card-accent)' }}
+              className="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer text-label hover:opacity-75 transition-opacity shrink-0"
             >
               <Info className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
             </button>
@@ -225,7 +223,7 @@ export function ShopProductCard({
             }}
           >
             <div className="mb-2 flex items-start justify-between gap-3">
-              <h3 className="text-base font-normal" style={{ color: 'var(--product-card-accent)' }}>{product.name}</h3>
+              <h3 className="text-base font-normal text-label">{product.name}</h3>
               <button type="button" onClick={() => setShowDescription(false)} aria-label="Close" className="-mr-1 -mt-1 rounded-full p-1.5 opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10">
                 <X className="h-4 w-4" />
               </button>
@@ -263,7 +261,7 @@ export function ShopProductCard({
             {/* Modal Header */}
             <div className="mb-3 flex items-center justify-between gap-2 border-b pb-2.5 border-[var(--byblos-border,rgba(0,0,0,0.1))]">
               <div className="min-w-0 flex-1">
-                <h3 className="text-sm sm:text-base font-normal truncate" style={{ color: 'var(--product-card-accent)' }}>
+                <h3 className="text-sm sm:text-base font-normal truncate text-label">
                   {product.name}
                 </h3>
                 <p className="text-[11px] font-semibold opacity-70">
