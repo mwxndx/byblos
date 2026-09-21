@@ -62,7 +62,9 @@
     "zustand": "^4.5.2"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.24.0"
+    "@rollup/rollup-linux-x64-gnu": "4.24.0",
+    "@esbuild/linux-x64": "0.21.5",
+    "@swc/core-linux-x64-gnu": "1.7.39"
   },
   "devDependencies": {
     "@capacitor/cli": "^8.5.1",
