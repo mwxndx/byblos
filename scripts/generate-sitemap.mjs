@@ -26,7 +26,15 @@ const routes = [
 ];
 
 async function fetchDynamicSellerRoutes() {
-  const dbUrl = process.env.DB_URL || 'postgresql://byblos_user:DgpNqT0uXz7RIPKLGuDSVxDSWyqsK6d2@dpg-d9u7gq3m8hqs73ennd20-a.frankfurt-postgres.render.com/bybloshqdb';
+  // DB_URL must be provided by the build environment. Never hardcode a
+  // production connection string here — it leaks a live credential into the
+  // repo and its git history. Without DB_URL we simply omit dynamic seller
+  // routes from the sitemap (static routes still ship).
+  const dbUrl = process.env.DB_URL;
+  if (!dbUrl) {
+    console.warn('DB_URL not set — skipping dynamic seller routes in sitemap.');
+    return [];
+  }
   try {
     const pg = await import('../server/node_modules/pg/lib/index.js');
     const { Pool } = pg.default || pg;

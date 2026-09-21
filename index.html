@@ -110,8 +110,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
-  <!-- Canonical URL -->
-  <link rel="canonical" href="https://www.byblosafrica.site/" />
+  <!-- Canonical URL is set per-route by <SEOHead> (react-helmet-async), not
+       hardcoded here: this single static index.html is served for every route
+       (see vercel.json), so a fixed canonical would make every deep page
+       (/about, /shop/men, seller shops, …) declare the homepage as its
+       canonical and get dropped from the index as a duplicate. Pages without
+       SEOHead self-canonicalise to their own URL, and the apex→www redirect
+       keeps that on the www host. -->
+
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
@@ -134,10 +140,10 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "Byblos",
-      "url": "https://byblosafrica.site/",
+      "url": "https://www.byblosafrica.site/",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://byblosafrica.site/shop?q={search_term_string}",
+        "target": "https://www.byblosafrica.site/shop?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     }
@@ -148,7 +154,7 @@
       "@context": "https://schema.org",
       "@type": "Store",
       "name": "Byblos - Business Operating App for Nairobi Sellers",
-      "url": "https://byblosafrica.site/",
+      "url": "https://www.byblosafrica.site/",
       "description": "Byblos helps Nairobi sellers start and run a business with a trusted shop link, secure checkout, order management, delivery support, receipts, refunds, and withdrawals.",
       "address": {
         "@type": "PostalAddress",
@@ -171,7 +177,7 @@
         }
       ],
       "priceRange": "KSh 500 - KSh 50,000",
-      "image": "https://byblosafrica.site/images/og-image.jpg"
+      "image": "https://www.byblosafrica.site/images/og-image.jpg"
     }
     </script>
 </head>
