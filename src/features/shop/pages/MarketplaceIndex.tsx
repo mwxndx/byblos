@@ -3,6 +3,7 @@ import { AddBusinessCard } from '@/features/shop/components/AddBusinessCard';
 import { LandingDoodles } from '@/features/shop/components/LandingDoodles';
 import { Link } from 'react-router-dom';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
+import { SEOHead } from '@/shared/components/SEOHead';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
 
@@ -81,7 +82,17 @@ const LandingHome = () => (
 );
 
 const IndexPage = () => {
-  return <LandingHome />;
+  return (
+    <>
+      <SEOHead
+        title="Byblos | Start and Run Your Business in Nairobi"
+        description="The safer way to buy from businesses on social media. Byblos gives Nairobi sellers a trusted shop link, secure checkout, order management, delivery, receipts, refunds, and withdrawals."
+        url="https://www.byblosafrica.site/"
+        canonical="https://www.byblosafrica.site/"
+      />
+      <LandingHome />
+    </>
+  );
 };
 
 export default IndexPage;

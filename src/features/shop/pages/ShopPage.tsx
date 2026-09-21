@@ -100,6 +100,11 @@ const ShopPage = () => {
         title={sellerInfo?.shopName || sellerInfo?.fullName || 'Shop'}
         description={sellerInfo?.bio || `Shop ${sellerInfo?.shopName || 'products'} on Byblos. Browse quality items and order securely.`}
         image={sellerInfo?.avatarUrl ? getImageUrl(sellerInfo.avatarUrl) : undefined}
+        // A shop is reachable at both /shop/:slug and the short link /:slug — pin
+        // the canonical to one www short link so the two paths don't compete as
+        // duplicates, and drop any ?creator= tracking param from the canonical.
+        url={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
+        canonical={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
       />
       {isCreatorPreview && (
         <div className="sticky top-0 z-50 border-b border-yellow-400/30 bg-black/90 px-4 py-2.5 backdrop-blur-md shadow-lg">

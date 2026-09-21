@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, ShieldCheck, Trash2 } from '@/shared/ui/icons';
+import { SEOHead } from '@/shared/components/SEOHead';
 
 const SUPPORT_EMAIL = 'bybloshqke@zohomail.com';
 
@@ -11,6 +12,12 @@ const SUPPORT_EMAIL = 'bybloshqke@zohomail.com';
 export default function DeleteAccountPage() {
   return (
     <div className="min-h-[100svh] bg-black text-white">
+      <SEOHead
+        title="Delete your Byblos account"
+        description="How to request deletion of your Byblos account and associated personal data, what is deleted versus retained, and for how long."
+        url="https://www.byblosafrica.site/delete-account"
+        canonical="https://www.byblosafrica.site/delete-account"
+      />
       <header className="sticky top-0 z-10 border-b border-white/10 bg-black/95 px-4 py-3 backdrop-blur pt-safe-top">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <Link

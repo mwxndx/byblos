@@ -1,18 +1,18 @@
 User-agent: *
 Allow: /
-Allow: /shop
-Allow: /shop/*
-Allow: /sell
-Allow: /about
-Allow: /contact
-Allow: /privacy
-Allow: /terms
 
+# Private dashboards, internal portals, auth and transactional flows —
+# these render app shells or per-user/per-token content and should not be
+# crawled or indexed.
 Disallow: /buyer/
 Disallow: /seller/
 Disallow: /admin/
 Disallow: /creator/
 Disallow: /mzigo/
+Disallow: /logistics/
+Disallow: /marketing/
+Disallow: /verify-email
+Disallow: /track/
 Disallow: /checkout
 Disallow: /payment-success
 Disallow: /api/

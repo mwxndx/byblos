@@ -10,19 +10,16 @@ const __dirname = dirname(__filename);
 // Define your website URL
 const siteUrl = 'https://www.byblosafrica.site';
 
-// Static routes
+// Static routes — ONLY pages that actually exist and render real content.
+// Do not add /shop, /shop/<category>, /sell, /about, /contact here: those have
+// no route and fall through to the /:shopName wildcard, rendering a
+// "shop not found" shell that Google refuses to index (soft-404). Build the
+// pages first, then add them back.
 const routes = [
   { url: '/', changefreq: 'daily', priority: 1.0 },
-  { url: '/shop', changefreq: 'daily', priority: 0.9 },
-  { url: '/shop/women', changefreq: 'daily', priority: 0.8 },
-  { url: '/shop/men', changefreq: 'daily', priority: 0.8 },
-  { url: '/shop/shoes', changefreq: 'daily', priority: 0.8 },
-  { url: '/shop/vintage', changefreq: 'daily', priority: 0.8 },
-  { url: '/sell', changefreq: 'weekly', priority: 0.7 },
-  { url: '/about', changefreq: 'monthly', priority: 0.5 },
-  { url: '/contact', changefreq: 'monthly', priority: 0.5 },
   { url: '/privacy', changefreq: 'yearly', priority: 0.3 },
   { url: '/terms', changefreq: 'yearly', priority: 0.3 },
+  { url: '/delete-account', changefreq: 'yearly', priority: 0.3 },
 ];
 
 async function fetchDynamicSellerRoutes() {
@@ -48,7 +45,9 @@ async function fetchDynamicSellerRoutes() {
     for (const seller of rows) {
       const identifier = seller.slug || encodeURIComponent(seller.shop_name);
       if (identifier) {
-        dynamicRoutes.push({ url: `/shop/${identifier}`, changefreq: 'daily', priority: 0.9 });
+        // Emit only the short-link form. A shop also resolves at /shop/<id>,
+        // but that page canonicalises to the short link (see ShopPage SEOHead),
+        // so listing both would advertise a duplicate.
         dynamicRoutes.push({ url: `/${identifier}`, changefreq: 'daily', priority: 0.9 });
       }
     }

@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@/shared/ui/icons';
 import { TermsContent } from '@/shared/components/TermsContent';
+import { SEOHead } from '@/shared/components/SEOHead';
+
+const SITE = 'https://www.byblosafrica.site';
 
 /**
  * Public, standalone legal page rendering the Privacy Policy + Client Agreement.
@@ -9,8 +12,15 @@ import { TermsContent } from '@/shared/components/TermsContent';
  * high-contrast document card so the policy is always legible to reviewers.
  */
 export default function LegalPage() {
+  const { pathname } = useLocation();
   return (
     <div className="min-h-[100svh] bg-black">
+      <SEOHead
+        title="Privacy Policy & Terms"
+        description="Byblos Privacy Policy and Terms of Service: how we handle your data and the rules for using the Byblos app and website."
+        url={`${SITE}${pathname}`}
+        canonical={`${SITE}${pathname}`}
+      />
       <header className="sticky top-0 z-10 border-b border-white/10 bg-black/95 px-4 py-3 backdrop-blur pt-safe-top">
         <div className="mx-auto flex max-w-3xl items-center justify-between">
           <Link
