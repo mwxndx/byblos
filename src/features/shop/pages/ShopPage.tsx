@@ -158,6 +158,7 @@ const ShopPage = () => {
             </div>
             <input
               type="text"
+              aria-label="Search products"
               className={cn(
                 "block w-full pl-10 pr-3 py-3 border border-[var(--byblos-border,rgba(0,0,0,0.1))] rounded-2xl transition-all duration-300",
                 "bg-[var(--byblos-surface,#ffffff)] text-[var(--byblos-text,#0f0f0e)] placeholder:text-[var(--byblos-muted)]",

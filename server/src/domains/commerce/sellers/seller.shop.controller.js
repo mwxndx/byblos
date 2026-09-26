@@ -100,7 +100,11 @@ export const searchSellers = async (req, res) => {
       });
     }
 
-    const sellers = await searchSellersInDB(city, location);
+    const searchLimit = boundedLimit(req.query.limit, SELLER_SEARCH_MAX);
+    const sellers = await searchSellersInDB(city, location, {
+      limit: searchLimit,
+      offset: boundedOffset(req.query.page, searchLimit),
+    });
 
     // Sanitize results to remove sensitive info
     // searchSellersInDB returns raw rows, so we map them to sanitized public objects
@@ -120,8 +124,25 @@ export const searchSellers = async (req, res) => {
   }
 };
 
+// Public list endpoints are client-side filtered (the shop page loads a
+// seller's whole catalogue and searches it in the browser), so these are
+// generous SAFETY CAPS, not real pagination — high enough that realistic
+// shops/cities are unaffected, low enough that a pathological or malicious
+// dataset can't pull unbounded rows into memory. Swap for true server-side
+// pagination + search if catalogues routinely exceed these.
+const SELLER_SEARCH_MAX = 200;
+const SELLER_PRODUCTS_MAX = 500;
+function boundedLimit(rawLimit, cap) {
+  const n = parseInt(rawLimit, 10);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, cap) : cap;
+}
+function boundedOffset(rawPage, limit) {
+  const page = Math.max(parseInt(rawPage, 10) || 1, 1);
+  return (page - 1) * limit;
+}
+
 // Internal function to search sellers in database
-async function searchSellersInDB(city, location = null) {
+async function searchSellersInDB(city, location = null, { limit = SELLER_SEARCH_MAX, offset = 0 } = {}) {
   let queryText = `
     SELECT 
       id, 
@@ -143,6 +164,8 @@ async function searchSellersInDB(city, location = null) {
   }
 
   queryText += ' ORDER BY created_at DESC';
+  queryParams.push(limit, offset);
+  queryText += ` LIMIT $${queryParams.length - 1} OFFSET $${queryParams.length}`;
 
   const result = await query(queryText, queryParams);
   return result.rows;
@@ -162,7 +185,11 @@ export const getSellerProducts = async (req, res) => {
       });
     }
 
-    const products = await getSellerProductsFromDB(sellerId);
+    const productsLimit = boundedLimit(req.query.limit, SELLER_PRODUCTS_MAX);
+    const products = await getSellerProductsFromDB(sellerId, {
+      limit: productsLimit,
+      offset: boundedOffset(req.query.page, productsLimit),
+    });
 
     res.status(200).json({
       status: 'success',
@@ -179,7 +206,7 @@ export const getSellerProducts = async (req, res) => {
 };
 
 // Internal function to get products for a specific seller
-async function getSellerProductsFromDB(sellerId) {
+async function getSellerProductsFromDB(sellerId, { limit = SELLER_PRODUCTS_MAX, offset = 0 } = {}) {
   const result = await query(
     `SELECT 
       p.id,
@@ -207,8 +234,10 @@ async function getSellerProductsFromDB(sellerId) {
       s.shop_name AS "sellerName"
     FROM products p
     JOIN sellers s ON p.seller_id = s.id
-    WHERE p.seller_id = $1 AND p.status = 'available'`,
-    [sellerId]
+    WHERE p.seller_id = $1 AND p.status = 'available'
+    ORDER BY p.created_at DESC
+    LIMIT $2 OFFSET $3`,
+    [sellerId, limit, offset]
   );
   return result.rows;
 }
