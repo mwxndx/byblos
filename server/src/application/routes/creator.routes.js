@@ -26,10 +26,15 @@ router.post('/resend-verification', authLimiter, validate(V.resendVerification),
 router.post('/forgot-password', authLimiter, validate(AuthV.forgotPassword), creatorController.forgotPassword);
 router.post('/reset-password', authLimiter, validate(AuthV.resetPassword), creatorController.resetPassword);
 
+// Logout is public (before `protect`), matching the seller/buyer routes. It only
+// blacklists the raw access + refresh tokens on the request (revokeSessionTokens
+// reads no req.user), so it must still succeed once the 24h access token has
+// expired — otherwise the still-valid 90-day refresh token could never be revoked.
+router.post('/logout', creatorController.logout);
+
 router.use(protect);
 router.use(requireCreatorProfile);
 
-router.post('/logout', creatorController.logout);
 router.get('/profile', creatorController.getProfile);
 router.patch('/profile', validate(V.updateProfile), creatorController.updateProfile);
 router.get('/dashboard', creatorController.getDashboard);
