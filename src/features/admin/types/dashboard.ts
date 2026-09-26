@@ -36,6 +36,8 @@ export interface DashboardAnalytics {
   pendingWithdrawals?: number;
   pendingWithdrawalAmount?: number;
   pendingCreatorRequests?: number;
+  pendingRefundRequests?: number;
+  pendingDetections?: number;
   totalCreatorEarnings?: number;
   totalCreatorSales?: number;
   totalCreatorLinkClicks?: number;

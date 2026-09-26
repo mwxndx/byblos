@@ -70,6 +70,22 @@ class AdminService {
         SELECT COALESCE(SUM(amount), 0) AS count
         FROM withdrawal_requests
         WHERE status NOT IN ('completed', 'failed', 'rejected')
+      `,
+      // Admin action queues surfaced on the dashboard's "needs attention" row
+      // and as tab badges. Refund requests awaiting a decision:
+      pendingRefundRequests: `
+        SELECT COUNT(*)
+        FROM refund_requests
+        WHERE status = 'pending'
+      `,
+      // Creator earnings held for self-dealing review (the Detections queue) --
+      // flagged rows across both earning tables (see creator.service
+      // listFlaggedEarnings, which reads the same flag).
+      pendingDetections: `
+        SELECT (
+          (SELECT COUNT(*) FROM creator_earnings WHERE metadata->>'flagged_for_review' = 'true')
+          + (SELECT COUNT(*) FROM creator_referral_earnings WHERE metadata->>'flagged_for_review' = 'true')
+        ) AS count
       `
     };
 
@@ -130,6 +146,8 @@ class AdminService {
       lowStockProducts: stats.total_lowStockProducts,
       pendingWithdrawals: stats.total_pendingWithdrawals,
       pendingWithdrawalAmount: stats.total_pendingWithdrawalAmount,
+      pendingRefundRequests: stats.total_pendingRefundRequests,
+      pendingDetections: stats.total_pendingDetections,
       topShops
     };
 

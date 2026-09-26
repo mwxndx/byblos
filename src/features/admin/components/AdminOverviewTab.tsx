@@ -1,8 +1,7 @@
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
-import { StatCard } from '@/shared/ui/stat-card';
-import { AlertTriangle, Package, Store, WalletCards } from '@/shared/ui/icons';
+import { Store } from '@/shared/ui/icons';
 import {
   ChartContainer,
   GeoDistributionChart,
@@ -28,59 +27,10 @@ export function AdminOverviewTab({ dashboardState, safeFormatDate, onShowSellers
   const asChartData = (value: unknown): Record<string, unknown>[] =>
     Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
 
-  const operatingCards = [
-    {
-      label: 'Open paid orders',
-      value: analytics.activeOrders || 0,
-      detail: 'Needs fulfillment or buyer confirmation',
-      icon: <Package className="h-4 w-4 text-blue-400" />
-    },
-    {
-      label: 'Pending withdrawals',
-      value: analytics.pendingWithdrawals || 0,
-      detail: 'Needs payout monitoring',
-      icon: <WalletCards className="h-4 w-4 text-emerald-400" />
-    },
-    {
-      label: 'Low stock products',
-      value: analytics.lowStockProducts || 0,
-      detail: 'Inventory attention',
-      icon: <AlertTriangle className="h-4 w-4 text-amber-400" />
-    }
-  ];
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <div className="col-span-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {operatingCards.map(card => {
-          const hasActionItems = Number(card.value) > 0;
-          return (
-            <StatCard
-              key={card.label}
-              title={card.label}
-              value={Number(card.value).toLocaleString()}
-              subtitle={card.detail}
-              icon={
-                <div className={`flex h-11 w-11 items-center justify-center rounded-xl border ${hasActionItems ? 'border-amber-400/30 bg-amber-400/15' : 'border-separator bg-white/[0.04]'}`}>
-                  {card.icon}
-                </div>
-              }
-              className={`p-5 shadow-xl transition-colors duration-200 ${hasActionItems ? 'border border-amber-500/30 bg-amber-500/[0.08]' : 'border border-separator bg-surface-1'}`}
-              titleClassName={hasActionItems ? 'text-amber-300/80 font-semibold' : 'text-label-3'}
-              valueClassName={hasActionItems ? 'text-amber-300 font-semibold' : 'text-label'}
-              subtitleClassName={hasActionItems ? 'text-amber-200/80 font-medium' : 'text-label-3'}
-            />
-          );
-        })}
-      </div>
-
-      <SalesChart data={asChartData(analytics.salesTrends)} />
-      <RevenueChart data={asChartData(analytics.revenueTrends)} />
-      <UserGrowthChart data={asChartData(analytics.userGrowth)} />
-      <GeoDistributionChart data={asChartData(analytics.geoDistribution)} />
-      <ProductStatusChart data={asChartData(analytics.productStatus)} />
-
-      <ChartContainer title="Top Shops" description="Highest total sales" className="col-span-4 lg:col-span-2">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <ChartContainer title="Top Shops" description="Highest total sales" className="col-span-4">
         <div className="space-y-4 h-full flex flex-col justify-center">
           {dashboardState.topShops?.length ? dashboardState.topShops.slice(0, 3).map((shop: Record<string, unknown>, index: number) => (
             <div key={String(shop.id)} className="flex items-center justify-between p-5 bg-white/[0.03] rounded-[1.5rem] border border-separator hover:bg-white/10 transition-all duration-500 group/shop">
@@ -157,6 +107,19 @@ export function AdminOverviewTab({ dashboardState, safeFormatDate, onShowSellers
           </div>
         </CardContent>
       </Card>
+      </div>
+
+      {/* Analytics — insight, kept below the daily-driver summary. */}
+      <div>
+        <p className="mb-3 text-sm font-semibold text-label-2">Analytics</p>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <SalesChart data={asChartData(analytics.salesTrends)} />
+          <RevenueChart data={asChartData(analytics.revenueTrends)} />
+          <UserGrowthChart data={asChartData(analytics.userGrowth)} />
+          <GeoDistributionChart data={asChartData(analytics.geoDistribution)} />
+          <ProductStatusChart data={asChartData(analytics.productStatus)} />
+        </div>
+      </div>
     </div>
   );
 }

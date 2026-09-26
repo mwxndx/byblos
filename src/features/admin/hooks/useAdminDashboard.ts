@@ -236,6 +236,8 @@ export function useAdminDashboard() {
           pendingWithdrawals: dashboardStats?.pendingWithdrawals || 0,
           pendingWithdrawalAmount: dashboardStats?.pendingWithdrawalAmount || 0,
           pendingCreatorRequests: dashboardStats?.pendingCreatorRequests || 0,
+          pendingRefundRequests: dashboardStats?.pendingRefundRequests || 0,
+          pendingDetections: dashboardStats?.pendingDetections || 0,
           totalCreatorEarnings: dashboardStats?.totalCreatorEarnings || 0,
           totalCreatorSales: dashboardStats?.totalCreatorSales || 0,
           totalCreatorLinkClicks: dashboardStats?.totalCreatorLinkClicks || 0,
@@ -407,6 +409,10 @@ export function useAdminDashboard() {
   // as real aggregates (admin.service.js getDashboardStats).
   const pendingPayoutCount = dashboardState.analytics.pendingWithdrawals || 0;
   const pendingPayoutAmount = dashboardState.analytics.pendingWithdrawalAmount || 0;
+  // Action-queue counts for the "needs attention" row and tab badges.
+  const pendingRefundCount = dashboardState.analytics.pendingRefundRequests || 0;
+  const pendingDetectionCount = dashboardState.analytics.pendingDetections || 0;
+  const openOrderCount = dashboardState.analytics.activeOrders || 0;
 
   // Guards against a stale response overwriting a newer one: if the admin
   // clicks View on seller A, then clicks View on seller B before A's
@@ -612,6 +618,9 @@ export function useAdminDashboard() {
     providerHealthAvailable,
     pendingPayoutCount,
     pendingPayoutAmount,
+    pendingRefundCount,
+    pendingDetectionCount,
+    openOrderCount,
     inspectionSessionId,
     selectedSeller,
     isLoadingSeller,

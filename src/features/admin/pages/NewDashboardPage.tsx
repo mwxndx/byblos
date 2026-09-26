@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent } from "@/shared/ui/tabs";
 import { Spinner } from "@/shared/ui/spinner";
-import { Package, ShoppingCart, UserPlus, UserCircle, DollarSign, Activity, Users, XCircle } from '@/shared/ui/icons';
+import { Activity, RefreshCw, Shield, Truck, WalletCards, XCircle } from '@/shared/ui/icons';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
+import { adminApi } from '@/features/admin/api';
+import { adminQueryKeys } from '@/features/admin/api/queryKeys';
 import RefundRequestsPage from './RefundRequestsPage';
 import DetectionsPage from './DetectionsPage';
 import { AdminEntityModals } from '../components/AdminEntityModals';
-import { AdminDashboardHeader } from '../components/AdminDashboardHeader';
 import { AdminDashboardTabs } from '../components/AdminDashboardTabs';
 import { AdminOverviewTab } from '../components/AdminOverviewTab';
 import { AdminLogisticsTab } from '../components/AdminLogisticsTab';
@@ -16,14 +18,11 @@ import { AdminCreatorsTab } from '../components/AdminCreatorsTab';
 import { AdminBuyersTab } from '../components/AdminBuyersTab';
 import { AdminWithdrawalsTab } from '../components/AdminWithdrawalsTab';
 import { useAdminDashboard } from '../hooks/useAdminDashboard';
-import {
-  StatsCard,
-  type StatsCardProps
-} from '../components/AdminDashboardCharts';
 
-// Custom tooltip for the events chart
+const money = (value: number) => `KSh ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const NewAdminDashboard = () => {
+  const navigate = useNavigate();
   const {
     authLoading,
     isAuthenticated,
@@ -45,6 +44,9 @@ const NewAdminDashboard = () => {
     providerHealthAvailable,
     pendingPayoutCount,
     pendingPayoutAmount,
+    pendingRefundCount,
+    pendingDetectionCount,
+    openOrderCount,
     inspectionSessionId,
     selectedSeller,
     isLoadingSeller,
@@ -61,88 +63,50 @@ const NewAdminDashboard = () => {
     processingWithdrawalId,
   } = useAdminDashboard();
 
-  const navigate = useNavigate();
+  // Logistics problem count for the action row + tab badge. Shares the exact
+  // query key the Logistics tab uses (status 'all', sort 'priority'), so the
+  // list is fetched once and this reads the same cached summary — no duplicate
+  // request and no second copy of the problem-detection SQL.
+  const logisticsQuery = useQuery({
+    queryKey: adminQueryKeys.logistics('all', 'priority'),
+    queryFn: () => adminApi.getLogisticsRequests({ status: 'all', sort: 'priority' }),
+    enabled: isAuthenticated && !authLoading,
+    staleTime: 20_000,
+  });
+  const logisticsSummary = logisticsQuery.data?.summary;
+  const logisticsProblems = (logisticsSummary?.failed || 0) + (logisticsSummary?.delayed || 0) + (logisticsSummary?.manualReview || 0);
 
-  const shouldShowTrend = (trend: number) => {
-    return trend !== 0 || dashboardState.analytics.monthlyGrowth?.revenue !== 0;
-  };
+  const analytics = dashboardState.analytics;
+  const financials = dashboardState.financialMetrics;
 
-  const statsCards: StatsCardProps[] = [
-    {
-      title: 'Products',
-      value: dashboardState.analytics.totalProducts.toLocaleString(),
-      icon: <Package className="h-4 w-4 text-orange-500" />,
-      description: `${dashboardState.analytics.lowStockProducts || 0} low stock`,
-      trend: shouldShowTrend(dashboardState.analytics.monthlyGrowth?.products ?? 0)
-        ? dashboardState.analytics.monthlyGrowth?.products ?? 0
-        : null
-    },
-    {
-      title: 'Sellers',
-      value: dashboardState.analytics.totalSellers?.toLocaleString() || '0',
-      icon: <ShoppingCart className="h-4 w-4 text-purple-500" />,
-      description: 'Active sellers',
-      trend: shouldShowTrend(dashboardState.analytics.monthlyGrowth?.sellers ?? 0)
-        ? dashboardState.analytics.monthlyGrowth?.sellers ?? 0
-        : null
-    },
-    {
-      title: 'Creators',
-      value: dashboardState.analytics.totalCreators?.toLocaleString() || '0',
-      icon: <UserPlus className="h-4 w-4 text-yellow-500" />,
-      description: `${dashboardState.analytics.pendingCreatorRequests || 0} pending requests`,
-      trend: null
-    },
-    {
-      title: 'Buyers',
-      value: dashboardState.analytics.totalBuyers?.toLocaleString() || '0',
-      icon: <UserCircle className="h-4 w-4 text-cyan-500" />,
-      description: 'Registered buyers',
-      trend: shouldShowTrend(dashboardState.analytics.monthlyGrowth?.buyers ?? 0)
-        ? dashboardState.analytics.monthlyGrowth?.buyers ?? 0
-        : null
-    },
-    {
-      title: 'Sales',
-      value: `KSh ${dashboardState.financialMetrics.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      icon: <DollarSign className="h-4 w-4 text-green-600" />,
-      description: `${dashboardState.financialMetrics.totalOrders} orders`,
-      trend: shouldShowTrend(dashboardState.analytics.monthlyGrowth?.revenue ?? 0)
-        ? dashboardState.analytics.monthlyGrowth?.revenue ?? 0
-        : null
-    },
-    {
-      title: 'Commission',
-      value: `KSh ${dashboardState.financialMetrics.totalCommission.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      icon: <DollarSign className="h-4 w-4 text-yellow-600" />,
-      description: 'Platform earnings',
-      trend: shouldShowTrend(dashboardState.analytics.monthlyGrowth?.revenue ?? 0)
-        ? dashboardState.analytics.monthlyGrowth?.revenue ?? 0
-        : null
-    },
-    {
-      title: 'Refunds',
-      value: `KSh ${dashboardState.financialMetrics.totalRefunds.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-      icon: <DollarSign className="h-4 w-4 text-red-600" />,
-      description: `${dashboardState.financialMetrics.totalRefundRequests} completed`,
-      trend: null
-    },
-    {
-      title: 'Open Orders',
-      value: dashboardState.analytics.activeOrders?.toLocaleString() || '0',
-      icon: <Activity className="h-4 w-4 text-blue-500" />,
-      description: 'Paid but not closed',
-      trend: null
-    },
-    {
-      title: 'Pending Payouts',
-      value: dashboardState.analytics.pendingWithdrawals?.toLocaleString() || '0',
-      icon: <Users className="h-4 w-4 text-blue-400" />,
-      description: 'Awaiting processing',
-      trend: null
-    }
+  // Only the queues an admin acts on live here. Vanity metrics moved to the
+  // Overview "at a glance" strip so they no longer sit above every tab.
+  const attention = [
+    { key: 'withdrawals', icon: WalletCards, label: 'Payouts to approve', count: pendingPayoutCount, hint: pendingPayoutCount > 0 ? `${money(pendingPayoutAmount)} waiting` : 'None waiting', tone: 'amber' as const },
+    { key: 'refunds', icon: RefreshCw, label: 'Refunds pending', count: pendingRefundCount, hint: pendingRefundCount > 0 ? 'Decide now' : 'None pending', tone: 'red' as const },
+    { key: 'detections', icon: Shield, label: 'Detections to review', count: pendingDetectionCount, hint: pendingDetectionCount > 0 ? 'Self-dealing check' : 'None flagged', tone: 'blue' as const },
+    { key: 'logistics', icon: Truck, label: 'Logistics problems', count: logisticsProblems, hint: logisticsProblems > 0 ? 'Needs resolution' : 'All clear', tone: 'red' as const },
+    { key: null, icon: Activity, label: 'Open paid orders', count: openOrderCount, hint: 'Being fulfilled', tone: 'neutral' as const },
   ];
 
+  const toneClass = (tone: string, active: boolean) => {
+    if (!active) return 'border-separator bg-surface-1 text-label-2';
+    if (tone === 'amber') return 'border-amber-500/30 bg-amber-500/[0.08] text-amber-300';
+    if (tone === 'red') return 'border-red-500/30 bg-red-500/[0.08] text-red-300';
+    if (tone === 'blue') return 'border-blue-500/30 bg-blue-500/[0.08] text-blue-300';
+    return 'border-separator bg-surface-1 text-label-2';
+  };
+
+  const metrics = [
+    { label: 'Sales', value: money(financials.totalSales) },
+    { label: 'Commission', value: money(financials.totalCommission) },
+    { label: 'Refunds paid', value: money(financials.totalRefunds) },
+    { label: 'Products', value: Number(analytics.totalProducts || 0).toLocaleString() },
+    { label: 'Sellers', value: Number(analytics.totalSellers || 0).toLocaleString() },
+    { label: 'Creators', value: Number(analytics.totalCreators || 0).toLocaleString() },
+    { label: 'Buyers', value: Number(analytics.totalBuyers || 0).toLocaleString() },
+    { label: 'Low stock', value: Number(analytics.lowStockProducts || 0).toLocaleString() },
+  ];
 
   if (authLoading || !isInitialized) {
     return (
@@ -171,10 +135,7 @@ const NewAdminDashboard = () => {
             <h2 className="text-2xl font-semibold text-label tracking-tight">Something went wrong</h2>
             <p className="text-label-2 font-medium">{error}</p>
           </div>
-          <Button
-            onClick={retryDashboard}
-            className="w-full h-12 bg-yellow-400 text-black font-semibold rounded-2xl hover:bg-yellow-300 transition-all"
-          >
+          <Button onClick={retryDashboard} className="w-full h-12 bg-yellow-400 text-black font-semibold rounded-2xl hover:bg-yellow-300 transition-all">
             Try again
           </Button>
         </div>
@@ -183,133 +144,175 @@ const NewAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label font-sans selection:bg-yellow-500/30 selection:text-black">
-        <div className="mx-auto w-full max-w-[1760px] p-3 sm:p-5 md:p-8 lg:p-10 space-y-6 sm:space-y-8">
-          <AdminDashboardHeader />
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {statsCards.map((stat) => (
-              <StatsCard key={stat.title} {...stat} />
-            ))}
+    <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label font-sans">
+      <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-5 md:p-8 space-y-6">
+        {/* Slim header — one line, no hero card. */}
+        <header className="flex items-center justify-between gap-3 border-b border-separator pb-4">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-xl font-semibold tracking-tight text-label">Admin</h1>
+            <span className="text-sm text-label-3">Byblos operations</span>
           </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-label-2">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            <NotificationBell />
+          </div>
+        </header>
 
-          {/* Navigation & Content */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <AdminDashboardTabs />
+        {/* Needs attention — the admin's action queue, first thing. */}
+        <section>
+          <p className="mb-2 text-sm font-semibold text-label-2">Needs attention</p>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            {attention.map((tile) => {
+              const active = tile.count > 0 && tile.tone !== 'neutral';
+              const Icon = tile.icon;
+              const clickable = Boolean(tile.key);
+              return (
+                <button
+                  key={tile.label}
+                  type="button"
+                  disabled={!clickable}
+                  onClick={() => tile.key && setActiveTab(tile.key)}
+                  className={`rounded-2xl border p-4 text-left transition-colors ${toneClass(tile.tone, active)} ${clickable ? 'hover:border-yellow-500/40 cursor-pointer' : 'cursor-default'}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    <span className="text-xs font-semibold">{tile.label}</span>
+                  </div>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-label">{tile.count.toLocaleString()}</p>
+                  <p className="mt-0.5 text-xs text-label-3">{tile.hint}{clickable ? ' →' : ''}</p>
+                </button>
+              );
+            })}
+          </div>
+        </section>
 
-            <AdminEntityModals
-              selectedSeller={selectedSeller as Record<string, unknown> | null}
-              isLoadingSeller={isLoadingSeller}
-              closeSellerModal={closeSellerModal}
-              selectedBuyer={selectedBuyer as Record<string, unknown> | null}
-              isLoadingBuyer={isLoadingBuyer}
-              closeBuyerModal={closeBuyerModal}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <AdminDashboardTabs
+            counts={{
+              withdrawals: pendingPayoutCount,
+              refunds: pendingRefundCount,
+              detections: pendingDetectionCount,
+              logistics: logisticsProblems,
+            }}
+          />
+
+          <AdminEntityModals
+            selectedSeller={selectedSeller as Record<string, unknown> | null}
+            isLoadingSeller={isLoadingSeller}
+            closeSellerModal={closeSellerModal}
+            selectedBuyer={selectedBuyer as Record<string, unknown> | null}
+            isLoadingBuyer={isLoadingBuyer}
+            closeBuyerModal={closeBuyerModal}
+            safeFormatDate={safeFormatDate}
+            inspectionSessionId={inspectionSessionId}
+          />
+
+          <TabsContent value="overview" className="space-y-6">
+            {/* At a glance — business metrics, on Overview only. */}
+            <div>
+              <p className="mb-2 text-sm font-semibold text-label-2">At a glance</p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
+                {metrics.map((m) => (
+                  <div key={m.label} className="rounded-xl border border-separator bg-surface-1 p-3">
+                    <p className="text-[11px] text-label-3">{m.label}</p>
+                    <p className="mt-1 text-base font-semibold tabular-nums text-label">{m.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <AdminOverviewTab
+              dashboardState={{
+                analytics: dashboardState.analytics as unknown as Record<string, unknown>,
+                topShops: dashboardState.topShops as Record<string, unknown>[],
+                sellers: dashboardState.sellers as unknown as Record<string, unknown>[],
+              }}
               safeFormatDate={safeFormatDate}
-              inspectionSessionId={inspectionSessionId}
+              onShowSellers={() => setActiveTab('sellers')}
             />
-            <TabsContent value="overview" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-              <AdminOverviewTab
-                dashboardState={{
-                  analytics: dashboardState.analytics as unknown as Record<string, unknown>,
-                  topShops: dashboardState.topShops as Record<string, unknown>[],
-                  sellers: dashboardState.sellers as unknown as Record<string, unknown>[],
-                }}
-                safeFormatDate={safeFormatDate}
-                onShowSellers={() => setActiveTab('sellers')}
-              />
-            </TabsContent>
+          </TabsContent>
 
-            {/* Sellers Tab */}
-            <TabsContent value="sellers" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <AdminSellersTab
-                sellers={dashboardState.sellers}
-                searchQuery={sellersList.search}
-                onSearchChange={sellersList.setSearch}
-                pagination={paginationState.sellers}
-                onPageChange={sellersList.setPage}
-                onView={handleViewSeller}
-                onDelete={handleDeleteUser}
-                deletingId={deletingId}
-              />
-            </TabsContent>
+          <TabsContent value="withdrawals" className="space-y-6">
+            <AdminWithdrawalsTab
+              withdrawalRequests={dashboardState.withdrawalRequests}
+              searchQuery={withdrawalsList.search}
+              onSearchChange={withdrawalsList.setSearch}
+              pagination={paginationState.withdrawalRequests}
+              onPageChange={withdrawalsList.setPage}
+              activeOrders={dashboardState.analytics.activeOrders}
+              pendingPayoutCount={pendingPayoutCount}
+              pendingPayoutAmount={pendingPayoutAmount}
+              providerHealth={providerHealth}
+              providerHealthOk={providerHealthOk}
+              providerHealthAvailable={providerHealthAvailable}
+              formatProviderBalance={formatProviderBalance}
+              formatDate={safeFormatDate}
+              onAction={handleWithdrawalRequestAction}
+              processingRequestId={processingWithdrawalId}
+            />
+          </TabsContent>
 
-            {/* Creators Tab */}
-            <TabsContent value="creators" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <AdminCreatorsTab
-                creators={dashboardState.creators}
-                searchQuery={creatorsList.search}
-                onSearchChange={creatorsList.setSearch}
-                pagination={paginationState.creators}
-                onPageChange={creatorsList.setPage}
-                onDelete={handleDeleteCreator}
-                deletingId={deletingId}
-                totalCreatorSales={dashboardState.analytics.totalCreatorSales || 0}
-                totalCreatorLinkClicks={dashboardState.analytics.totalCreatorLinkClicks || 0}
-                totalCreatorEarnings={dashboardState.analytics.totalCreatorEarnings || 0}
-              />
-            </TabsContent>
+          <TabsContent value="refunds" className="space-y-6">
+            <div className="bg-surface-1 border border-separator rounded-card p-5 md:p-8 shadow-xl">
+              <RefundRequestsPage />
+            </div>
+          </TabsContent>
 
-            {/* Buyers Tab */}
-            <TabsContent value="buyers" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <AdminBuyersTab
-                buyers={dashboardState.buyers}
-                searchQuery={buyersList.search}
-                onSearchChange={buyersList.setSearch}
-                pagination={paginationState.buyers}
-                onPageChange={buyersList.setPage}
-                onView={handleViewBuyer}
-                onDelete={handleDeleteUser}
-                deletingId={deletingId}
-                formatDate={safeFormatDate}
-              />
-            </TabsContent>
+          <TabsContent value="detections" className="space-y-6">
+            <div className="bg-surface-1 border border-separator rounded-card p-5 md:p-8 shadow-xl">
+              <DetectionsPage />
+            </div>
+          </TabsContent>
 
-            {/* Withdrawals Tab */}
-            <TabsContent value="withdrawals" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <AdminWithdrawalsTab
-                withdrawalRequests={dashboardState.withdrawalRequests}
-                searchQuery={withdrawalsList.search}
-                onSearchChange={withdrawalsList.setSearch}
-                pagination={paginationState.withdrawalRequests}
-                onPageChange={withdrawalsList.setPage}
-                activeOrders={dashboardState.analytics.activeOrders}
-                pendingPayoutCount={pendingPayoutCount}
-                pendingPayoutAmount={pendingPayoutAmount}
-                providerHealth={providerHealth}
-                providerHealthOk={providerHealthOk}
-                providerHealthAvailable={providerHealthAvailable}
-                formatProviderBalance={formatProviderBalance}
-                formatDate={safeFormatDate}
-                onAction={handleWithdrawalRequestAction}
-                processingRequestId={processingWithdrawalId}
-              />
-            </TabsContent>
+          <TabsContent value="logistics" className="space-y-6">
+            <AdminLogisticsTab />
+          </TabsContent>
 
-            <TabsContent value="logistics" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <AdminLogisticsTab />
-            </TabsContent>
+          <TabsContent value="sellers" className="space-y-6">
+            <AdminSellersTab
+              sellers={dashboardState.sellers}
+              searchQuery={sellersList.search}
+              onSearchChange={sellersList.setSearch}
+              pagination={paginationState.sellers}
+              onPageChange={sellersList.setPage}
+              onView={handleViewSeller}
+              onDelete={handleDeleteUser}
+              deletingId={deletingId}
+            />
+          </TabsContent>
 
-            {/* Refunds Tab */}
-            <TabsContent value="refunds" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="bg-white/80 dark:bg-surface-1 backdrop-blur-2xl border border-black/10 dark:border-separator rounded-card p-8 shadow-xl dark:shadow-2xl">
-                <RefundRequestsPage />
-              </div>
-            </TabsContent>
+          <TabsContent value="creators" className="space-y-6">
+            <AdminCreatorsTab
+              creators={dashboardState.creators}
+              searchQuery={creatorsList.search}
+              onSearchChange={creatorsList.setSearch}
+              pagination={paginationState.creators}
+              onPageChange={creatorsList.setPage}
+              onDelete={handleDeleteCreator}
+              deletingId={deletingId}
+              totalCreatorSales={dashboardState.analytics.totalCreatorSales || 0}
+              totalCreatorLinkClicks={dashboardState.analytics.totalCreatorLinkClicks || 0}
+              totalCreatorEarnings={dashboardState.analytics.totalCreatorEarnings || 0}
+            />
+          </TabsContent>
 
-            {/* Detections Tab — creator self-dealing review queue */}
-            <TabsContent value="detections" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <div className="bg-white/80 dark:bg-surface-1 backdrop-blur-2xl border border-black/10 dark:border-separator rounded-card p-8 shadow-xl dark:shadow-2xl">
-                <DetectionsPage />
-              </div>
-            </TabsContent>
-          </Tabs>
-        </div>
+          <TabsContent value="buyers" className="space-y-6">
+            <AdminBuyersTab
+              buyers={dashboardState.buyers}
+              searchQuery={buyersList.search}
+              onSearchChange={buyersList.setSearch}
+              pagination={paginationState.buyers}
+              onPageChange={buyersList.setPage}
+              onView={handleViewBuyer}
+              onDelete={handleDeleteUser}
+              deletingId={deletingId}
+              formatDate={safeFormatDate}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
 
 export default NewAdminDashboard;
-
-
-
