@@ -1,23 +1,29 @@
-import { ArrowLeft, CalendarClock, CheckCircle2, LogOut, PackageCheck, RefreshCw, Truck } from '@/shared/ui/icons';
-import React, { useMemo } from 'react';
+import { ArrowLeft, LogOut, MapPin, PackageCheck, RefreshCw, Store, Truck } from '@/shared/ui/icons';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
-import { SORT_OPTIONS } from '../utils/mzigoDashboard.constants';
-import { DashboardStat, RequestCard } from '../components/mzigoDashboard.components';
+import { RequestCard } from '../components/mzigoDashboard.components';
+import { requestStage, type RequestStage } from '../utils/mzigoJourney';
 import { useMzigoDashboard } from '../hooks/useMzigoDashboard';
-import { MzigoActivityPanel } from '../components/MzigoActivityPanel';
+import type { LogisticsRequestCard } from '@/features/logistics/api';
 
-// Buttons are always yellow (primary) or outlined-white (secondary), never a
-// dark fill, so every action reads clearly on the black theme.
-const BTN_PRIMARY = 'bg-yellow-400 text-black font-semibold hover:bg-yellow-300';
 const BTN_SECONDARY = 'border border-black/10 dark:border-white/15 bg-black/[0.04] dark:bg-white/[0.05] text-slate-800 dark:text-white hover:bg-black/[0.08] dark:hover:bg-white/10';
+
+type View = 'todo' | 'late' | 'done';
+
+// Ordered by how a courier actually works a package through the day.
+const STAGES: Array<{ key: RequestStage; title: string; icon: typeof Store }> = [
+  { key: 'pickup', title: 'Pick up from seller', icon: Store },
+  { key: 'hub', title: 'At the hub', icon: PackageCheck },
+  { key: 'deliver', title: 'Deliver to buyer', icon: Truck },
+  { key: 'collect', title: 'Ready for collection', icon: MapPin },
+];
 
 const MzigoDashboardPage = () => {
   const navigate = useNavigate();
+  const [view, setView] = useState<View>('todo');
   const {
-    sort,
-    setSort,
     now,
     updatingStatusKey,
     partner,
@@ -30,8 +36,6 @@ const MzigoDashboardPage = () => {
     requestsQuery,
   } = useMzigoDashboard();
 
-  // Two buckets only: everything still moving ("To do") and history ("Done").
-  // The flat `requests` list keeps the server's global sort across old groups.
   const todo = useMemo(
     () => (dashboard?.requests || []).filter(
       (request) => !(request.isCompleted || request.status === 'completed' || request.group === 'completed'),
@@ -40,199 +44,154 @@ const MzigoDashboardPage = () => {
   );
   const done = grouped.completed;
 
+  // Active requests bucketed by real-world stage, honouring the Late filter.
+  const stages = useMemo(() => {
+    const source = view === 'late' ? todo.filter((r) => r.isOverdue) : todo;
+    const buckets: Record<RequestStage, LogisticsRequestCard[]> = { pickup: [], hub: [], deliver: [], collect: [] };
+    for (const request of source) buckets[requestStage(request)].push(request);
+    return buckets;
+  }, [todo, view]);
+
+  const hasStageCards = STAGES.some((stage) => stages[stage.key].length > 0);
+
+  const FILTERS: Array<{ value: View; label: string; count: number; tone: string }> = [
+    { value: 'late', label: 'Late', count: overdueCount, tone: overdueCount > 0 ? 'border-red-400/40 bg-red-400/10 text-red-600 dark:text-red-300' : `${BTN_SECONDARY}` },
+    { value: 'todo', label: 'To do', count: activeCount, tone: 'border-yellow-500/30 bg-yellow-400/10 text-yellow-700 dark:text-yellow-300' },
+    { value: 'done', label: 'Done', count: done.length, tone: `${BTN_SECONDARY}` },
+  ];
+
   return (
-    <main className="dashboard-layout mzigo-light-dashboard min-h-[100svh] overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100svh', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(4rem + var(--sab, 16px))' } as React.CSSProperties}>
+    <main className="dashboard-layout mzigo-light-dashboard min-h-[100svh] overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100svh', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, 16px))' } as React.CSSProperties}>
       {/* ── Header ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-20 border-b border-black/10 dark:border-separator bg-white/80 dark:bg-black/80 px-4 pb-3 pt-safe-top backdrop-blur">
-
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
-          <div className="flex justify-start">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             {!isNativeApp() && (
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ${BTN_SECONDARY}`}
+                aria-label="Home"
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm ${BTN_SECONDARY}`}
               >
                 <ArrowLeft size={16} />
-                <span className="hidden sm:inline">Home</span>
               </button>
             )}
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-yellow-500 dark:text-yellow-400">Mzigo Ego</p>
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{partner?.name || 'Logistics partner'}</p>
+            </div>
           </div>
 
-          <div className="text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-yellow-500 dark:text-yellow-400">Mzigo Ego</p>
-            <h1 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white sm:text-xl">Deliveries</h1>
-            <p className="text-[11px] text-slate-500 dark:text-white/50">{partner?.name || 'Logistics partner'}</p>
-          </div>
-
-          <div className="flex justify-end">
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => requestsQuery.refetch()}
+              aria-label="Refresh"
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm ${BTN_SECONDARY}`}
+            >
+              <RefreshCw size={15} />
+            </button>
             <NotificationBell variant="logistics" />
           </div>
         </div>
       </header>
 
-      <section className="w-full px-4 py-6 sm:px-6 lg:px-8">
-        <MzigoActivityPanel />
-
-        {/* ── Overview stats flex strip ────────────────────────── */}
-        <div className="mb-6 flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-2.5 shadow-sm">
-          <div className="flex items-center gap-2 rounded-xl border border-yellow-500/25 bg-yellow-500/[0.08] px-3 py-1.5 text-xs">
-            <Truck size={14} className="text-yellow-500 dark:text-yellow-400" />
-            <span className="font-medium text-slate-700 dark:text-white/70">To do:</span>
-            <span className="font-semibold text-yellow-600 dark:text-yellow-300">{activeCount}</span>
-          </div>
-
-          <div className={`flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs ${
-            overdueCount > 0 ? 'border-red-400/30 bg-red-400/10' : 'border-black/10 dark:border-separator bg-slate-50 dark:bg-white/[0.02]'
-          }`}>
-            <CalendarClock size={14} className={overdueCount > 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-white/40'} />
-            <span className="font-medium text-slate-700 dark:text-white/70">Late:</span>
-            <span className={`font-semibold ${overdueCount > 0 ? 'text-red-500 dark:text-red-300' : 'text-slate-900 dark:text-white'}`}>{overdueCount}</span>
-          </div>
-
-          <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.08] px-3 py-1.5 text-xs">
-            <CheckCircle2 size={14} className="text-emerald-500 dark:text-emerald-400" />
-            <span className="font-medium text-slate-700 dark:text-white/70">Done:</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-300">{done.length}</span>
-          </div>
-
-          <div className="flex items-center gap-2 rounded-xl border border-black/10 dark:border-separator bg-slate-50 dark:bg-white/[0.02] px-3 py-1.5 text-xs">
-            <PackageCheck size={14} className="text-slate-400 dark:text-white/40" />
-            <span className="font-medium text-slate-700 dark:text-white/70">All:</span>
-            <span className="font-semibold text-slate-900 dark:text-white">{dashboard?.count || 0}</span>
-          </div>
+      <section className="w-full px-4 py-5 sm:px-6 lg:px-8">
+        {/* ── Status / filter bar (Late · To do · Done) ─────────── */}
+        <div className="mb-6 flex gap-2">
+          {FILTERS.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => setView(filter.value)}
+              className={`flex flex-1 items-center justify-center gap-2 rounded-2xl border px-3 py-2.5 text-sm font-semibold transition ${
+                view === filter.value ? filter.tone : `${BTN_SECONDARY} opacity-80`
+              }`}
+            >
+              {filter.label}
+              <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                view === filter.value ? 'bg-black/10 dark:bg-white/15' : 'bg-black/10 dark:bg-white/10'
+              }`}>
+                {filter.count}
+              </span>
+            </button>
+          ))}
         </div>
 
-        {/* ── Sort & Controls ───────────────────── */}
-        <div className="mb-6 flex flex-col items-stretch justify-between gap-4 rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-4 shadow-sm sm:flex-row sm:items-center">
-          <div>
-            <p className="text-xs text-slate-600 dark:text-white/60">Finished deliveries move to Done below.</p>
-          </div>
-
-          <div className="w-full overflow-x-auto pb-1 sm:w-auto">
-            <div className="flex min-w-max items-center gap-2">
-              {SORT_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setSort(option.value)}
-                  className={`shrink-0 rounded-full px-4 py-2 text-sm transition ${
-                    sort === option.value ? BTN_PRIMARY : BTN_SECONDARY
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => requestsQuery.refetch()}
-                className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm transition ${BTN_SECONDARY}`}
-              >
-                <RefreshCw size={15} />
-                Refresh
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Buckets ──────────────────────────────────────────── */}
+        {/* ── Queue ─────────────────────────────────────────────── */}
         {requestsQuery.isLoading ? (
           <div className="grid gap-4 lg:grid-cols-3">
             {[0, 1, 2].map((item) => (
               <div key={item} className="h-64 animate-pulse rounded-2xl border border-black/10 dark:border-separator bg-slate-100 dark:bg-white/[0.03]" />
             ))}
           </div>
+        ) : view === 'done' ? (
+          done.length === 0 ? (
+            <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
+              No completed deliveries yet.
+            </div>
+          ) : (
+            <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+              {done.map((request) => (
+                <RequestCard
+                  key={request.id}
+                  request={request}
+                  tone="border-emerald-500/20 bg-emerald-50/30 dark:bg-white/[0.02] shadow-sm"
+                  now={now}
+                  onStatusUpdate={handleStatusUpdate}
+                  updatingStatusKey={updatingStatusKey}
+                  readOnly
+                />
+              ))}
+            </div>
+          )
+        ) : !hasStageCards ? (
+          <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
+            {view === 'late' ? 'Nothing is running late right now.' : 'Nothing to do right now. New deliveries appear here automatically.'}
+          </div>
         ) : (
           <div className="space-y-8">
-            <section>
-              <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">To do</h2>
-                  <p className="text-sm text-slate-500 dark:text-white/50">Deliveries still on the move, most urgent first.</p>
-                </div>
-                <span className="rounded-full bg-yellow-400 px-3 py-1 text-xs font-bold text-black">
-                  {todo.length} {todo.length === 1 ? 'delivery' : 'deliveries'}
-                </span>
-              </div>
-
-              {todo.length === 0 ? (
-                <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
-                  Nothing to do right now. New deliveries appear here automatically.
-                </div>
-              ) : (
-                <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-                  {todo.map((request) => (
-                    <RequestCard
-                      key={request.id}
-                      request={request}
-                      tone="border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] shadow-sm"
-                      now={now}
-                      onStatusUpdate={handleStatusUpdate}
-                      updatingStatusKey={updatingStatusKey}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section>
-              <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
-                <div>
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">Done</h2>
-                  <p className="text-sm text-slate-500 dark:text-white/50">Completed deliveries, kept for your records.</p>
-                </div>
-                <span className="rounded-full border border-black/10 dark:border-separator bg-slate-100 dark:bg-white/10 px-3 py-1 text-xs font-bold text-slate-800 dark:text-white">
-                  {done.length} {done.length === 1 ? 'delivery' : 'deliveries'}
-                </span>
-              </div>
-
-              {done.length === 0 ? (
-                <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
-                  No completed deliveries yet.
-                </div>
-              ) : (
-                <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
-                  {done.map((request) => (
-                    <RequestCard
-                      key={request.id}
-                      request={request}
-                      tone="border-emerald-500/20 bg-emerald-50/30 dark:bg-white/[0.02] shadow-sm"
-                      now={now}
-                      onStatusUpdate={handleStatusUpdate}
-                      updatingStatusKey={updatingStatusKey}
-                      readOnly
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
+            {STAGES.map((stage) => {
+              const cards = stages[stage.key];
+              if (cards.length === 0) return null;
+              const Icon = stage.icon;
+              return (
+                <section key={stage.key}>
+                  <div className="mb-3 flex items-center gap-2">
+                    <Icon size={17} className="text-yellow-500 dark:text-yellow-400" />
+                    <h2 className="text-base font-bold text-slate-900 dark:text-white">{stage.title}</h2>
+                    <span className="text-sm text-slate-400 dark:text-white/40">{cards.length}</span>
+                  </div>
+                  <div className="grid gap-4 xl:grid-cols-2 2xl:grid-cols-3">
+                    {cards.map((request) => (
+                      <RequestCard
+                        key={request.id}
+                        request={request}
+                        tone="border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] shadow-sm"
+                        now={now}
+                        onStatusUpdate={handleStatusUpdate}
+                        updatingStatusKey={updatingStatusKey}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         )}
       </section>
 
       {/* ── Account ──────────────────────────────────────────── */}
       <section className="w-full px-4 pb-6 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-4 shadow-sm">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-white/50">Account</p>
-          <p className="mt-1 text-sm text-slate-600 dark:text-white/60">Sign out of your logistics workspace on this device.</p>
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="mt-3 inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-300 transition hover:bg-red-500/20"
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-300 transition hover:bg-red-500/20"
+        >
+          <LogOut size={16} />
+          Logout
+        </button>
       </section>
-
-      <footer
-        className="fixed inset-x-0 bottom-0 z-50 border-t border-black/10 dark:border-separator bg-white/95 dark:bg-black/95 px-4 py-3 text-center text-xs text-slate-500 dark:text-white/50 backdrop-blur shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.55)] transition-colors duration-200"
-        style={{ paddingBottom: 'var(--sab, 16px)' }}
-      >
-        <CalendarClock size={14} className="mr-1 inline-block text-yellow-500 dark:text-yellow-400" />
-        Every delivery has a 24 hour window.
-      </footer>
     </main>
   );
 };

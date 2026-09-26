@@ -90,13 +90,78 @@ export function isRequestTrackable(request: LogisticsRequestCard) {
   return isDeliveryTrackable(request.deliveryLeg?.status) || isPickupTrackable(request.pickupLeg?.status);
 }
 
+/**
+ * A request is a door delivery when it carries a delivery leg; otherwise the
+ * buyer collects at the hub. Mirrors the buyerAddress fallback in the card and
+ * the hasBuyerPaidDoorDelivery split used elsewhere.
+ */
+export function requestHasDoorDelivery(request: LogisticsRequestCard): boolean {
+  return Boolean(request.deliveryLeg);
+}
+
 /** Collapse pickup + delivery leg statuses into one linear courier journey. */
 export function deriveJourney(request: LogisticsRequestCard): Journey {
+  const completed = Boolean(request.isCompleted) || request.status === 'completed';
+  // Hub-collection orders have no delivery leg — they finish at "Collected",
+  // not "Delivered", so they need their own step track.
+  if (!requestHasDoorDelivery(request)) {
+    return deriveHubCollectionJourney(request, completed);
+  }
   return deriveJourneyFromStatuses(
     request.pickupLeg?.status ?? null,
     request.deliveryLeg?.status ?? null,
-    Boolean(request.isCompleted) || request.status === 'completed',
+    completed,
   );
+}
+
+/** Seller -> Mzigo Hub -> Buyer collects at hub (no delivery leg). */
+function deriveHubCollectionJourney(request: LogisticsRequestCard, completed: boolean): Journey {
+  const pickup = request.pickupLeg?.status;
+  const collected = completed || has(pickup, 'collected') || String(request.order.status || '').toUpperCase() === 'COMPLETED';
+  const atHub = has(pickup, 'dropped', 'hub');
+  const enRoute = has(pickup, 'picked_up');
+  const failed = has(pickup, 'failed');
+  const delayed = has(pickup, 'delayed');
+
+  let stepIndex = 0;
+  let percentProgress = 15;
+  let activeLeg: Journey['activeLeg'] = 'seller_to_hub';
+  if (collected) { stepIndex = 3; percentProgress = 100; activeLeg = 'completed'; }
+  else if (atHub) { stepIndex = 2; percentProgress = 70; activeLeg = 'hub_to_buyer'; }
+  else if (enRoute) { stepIndex = 1; percentProgress = 45; activeLeg = 'hub'; }
+
+  let state: JourneyState = 'normal';
+  if (failed) state = 'attention';
+  else if (delayed) state = 'delayed';
+
+  return {
+    stepIndex,
+    steps: HUB_COLLECTION_JOURNEY_STEPS,
+    state,
+    label: hubCollectionLabel(stepIndex, state),
+    detail: hubCollectionDetail(stepIndex, state),
+    isDelivered: stepIndex === 3 && state === 'normal',
+    activeLeg,
+    activeEta: request.pickupLeg?.deadlineAt || request.deadlineAt || null,
+    percentProgress,
+  };
+}
+
+function hubCollectionLabel(stepIndex: number, state: JourneyState) {
+  if (state === 'attention') return 'Needs attention';
+  if (state === 'delayed') return 'Running late';
+  return HUB_COLLECTION_JOURNEY_STEPS[stepIndex]?.label ?? 'Seller Handoff';
+}
+
+function hubCollectionDetail(stepIndex: number, state: JourneyState) {
+  if (state === 'attention') return 'A pickup step could not be completed. Follow up with the courier.';
+  if (state === 'delayed') return 'The package is taking longer than usual. It is still on track.';
+  switch (stepIndex) {
+    case 3: return 'Buyer collected the package at the Mzigo hub.';
+    case 2: return 'Package is at the Mzigo hub, ready for the buyer to collect.';
+    case 1: return 'Rider has picked up from the seller and is heading to the hub.';
+    default: return 'Seller is preparing the package for handoff to the Mzigo hub.';
+  }
 }
 
 /**
@@ -340,6 +405,40 @@ export function courierActions(request: LogisticsRequestCard): {
   const primary = mapped.find((action) => !/fail|delay/i.test(action.label)) || null;
 
   return { legType: chosen.legType, leg: chosen.leg, primary, secondary };
+}
+
+export type RequestStage = 'pickup' | 'hub' | 'deliver' | 'collect';
+
+/**
+ * Which real-world action stage a live request sits in, so the queue can group
+ * by "what the courier does next" rather than one flat list.
+ */
+export function requestStage(request: LogisticsRequestCard): RequestStage {
+  const journey = deriveJourney(request);
+  const door = requestHasDoorDelivery(request);
+  if (journey.activeLeg === 'seller_to_hub') return 'pickup';
+  if (journey.activeLeg === 'hub') return 'hub';
+  if (journey.activeLeg === 'hub_to_buyer') return door ? 'deliver' : 'collect';
+  return door ? 'deliver' : 'collect';
+}
+
+/** The one place the courier goes next for the current action, with its address. */
+export function requestNextStop(
+  request: LogisticsRequestCard,
+  primary: NextAction | null,
+): { verb: string; place: string } | null {
+  const seller = request.seller.physicalAddress || request.seller.location || request.pickupLeg?.origin.address || request.pickupLeg?.origin.label;
+  const hub = request.sellerDropoff?.address || request.sellerDropoff?.label || MZIGO_CBD_HUB.address;
+  const buyer = request.deliveryLeg?.destination.address || request.deliveryLeg?.destination.label;
+
+  if (!primary) return null;
+  if (primary.legType === 'delivery') {
+    return { verb: 'Deliver to', place: buyer || 'buyer address on file' };
+  }
+  const status = String(request.pickupLeg?.status || '').toLowerCase();
+  if (/picked_up/.test(status)) return { verb: 'Drop at hub', place: hub };
+  if (/dropped|hub/.test(status)) return { verb: 'Buyer collects at', place: hub };
+  return { verb: 'Pick up from', place: seller || 'seller address on file' };
 }
 
 /** Route link to open in Google Maps */

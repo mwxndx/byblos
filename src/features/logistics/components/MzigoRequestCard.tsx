@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, UserRound } from '@/shared/ui/icons';
+import { ChevronDown, ChevronUp, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, Truck, UserRound } from '@/shared/ui/icons';
 import { LogisticsLegType, LogisticsRequestCard, LogisticsStatusUpdate } from '@/features/logistics/api';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { deadlineText, formatCurrency, formatDate, statusLabel } from '../utils/mzigoDashboard.utils';
-import { courierActions, deriveJourney, routeLink } from '../utils/mzigoJourney';
+import { courierActions, deriveJourney, requestHasDoorDelivery, requestNextStop, routeLink } from '../utils/mzigoJourney';
 import { MzigoJourneyStepper } from './MzigoJourneyStepper';
 
 function CallButton({ name, phone }: { name: string; phone?: string | null }) {
@@ -52,6 +52,8 @@ export function RequestCard({
   const journey = deriveJourney(request);
   const actions = isCompleted ? null : courierActions(request);
   const route = routeLink(request);
+  const isDoorDelivery = requestHasDoorDelivery(request);
+  const nextStop = isCompleted ? null : requestNextStop(request, actions?.primary ?? null);
 
   const sellerDisplayName = request.seller.shopName || request.seller.name || 'Seller';
   const sellerAddress = request.seller.physicalAddress || request.seller.location || 'No seller address saved';
@@ -66,35 +68,47 @@ export function RequestCard({
 
   return (
     <article className={`rounded-2xl border p-4 text-label shadow-[0_18px_45px_rgba(0,0,0,0.45)] ${tone}`}>
-      {/* Header — image, order, plain status, deadline. */}
-      <div className="flex items-start gap-3">
-        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-separator bg-black/45">
+      {/* Top row — flow (deliver vs collect) on the left, timing on the right. */}
+      <div className="flex items-center justify-between gap-2">
+        {isDoorDelivery ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold text-sky-200">
+            <Truck size={13} />
+            Door delivery
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2.5 py-1 text-[11px] font-semibold text-yellow-200">
+            <Store size={13} />
+            Hub collection
+          </span>
+        )}
+        {isCompleted ? (
+          <span className="text-[11px] font-semibold text-emerald-300">Done · {formatDate(completedAt)}</span>
+        ) : request.isOverdue ? (
+          <span className="text-[11px] font-semibold text-red-300">{deadlineText(request.deadlineAt, now)}</span>
+        ) : (
+          <span className="text-[11px] text-label-2">Due {deadlineText(request.deadlineAt, now)}</span>
+        )}
+      </div>
+
+      {/* Product identity. */}
+      <div className="mt-3 flex items-start gap-3">
+        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-separator bg-black/45">
           {imageSrc ? (
             <img src={imageSrc} alt={productSummary} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-label-2">
-              <ShoppingBag size={22} />
+              <ShoppingBag size={18} />
             </div>
           )}
         </div>
-
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] uppercase tracking-wide text-label-2">Order {request.order.orderNumber}</p>
           <h3 className="truncate text-base font-semibold text-label">{productSummary}</h3>
-          <p className="mt-1 text-sm font-semibold text-yellow-300">{journey.label}</p>
-        </div>
-
-        <div className="shrink-0 rounded-xl border border-white/15 bg-black/60 px-3 py-2 text-right">
-          <p className="text-[11px] text-label-2">{isCompleted ? 'Completed' : 'Deadline'}</p>
-          <p className={request.isOverdue && !isCompleted ? 'text-sm font-semibold text-red-300' : 'text-sm font-semibold text-yellow-200'}>
-            {isCompleted ? 'Done' : deadlineText(request.deadlineAt, now)}
-          </p>
-          <p className="text-[11px] text-label-2">{formatDate(isCompleted ? completedAt : request.deadlineAt)}</p>
+          <p className="text-[11px] text-label-2">Order {request.order.orderNumber} · {sellerDisplayName}</p>
         </div>
       </div>
 
-      {/* Journey stepper — the two legs shown as one linear story. */}
-      <div className="mt-4 rounded-xl border border-separator bg-black/35 px-3 py-3">
+      {/* Journey stepper — now uses the correct track for each flow. */}
+      <div className="mt-3 rounded-xl border border-separator bg-black/35 px-3 py-3">
         <MzigoJourneyStepper journey={journey} />
       </div>
 
@@ -103,6 +117,28 @@ export function RequestCard({
         <p className={`mt-3 rounded-lg border px-3 py-2 text-xs font-medium ${bannerTone}`}>
           {journey.detail}
         </p>
+      )}
+
+      {/* Next stop — where to go for the current action, with a route link inline. */}
+      {nextStop && (
+        <div className="mt-3 flex items-start gap-2 rounded-xl border border-separator bg-black/40 px-3 py-2.5">
+          <MapPin size={15} className="mt-0.5 shrink-0 text-yellow-300" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] uppercase tracking-wide text-label-2">{nextStop.verb}</p>
+            <p className="truncate text-sm text-label">{nextStop.place}</p>
+          </div>
+          {route && (
+            <a
+              href={route.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-yellow-200 transition hover:text-yellow-100"
+            >
+              <Navigation size={13} />
+              Route
+            </a>
+          )}
+        </div>
       )}
 
       {/* Primary next action — one clear thing to do. */}
@@ -120,58 +156,41 @@ export function RequestCard({
         </button>
       )}
 
-      {/* Issue actions — smaller, secondary. */}
-      {actions && actions.secondary.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2">
-          {actions.secondary.map((action) => (
-            <button
-              key={action.status}
-              type="button"
-              disabled={Boolean(updatingStatusKey)}
-              onClick={() => onStatusUpdate(request.id, action.legType, action.status)}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-label-2 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-55"
-            >
-              {updatingStatusKey === `${request.id}:${action.legType}:${action.status}` && (
-                <Loader2 size={12} className="animate-spin" />
-              )}
-              {action.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Quick contacts + one combined route link — active orders only. */}
-      {!isCompleted && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <CallButton name="seller" phone={request.seller.phone} />
-          <CallButton name="buyer" phone={request.buyer.phone} />
-          {route && (
-            <a
-              href={route.href}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-yellow-400/40 bg-yellow-400/10 px-3 py-1.5 text-xs font-semibold text-yellow-200 transition hover:bg-yellow-400/20"
-            >
-              <Navigation size={13} />
-              {route.label}
-            </a>
-          )}
-        </div>
-      )}
-
-      {/* Details — collapsed by default so the queue scans fast. */}
+      {/* Everything else — contacts, exceptions, details — folded under one toggle. */}
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-label-2 transition hover:bg-white/10"
+        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-label-2 transition hover:bg-white/10"
       >
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        {expanded ? 'Hide details' : 'Show details'}
+        {expanded ? 'Less' : 'More'}
       </button>
 
       {expanded && (
         <div className="mt-3 space-y-3 text-sm">
+          {/* Contacts + exception actions, active orders only. */}
+          {!isCompleted && (
+            <div className="flex flex-wrap gap-2">
+              <CallButton name="seller" phone={request.seller.phone} />
+              <CallButton name="buyer" phone={request.buyer.phone} />
+              {actions?.secondary.map((action) => (
+                <button
+                  key={action.status}
+                  type="button"
+                  disabled={Boolean(updatingStatusKey)}
+                  onClick={() => onStatusUpdate(request.id, action.legType, action.status)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-label-2 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-55"
+                >
+                  {updatingStatusKey === `${request.id}:${action.legType}:${action.status}` && (
+                    <Loader2 size={12} className="animate-spin" />
+                  )}
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="rounded-xl border border-separator bg-black/40 p-3">
             <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
               <ShoppingBag size={13} />
