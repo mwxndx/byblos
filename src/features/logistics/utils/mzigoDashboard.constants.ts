@@ -66,6 +66,12 @@ export const PICKUP_ACTIONS: Record<string, Array<{ status: LogisticsStatusUpdat
     { status: 'dropped_at_hub', label: 'Dropped at hub' },
     { status: 'pickup_failed', label: 'Mark failed' },
   ],
+  // Collection orders (no delivery leg): the hub confirms the buyer collected.
+  // courierActions only surfaces these once there's no delivery leg to advance,
+  // so door-delivery orders show the delivery actions instead.
+  dropped_at_hub: [
+    { status: 'buyer_collected', label: 'Buyer collected' },
+  ],
 };
 
 export const DELIVERY_ACTIONS: Record<string, Array<{ status: LogisticsStatusUpdate; label: string }>> = {

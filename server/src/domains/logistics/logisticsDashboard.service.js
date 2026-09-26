@@ -426,6 +426,20 @@ class LogisticsDashboardService {
                 paymentComplete: COMPLETED_PAYMENT_STATUSES.has(paymentStatus)
             });
 
+            // 'collected' is a hub-collection-only confirmation. If the order has
+            // a delivery leg it's a door delivery — the buyer receives via
+            // 'delivered', not 'collected' — so reject it (defence in depth; the
+            // dashboard already hides the button for door orders).
+            if (normalizedLegType === 'pickup' && internalStatus === 'collected') {
+                const { rows: deliveryLeg } = await client.query(
+                    `SELECT 1 FROM logistics_legs WHERE logistics_request_id = $1 AND leg_type = 'delivery' LIMIT 1`,
+                    [record.request_id]
+                );
+                if (deliveryLeg.length > 0) {
+                    throw new AppError('Cannot mark collected: this order uses door delivery, not hub collection.', 409);
+                }
+            }
+
             if (record.leg_status === internalStatus) {
                 const readyOrder = normalizedLegType === 'delivery' && internalStatus === 'delivered'
                     ? await markOrderReadyForBuyerAfterDeliveredLeg(client, record.order_id, 'mzigo_delivery_idempotent')

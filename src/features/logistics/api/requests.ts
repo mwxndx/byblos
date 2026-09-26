@@ -9,6 +9,7 @@ export type LogisticsStatusUpdate =
   | 'pickup_started'
   | 'picked_up_from_seller'
   | 'dropped_at_hub'
+  | 'buyer_collected'
   | 'pickup_failed'
   | 'delivery_pending'
   | 'courier_assigned'
