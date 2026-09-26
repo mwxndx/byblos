@@ -107,12 +107,17 @@ export const updateOrderStatus = async (req, res) => {
     } catch (error) {
         logger.error('Error updating order status:', error);
 
-        const statusCode = error.message.includes('Unauthorized') ? 403 :
-            error.message.includes('Invalid') ? 400 : 500;
+        // Prefer the AppError's own status code (e.g. 403 ORDER_UPDATE_FORBIDDEN,
+        // 400 ORDER_STATUS_NOT_ALLOWED / illegal transition); fall back to the
+        // legacy message heuristics for plain errors.
+        const statusCode = error.statusCode ||
+            (error.message.includes('Unauthorized') ? 403 :
+                error.message.includes('Invalid') ? 400 : 500);
 
         res.status(statusCode).json({
             status: 'error',
-            message: error.message
+            message: error.message,
+            ...(error.code ? { code: error.code } : {})
         });
     }
 };

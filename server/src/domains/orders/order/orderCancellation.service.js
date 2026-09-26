@@ -54,6 +54,14 @@ class OrderCancellationService {
             [refundAmount, order.buyer_id]
           );
           await settlementService.reverseOrderSettlementForRefund(client, orderId, 'order_cancellation');
+          // Defence-in-depth, symmetric with the refund/reversal paths. Today this
+          // is a no-op: creator earnings are only created at escrow release
+          // (EscrowManager.releaseFunds -> creditCreatorForOrder), which fires on
+          // COMPLETION, and a COMPLETED order cannot reach here (guarded above).
+          // Kept so the invariant is enforced, not merely assumed, if creator
+          // crediting ever moves earlier (e.g. to payment time). Safe when there
+          // is nothing to reverse — it only acts on 'credited' earnings.
+          await settlementService.reverseCreatorEarningsForRefund(client, orderId, 'order_cancellation');
         }
 
         if (order.order_type === OrderType.SERVICE) {

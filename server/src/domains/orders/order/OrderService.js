@@ -6,6 +6,7 @@ import Order from './order.model.js';
 import Buyer from '../../commerce/buyers/buyer.model.js';
 import escrowManager from '../escrow/EscrowManager.js';
 import { assertValidTransition } from '../../../shared/utils/OrderStatusGuard.js';
+import { assertOrderStatusUpdateAuthorized } from './orderStatusUpdatePolicy.js';
 import domainEventDispatcher, { AppEvents, DomainEvents } from '../../../shared/core/domainEventDispatcher.js';
 const eventBus = domainEventDispatcher;
 import InventoryReservationService from '../../commerce/products/inventoryReservation.service.js';
@@ -21,6 +22,11 @@ export class OrderService {
         throw new Error('Order not found');
       }
       const currentOrder = orderRes.rows[0];
+      // Broken-access-control fix: this generic endpoint never verified the
+      // caller owned the order, and let anyone drive an order to COMPLETED
+      // (skipping escrow release). Enforce owner/admin + block money-terminal
+      // states, which must go through their dedicated handlers.
+      assertOrderStatusUpdateAuthorized(user, currentOrder, status);
       assertValidTransition(currentOrder.status, status);
 
       const updateRes = await client.query(
