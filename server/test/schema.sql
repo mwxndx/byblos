@@ -1771,6 +1771,7 @@ CREATE TABLE public.product_orders (
     seller_dropoff_deadline timestamp with time zone,
     buyer_pickup_deadline timestamp with time zone,
     ready_for_pickup_at timestamp with time zone,
+    handoff_confirmed_at timestamp with time zone,
     cancelled_at timestamp with time zone,
     pre_handoff_sla jsonb,
     paid_at timestamp with time zone,
@@ -6132,6 +6133,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (106, '20260913130000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (107, '20260913140000_drop_orphaned_creator_withdrawal_requests', '2026-09-13 14:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (108, '20260914120000_add_admin_directory_created_at_indexes', '2026-09-14 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (109, '20260926120000_drop_dead_buyers_refund_balance_column', '2026-09-26 12:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (110, '20260926130000_add_product_orders_handoff_confirmed_at', '2026-09-26 13:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the

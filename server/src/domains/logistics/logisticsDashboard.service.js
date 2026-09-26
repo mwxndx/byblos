@@ -318,7 +318,7 @@ class LogisticsDashboardService {
         let nextStatus = 'active';
         const hasFailedLeg = legs.some(leg => leg.status === 'failed');
         const allComplete = legs.every(leg => {
-            if (leg.leg_type === 'pickup') return leg.status === 'dropped_at_hub';
+            if (leg.leg_type === 'pickup') return leg.status === 'dropped_at_hub' || leg.status === 'collected';
             if (leg.leg_type === 'delivery') return leg.status === 'delivered';
             return false;
         });
@@ -484,6 +484,20 @@ class LogisticsDashboardService {
                 : normalizedLegType === 'pickup' && internalStatus === 'dropped_at_hub'
                     ? await this._markReadyForBuyerIfNoDeliveryLegPending(client, record.request_id, record.order_id, 'mzigo_pickup_dropped_at_hub')
                     : null;
+
+            // Anchor the buyer-confirm backstop clock: Mzigo has confirmed the buyer
+            // now has the package (door 'delivered' or hub 'collected'). The 48h
+            // auto-complete sweep keys off handoff_confirmed_at. Idempotent via COALESCE.
+            if ((normalizedLegType === 'delivery' && internalStatus === 'delivered')
+                || (normalizedLegType === 'pickup' && internalStatus === 'collected')) {
+                await client.query(
+                    `UPDATE product_orders
+                        SET handoff_confirmed_at = COALESCE(handoff_confirmed_at, NOW()),
+                            updated_at = NOW()
+                      WHERE id = $1`,
+                    [record.order_id]
+                );
+            }
 
             await client.query(
                 `INSERT INTO logistics_tracking_events

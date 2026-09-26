@@ -26,6 +26,7 @@ const LOGISTICS_STATUS_MAP = {
         pickup_started: 'started',
         picked_up_from_seller: 'picked_up',
         dropped_at_hub: 'dropped_at_hub',
+        buyer_collected: 'collected',
         pickup_failed: 'failed'
     },
     delivery: {
@@ -44,6 +45,7 @@ const LOGISTICS_STATUS_MESSAGES = {
     pickup_started: 'Pickup has started.',
     picked_up_from_seller: 'Package was picked up from the seller.',
     dropped_at_hub: 'Package was dropped at the hub.',
+    buyer_collected: 'Buyer collected the package from the hub.',
     pickup_failed: 'Pickup failed.',
     delivery_pending: 'Delivery is pending.',
     courier_assigned: 'Courier was assigned for delivery.',
@@ -61,7 +63,8 @@ const ALLOWED_LOGISTICS_TRANSITIONS = {
         en_route_pickup: new Set(['arrived_at_seller', 'picked_up', 'failed', 'cancelled']),
         arrived_at_seller: new Set(['picked_up', 'failed', 'cancelled']),
         picked_up: new Set(['dropped_at_hub', 'hub_dropoff_pending', 'out_for_delivery', 'failed', 'cancelled']),
-        dropped_at_hub: new Set(['out_for_delivery']),
+        dropped_at_hub: new Set(['out_for_delivery', 'collected']),
+        collected: new Set([]),
         failed: new Set([])
     },
     delivery: {
@@ -87,6 +90,7 @@ const IMPORTANT_LOGISTICS_STATUS_NOTIFICATIONS = new Set([
     'pickup_assigned',
     'picked_up_from_seller',
     'dropped_at_hub',
+    'buyer_collected',
     'out_for_delivery',
     'delivered',
     'delivery_delayed',
