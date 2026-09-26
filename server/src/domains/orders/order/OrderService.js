@@ -132,6 +132,61 @@ export class OrderService {
     return OrderService._buyerComplete(orderId, buyerId, 'Buyer collected order');
   }
 
+  // System backstop (48h): Mzigo confirmed the buyer has the package
+  // (delivered/collected) but the buyer never tapped confirm. Auto-complete to
+  // the seller. Mirrors _buyerComplete but is system-initiated (no buyer scope)
+  // and refuses to complete when escrow release is blocked by a logistics hold,
+  // leaving the order for manual review rather than marking it COMPLETED with
+  // funds stranded.
+  static async autoCompleteAfterHandoffTimeout(orderId, reason = 'buyer_confirmation_timeout_48h') {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const { rows } = await client.query('SELECT * FROM product_orders WHERE id = $1 FOR UPDATE', [orderId]);
+      if (rows.length === 0) throw new Error('Order not found');
+      const order = rows[0];
+      if (order.status === OrderStatus.COMPLETED) {
+        await client.query('ROLLBACK');
+        return order; // already completed (e.g. buyer confirmed first) — idempotent
+      }
+      assertValidTransition(order.status, OrderStatus.COMPLETED, orderId);
+
+      const completionMetadata = {
+        completed_by: 'system',
+        completion_reason: reason,
+        financial_finality: true,
+        auto_completed_at: new Date().toISOString(),
+      };
+      const upd = await client.query(
+        `UPDATE product_orders
+            SET status = $1::order_status,
+                completed_at = NOW(),
+                updated_at = NOW(),
+                metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb
+          WHERE id = $2
+          RETURNING *`,
+        [OrderStatus.COMPLETED, orderId, JSON.stringify(completionMetadata)]
+      );
+      const completedOrder = upd.rows[0];
+
+      const release = await escrowManager.releaseFunds(client, completedOrder, 'AutoHandoffTimeout');
+      if (release && release.success === false) {
+        await client.query('ROLLBACK');
+        logger.warn(`[autoComplete] Order ${orderId} not auto-completed; escrow release blocked: ${release.reason}`);
+        return null;
+      }
+
+      await client.query('COMMIT');
+      OrderService._emitOrderUpdate(orderId, order.status, OrderStatus.COMPLETED, reason, null);
+      return completedOrder;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(rErr => logger.error('[autoComplete] Rollback failed:', rErr));
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
   // Cancellation delegates to the (previously orphaned) OrderCancellationService,
   // which cancels on product_orders and refunds the buyer when already paid.
   // order.controller cancelOrder/sellerCancelOrder call OrderService.cancelOrder,

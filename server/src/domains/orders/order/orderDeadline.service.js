@@ -180,6 +180,43 @@ class OrderDeadlineService {
     }
 
     /**
+     * 48h buyer-confirmation backstop. Mzigo confirmed the buyer has the package
+     * (handoff_confirmed_at set on delivery 'delivered' / pickup 'collected'),
+     * but the buyer never tapped confirm. Auto-complete to the seller so escrow
+     * is never stranded. Idempotent: an order the buyer confirms first is no
+     * longer READY_FOR_BUYER and won't match.
+     */
+    async checkExpiredHandoffConfirmations() {
+        try {
+            const { rows } = await pool.query(
+                `SELECT id, order_number
+                 FROM product_orders
+                 WHERE status = 'READY_FOR_BUYER'
+                   AND handoff_confirmed_at IS NOT NULL
+                   AND handoff_confirmed_at < NOW() - INTERVAL '48 hours'
+                 ORDER BY handoff_confirmed_at ASC
+                 LIMIT 100`
+            );
+            if (rows.length === 0) return { processedCount: 0, orders: [] };
+
+            const { default: OrderService } = await import('./OrderService.js');
+            let processedCount = 0;
+            for (const order of rows) {
+                try {
+                    const completed = await OrderService.autoCompleteAfterHandoffTimeout(order.id, 'buyer_confirmation_timeout_48h');
+                    if (completed) processedCount++;
+                } catch (orderErr) {
+                    logger.error(`Error auto-completing order ${order.order_number || order.id} after handoff timeout:`, orderErr.message);
+                }
+            }
+            return { processedCount, orders: rows.map((o) => o.order_number) };
+        } catch (error) {
+            logger.error('Error checking expired handoff confirmations:', error);
+            throw error;
+        }
+    }
+
+    /**
      * PIN-06: RESCUE EXPIRED RESERVATIONS
      * Releases inventory for orders that weren't paid within 10 minutes (or TTL)
      */
@@ -587,7 +624,8 @@ class OrderDeadlineService {
             buyerDeadlines: { processedCount: 0, orders: [] },
             customProductionReminders: { processedCount: 0, orders: [] },
             customProductionDeadlines: { processedCount: 0, orders: [] },
-            servicePayments: { processedCount: 0, orders: [] }
+            servicePayments: { processedCount: 0, orders: [] },
+            handoffConfirmations: { processedCount: 0, orders: [] }
         };
 
         try {
@@ -597,6 +635,7 @@ class OrderDeadlineService {
             results.customProductionReminders = await this.checkCustomProductionReminders();
             results.customProductionDeadlines = await this.checkExpiredCustomProductionDeadlines();
             results.servicePayments = await this.checkServicePaymentRelease();
+            results.handoffConfirmations = await this.checkExpiredHandoffConfirmations();
 
             const totalProcessed =
                 results.reservations.processedCount +
@@ -604,7 +643,8 @@ class OrderDeadlineService {
                 results.buyerDeadlines.processedCount +
                 results.customProductionReminders.processedCount +
                 results.customProductionDeadlines.processedCount +
-                results.servicePayments.processedCount;
+                results.servicePayments.processedCount +
+                results.handoffConfirmations.processedCount;
 
             if (totalProcessed > 0) {
                 logger.info(`✅ Order deadline checks completed. Processed ${totalProcessed} orders`, results);
