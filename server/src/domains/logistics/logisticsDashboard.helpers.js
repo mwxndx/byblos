@@ -400,6 +400,13 @@ function mapRequestRow(row) {
             completedAt: row.order_completed_at || null,
             createdAt: row.order_created_at
         },
+        // Amounts owed to Mzigo for this order (buyer-paid delivery/collection +
+        // seller-paid pickup), for the admin reconciliation report.
+        fees: {
+            pickup: parseNumber(row.pickup_fee_amount) || 0,
+            delivery: parseNumber(row.delivery_fee_amount) || 0,
+            collection: parseNumber(row.collection_fee_amount) || 0
+        },
         product: {
             items: row.items || [],
             summary: (row.items || [])

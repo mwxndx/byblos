@@ -147,6 +147,16 @@ export function LogisticsAdminCard({
         </div>
       </div>
 
+      {request.fees && (request.fees.delivery > 0 || request.fees.collection > 0 || request.fees.pickup > 0) ? (
+        <div className="mt-3 flex flex-wrap items-baseline gap-x-5 gap-y-1 rounded-2xl border border-separator bg-black/20 px-4 py-2 text-xs text-label-2">
+          <span className="uppercase tracking-widest text-label-3">Owed to Mzigo</span>
+          {request.fees.delivery > 0 && <span>Delivery <span className="font-semibold text-label">{formatCurrency(request.fees.delivery)}</span></span>}
+          {request.fees.collection > 0 && <span>Collection <span className="font-semibold text-label">{formatCurrency(request.fees.collection)}</span></span>}
+          {request.fees.pickup > 0 && <span>Pickup <span className="font-semibold text-label">{formatCurrency(request.fees.pickup)}</span></span>}
+          <span className="font-semibold text-label">Total {formatCurrency(request.fees.pickup + request.fees.delivery + request.fees.collection)}</span>
+        </div>
+      ) : null}
+
       <div className="mt-5 grid gap-4 xl:grid-cols-2">
         <LegAdminPanel
           request={request}

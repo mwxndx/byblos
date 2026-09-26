@@ -13,7 +13,7 @@ import type {
 } from '@/features/logistics/api';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { STATUS_FILTERS, SORT_OPTIONS, label } from '../utils/adminLogisticsTab.utils';
+import { STATUS_FILTERS, SORT_OPTIONS, label, formatCurrency } from '../utils/adminLogisticsTab.utils';
 import { LogisticsAdminCard } from './adminLogisticsTab.components';
 
 export function AdminLogisticsTab() {
@@ -63,6 +63,21 @@ export function AdminLogisticsTab() {
 
   const dashboard = logisticsQuery.data;
   const requests = useMemo(() => dashboard?.requests || [], [dashboard]);
+
+  // Reconciliation totals: what Byblos owes Mzigo across the requests in view.
+  const feeTotals = useMemo(
+    () =>
+      requests.reduce(
+        (acc, r) => {
+          acc.pickup += r.fees?.pickup || 0;
+          acc.delivery += r.fees?.delivery || 0;
+          acc.collection += r.fees?.collection || 0;
+          return acc;
+        },
+        { pickup: 0, delivery: 0, collection: 0 }
+      ),
+    [requests]
+  );
 
   const handleDraftStatus = (key: string, nextStatus: LogisticsStatusUpdate) => {
     setDraftStatuses((current) => ({ ...current, [key]: nextStatus }));
@@ -120,6 +135,19 @@ export function AdminLogisticsTab() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Reconciliation: fees owed to Mzigo across the requests in this view. */}
+      <Card className="border-separator bg-surface-1 text-label">
+        <CardContent className="p-4">
+          <p className="text-xs uppercase tracking-widest text-label-2">Owed to Mzigo — this view</p>
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-8 gap-y-2 text-sm">
+            <span className="text-label-2">Delivery fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.delivery)}</span></span>
+            <span className="text-label-2">Collection fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.collection)}</span></span>
+            <span className="text-label-2">Pickup fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.pickup)}</span></span>
+            <span className="text-base font-semibold">Total <span className="ml-1 tabular-nums">{formatCurrency(feeTotals.pickup + feeTotals.delivery + feeTotals.collection)}</span></span>
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border-separator bg-surface-1 text-label">
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

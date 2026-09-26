@@ -60,6 +60,12 @@ export interface LogisticsRequestCard {
     completedAt?: string | null;
     createdAt?: string;
   };
+  // Amounts owed to Mzigo for this order (admin reconciliation report).
+  fees?: {
+    pickup: number;
+    delivery: number;
+    collection: number;
+  };
   partner?: {
     id?: number | null;
     name?: string | null;
