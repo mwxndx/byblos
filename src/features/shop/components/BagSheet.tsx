@@ -131,6 +131,12 @@ export function BagSheet() {
                 <div className="flex justify-between opacity-80"><dt>Subtotal</dt><dd className="font-semibold tabular-nums">{formatCurrency(bag.subtotal)}</dd></div>
                 <div className="flex justify-between opacity-80"><dt>Byblos service charge (2%)</dt><dd className="font-semibold tabular-nums">{formatCurrency(bag.serviceCharge)}</dd></div>
                 {phoneCheck.doorDeliveryEnabled && <div className="flex justify-between opacity-80"><dt>Delivery fee</dt><dd className="font-semibold tabular-nums">{phoneCheck.isQuoteLoading ? '…' : formatCurrency(phoneCheck.displayedDeliveryFee)}</dd></div>}
+                {phoneCheck.displayedCollectionFee > 0 && (
+                  <>
+                    <div className="flex justify-between opacity-80"><dt>Collection fee</dt><dd className="font-semibold tabular-nums">{formatCurrency(phoneCheck.displayedCollectionFee)}</dd></div>
+                    <div className="pb-0.5 text-[11px] leading-snug opacity-60">Keeps your package safe and verified at the Mzigo hub until you collect it. Waived if you choose door delivery.</div>
+                  </>
+                )}
                 <div className="flex justify-between text-base font-semibold"><dt>Total</dt><dd className="tabular-nums">{formatCurrency(phoneCheck.displayedTotal)}</dd></div>
               </dl>
             </div>

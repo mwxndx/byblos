@@ -196,11 +196,16 @@ export const getThemeClasses = (theme: Theme): ProductCardThemeClasses => {
 
 const PRODUCT_SERVICE_CHARGE_RATE = 0.02;
 
+// Flat KES 100 hub collection fee (physical orders that don't use door delivery).
+// Mutually exclusive with the delivery fee; must match the backend (fees.js
+// COLLECTION_FEE_AMOUNT).
+export const BUYER_COLLECTION_FEE = 100;
+
 export const calculateProductServiceCharge = (amount: number) =>
   Math.ceil(amount * PRODUCT_SERVICE_CHARGE_RATE * 100) / 100;
 
-export const calculateBuyerPayableTotal = (productAmount: number, deliveryFee = 0) =>
-  Math.ceil(Math.round((productAmount + deliveryFee + calculateProductServiceCharge(productAmount)) * 100) / 100);
+export const calculateBuyerPayableTotal = (productAmount: number, deliveryFee = 0, collectionFee = 0) =>
+  Math.ceil(Math.round((productAmount + deliveryFee + collectionFee + calculateProductServiceCharge(productAmount)) * 100) / 100);
 
 export const normalizeProductImages = (product: Product): string[] => {
   if (!product) return [];

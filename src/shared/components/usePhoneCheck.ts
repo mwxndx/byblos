@@ -5,6 +5,7 @@ import { getLogisticsQuote } from '@/features/buyer/api/payments';
 import {
   calculateBuyerPayableTotal,
   calculateProductServiceCharge,
+  BUYER_COLLECTION_FEE,
 } from '@/features/shop/utils/productCardUtils';
 
 export interface UsePhoneCheckProps {
@@ -53,7 +54,11 @@ export function usePhoneCheck({
   const displayedServiceCharge = calculateProductServiceCharge(productPrice);
   const displayedDeliveryFee =
     doorDeliveryEnabled && deliveryQuote?.feeAmount ? Number(deliveryQuote.feeAmount) : 0;
-  const displayedTotal = calculateBuyerPayableTotal(productPrice, displayedDeliveryFee);
+  // A physical order that doesn't use door delivery is collected from the hub
+  // for a flat KES 100 (mutually exclusive with the delivery fee). Mirrors the
+  // backend rule: anyPhysical && !door.
+  const displayedCollectionFee = canUseDoorDelivery && !doorDeliveryEnabled ? BUYER_COLLECTION_FEE : 0;
+  const displayedTotal = calculateBuyerPayableTotal(productPrice, displayedDeliveryFee, displayedCollectionFee);
 
   // Reset state when modal opens
   useEffect(() => {
@@ -243,6 +248,7 @@ export function usePhoneCheck({
     setDoorDeliveryEnabled,
     isQuoteLoading,
     displayedDeliveryFee,
+    displayedCollectionFee,
     displayedTotal,
     canUseDoorDelivery,
     deliveryLocation,
