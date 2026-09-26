@@ -6,17 +6,21 @@
 //   creatorCommission = round(subtotal × agreedRate)     (FULL subtotal; seller-funded)
 //   sellerPayout      = subtotal − creatorCommission − 10 (KES 10 Byblos seller fee)
 //   platformFee       = 10 + serviceCharge               (Byblos revenue ONLY; excludes creator commission)
-//   buyerTotal        = subtotal + serviceCharge + delivery  (creator commission NOT added)
+//   buyerTotal        = subtotal + serviceCharge + delivery + collection  (creator commission NOT added)
 //
 // Accounting invariant (must always hold):
-//   buyerTotal = sellerPayout + creatorCommission + platformFee + delivery
+//   buyerTotal = sellerPayout + creatorCommission + platformFee + delivery + collection
 //
-// Delivery is buyer-paid and passes through to logistics; it is excluded from
-// seller payout and from platform_fee_amount.
+// Delivery fee and collection fee are both buyer-paid logistics charges that
+// pass through to Mzigo; both are excluded from seller payout and platform_fee.
+// They are mutually exclusive per order: door delivery XOR hub collection.
 import Fees from '../../../shared/config/fees.js';
 
 // Flat KES 10 Byblos seller fee per sale.
 export const PLATFORM_SELLER_FEE = Number(Fees.PLATFORM_COMMISSION_AMOUNT) || 0;
+
+// Flat KES 100 hub collection fee (physical, non-door-delivery); owed to Mzigo.
+export const PLATFORM_COLLECTION_FEE = Number(Fees.COLLECTION_FEE_AMOUNT) || 0;
 
 export function roundMoney(amount) {
   return Math.round((Number(amount) || 0) * 100) / 100;
@@ -37,9 +41,10 @@ export function computeCreatorCommission(subtotal, rate) {
 
 // Derive all authoritative money fields for an order.
 // creatorCommission is supplied by the caller (from resolveAttribution).
-export function deriveOrderFinancials({ subtotal, deliveryFee = 0, creatorCommission = 0 }) {
+export function deriveOrderFinancials({ subtotal, deliveryFee = 0, collectionFee = 0, creatorCommission = 0 }) {
   const s = roundMoney(subtotal);
   const delivery = roundMoney(deliveryFee);
+  const collection = roundMoney(collectionFee);
   const creatorCommissionAmount = roundMoney(creatorCommission);
   const serviceCharge = roundMoney(computeServiceCharge(s));
 
@@ -51,14 +56,15 @@ export function deriveOrderFinancials({ subtotal, deliveryFee = 0, creatorCommis
   // product proceeds, then the flat KES 10 Byblos seller fee.
   const sellerPayout = roundMoney(s - creatorCommissionAmount - PLATFORM_SELLER_FEE);
 
-  // Buyer pays product + service charge + delivery. Creator commission does NOT
-  // increase the buyer's payment.
-  const buyerTotal = roundMoney(s + serviceCharge + delivery);
+  // Buyer pays product + service charge + the logistics charge (delivery or
+  // collection). Creator commission does NOT increase the buyer's payment.
+  const buyerTotal = roundMoney(s + serviceCharge + delivery + collection);
 
   return {
     subtotal: s,
     serviceCharge,
     deliveryFee: delivery,
+    collectionFee: collection,
     creatorCommission: creatorCommissionAmount,
     platformFee,
     sellerPayout,

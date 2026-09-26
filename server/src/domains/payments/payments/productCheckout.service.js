@@ -28,7 +28,7 @@ import { resolveFulfillmentType } from '../../../shared/utils/fulfillment.js';
 import LogisticsQuoteService from '../../logistics/logisticsQuote.service.js';
 import LogisticsRequestService from '../../logistics/logisticsRequest.service.js';
 import { OrderStatus, OrderType } from '../../../shared/constants/enums.js';
-import { deriveOrderFinancials, roundMoney } from './checkoutPricing.js';
+import { deriveOrderFinancials, roundMoney, PLATFORM_COLLECTION_FEE } from './checkoutPricing.js';
 
 const PROVIDER = 'paystack';
 const MAX_BAG_ITEMS = 5;
@@ -314,8 +314,13 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
   });
   const creatorCommission = creatorAttribution?.commission_amount || 0;
 
+  // Hub collection fee: physical orders that don't use door delivery are
+  // collected from the Mzigo hub. A flat KES 100 (buyer-paid, owed to Mzigo)
+  // is charged instead of a delivery fee — the two are mutually exclusive.
+  const collectionFee = anyPhysical && !door ? PLATFORM_COLLECTION_FEE : 0;
+
   // Authoritative money fields.
-  const fin = deriveOrderFinancials({ subtotal, deliveryFee, creatorCommission });
+  const fin = deriveOrderFinancials({ subtotal, deliveryFee, collectionFee, creatorCommission });
 
   // Fulfillment + order type from the aggregate.
   const effectiveType = allDigital ? 'digital' : (singleLine && singleLine.isService ? 'service' : 'physical');
@@ -391,12 +396,14 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
       pricing: {
         product_subtotal: fin.subtotal,
         buyer_delivery_fee: fin.deliveryFee,
+        buyer_collection_fee: fin.collectionFee,
         buyer_service_charge: fin.serviceCharge,
         platform_fee: fin.platformFee,
         seller_payout: fin.sellerPayout,
         buyer_total: fin.buyerTotal,
         creator_commission: fin.creatorCommission,
         seller_payout_excludes_delivery_fee: true,
+        seller_payout_excludes_collection_fee: true,
       },
       ...(creatorAttribution ? { creator_attribution: creatorAttribution } : {}),
     };
