@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 
 const { pool } = await import('../src/infrastructure/database/database.js');
 const { initiateProductPayment } = await import('../src/domains/payments/payments/productCheckout.service.js');
-const { computeServiceCharge } = await import('../src/domains/payments/payments/checkoutPricing.js');
+const { computeServiceCharge, PLATFORM_COLLECTION_FEE } = await import('../src/domains/payments/payments/checkoutPricing.js');
 const { createBuyer, createSeller, createCreator, createSellerCreatorLink, cleanupOrder, cleanupBuyer, cleanupSeller, cleanupCreator } =
   await import('./helpers/factories.js');
 
@@ -65,9 +65,11 @@ describe('Bag checkout (real initiateProductPayment, mock provider)', () => {
     ctx.order = await orderByToken(token);
     const subtotal = 600 * 1 + 400 * 2; // 1400
     const sc = computeServiceCharge(subtotal);
-    assert.equal(Number(ctx.order.total_amount), subtotal + sc, 'buyer total = subtotal + service charge');
-    assert.equal(Number(ctx.order.seller_payout_amount), subtotal - 10, 'seller payout = subtotal - flat fee');
-    assert.equal(Number(ctx.order.platform_fee_amount), 10 + sc, 'platform fee = flat fee + service charge');
+    // Physical bag with no door delivery selected → hub collection fee applies.
+    assert.equal(Number(ctx.order.total_amount), subtotal + sc + PLATFORM_COLLECTION_FEE, 'buyer total = subtotal + service charge + collection fee');
+    assert.equal(Number(ctx.order.metadata?.pricing?.buyer_collection_fee), PLATFORM_COLLECTION_FEE, 'collection fee recorded on the order');
+    assert.equal(Number(ctx.order.seller_payout_amount), subtotal - 10, 'seller payout = subtotal - flat fee (collection fee owed to Mzigo, not the seller)');
+    assert.equal(Number(ctx.order.platform_fee_amount), 10 + sc, 'platform fee = flat fee + service charge (excludes collection fee)');
     assert.equal(Number(ctx.order.total_quantity), 3);
 
     const { rows: items } = await pool.query('SELECT product_id, quantity FROM order_items WHERE order_id = $1 ORDER BY product_id', [ctx.order.id]);
@@ -103,14 +105,15 @@ describe('Bag checkout (real initiateProductPayment, mock provider)', () => {
     assert.equal(Number(attribution.creator_id), ctx.creator.id);
     assert.equal(Number(attribution.commission_amount), commission, 'commission = 5% of full subtotal');
 
-    // Seller funds the commission; buyer total is unchanged by it.
-    assert.equal(Number(ctx.order.total_amount), subtotal + sc, 'buyer pays subtotal + service charge — commission NOT added');
+    // Seller funds the commission; buyer total is unchanged by it. Physical
+    // order with no door delivery → hub collection fee still applies on top.
+    assert.equal(Number(ctx.order.total_amount), subtotal + sc + PLATFORM_COLLECTION_FEE, 'buyer pays subtotal + service charge + collection fee — commission NOT added');
     assert.equal(Number(ctx.order.seller_payout_amount), subtotal - commission - 10, 'seller payout absorbs the commission');
-    // Accounting invariant on the persisted order (no delivery here).
+    // Accounting invariant on the persisted order (no delivery; collection fee owed to Mzigo).
     assert.equal(
       Number(ctx.order.total_amount),
-      Number(ctx.order.seller_payout_amount) + commission + Number(ctx.order.platform_fee_amount),
-      'buyerTotal = sellerPayout + commission + platformFee'
+      Number(ctx.order.seller_payout_amount) + commission + Number(ctx.order.platform_fee_amount) + PLATFORM_COLLECTION_FEE,
+      'buyerTotal = sellerPayout + commission + platformFee + collectionFee'
     );
   });
 
