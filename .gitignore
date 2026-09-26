@@ -134,3 +134,12 @@ google-services.json
 
 # Dead WhatsApp Web session data (removed; do not recreate)
 server/src/whatsapp-sessions/
+
+# Local agent/harness tooling — machine-local config, not project source
+.claude/
+.agents/
+CLAUDE.md
+skills-lock.json
+
+# Crash dumps
+*.stackdump
