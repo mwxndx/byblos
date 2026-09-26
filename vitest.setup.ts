@@ -5,3 +5,14 @@
 // startup with "Cannot find module .../vitest.setup.ts" before collecting
 // any tests.
 import '@testing-library/jest-dom/vitest';
+
+// This project runs Vitest with `globals: false`, so @testing-library/react
+// can't auto-register its between-test cleanup (that hooks the global
+// afterEach). Without this, rendered components leak into the next test and
+// queries fail with "Found multiple elements". Register cleanup explicitly.
+import { afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
+afterEach(() => {
+  cleanup();
+});
