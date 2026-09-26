@@ -312,7 +312,14 @@ export function deriveOrderJourney(order: ApiOrder): Journey {
 
   // Physical: Hub Collection (Buyer collects at Byblos CBD Hub)
   if (!hasDoorDelivery) {
-    const isCompleted = order.status === 'COMPLETED';
+    // Mirror the door-delivery branch, which reaches "Delivered" from the leg
+    // status (delivery = delivered) before the order flips to COMPLETED: once
+    // Mzigo confirms the buyer collected (pickup leg = buyer_collected), the
+    // buyer/seller view must read "Collected" too — otherwise it sits on
+    // "Ready at Hub" while the Mzigo console already shows "Collected" through
+    // the READY_FOR_BUYER + 48h-backstop window.
+    const collectedByHub = has(pickupLeg?.status, 'collected');
+    const isCompleted = order.status === 'COMPLETED' || collectedByHub;
     const isReady = order.status === 'READY_FOR_BUYER' || order.status === 'COLLECTION_PENDING';
     const isAtHub = has(pickupLeg?.status, 'picked_up', 'dropped', 'hub') || isReady;
     const stepIndex = isCompleted ? 3 : isReady ? 2 : isAtHub ? 1 : 0;
