@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { cn } from '@/shared/utils/formatting';
 import { Check, ChevronDown, Loader2, Megaphone, Plus, ShoppingBag, Store, type LucideIcon } from '@/shared/ui/icons';
 import {
   DropdownMenu,
@@ -38,7 +39,7 @@ const metaForRole = (role: SwitchableRole): RoleMeta => {
  * Dropdown that lets a user who owns multiple account types switch between them,
  * and lets single-role users discover and add new account access (e.g. Creator).
  */
-export function AccountSwitcher() {
+export function AccountSwitcher({ triggerClassName }: { triggerClassName?: string } = {}) {
   const navigate = useNavigate();
   const { data } = useMyAccounts();
   const { switchAccount, role: currentRole } = useGlobalAuth();
@@ -81,7 +82,10 @@ export function AccountSwitcher() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white transition hover:bg-slate-200 dark:hover:bg-white/12 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white transition hover:bg-slate-200 dark:hover:bg-white/12 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]',
+            triggerClassName,
+          )}
           aria-label="Switch account"
         >
           <ActiveIcon className="h-4 w-4 text-[var(--theme-accent,#f5c518)]" />

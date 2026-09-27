@@ -85,15 +85,17 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
         </SheetHeader>
 
         <div className="space-y-4 px-4 pb-8">
-          {/* Theme + account switcher */}
-          <section className="space-y-4 rounded-card border border-separator bg-surface-1 p-4">
-            <div>
-              <span className="text-sm font-medium text-label-2">Theme</span>
-              <ThemeSegmentedPill value={theme} onChange={setTheme} className="mt-2 flex w-full [&>button]:flex-1" />
-            </div>
-            <div className="space-y-2 border-t border-separator pt-4">
-              <span className="text-sm font-medium text-label-2">Account</span>
-              <AccountSwitcher />
+          {/* Theme + account switcher — one equal row */}
+          <section className="rounded-card border border-separator bg-surface-1 p-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <span className="text-sm font-medium text-label-2">Theme</span>
+                <ThemeSegmentedPill value={theme} onChange={setTheme} className="w-full justify-center" />
+              </div>
+              <div className="space-y-2">
+                <span className="text-sm font-medium text-label-2">Account</span>
+                <AccountSwitcher triggerClassName="w-full justify-center" />
+              </div>
             </div>
           </section>
 

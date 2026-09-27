@@ -100,12 +100,10 @@ export const buyerRoutes = [
         ),
       },
       {
+        // Profile is now a slide-over sheet opened from the header, not a page —
+        // keep the old path working by redirecting to the dashboard.
         path: 'profile',
-        element: (
-          <Suspense fallback={<RouteFallback />}>
-            <BuyerDashboard />
-          </Suspense>
-        ),
+        element: <Navigate to="/buyer/dashboard" replace />,
       },
       {
         path: 'refunds',

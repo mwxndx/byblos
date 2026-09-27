@@ -1,7 +1,9 @@
-import { BarChart3, Package, ShoppingBag, Users, Wallet } from '@/shared/ui/icons';
+import { BarChart3, Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
 import type { SellerTabId } from '../types';
 
-const tabIcons = {
+type SellerNavTabId = Exclude<SellerTabId, 'settings'>;
+
+const tabIcons: Record<SellerNavTabId, LucideIcon> = {
   overview: BarChart3,
   products: Package,
   orders: ShoppingBag,
@@ -9,10 +11,8 @@ const tabIcons = {
   creators: Users,
 };
 
-// Settings/profile is no longer a bottom-nav tab — it opens from the profile
-// icon in the header (see SellerDashboardHeader). The nav is the five primary
-// work areas only.
-const tabs: Array<{ id: Exclude<SellerTabId, 'settings'>; label: string }> = [
+// Settings/profile is reached from the header profile icon, not the nav.
+const tabs: Array<{ id: SellerNavTabId; label: string }> = [
   { id: 'overview', label: 'Overview' },
   { id: 'products', label: 'Products' },
   { id: 'orders', label: 'Orders' },
@@ -27,50 +27,46 @@ interface SellerDashboardTabsProps {
   onSelectTab: (tab: SellerTabId) => void;
 }
 
-// The seller tabs live in a fixed bottom navigation bar (icons + small labels),
-// the same on web and the native app. It is `fixed`, so it never pushes or
-// overlaps page content — the dashboard adds matching bottom padding (see
-// SellerDashboard) so the last items stay above the bar.
+// Fixed bottom navigation, styled identically to the buyer bottom nav
+// (BuyerBottomNav): plain icons with a colour-only active state, a dot for
+// unread orders and a count pill for pending creators.
 export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreatorsCount = 0, onSelectTab }: SellerDashboardTabsProps) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--byblos-border,rgba(255,255,255,0.1))] bg-[var(--byblos-surface,#0a0a0a)]/95 backdrop-blur shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-[var(--byblos-border,rgba(255,255,255,0.1))] bg-[var(--byblos-surface,#000000)]/95 backdrop-blur transition-colors duration-200"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       aria-label="Dashboard sections"
     >
-      <div className="mx-auto flex max-w-3xl items-center justify-around px-1 py-1.5">
+      <div className="flex h-14 items-center justify-around px-1">
         {tabs.map(({ id, label }) => {
           const Icon = tabIcons[id];
-          const selected = activeTab === id;
+          const isActive = activeTab === id;
+          const showDot = id === 'orders' && hasUnreadOrders;
+          const count = id === 'creators' ? pendingCreatorsCount : 0;
 
           return (
             <button
               key={id}
+              type="button"
               onClick={() => onSelectTab(id)}
               aria-label={label}
-              aria-current={selected ? 'page' : undefined}
-              className={`relative flex flex-1 flex-col items-center justify-center py-1.5 px-0.5 transition-all duration-200 ${
-                selected
-                  ? 'text-[var(--theme-accent,#facc15)] font-bold'
-                  : 'text-[var(--byblos-muted,#999999)] hover:text-[var(--byblos-text,#ffffff)] font-medium'
-              }`}
+              aria-current={isActive ? 'page' : undefined}
+              className="relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 border-none bg-transparent py-1.5 transition-opacity duration-150 active:scale-95"
             >
-              <span
-                className={`relative flex items-center justify-center rounded-full px-3 py-1 transition-all duration-200 ${
-                  selected ? 'bg-[var(--theme-accent,#facc15)]/15 scale-105' : ''
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                {id === 'orders' && hasUnreadOrders && (
-                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[var(--byblos-surface,#0a0a0a)] bg-red-500 animate-pulse" />
-                )}
-                {id === 'creators' && pendingCreatorsCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[var(--byblos-surface,#0a0a0a)] bg-yellow-400 animate-pulse" />
-                )}
-              </span>
-              <span className="mt-1 text-[10px] leading-tight tracking-tight truncate max-w-full text-center">
+              <Icon
+                size={18}
+                className={isActive ? 'text-[#F5C518]' : 'text-slate-500 transition-colors dark:text-white/50'}
+              />
+              <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'font-bold text-[#F5C518]' : 'text-slate-500 dark:text-white/50'}`}>
                 {label}
               </span>
+              {count > 0 ? (
+                <span className="absolute top-1 right-[50%] flex h-[15px] min-w-[15px] translate-x-[12px] items-center justify-center rounded-full bg-[#F5C518] px-1 text-[9px] font-semibold text-black shadow-sm">
+                  {count > 99 ? '99+' : count}
+                </span>
+              ) : showDot ? (
+                <div className="absolute top-1.5 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-[#F5C518] ring-2 ring-black" />
+              ) : null}
             </button>
           );
         })}

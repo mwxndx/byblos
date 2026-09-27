@@ -2,6 +2,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound } from '@/shared/ui/icons';
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import { BuyerMembershipCard } from './BuyerMembershipCard';
 import { DeleteAccountButton } from '@/components/account/DeleteAccountButton';
 import { deleteBuyerAccount } from '@/features/buyer/api/profile';
@@ -26,15 +27,23 @@ function displayValue(value?: string | null) {
   return value?.trim() || 'Not set';
 }
 
-function BuyerThemePillPicker() {
+function BuyerPreferencesRow() {
   const { theme, setTheme } = useThemeScope('buyer');
 
   return (
-    <div className="space-y-2">
-      <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
-        Theme
-      </span>
-      <ThemeSegmentedPill value={theme} onChange={setTheme} className="flex w-full [&>button]:flex-1" />
+    <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-2">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
+          Theme
+        </span>
+        <ThemeSegmentedPill value={theme} onChange={setTheme} className="w-full justify-center" />
+      </div>
+      <div className="space-y-2">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
+          Account
+        </span>
+        <AccountSwitcher triggerClassName="w-full justify-center" />
+      </div>
     </div>
   );
 }
@@ -102,15 +111,9 @@ export function BuyerProfileContent({
 
   return (
     <div className="w-full space-y-4">
-      {/* App theme + account switcher - Positioned Above Account Details */}
-      <section className="space-y-4 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
-        <BuyerThemePillPicker />
-        <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
-            Account
-          </span>
-          <AccountSwitcher />
-        </div>
+      {/* App theme + account switcher - one equal row above account details */}
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+        <BuyerPreferencesRow />
       </section>
 
       {/* Account Details Section */}
@@ -191,5 +194,29 @@ export function BuyerProfileContent({
         <DeleteAccountButton deleteAccount={deleteBuyerAccount} onDeleted={onLogout} />
       </div>
     </div>
+  );
+}
+
+interface BuyerProfileSheetProps extends BuyerProfileContentProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+/**
+ * Buyer profile as a right-side slide-over — the same UX as the creator
+ * profile. Opened from the profile icon in the buyer header.
+ */
+export function BuyerProfileSheet({ open, onOpenChange, ...content }: BuyerProfileSheetProps) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" className="w-full overflow-y-auto bg-surface-1 p-0 text-label sm:max-w-md">
+        <SheetHeader className="px-4 pb-2 pt-6 text-left">
+          <SheetTitle className="text-label">Profile</SheetTitle>
+        </SheetHeader>
+        <div className="px-4 pb-8">
+          <BuyerProfileContent {...content} />
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 }

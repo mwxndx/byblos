@@ -21,6 +21,7 @@ import { WithdrawalsTab } from '../components/dashboard/tabs/WithdrawalsTab';
 import { SellerDashboardHeader } from '../components/dashboard/widgets/SellerDashboardHeader';
 import { SellerDashboardErrorState, SellerDashboardLoadingState } from '../components/dashboard/widgets/SellerDashboardState';
 import { SellerDashboardTabs } from '../components/dashboard/widgets/SellerDashboardTabs';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import { copyLinkedTextToClipboard, getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { useShopAccentOnly } from '@/shared/hooks/useShopTheme';
@@ -66,6 +67,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
     localStorage.getItem('seller_last_viewed_orders')
   );
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Hook non-root tab navigation into native Android back stack
   useEffect(() => {
@@ -238,16 +240,16 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
 
   return (
     <div className="seller-surface flex flex-col" style={{ minHeight: '100svh', height: '100svh', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
-      <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => handleSelectTab('settings')} />
+      <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       <div
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
         className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
-        // The seller tabs are a fixed bottom bar on web and native alike, so
-        // always reserve space so the last content clears it.
-        style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
+        // The seller tabs are a fixed bottom bar (h-14) on web and native alike,
+        // so reserve matching space so the last content clears it.
+        style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}
       >
         <div className="mb-5 mt-1 sm:mb-6">
           <SellerProfileHero
@@ -301,14 +303,27 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
           />
         )}
 
-        {activeTab === 'settings' && (
-          <SettingsTab
-            sellerProfile={sellerProfile}
-            onLogout={handleLogout}
-            {...settingsForm}
-          />
-        )}
       </div>
+
+      {/* Profile / settings as a right-side slide-over — same UX as the creator
+          profile, opened from the header profile icon. The .seller-surface
+          wrapper carries the seller-scoped styling into the portal. */}
+      <Sheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
+        <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-md">
+          <div className="seller-surface min-h-full">
+            <SheetHeader className="px-4 pb-2 pt-6 text-left">
+              <SheetTitle>Profile</SheetTitle>
+            </SheetHeader>
+            <div className="px-4 pb-8">
+              <SettingsTab
+                sellerProfile={sellerProfile}
+                onLogout={handleLogout}
+                {...settingsForm}
+              />
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
