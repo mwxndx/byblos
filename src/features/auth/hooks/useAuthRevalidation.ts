@@ -29,6 +29,17 @@ const isExcludedFromRestoration = (path: string): boolean => {
   return EXCLUDED_RESTORE_PATHS.some((p) => path.includes(p));
 };
 
+// A profile probe only proves the session is gone when the server definitively
+// rejects it (401 Unauthorized / 404 Not Found). A 5xx, a timeout, being
+// offline, or a cold-starting backend is a transient failure — NOT a logout —
+// so we must not clear the persisted session marker on those, or a valid user
+// gets signed out by a temporary blip. react-query already retries the profile
+// query, so only a sustained failure reaches the callers of this.
+export const isDefinitiveAuthFailure = (error: unknown): boolean => {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 401 || status === 404;
+};
+
 interface UseAuthRevalidationOptions {
   pathname: string;
   user: GlobalUser | null;
@@ -126,8 +137,13 @@ export function useAuthRevalidation({
       await markRoleSessionActive(currentRole);
       markAuthChecked();
     } catch (error) {
-      if (currentRole === 'buyer' && (error.response?.status === 404 || error.response?.status === 401)) {
-        // Preserve the previous cross-role behavior: seller sessions should not be cleared by a buyer route probe.
+      if (!isDefinitiveAuthFailure(error)) {
+        // Transient error (5xx, timeout, offline, cold-starting backend): keep
+        // the session marker and any existing user in place so a temporary
+        // outage does not log a valid user out. A later revalidation recovers.
+      } else if (currentRole === 'buyer') {
+        // A buyer-route probe returning 401/404 must not clear another role's
+        // session (cross-role safety).
       } else {
         setUser(null);
         await clearRoleSession(currentRole);
@@ -213,6 +229,32 @@ export function useAuthRevalidation({
         return;
       }
 
+      // ── Optimistic navigation ────────────────────────────────────────────
+      // We already know, from the local session marker, which dashboard this
+      // returning user belongs on. Navigate there NOW — before the (possibly
+      // slow, e.g. cold-starting backend) profile fetch — so the user lands on
+      // their dashboard skeleton instead of flashing the public landing page
+      // while the fetch runs. Keep isLoading true so AppProtectedRoute shows its
+      // loading fallback rather than bouncing to /login while `user` is still
+      // null; the fetch below fills the profile in, or clears the session on
+      // failure (which then lets the protected route send them to login).
+      if (bootPath === '/') {
+        let destinationPath = getDashboardPath(activeRole);
+        if (isNativeApp()) {
+          const savedPath = await storage.get(LAST_NATIVE_PATH_KEY);
+          if (savedPath && !isPublicRoute(savedPath) && !isExcludedFromRestoration(savedPath)) {
+            const savedRole = getRoleFromRoute(savedPath);
+            if (!savedRole || savedRole === activeRole) {
+              destinationPath = savedPath;
+            }
+          }
+        }
+        if (cancelled) return;
+        setIsLoading(true);
+        setInitializing(false);
+        navigate(destinationPath, { replace: true });
+      }
+
       let queryOpts;
       if (activeRole === 'buyer') queryOpts = buyerProfileQueryOptions;
       else if (activeRole === 'seller') queryOpts = sellerProfileQueryOptions;
@@ -225,7 +267,6 @@ export function useAuthRevalidation({
         if (cancelled) return;
         if (!profileData) {
           await clearRoleSession(activeRole);
-          setInitializing(false);
           return;
         }
         setUser({
@@ -235,26 +276,21 @@ export function useAuthRevalidation({
         });
         await markRoleSessionActive(activeRole);
         markAuthChecked();
-
-        if (bootPath === '/') {
-          let destinationPath = getDashboardPath(activeRole);
-          if (isNativeApp()) {
-            const savedPath = await storage.get(LAST_NATIVE_PATH_KEY);
-            if (savedPath && !isPublicRoute(savedPath) && !isExcludedFromRestoration(savedPath)) {
-              const savedRole = getRoleFromRoute(savedPath);
-              if (!savedRole || savedRole === activeRole) {
-                destinationPath = savedPath;
-              }
-            }
-          }
-          navigate(destinationPath, { replace: true });
+      } catch (error) {
+        // Only a definitive auth failure (401/404) means the session is really
+        // gone — drop the marker so AppProtectedRoute routes to login. A
+        // transient error (5xx, timeout, cold-starting backend) is NOT a logout:
+        // keep the marker so a valid user is not signed out by a blip and the
+        // session restores on the next launch.
+        if (isDefinitiveAuthFailure(error) && !cancelled) {
+          await clearRoleSession(activeRole);
         }
-      } catch {
-        // Token invalid/expired — drop the marker and show the landing page.
-        if (!cancelled) await clearRoleSession(activeRole);
       } finally {
         // Always ungate rendering after the restore attempt completes.
-        if (!cancelled) setInitializing(false);
+        if (!cancelled) {
+          setIsLoading(false);
+          setInitializing(false);
+        }
       }
     })();
     // Safety fallback: ensure initializing is ungated after 3 seconds max
