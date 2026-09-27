@@ -145,3 +145,6 @@ skills-lock.json
 
 # Generated at build/dev from VITE_FIREBASE_* env (scripts/generate-firebase-sw.mjs)
 public/firebase-messaging-sw.js
+
+# Committed-by-mistake Python venv (graphify tool site-packages) — not app code
+/Lib/
