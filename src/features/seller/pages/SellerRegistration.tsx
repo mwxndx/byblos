@@ -1,19 +1,11 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card';
-import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
-import { User, Mail, Phone, Lock, Loader2, Eye, EyeOff, ArrowLeft, Store, MapPin, Check, X, Globe, RefreshCw } from '@/shared/ui/icons';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Mail, Loader2, ArrowLeft, RefreshCw } from '@/shared/ui/icons';
 import { useToast } from '@/shared/hooks/use-toast';
-import { sellerApi, checkShopNameAvailability } from '@/features/seller/api';
 import TermsModal from '@/shared/components/TermsModal';
-import { useSellerResendVerificationMutation } from '@/features/seller/hooks/mutations/useSellerAuthMutations';
 import { SellerRegistrationSteps } from '../components/SellerRegistrationSteps';
 import { useSellerRegistration } from '../hooks/useSellerRegistration';
-import { checkPasswordStrength, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
 
 interface SellerRegistrationProps {
   onSuccess?: () => void;

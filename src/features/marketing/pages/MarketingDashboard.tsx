@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';
-import {
-    LineChart, Line, AreaChart, Area,
+import { AreaChart, Area,
     BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';

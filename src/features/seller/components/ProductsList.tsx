@@ -1,17 +1,12 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
-import { Loader2, Plus, Search } from '@/shared/ui/icons';
+import { Plus, Search } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { useToast } from '@/shared/hooks/use-toast';
-import { useQueryClient } from '@tanstack/react-query';
-import { useUpdateProductMutation, useUpdateInventoryMutation, sellerProductQuery } from '@/features/seller/hooks/useSellerProducts';
-import type { ApiSellerProduct, Product } from '@/shared/types';
+import type { Product } from '@/shared/types';
 import { ProductDeleteDialog } from './products-list/ProductDeleteDialog';
-import { ProductEditDialog, type ProductEditFormData } from './products-list/ProductEditDialog';
+import { ProductEditDialog } from './products-list/ProductEditDialog';
 import { ProductInventoryDialog } from './products-list/ProductInventoryDialog';
 import { SellerProductCards } from './products-list/SellerProductCards';
 import { SellerProductsTable } from './products-list/SellerProductsTable';
-import { createInitialEditFormData, processImage } from './products-list/productsListUtils';
 import { useProductsList } from '../hooks/useProductsList';
 
 interface ProductsListProps {

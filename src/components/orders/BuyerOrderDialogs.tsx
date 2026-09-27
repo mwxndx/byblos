@@ -2,8 +2,7 @@ import { Button } from '@/shared/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { CheckCircle, Package, RefreshCw, XCircle } from '@/shared/ui/icons';
 import type { ApiOrder } from '@/shared/types';
-import { getImageUrl } from '@/shared/utils/formatting';
-import { getBuyerServiceCharge, getConfirmReceiptLabel, isServiceOrder } from '@/features/orders/utils/ordersSectionUtils';
+import { getBuyerServiceCharge, isServiceOrder } from '@/features/orders/utils/ordersSectionUtils';
 import { OrderDetailsDialog } from './OrderDetailsDialog';
 
 interface BuyerOrderDialogsProps {

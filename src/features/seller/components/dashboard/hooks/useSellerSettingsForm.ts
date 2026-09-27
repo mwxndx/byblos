@@ -7,7 +7,7 @@ import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { SellerSettingsFormData } from '../types';
 import type { ApiSeller } from '@/shared/types';
 import type { LocationCoordinates } from '@/infrastructure/location/location';
-import { cities, isDefaultCoordinate, buildInitialFormData } from './sellerSettingsForm.utils';
+import { cities, buildInitialFormData } from './sellerSettingsForm.utils';
 
 interface UseSellerSettingsFormArgs {
   sellerProfile: ApiSeller | Record<string, unknown>;

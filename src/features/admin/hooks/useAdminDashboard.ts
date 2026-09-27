@@ -19,7 +19,7 @@ import {
 } from '@/features/admin/hooks/queries/useAdminQueries';
 import { usePaginatedAdminList } from '@/features/admin/hooks/usePaginatedAdminList';
 
-import type { DashboardAnalytics, MonthlyMetricsData, WithdrawalRequest, FinancialMetrics, MonthlyFinancialData, DashboardState, DashboardPaginationState } from '../types/dashboard';
+import type { DashboardAnalytics, MonthlyMetricsData, WithdrawalRequest, DashboardState, DashboardPaginationState } from '../types/dashboard';
 import { EMPTY_PAGINATION } from '../types/dashboard';
 
 export function useAdminDashboard() {

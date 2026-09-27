@@ -6,7 +6,6 @@ import { BagProvider } from '@/features/shop/bag/BagContext';
 import { BagSheet } from '@/features/shop/components/BagSheet';
 import { ShopBagProductCard } from '@/features/shop/components/ShopBagProductCard';
 import type { Product, Seller } from '@/shared/types';
-import { type Theme } from '@/shared/hooks/useShopTheme';
 import { isAesthetic } from '../utils/shopPage.shared';
 import { SEOHead } from '@/shared/components/SEOHead';
 import { ShopHero } from '../components/ShopHero';

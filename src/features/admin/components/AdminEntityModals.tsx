@@ -3,7 +3,6 @@ import { AdminSellerDetailModal, type SellerDetail } from './AdminSellerDetailMo
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
-import { format } from 'date-fns';
 import { Loader2, UserCircle, X } from '@/shared/ui/icons';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
 

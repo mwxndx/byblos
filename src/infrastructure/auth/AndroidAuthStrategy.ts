@@ -3,7 +3,6 @@ import { AuthStrategy, AuthPlatform, AppRole, StorageAdapter } from './types';
 import { buildApiBaseUrl } from '../http/apiBaseUrl';
 import { BYBLOS_AUTH_KEYS } from '../storage/storage';
 
-import { getFreshCsrfToken, getCachedCsrfToken } from './WebAuthStrategy';
 
 export class AndroidAuthStrategy implements AuthStrategy {
   readonly platform: AuthPlatform = 'android';

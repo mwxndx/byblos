@@ -1,4 +1,4 @@
-import { transformSeller, type ApiPublicSeller } from './sellerTransforms';
+import { transformSeller } from './sellerTransforms';
 
 import type { ApiProduct } from '@/shared/types/api/product';
 export type { ApiProduct };

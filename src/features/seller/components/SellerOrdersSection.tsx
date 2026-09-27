@@ -1,36 +1,15 @@
-import { OrderStatus } from '@/shared/types';
-import { useState, useMemo, useCallback, useEffect, useRef, type FormEvent } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/shared/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { Badge } from '@/shared/ui/badge';
+import { Card, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Input } from '@/shared/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/shared/ui/dialog';
-import { Label } from '@/shared/ui/label';
-import { format, isValid, parseISO } from 'date-fns';
 import { EmptyState } from '@/shared/ui/empty-state';
 import { SellerOrderCard } from './SellerOrderCard';
 
-import { Clock, Package, Truck, CheckCircle, RefreshCw, XCircle, Calendar, User, Download, MapPin, CreditCard } from '@/shared/ui/icons';
-import { useToast } from '@/shared/hooks/use-toast';
+import { Package, RefreshCw, Download } from '@/shared/ui/icons';
 import { exportOrdersToCSV } from '@/shared/utils/exportUtils';
-import {
-  useQuotePickupMutation,
-  useRequestPickupMutation,
-  useSelectHubDropoffMutation,
-  useMarkDroppedAtHubMutation,
-  useUpdateOrderStatusMutation,
-  useConfirmBookingMutation,
-  useCancelSellerOrderMutation
-} from '@/features/seller/hooks/mutations/useSellerOrderMutations';
-import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
-import { getOrderInstruction } from '@/features/orders/utils/orderInstructions';
-import { useSellerOrders } from './dashboard/hooks/useSellerOrders';
-import { sellerDashboardQueryKeys } from './dashboard/queryKeys';
-import LocationPicker from '@/shared/components/LocationPicker';
 
-import { formatCurrency, formatDate, getEffectiveFulfillmentType, hasBuyerPaidDoorDelivery, HUB_DROPOFF_LOCATION } from '../utils/sellerOrders.utils';
+
+
 import { useSellerOrderActions } from '../hooks/useSellerOrderActions';
 import { SellerOrderDialogs } from './SellerOrderDialogs';
 

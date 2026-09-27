@@ -1,6 +1,5 @@
 import type { OrderStatus, Theme } from '@/shared/types';
 export type { Theme };
-import type { ProductType } from '@/shared/types/index';
 
 
 

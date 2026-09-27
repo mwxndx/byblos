@@ -1,17 +1,10 @@
-import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { useToast } from '@/shared/hooks/use-toast';
-import { Eye, EyeOff, Loader2, Mail, User, Phone, Lock, ArrowLeft, ShoppingBag, MapPin, Check, X, RefreshCw } from '@/shared/ui/icons';
-import { locationData } from '@/shared/utils/constants';
+import { Loader2, Mail, ArrowLeft, RefreshCw } from '@/shared/ui/icons';
 import TermsModal from '@/shared/components/TermsModal';
-import { useBuyerResendVerificationMutation } from '@/features/buyer/hooks/mutations/useBuyerAuthMutations';
 import { BuyerRegisterSteps } from '@/features/buyer/components/BuyerRegisterSteps';
 import { useBuyerRegister } from '@/features/buyer/hooks/useBuyerRegister';
-import { checkPasswordStrength, type BuyerRegisterFormData } from '@/features/buyer/utils/buyerRegisterUtils';
 
 export function BuyerRegister() {
   const navigate = useNavigate();

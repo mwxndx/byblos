@@ -12,7 +12,7 @@ import publicRoutes from './routes/public.routes.js';
 import healthRoutes from './routes/health.routes.js';
 import ticketRoutes from './routes/ticket.routes.js';
 import eventRoutes from './routes/event.routes.js';
-import { pool, testConnection as testDbConnection } from './config/database.js';
+import { testConnection as testDbConnection } from './config/database.js';
 import { globalErrorHandler, notFoundHandler } from './utils/errorHandler.js';
 import { protect } from './middleware/auth.js';
 import adminRoutes from './routes/admin.routes.js'; // Import admin routes

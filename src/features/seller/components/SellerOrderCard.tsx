@@ -1,16 +1,15 @@
 import { useState } from 'react';
-import { Calendar, CheckCircle, ChevronDown, Clock, MapPin, Package, Truck, XCircle } from '@/shared/ui/icons';
+import { Calendar, ChevronDown, Package } from '@/shared/ui/icons';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/utils/formatting';
-import { Badge } from '@/shared/ui/badge';
 import type { ApiOrder } from '@/shared/types';
 import { SellerOrderActions } from './SellerOrderActions';
 import { getOrderInstruction } from '@/features/orders/utils/orderInstructions';
 import { OrderLogisticsTracking } from '@/components/orders/OrderLogisticsTracking';
 import { OrderStatusBadge } from '@/shared/ui/OrderStatusBadge';
 import { isDigitalOrder, isServiceOrder, OrderMetaPills } from '@/features/orders/utils/ordersSectionUtils';
-import { formatCurrency, formatDate, getEffectiveFulfillmentType, HUB_DROPOFF_LOCATION } from '../utils/sellerOrders.utils';
+import { formatCurrency, formatDate, getEffectiveFulfillmentType } from '../utils/sellerOrders.utils';
 
 interface SellerOrderCardProps {
   order: ApiOrder;

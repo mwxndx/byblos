@@ -1,8 +1,7 @@
-import { Search, UserPlus, Trash2, Loader2 } from '@/shared/ui/icons';
+import { Search, Trash2, Loader2 } from '@/shared/ui/icons';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Input } from '@/shared/ui/input';
 import { Button } from '@/shared/ui/button';
-import { IconButton } from '@/shared/ui/icon-button';
 import { AdminPaginationControls } from './AdminPaginationControls';
 import type { AdminCreator, PaginationMeta } from '../types/dashboard';
 

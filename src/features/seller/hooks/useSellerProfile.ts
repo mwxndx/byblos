@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { sellerApi } from '@/features/seller/api';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
-import { toast } from 'sonner';
 
 // Profile Query
 export function useSellerProfileQuery(enabled = true) {

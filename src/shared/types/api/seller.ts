@@ -1,4 +1,3 @@
-import type { Theme } from '../primitives';
 
 // Seller schema returned by the public-facing API
 export interface ApiPublicSeller {

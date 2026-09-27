@@ -5,15 +5,13 @@ import { toast } from 'sonner';
 import { adminApi, type AdminLogisticsStatusFilter } from '@/features/admin/api';
 import { adminQueryKeys } from '@/features/admin/api/queryKeys';
 import type {
-  LogisticsLeg,
   LogisticsLegType,
-  LogisticsRequestCard,
   LogisticsSort,
   LogisticsStatusUpdate,
 } from '@/features/logistics/api';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import { STATUS_FILTERS, SORT_OPTIONS, label, formatCurrency } from '../utils/adminLogisticsTab.utils';
+import { STATUS_FILTERS, SORT_OPTIONS, formatCurrency } from '../utils/adminLogisticsTab.utils';
 import { LogisticsAdminCard } from './adminLogisticsTab.components';
 
 export function AdminLogisticsTab() {

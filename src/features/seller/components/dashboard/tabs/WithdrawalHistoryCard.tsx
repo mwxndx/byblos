@@ -2,7 +2,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent } from '@/shared/ui/card';
 import { getWithdrawalFee } from '../dashboardUtils';
 import type { ApiWithdrawalRequest } from '@/shared/types/api/withdrawal';
-import { formatKes, formatSettlementTime, getWithdrawalStatusLabel } from './withdrawalsTab.utils';
+import { formatKes, getWithdrawalStatusLabel } from './withdrawalsTab.utils';
 import { getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 
 export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalRequest }) {

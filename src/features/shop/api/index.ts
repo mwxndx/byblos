@@ -3,7 +3,6 @@ import { searchSellers, searchProducts } from './search';
 import { getSellersPage, getSellers, knockSeller, getSellerInfo } from './sellers';
 import { getProductsPage, getProducts, getProduct, getFeaturedProducts, getProductsByLocation } from './products';
 import { pollPaymentStatus } from '@/features/payments/api/publicPayments';
-import { fetchPublicTracking } from './tracking';
 
 export * from './types';
 export * from './search';

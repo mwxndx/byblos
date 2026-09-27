@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import buyerApi from '@/features/buyer/api';
 import { sellerApi } from '@/features/seller/api';
-import adminApi from '@/features/admin/api';
 import creatorApi from '@/features/creator/api';
 import { getApiForRole } from '@/features/auth/api/authApi';
 import type { UserRole, BuyerRegistrationData, SellerRegistrationData } from '@/features/auth/types/authTypes';

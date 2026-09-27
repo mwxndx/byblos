@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { useGetOrderStatusMutation } from '@/features/buyer/hooks/queries/useOrderStatusQuery';
 import { useGlobalAuth } from '@/features/auth/contexts';
-import { formatCurrency } from '@/shared/utils/formatting';
 import { isNativeApp, APP_DOWNLOAD_URL, getDevicePlatform, getAndroidDeepLink } from '@/infrastructure/navigation/mobileApp';
 
 type ModalState = 'POLLING' | 'SUCCESS' | 'FAILED' | 'TIMEOUT';

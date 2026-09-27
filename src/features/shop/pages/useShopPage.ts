@@ -5,8 +5,8 @@ import { useTrackCreatorLinkMutation } from '@/features/creator/hooks/mutations/
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-import { useShopTheme, useShopAccentOnly, type Theme } from '@/shared/hooks/useShopTheme';
-import { useShopPageTheme, type ShopPageTheme } from '../components/ShopPageThemePicker';
+import { useShopAccentOnly, type Theme } from '@/shared/hooks/useShopTheme';
+import { useShopPageTheme } from '../components/ShopPageThemePicker';
 import { isAesthetic, getSellerInitials, type ShopProduct, type ShopSeller } from '../utils/shopPage.shared';
 
 export function useShopPage() {

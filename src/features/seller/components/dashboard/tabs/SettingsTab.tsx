@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Edit, Loader2, LogOut, Trash2 } from '@/shared/ui/icons';
+import { useState } from 'react';
+import { Edit, Loader2, LogOut } from '@/shared/ui/icons';
 import { DeleteAccountButton } from '@/components/account/DeleteAccountButton';
 import { deleteSellerAccount } from '@/features/seller/api/profileApi';
 import type { Theme } from '@/features/seller/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { ThemeSelector } from '../../ThemeSelector';
-import { getSellerInitials } from '../dashboardUtils';
 import { getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
 import type { SellerSettingsFormData } from '../types';
 import { SectionHeader, SocialInput } from './settingsTab.parts';

@@ -16,10 +16,7 @@ import { classifyApiError } from '@/shared/utils/errorClassification';
 
 import { switchAccountRequest, type SwitchableRole } from '@/features/auth/api/account';
 import type {
-  BuyerRegistrationData,
   GlobalUser,
-  RegistrationData,
-  SellerRegistrationData,
   UserProfile,
   UserRole,
 } from '../types/authTypes';
@@ -30,10 +27,6 @@ import {
   useCreatorLoginMutation,
   useLogisticsLoginMutation,
   useMarketingLoginMutation,
-  useRegisterMutation,
-  useForgotPasswordMutation,
-  useResetPasswordMutation,
-  useUpdateProfileMutation,
 } from './useAuthMutations';
 import {
   buyerProfileQueryOptions,

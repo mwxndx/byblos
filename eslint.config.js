@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
+import unusedImports from "eslint-plugin-unused-imports";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -37,6 +38,7 @@ export default tseslint.config(
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      "unused-imports": unusedImports,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
@@ -45,6 +47,9 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      // Auto-removable on --fix; keeps unused imports out going forward
+      // (matches SonarCloud S1128). Unused *variables* stay off above.
+      "unused-imports/no-unused-imports": "error",
     },
   }
 );

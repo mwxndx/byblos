@@ -1,4 +1,3 @@
-import { Capacitor } from '@capacitor/core';
 
 export type AuthPlatform = 'web' | 'android';
 export type AppRole = 'buyer' | 'seller' | 'creator' | 'logistics' | 'admin' | 'marketing';

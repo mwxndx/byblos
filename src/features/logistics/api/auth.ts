@@ -1,5 +1,5 @@
 import apiClient from '@/infrastructure/http/apiClient';
-import { registerNativePushNotifications, unregisterNativePushNotifications } from '@/features/notifications/utils/mobileNotifications';
+import { unregisterNativePushNotifications } from '@/features/notifications/utils/mobileNotifications';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { storage } from '@/infrastructure/storage/storage';
 

@@ -1,4 +1,3 @@
-import { Badge } from '@/shared/ui/badge';
 import { cn } from '@/shared/utils/formatting';
 import { CheckCircle, Clock, Package, Truck, XCircle } from '@/shared/ui/icons';
 

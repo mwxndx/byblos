@@ -10,7 +10,7 @@ import {
   Store,
   Truck,
 } from '@/shared/ui/icons';
-import type { ApiOrder, ApiOrderLogisticsDeliveryLeg } from '@/shared/types';
+import type { ApiOrder } from '@/shared/types';
 import {
   MZIGO_CBD_HUB,
   deriveOrderJourney,
