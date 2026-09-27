@@ -157,7 +157,7 @@ export function SettingsLocationSection({
                     initialCoordinates={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : null}
                     onLocationChange={handleShopLocationChange}
                   />
-                  {(formData.physicalAddress || formData.latitude || formData.longitude || sellerProfile?.physicalAddress) && (
+                  {(Boolean(formData.physicalAddress) || formData.latitude != null || formData.longitude != null || Boolean(sellerProfile?.physicalAddress)) && (
                     <button
                       type="button"
                       onClick={handleDeleteLocation}

@@ -67,7 +67,7 @@ export function DetectionCard({ earning, formatCurrency, onRelease, onReverse }:
                 <p className="text-[10px] font-bold text-label-3 uppercase tracking-widest opacity-60">{EARNING_TYPE_LABEL[earning.earning_type]}</p>
               </div>
             </div>
-            {earning.buyer_id && (
+            {earning.buyer_id != null && (
               <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-1">
                 Buyer on this order: #{earning.buyer_id} — matched against the creator's own identity
               </p>

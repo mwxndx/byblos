@@ -53,7 +53,8 @@ if (process.env.SEED_TEST_ACCOUNTS !== 'true') {
   const dbUrl = String(process.env.DATABASE_URL || '');
   const looksProd = host.includes('render.com') || host.includes('amazonaws.com') || dbUrl.includes('render.com') || dbUrl.includes('amazonaws.com');
   if (looksProd) {
-    console.error(`FATAL SAFETY GUARD: "${host || dbUrl}" looks like a production host. Refusing to seed test accounts.`);
+    // Log only the host, never the full DATABASE_URL (it carries credentials).
+    console.error(`FATAL SAFETY GUARD: "${host || 'the configured DATABASE_URL'}" looks like a production host. Refusing to seed test accounts.`);
     process.exit(1);
   }
 }

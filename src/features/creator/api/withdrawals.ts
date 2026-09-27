@@ -3,7 +3,7 @@ import apiClient from '@/infrastructure/http/apiClient';
 // <unknown> instead of no type parameter (defaults to axios's own `any`) --
 // see the matching comment in profile.ts.
 export const requestWithdrawal = async (amount: number | string) => {
-  const idempotencyKey = `creator-withdrawal-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const idempotencyKey = `creator-withdrawal-${crypto.randomUUID()}`;
   const response = await apiClient.post<unknown>(
     '/creators/withdrawals',
     { amount, idempotencyKey },

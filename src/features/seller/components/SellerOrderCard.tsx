@@ -216,7 +216,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                                     {(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }) ? (
                                                                         <div className="space-y-1">
                                                                             <p>{(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).fullAddress || 'Buyer Coordinates Provided'}</p>
-                                                                            {(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).latitude && (order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).longitude && (
+                                                                            {(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).latitude != null && (order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).longitude != null && (
                                                                                 <a
                                                                                     href={`https://www.google.com/maps?q=${(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).latitude},${(order.metadata.buyer_location as { fullAddress?: string; latitude?: number; longitude?: number }).longitude}`}
                                                                                     target="_blank"

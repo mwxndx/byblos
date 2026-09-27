@@ -57,7 +57,9 @@ async function tableExists(pool, tableName) {
 }
 
 async function run() {
-    console.log(`[${new Date().toISOString()}] [DEBUG] Initial DATABASE_URL: ${process.env.DATABASE_URL ? (process.env.DATABASE_URL.substring(0, 15) + '...') : 'undefined'}`);
+    // Don't log any of the connection string — even a prefix leaks the scheme
+    // and the start of credentials. Presence is all this debug line needs.
+    console.log(`[${new Date().toISOString()}] [DEBUG] DATABASE_URL: ${process.env.DATABASE_URL ? 'set' : 'undefined'}`);
 
     // Task 3: Robust Fallback Logic
     // If we have individual components, ALWAYS use them as they are usually the most up-to-date

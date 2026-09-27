@@ -46,7 +46,7 @@ export function MzigoJourneyStepper({ journey, compact = false }: { journey: Jou
               {!compact && (
                 <span
                   className={`text-[10px] font-semibold text-center ${
-                    isCurrent ? 'text-label' : isDone ? 'text-label-2' : 'text-label-2'
+                    isCurrent ? 'text-label' : 'text-label-2'
                   }`}
                 >
                   {step.label}
