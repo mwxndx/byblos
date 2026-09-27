@@ -244,7 +244,9 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
         className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
-        style={isNativeApp() ? { paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' } : undefined}
+        // The seller tabs are a fixed bottom bar on web and native alike, so
+        // always reserve space so the last content clears it.
+        style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
       >
         <div className="mb-5 mt-1 sm:mb-6">
           <SellerProfileHero

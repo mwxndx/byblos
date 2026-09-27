@@ -1,8 +1,7 @@
 import { Button } from '@/shared/ui/button';
 import { AddBusinessCard } from '@/features/shop/components/AddBusinessCard';
-import { LandingDoodles } from '@/features/shop/components/LandingDoodles';
 import { Link } from 'react-router-dom';
-import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
+import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 import { SEOHead } from '@/shared/components/SEOHead';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -14,10 +13,6 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybl
  */
 const LandingHome = () => (
   <div className="relative flex min-h-[100svh] items-center justify-center bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200">
-    {/* z-0 explicitly, so the scatter stays behind the nav buttons and main content
-        regardless of DOM order — flex items paint in the same layer as position:absolute
-        siblings, so relying on ordering alone here would be fragile. */}
-    <LandingDoodles />
     <Link to="/mzigo/login" className="absolute left-5 top-[calc(1.25rem+env(safe-area-inset-top,0px))] z-10" aria-label="Mzigo Ego delivery partner login">
       <Button className="flex h-10 w-10 items-center justify-center rounded-full border border-separator bg-fill p-0 hover:bg-fill-2">
         <img src="/mzigo-ego.png" alt="Mzigo Ego" className="h-6 w-6 object-contain" />
@@ -57,8 +52,9 @@ const LandingHome = () => (
         Tap logo to get access
       </p>
 
-      {/* Play Store download is a web-only affordance — the native app already has itself installed. */}
-      {!isNativeApp() && (
+      {/* Play Store download: web only (native already has the app installed),
+          and never on iOS — an Android store link is useless there. */}
+      {!isNativeApp() && getDevicePlatform() !== 'ios' && (
         <a
           href={PLAY_STORE_URL}
           target="_blank"
