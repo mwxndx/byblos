@@ -3,6 +3,7 @@ import type { AxiosRequestConfig } from 'axios';
 import apiClient from '@/infrastructure/http/apiClient';
 import { getNativePlatform, getStableDeviceId, isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { appNavigate } from '@/infrastructure/navigation/navigationService';
+import { getWebPushToken, isWebPushSupported } from '@/features/notifications/webPush';
 import type { UserRole } from '@/features/auth/types/authTypes';
 
 type AppNotificationRole = UserRole | 'logistics';
@@ -26,11 +27,12 @@ function notificationEndpoint(role: AppNotificationRole) {
 async function persistDeviceToken(
   token: string,
   role: AppNotificationRole,
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig,
+  platform: string = getNativePlatform()
 ) {
   try {
     await apiClient.post(notificationEndpoint(role), {
-      platform: getNativePlatform(),
+      platform,
       token,
       deviceId: getStableDeviceId(),
       appVersion: appVersion(),
@@ -39,11 +41,29 @@ async function persistDeviceToken(
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
     localStorage.setItem(REGISTRATION_STORAGE_KEY, JSON.stringify({
       role,
-      platform: getNativePlatform(),
+      platform,
       registeredAt: new Date().toISOString(),
     }));
   } catch (err) {
     console.warn('[MobileNotifications] Failed to persist device token to backend', err);
+  }
+}
+
+// Browser (non-native) push: request permission, get an FCM web token, and
+// register it under the 'web' platform. The backend already accepts 'web'
+// (notification_device_tokens.platform CHECK) and branches the FCM payload on
+// it. Native sessions never reach here — see registerNativePushNotifications.
+async function registerWebPush(
+  role: AppNotificationRole,
+  requestConfig?: AxiosRequestConfig
+) {
+  if (!isWebPushSupported()) return;
+  try {
+    const token = await getWebPushToken();
+    if (!token) return;
+    await persistDeviceToken(token, role, requestConfig, 'web');
+  } catch (err) {
+    console.warn('[MobileNotifications] Web push registration failed', err);
   }
 }
 
@@ -116,7 +136,12 @@ export async function registerNativePushNotifications(
   role: AppNotificationRole,
   requestConfig?: AxiosRequestConfig
 ) {
-  if (!isNativeApp()) return;
+  if (!isNativeApp()) {
+    // Non-native browser session: run the web-push path instead. The native
+    // flow below is left exactly as-is for native apps.
+    void registerWebPush(role, requestConfig);
+    return;
+  }
   if (registrationPromise) return registrationPromise;
 
   pendingRole = role;

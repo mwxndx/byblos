@@ -5,6 +5,7 @@ import { router } from "@/app/router";
 import { LoadingScreen } from "@/shared/components/LoadingScreen";
 import { useAppTheme } from "@/shared/hooks/useAppTheme";
 import { useAndroidBackHandler } from "@/shared/utils/modalBackHandler";
+import { InstallPrompt } from "@/features/pwa/InstallPrompt";
 
 function App() {
   // Bootstrap app theme (light / dark / system) on mount.
@@ -20,6 +21,7 @@ function App() {
         router={router}
         fallbackElement={<LoadingScreen />}
       />
+      <InstallPrompt />
     </ErrorBoundary>
   );
 }

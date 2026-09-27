@@ -101,38 +101,61 @@ async function getAccessToken() {
     return cachedToken.accessToken;
 }
 
+// Build the FCM HTTP v1 message body for one token, platform-aware. Pure and
+// exported so the platform branching can be unit-tested without the network.
+// Native tokens ('android'/'ios') get the Android notification block; 'web'
+// tokens must NOT (those fields are Android-only), so they get a webpush block
+// instead. iOS native tokens keep the android block off, mirroring the
+// pre-existing behavior where only the android block was ever sent.
+export function buildFcmMessage({ token, title, body, data = {}, platform }) {
+    const message = {
+        token,
+        notification: { title, body },
+        data,
+    };
+
+    if (platform === 'web') {
+        const link = data.path || data.url;
+        const webpush = {};
+        // fcm_options.link requires an absolute URL; our service worker also
+        // routes clicks from data.path, so a relative path is handled there.
+        if (typeof link === 'string' && /^https?:\/\//.test(link)) {
+            webpush.fcm_options = { link };
+        }
+        message.webpush = webpush;
+    } else {
+        const channelId = data.channelId || 'byblos_general';
+        message.android = {
+            priority: 'HIGH',
+            notification: {
+                channel_id: channelId,
+                sound: 'default',
+                default_sound: true,
+                default_vibrate_timings: true,
+                notification_priority: 'PRIORITY_HIGH',
+                visibility: 'PUBLIC',
+            },
+        };
+    }
+
+    return message;
+}
+
 // Send one message to one device token via FCM HTTP v1.
 // Returns { ok } on success, or { ok:false, unregistered, status, error } on failure.
 // `unregistered` marks tokens that are permanently invalid so callers can prune them.
-export async function sendFcmV1({ token, title, body, data = {} }) {
+export async function sendFcmV1({ token, title, body, data = {}, platform }) {
     const sa = getServiceAccount();
     if (!sa) return { ok: false, reason: 'not_configured' };
 
     const accessToken = await getAccessToken();
     if (!accessToken) return { ok: false, reason: 'auth_failed' };
 
-    const channelId = data.channelId || 'byblos_general';
-
     const res = await fetch(`https://fcm.googleapis.com/v1/projects/${sa.project_id}/messages:send`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            message: {
-                token,
-                notification: { title, body },
-                data,
-                android: {
-                    priority: 'HIGH',
-                    notification: {
-                        channel_id: channelId,
-                        sound: 'default',
-                        default_sound: true,
-                        default_vibrate_timings: true,
-                        notification_priority: 'PRIORITY_HIGH',
-                        visibility: 'PUBLIC',
-                    },
-                },
-            },
+            message: buildFcmMessage({ token, title, body, data, platform }),
         }),
     });
 

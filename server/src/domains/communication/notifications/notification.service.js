@@ -174,7 +174,7 @@ class NotificationService {
         );
 
         const pushPromises = tokens.map(async (device) => {
-            const result = await sendFcmV1({ token: device.token, title, body, data: stringData });
+            const result = await sendFcmV1({ token: device.token, title, body, data: stringData, platform: device.platform });
             return { device, result };
         });
 

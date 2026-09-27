@@ -2,6 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
+import { isNativeApp } from './infrastructure/navigation/mobileApp';
+import { registerFirebaseServiceWorker } from './features/notifications/webPush';
 import './styles/fonts.css';
 import './app.css';
 
@@ -17,3 +19,10 @@ root.render(
     </HelmetProvider>
   </StrictMode>
 );
+
+// Register the FCM service worker for web (non-native) sessions. This enables
+// background web push and satisfies one of Chrome's PWA install criteria.
+// Native apps use Capacitor push, not a service worker.
+if (!isNativeApp()) {
+  void registerFirebaseServiceWorker();
+}

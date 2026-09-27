@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "patch-package",
-    "dev": "vite",
+    "dev": "npm run generate-firebase-sw && vite",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "build": "npm run typecheck && npm run generate-sitemap && vite build",
-    "build:dev": "vite build --mode development",
-    "vercel-build": "npm run typecheck && npm run generate-sitemap && vite build --mode production",
+    "build": "npm run typecheck && npm run generate-sitemap && npm run generate-firebase-sw && vite build",
+    "build:dev": "npm run generate-firebase-sw && vite build --mode development",
+    "vercel-build": "npm run typecheck && npm run generate-sitemap && npm run generate-firebase-sw && vite build --mode production",
     "generate-sitemap": "node scripts/generate-sitemap.mjs",
+    "generate-firebase-sw": "node scripts/generate-firebase-sw.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
@@ -47,6 +48,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "firebase": "^11.10.0",
     "html-to-image": "^1.11.13",
     "leaflet": "^1.9.4",
     "react": "^18.2.0",
@@ -62,8 +64,8 @@
     "zustand": "^4.5.2"
   },
   "optionalDependencies": {
-    "@rollup/rollup-linux-x64-gnu": "4.24.0",
     "@esbuild/linux-x64": "0.21.5",
+    "@rollup/rollup-linux-x64-gnu": "4.24.0",
     "@swc/core-linux-x64-gnu": "1.7.39"
   },
   "devDependencies": {
