@@ -46,6 +46,9 @@ router.post('/refund-request', withdrawalRateLimiter, validate(V.refundRequest),
 // Get pending refund requests
 router.get('/refund-requests/pending', buyerController.getPendingRefundRequests);
 
+// Get full refund request history (all statuses)
+router.get('/refund-requests/history', buyerController.getRefundHistory);
+
 // Mark order as collected
 router.post('/orders/:orderId/collected', validate(V.orderCollected), buyerController.markOrderAsCollected);
 

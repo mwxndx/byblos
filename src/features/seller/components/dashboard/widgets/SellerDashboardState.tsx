@@ -9,7 +9,8 @@ interface SellerDashboardErrorStateProps {
 
 export function SellerDashboardLoadingState() {
   return (
-    <div className="min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
+    <div role="status" aria-busy="true" aria-live="polite" className="min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
+      <span className="sr-only">Loading dashboard…</span>
       <div className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
         {/* Hero */}
         <Skeleton className="mb-6 h-56 w-full rounded-3xl sm:h-64" />

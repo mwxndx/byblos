@@ -1,6 +1,6 @@
 import type { LucideIcon } from '@/shared/ui/icons';
 
-type BuyerSection = 'shop' | 'notifications' | 'wishlist' | 'orders' | 'profile';
+type BuyerSection = 'shop' | 'notifications' | 'wishlist' | 'orders' | 'profile' | 'refunds';
 
 interface BuyerNavItem {
   key: BuyerSection;

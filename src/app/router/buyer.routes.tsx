@@ -107,6 +107,14 @@ export const buyerRoutes = [
           </Suspense>
         ),
       },
+      {
+        path: 'refunds',
+        element: (
+          <Suspense fallback={<RouteFallback />}>
+            <BuyerDashboard />
+          </Suspense>
+        ),
+      },
     ],
   },
 

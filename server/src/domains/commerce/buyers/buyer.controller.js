@@ -605,6 +605,27 @@ export const getPendingRefundRequests = async (req, res, next) => {
 };
 
 /**
+ * Get the buyer's full refund withdrawal history (all statuses: processing,
+ * completed, failed, …). Read-only — powers the Refunds tab history list.
+ */
+export const getRefundHistory = async (req, res, next) => {
+  try {
+    const buyerId = req.user.buyerId;
+    // status omitted → all statuses (getRefundWithdrawalsForBuyer defaults status to null)
+    const { rows } = await WithdrawalService.getRefundWithdrawalsForBuyer(buyerId, { limit: 100 });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        requests: rows.map(request => sanitizeWithdrawalRequest(request))
+      }
+    });
+  } catch (error) {
+    logger.error('Error fetching refund history:', error);
+    next(error);
+  }
+};
+
+/**
  * Request refund withdrawal
  * Enforces minimum withdrawal amount (KSh 50), withdrawal charges, and T+2 clearance.
  */

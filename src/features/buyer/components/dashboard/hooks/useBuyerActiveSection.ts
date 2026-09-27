@@ -2,17 +2,18 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 type DashboardSection = 'shop' | 'notifications' | 'wishlist' | 'orders';
-type BuyerSection = DashboardSection | 'profile';
+type BuyerSection = DashboardSection | 'profile' | 'refunds';
 
 function sectionFromLocation(pathname: string, search: string): BuyerSection {
   if (pathname.includes('/buyer/orders')) return 'orders';
   if (pathname.includes('/buyer/notifications')) return 'notifications';
   if (pathname.includes('/buyer/wishlist')) return 'wishlist';
+  if (pathname.includes('/buyer/refunds')) return 'refunds';
   if (pathname.includes('/buyer/profile')) return 'profile';
 
   const queryParams = new URLSearchParams(search);
   const querySection = queryParams.get('section') || queryParams.get('tab');
-  if (querySection && ['shop', 'notifications', 'wishlist', 'orders', 'profile'].includes(querySection)) {
+  if (querySection && ['shop', 'notifications', 'wishlist', 'orders', 'profile', 'refunds'].includes(querySection)) {
     return querySection as BuyerSection;
   }
   return 'shop';

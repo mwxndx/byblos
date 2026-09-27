@@ -4,7 +4,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 // Lazy load the OrdersSection component
 const OrdersSection = lazy(() => import('@/features/orders/components/OrdersSectionContainer'));
 import {
-  Heart, User,
+  Heart, WalletCards,
   Store, ShoppingBag, Bell
 } from '@/shared/ui/icons';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,8 @@ import { useWishlist } from '@/features/buyer/hooks/useWishlist';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import WishlistSection from '../components/WishlistSection';
+import RefundCard from '../components/RefundCard';
+import { RefundHistory } from '../components/RefundHistory';
 import SellersGrid from '@/features/shop/components/SellersGrid';
 import { BuyerBottomNav } from '../components/dashboard/BuyerBottomNav';
 import { BuyerDashboardHeader } from '../components/dashboard/BuyerDashboardHeader';
@@ -29,7 +31,7 @@ import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { LoadingScreen as RouteFallback } from '@/shared/components/LoadingScreen';
 
 type DashboardSection = 'shop' | 'notifications' | 'wishlist' | 'orders';
-type BuyerSection = DashboardSection | 'profile';
+type BuyerSection = DashboardSection | 'profile' | 'refunds';
 
 const SWIPE_SECTIONS = ['shop', 'wishlist', 'orders', 'notifications'] as const;
 
@@ -83,8 +85,8 @@ function BuyerDashboard() {
     { key: 'shop', label: 'Shops', Icon: Store, path: '/buyer/dashboard' },
     { key: 'wishlist', label: 'Wishlist', Icon: Heart, path: '/buyer/wishlist' },
     { key: 'orders', label: 'Orders', Icon: ShoppingBag, path: '/buyer/orders', badge: hasUnreadOrders },
+    { key: 'refunds', label: 'Refunds', Icon: WalletCards, path: '/buyer/refunds' },
     { key: 'notifications', label: 'Alerts', Icon: Bell, path: '/buyer/notifications', badge: unreadNotificationsCount > 0, count: unreadNotificationsCount },
-    { key: 'profile', label: 'Profile', Icon: User, path: '/buyer/profile' },
   ] as const;
 
   const activeNav = activeSection;
@@ -95,7 +97,8 @@ function BuyerDashboard() {
       notifications: 'notifications',
       orders: 'orders',
       wishlist: 'wishlist',
-      profile: 'profile'
+      profile: 'profile',
+      refunds: 'refunds'
     };
     if (key !== 'profile') {
       setIsEditingProfile(false);
@@ -125,7 +128,7 @@ function BuyerDashboard() {
       height: '100svh',
       overflowY: 'hidden',
     }}>
-      <BuyerDashboardHeader />
+      <BuyerDashboardHeader onOpenProfile={() => setActiveTab('profile')} />
 
       {/* Dashboard Body: establishes positioning context for drawer and overlay immediately below header */}
       <div
@@ -189,13 +192,19 @@ function BuyerDashboard() {
             </div>
           )}
 
+          {activeSection === 'refunds' && (
+            <div className="mx-auto w-full max-w-[560px] space-y-4">
+              <RefundCard refundAmount={refundAmount} compact />
+              <RefundHistory />
+            </div>
+          )}
+
           {activeSection === 'profile' && (
             <div className="mx-auto w-full max-w-[560px]">
               <BuyerProfileContent
                 isEditingProfile={isEditingProfile}
                 isSavingProfile={isSavingProfile}
                 mobilePayment={mobilePayment}
-                refundAmount={user?.refunds || 0}
                 user={user}
                 whatsappNumber={whatsappNumber}
                 onLogout={handleLogout}

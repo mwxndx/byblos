@@ -1,7 +1,7 @@
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound, WalletCards } from '@/shared/ui/icons';
-import RefundCard from '../RefundCard';
+import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound } from '@/shared/ui/icons';
+import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { BuyerMembershipCard } from './BuyerMembershipCard';
 import { DeleteAccountButton } from '@/components/account/DeleteAccountButton';
 import { deleteBuyerAccount } from '@/features/buyer/api/profile';
@@ -13,7 +13,6 @@ interface BuyerProfileContentProps {
   isEditingProfile: boolean;
   isSavingProfile: boolean;
   mobilePayment: string;
-  refundAmount: number;
   user: import("@/features/auth/types/authTypes").UserProfile | null;
   whatsappNumber: string;
   onLogout: () => void;
@@ -91,7 +90,6 @@ export function BuyerProfileContent({
   isEditingProfile,
   isSavingProfile,
   mobilePayment,
-  refundAmount,
   user,
   whatsappNumber,
   onLogout,
@@ -104,9 +102,15 @@ export function BuyerProfileContent({
 
   return (
     <div className="w-full space-y-4">
-      {/* App Theme Picker Pill - Positioned Above Account Details */}
-      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+      {/* App theme + account switcher - Positioned Above Account Details */}
+      <section className="space-y-4 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
         <BuyerThemePillPicker />
+        <div className="space-y-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
+            Account
+          </span>
+          <AccountSwitcher />
+        </div>
       </section>
 
       {/* Account Details Section */}
@@ -170,14 +174,6 @@ export function BuyerProfileContent({
       </section>
 
       <BuyerMembershipCard />
-
-      <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <WalletCards className="h-4 w-4 text-[#F5C518]" />
-          <h3 className="text-sm font-bold text-slate-950 dark:text-white">Refunds</h3>
-        </div>
-        <RefundCard refundAmount={refundAmount} compact />
-      </section>
 
       <section className="space-y-3">
         <h3 className="text-sm font-bold text-slate-950 dark:text-white">Legal</h3>

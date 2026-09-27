@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent } from "@/shared/ui/tabs";
-import { Spinner } from "@/shared/ui/spinner";
+import { AppHeader } from "@/shared/ui/AppHeader";
+import { DashboardSkeleton } from "@/shared/ui/DashboardSkeleton";
 import { Activity, RefreshCw, Shield, Truck, WalletCards, XCircle } from '@/shared/ui/icons';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { adminApi } from '@/features/admin/api';
@@ -109,14 +110,7 @@ const NewAdminDashboard = () => {
   ];
 
   if (authLoading || !isInitialized) {
-    return (
-      <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)]">
-        <div className="flex flex-col items-center gap-4 rounded-full border border-separator bg-surface-1 px-6 py-4 shadow-xl">
-          <Spinner className="h-12 w-12 text-yellow-500" />
-          <p className="text-label-2 font-semibold text-sm animate-pulse">Loading dashboard…</p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   if (!isAuthenticated) {
@@ -145,19 +139,21 @@ const NewAdminDashboard = () => {
 
   return (
     <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label font-sans">
-      <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-5 md:p-8 space-y-6">
-        {/* Slim header — one line, no hero card. */}
-        <header className="flex items-center justify-between gap-3 border-b border-separator pb-4">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-xl font-semibold tracking-tight text-label">Admin</h1>
-            <span className="text-sm text-label-3">Byblos operations</span>
+      <AppHeader
+        left={
+          <div className="flex items-baseline gap-2 sm:gap-3">
+            <h1 className="text-lg font-semibold tracking-tight text-label sm:text-xl">Admin</h1>
+            <span className="hidden text-sm text-label-3 sm:inline">Byblos operations</span>
           </div>
-          <div className="flex items-center gap-3">
+        }
+        right={
+          <>
             <span className="text-sm text-label-2">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             <NotificationBell />
-          </div>
-        </header>
-
+          </>
+        }
+      />
+      <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-5 md:p-8 space-y-6">
         {/* Needs attention — the admin's action queue, first thing. */}
         <section>
           <p className="mb-2 text-sm font-semibold text-label-2">Needs attention</p>

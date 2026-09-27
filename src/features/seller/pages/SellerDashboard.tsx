@@ -30,13 +30,14 @@ import { registerSubNavigation, registerModalDismiss } from '@/shared/utils/moda
 import type { Theme } from '@/shared/types';
 import type { SellerDashboardProps, SellerTabId } from '../components/dashboard/types';
 
+// Swipeable nav tabs only — 'settings' is reached via the header profile icon,
+// not the bottom nav, so it is not part of the swipe cycle.
 const SELLER_TABS_ORDER: readonly SellerTabId[] = [
   'overview',
   'products',
   'orders',
   'withdrawals',
   'creators',
-  'settings',
 ];
 
 export default function SellerDashboard({ children }: SellerDashboardProps) {
@@ -237,7 +238,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
 
   return (
     <div className="seller-surface flex flex-col" style={{ minHeight: '100svh', height: '100svh', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
-      <SellerDashboardHeader sellerFirstName={sellerFirstName} />
+      <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => handleSelectTab('settings')} />
 
       <div
         onTouchStart={handleTouchStart}

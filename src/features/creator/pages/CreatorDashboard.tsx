@@ -2,7 +2,6 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, LogOut, UserRound } from '@/shared/ui/icons';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
-import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { toast } from 'sonner';
 import { useCreatorDashboardQuery } from '@/features/creator/hooks/queries/useCreatorDashboardQuery';
 import { useCreatorReferralDashboardQuery } from '@/features/creator/hooks/queries/useCreatorReferralDashboardQuery';
@@ -13,6 +12,8 @@ import { useLeavePromotedShopMutation } from '@/features/creator/hooks/mutations
 import { useLeaveInvitedBusinessMutation } from '@/features/creator/hooks/mutations/useLeaveInvitedBusinessMutation';
 import { clearRoleSession } from '@/features/auth/services/authSession';
 import { Button } from '@/shared/ui/button';
+import { AppHeader } from '@/shared/ui/AppHeader';
+import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
 import { copyLinkedTextToClipboard, resolveShareOrigin } from '@/shared/utils/shopLinks';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
@@ -131,14 +132,7 @@ export default function CreatorDashboard() {
   const businessEarnings = useMemo(() => dashboard?.businessEarnings || [], [dashboard?.businessEarnings]);
 
   if (loading) {
-    return (
-      <main className="dashboard-layout flex min-h-screen items-center justify-center bg-[var(--bg)] px-4 text-label transition-colors duration-200">
-        <div className="flex items-center gap-3 rounded-full border border-separator bg-surface-1 px-5 py-3 shadow-[var(--shadow-card)]">
-          <Loader2 className="h-5 w-5 animate-spin text-brand-text" />
-          <span className="text-sm font-medium text-label-2">Loading creator dashboard…</span>
-        </div>
-      </main>
-    );
+    return <DashboardSkeleton />;
   }
 
   const creator = dashboard?.creator || {};
@@ -192,27 +186,27 @@ export default function CreatorDashboard() {
 
   return (
     <main className="dashboard-layout text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100svh', height: '100svh', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
-      <header
-        className="sticky top-0 z-50 bg-[var(--bg)] px-4 pb-3 sm:px-6 flex items-end justify-between gap-3 transition-colors duration-200"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1rem)' }}
-      >
-        <div className="min-w-0">
-          <h1 className="text-2xl font-semibold tracking-tight text-label sm:text-3xl">Creator</h1>
-          <p className="mt-0.5 text-sm text-label-2">{money(availableBalance)} available</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <NotificationBell triggerClassName="text-label hover:bg-fill" />
-          <AccountSwitcher />
-          <button
-            type="button"
-            onClick={openProfile}
-            aria-label="Open profile"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
-          >
-            <UserRound className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
+      <AppHeader
+        left={
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-semibold tracking-tight text-label sm:text-xl">Creator</h1>
+            <p className="truncate text-xs text-label-2 sm:text-sm">{money(availableBalance)} available</p>
+          </div>
+        }
+        right={
+          <>
+            <NotificationBell triggerClassName="text-label hover:bg-fill" />
+            <button
+              type="button"
+              onClick={openProfile}
+              aria-label="Open profile"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
+            >
+              <UserRound className="h-5 w-5" />
+            </button>
+          </>
+        }
+      />
 
       <div className="px-4 pt-3 sm:px-6 lg:px-8">
         <div role="tablist" aria-label="Dashboard section" className="flex gap-1 rounded-control bg-fill p-1">

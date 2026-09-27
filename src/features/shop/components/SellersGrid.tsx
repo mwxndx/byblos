@@ -1,6 +1,7 @@
 import { memo, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import type { ApiPublicSeller } from '@/shared/types/api/seller';
 import SellerBrandCard from '@/features/shop/components/SellerBrandCard';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { usePublicSellersQuery } from '@/features/shop/hooks/useShopQueries';
 
 interface SellersGridProps {
@@ -14,26 +15,28 @@ const INITIAL_VISIBLE_SELLERS = 24;
 const VISIBLE_SELLERS_STEP = 24;
 
 const SellerGridSkeleton = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" aria-label="Loading shops">
+    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <span className="sr-only">Loading shops…</span>
         {Array.from({ length: 12 }).map((_, index) => (
             <div
                 key={index}
+                aria-hidden="true"
                 className="h-[184px] overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-3 shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-colors duration-200"
             >
                 <div className="mb-3 flex items-start gap-3">
-                    <div className="h-14 w-14 animate-pulse rounded-2xl bg-slate-200 dark:bg-[#232323]" />
+                    <Skeleton className="h-14 w-14 rounded-2xl" />
                     <div className="flex-1 space-y-2">
-                        <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-[#232323]" />
-                        <div className="h-3 w-full animate-pulse rounded bg-slate-200 dark:bg-[#232323]" />
-                        <div className="h-3 w-4/5 animate-pulse rounded bg-slate-200 dark:bg-[#232323]" />
+                        <Skeleton className="h-4 w-2/3 rounded" />
+                        <Skeleton className="h-3 w-full rounded" />
+                        <Skeleton className="h-3 w-4/5 rounded" />
                     </div>
                 </div>
                 <div className="grid grid-cols-3 gap-1.5">
-                    <div className="h-12 animate-pulse rounded-xl bg-slate-200 dark:bg-[#232323]" />
-                    <div className="h-12 animate-pulse rounded-xl bg-slate-200 dark:bg-[#232323]" />
-                    <div className="h-12 animate-pulse rounded-xl bg-slate-200 dark:bg-[#232323]" />
+                    <Skeleton className="h-12 rounded-xl" />
+                    <Skeleton className="h-12 rounded-xl" />
+                    <Skeleton className="h-12 rounded-xl" />
                 </div>
-                <div className="mt-3 h-9 animate-pulse rounded-xl bg-slate-200 dark:bg-[#232323]" />
+                <Skeleton className="mt-3 h-9 rounded-xl" />
             </div>
         ))}
     </div>

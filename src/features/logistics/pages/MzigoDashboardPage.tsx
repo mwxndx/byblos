@@ -3,6 +3,8 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
+import { AppHeader } from '@/shared/ui/AppHeader';
+import { Skeleton } from '@/shared/ui/skeleton';
 import { RequestCard } from '../components/mzigoDashboard.components';
 import { requestStage, type RequestStage } from '../utils/mzigoJourney';
 import { useMzigoDashboard } from '../hooks/useMzigoDashboard';
@@ -63,9 +65,9 @@ const MzigoDashboardPage = () => {
   return (
     <main className="dashboard-layout mzigo-light-dashboard min-h-[100svh] overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100svh', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, 16px))' } as React.CSSProperties}>
       {/* ── Header ─────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-20 border-b border-black/10 dark:border-separator bg-white/80 dark:bg-black/80 px-4 pb-3 pt-safe-top backdrop-blur">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-3">
+      <AppHeader
+        left={
+          <>
             {!isNativeApp() && (
               <button
                 type="button"
@@ -80,9 +82,10 @@ const MzigoDashboardPage = () => {
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-yellow-500 dark:text-yellow-400">Mzigo Ego</p>
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{partner?.name || 'Logistics partner'}</p>
             </div>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-1">
+          </>
+        }
+        right={
+          <>
             <button
               type="button"
               onClick={() => requestsQuery.refetch()}
@@ -92,9 +95,9 @@ const MzigoDashboardPage = () => {
               <RefreshCw size={15} />
             </button>
             <NotificationBell variant="logistics" />
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <section className="w-full px-4 py-5 sm:px-6 lg:px-8">
         {/* ── Status / filter bar (Late · To do · Done) ─────────── */}
@@ -120,9 +123,10 @@ const MzigoDashboardPage = () => {
 
         {/* ── Queue ─────────────────────────────────────────────── */}
         {requestsQuery.isLoading ? (
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div role="status" aria-busy="true" aria-live="polite" className="grid gap-4 lg:grid-cols-3">
+            <span className="sr-only">Loading delivery requests…</span>
             {[0, 1, 2].map((item) => (
-              <div key={item} className="h-64 animate-pulse rounded-2xl border border-black/10 dark:border-separator bg-slate-100 dark:bg-white/[0.03]" />
+              <Skeleton key={item} className="h-64 rounded-2xl" />
             ))}
           </div>
         ) : view === 'done' ? (

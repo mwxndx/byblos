@@ -11,6 +11,7 @@ import type { SellerSettingsFormData } from '../types';
 import { SectionHeader, SocialInput } from './settingsTab.parts';
 import { SettingsLocationSection } from './SettingsLocationSection';
 import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';
+import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { LegalLinks } from '@/shared/components/LegalLinks';
 import type { LocationCoordinates } from '@/infrastructure/location/location';
@@ -121,14 +122,21 @@ export function SettingsTab({
 
   return (
     <div className="w-full space-y-5 sm:space-y-6">
-      {/* Dashboard theme (light / dark / system) — seller-scoped */}
-      <section className="seller-card p-4 sm:p-5 lg:p-6">
+      {/* Dashboard theme (light / dark / system) + account switcher — seller-scoped */}
+      <section className="seller-card space-y-4 p-4 sm:p-5 lg:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-base font-semibold tracking-tight text-slate-950 dark:text-white sm:text-lg">Theme</h3>
             <p className="mt-0.5 seller-subtext">Choose how your dashboard looks. System follows your device.</p>
           </div>
           <ThemeSegmentedPill value={theme} onChange={setTheme} />
+        </div>
+        <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 dark:border-separator sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-base font-semibold tracking-tight text-slate-950 dark:text-white sm:text-lg">Account</h3>
+            <p className="mt-0.5 seller-subtext">Switch between your buyer, seller, and creator accounts.</p>
+          </div>
+          <AccountSwitcher />
         </div>
       </section>
 

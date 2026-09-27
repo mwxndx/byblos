@@ -5,6 +5,7 @@ export const buyerQueryKeys = {
   orders: () => [...buyerQueryKeys.all, 'orders'] as const,
   order: (id: string) => [...buyerQueryKeys.all, 'orders', id] as const,
   refunds: () => [...buyerQueryKeys.all, 'refunds'] as const,
+  refundHistory: () => [...buyerQueryKeys.all, 'refundHistory'] as const,
   shops: (params?: Record<string, unknown>) => [...buyerQueryKeys.all, 'shops', params || {}] as const,
   orderStatus: (orderNumber: string) => [...buyerQueryKeys.all, 'orderStatus', orderNumber] as const,
 };

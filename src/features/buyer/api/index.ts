@@ -4,7 +4,7 @@ import { login, register, resendVerification, forgotPassword, resetPassword, che
 import { getOrders, getOrder, cancelOrder, confirmOrderReceipt, markOrderAsCollected, downloadDigitalProduct } from './orders';
 import { getWishlist, addToWishlist, removeFromWishlist, syncWishlist } from './wishlist';
 import { getOrderStatus, initiateProduct, validateDiscountCode, getPaymentStatus, getLogisticsQuote } from './payments';
-import { requestRefund, getPendingRefundRequests } from './refunds';
+import { requestRefund, getPendingRefundRequests, getRefundHistory } from './refunds';
 import { getShops } from './shops';
 
 export * from './instance';
@@ -36,6 +36,7 @@ export const buyerApi = {
   saveBuyerInfo,
   requestRefund,
   getPendingRefundRequests,
+  getRefundHistory,
   downloadDigitalProduct,
   markOrderAsCollected,
   getShops,

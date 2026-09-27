@@ -1,4 +1,4 @@
-import { BarChart3, Package, Settings, ShoppingBag, Users, Wallet } from '@/shared/ui/icons';
+import { BarChart3, Package, ShoppingBag, Users, Wallet } from '@/shared/ui/icons';
 import type { SellerTabId } from '../types';
 
 const tabIcons = {
@@ -7,16 +7,17 @@ const tabIcons = {
   orders: ShoppingBag,
   withdrawals: Wallet,
   creators: Users,
-  settings: Settings
 };
 
-const tabs: Array<{ id: SellerTabId; label: string }> = [
+// Settings/profile is no longer a bottom-nav tab — it opens from the profile
+// icon in the header (see SellerDashboardHeader). The nav is the five primary
+// work areas only.
+const tabs: Array<{ id: Exclude<SellerTabId, 'settings'>; label: string }> = [
   { id: 'overview', label: 'Overview' },
   { id: 'products', label: 'Products' },
   { id: 'orders', label: 'Orders' },
   { id: 'withdrawals', label: 'Withdrawals' },
   { id: 'creators', label: 'Creators' },
-  { id: 'settings', label: 'Settings' },
 ];
 
 interface SellerDashboardTabsProps {

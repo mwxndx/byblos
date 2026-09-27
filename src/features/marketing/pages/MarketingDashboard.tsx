@@ -9,7 +9,8 @@ import { marketingApi } from '../api/marketingApi';
 import { StatCard } from '../components/StatCard';
 import { ChartCard } from '../components/ChartCard';
 import { SectionTitle } from '../components/SectionTitle';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
+import { AppHeader } from '@/shared/ui/AppHeader';
 
 import { useAppTheme } from '@/shared/hooks/useAppTheme';
 
@@ -118,11 +119,7 @@ export default function MarketingDashboard() {
         fetchAll();
     }, [fetchAll]);
 
-    if (loading) return (
-        <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)]">
-            <LoadingSpinner />
-        </div>
-    );
+    if (loading) return <DashboardSkeleton />;
 
     if (error) return (
         <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4">
@@ -134,41 +131,40 @@ export default function MarketingDashboard() {
     );
 
     return (
-        <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] p-3 text-label selection:bg-yellow-500/30 sm:p-4 md:p-8 lg:p-12 space-y-8 md:space-y-12">
-            {/* Header */}
-            <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden group">
-                <div className="relative z-10 flex items-center gap-5 md:gap-8">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 rounded-xl md:rounded-2xl flex items-center justify-center shadow-sm">
-                        <span className="text-black font-semibold text-2xl md:text-3xl">B</span>
+        <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
+            <AppHeader
+                left={
+                    <div className="flex min-w-0 items-center gap-2">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-yellow-400 shadow-sm">
+                            <span className="text-black font-semibold text-lg">B</span>
+                        </div>
+                        <h1 className="truncate text-base font-semibold tracking-tight text-label sm:text-lg">Marketing<span className="text-yellow-500">.</span></h1>
                     </div>
-                    <div>
-                        <h1 className="text-2xl md:text-4xl font-semibold tracking-tight text-label">Marketing Dashboard<span className="text-yellow-500">.</span></h1>
-                        <p className="text-label-2 text-xs md:text-sm font-medium mt-1">Platform growth and acquisition.</p>
-                    </div>
-                </div>
-
-                <div className="relative z-10 flex flex-wrap items-center gap-3">
-                    <select
-                        value={period}
-                        onChange={(e) => setPeriod(Number(e.target.value))}
-                        className="bg-[#171717] border border-separator text-xs font-semibold rounded-xl px-4 py-2.5 text-label focus:outline-none focus:border-yellow-500 transition-colors cursor-pointer"
-                    >
-                        <option value={3}>Last 3 Months</option>
-                        <option value={6}>Last 6 Months</option>
-                        <option value={12}>Last 12 Months</option>
-                    </select>
-
-                    <button
-                        onClick={async () => {
-                            await logout();
-                            navigate('/admin/marketing/login');
-                        }}
-                        className="bg-fill hover:bg-white/10 text-xs font-semibold rounded-xl px-4 py-2.5 text-label-2 border border-separator transition-colors"
-                    >
-                        Sign out
-                    </button>
-                </div>
-            </header>
+                }
+                right={
+                    <>
+                        <select
+                            value={period}
+                            onChange={(e) => setPeriod(Number(e.target.value))}
+                            className="cursor-pointer rounded-xl border border-separator bg-[#171717] px-3 py-2 text-xs font-semibold text-label transition-colors focus:border-yellow-500 focus:outline-none"
+                        >
+                            <option value={3}>Last 3 Months</option>
+                            <option value={6}>Last 6 Months</option>
+                            <option value={12}>Last 12 Months</option>
+                        </select>
+                        <button
+                            onClick={async () => {
+                                await logout();
+                                navigate('/admin/marketing/login');
+                            }}
+                            className="rounded-xl border border-separator bg-fill px-3 py-2 text-xs font-semibold text-label-2 transition-colors hover:bg-white/10"
+                        >
+                            Sign out
+                        </button>
+                    </>
+                }
+            />
+            <div className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-8 md:space-y-12">
 
             {/* Overview Stat Cards */}
             {overview && (
@@ -356,6 +352,7 @@ export default function MarketingDashboard() {
                     </div>
                 </div>
             )}
+            </div>
         </div>
     );
 }

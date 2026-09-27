@@ -52,4 +52,24 @@ export async function getPendingRefundRequests(): Promise<{
   }
 }
 
+export interface RefundHistoryItem {
+  id: number;
+  amount: number;
+  status: string;
+  createdAt: string;
+  withdrawalFee?: number;
+  totalDeducted?: number;
+}
+
+export async function getRefundHistory(): Promise<{ requests: RefundHistoryItem[] }> {
+  try {
+    const response = await buyerApiInstance.get('/buyers/refund-requests/history');
+    return response.data?.data || { requests: [] };
+  } catch (error) {
+    const err = error as ApiError;
+    console.error('Error fetching refund history:', err);
+    throw new Error(err.response?.data?.message || 'Failed to fetch refund history');
+  }
+}
+
 

@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet'
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';
+import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { CreatorSocialProfiles } from '@/features/creator/components/CreatorSocialProfiles';
 import { CreatorWithdrawalPanel } from '@/features/creator/components/CreatorWithdrawalPanel';
@@ -84,10 +85,16 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
         </SheetHeader>
 
         <div className="space-y-4 px-4 pb-8">
-          {/* Theme */}
-          <section className="rounded-card border border-separator bg-surface-1 p-4">
-            <span className="text-sm font-medium text-label-2">Theme</span>
-            <ThemeSegmentedPill value={theme} onChange={setTheme} className="mt-2 flex w-full [&>button]:flex-1" />
+          {/* Theme + account switcher */}
+          <section className="space-y-4 rounded-card border border-separator bg-surface-1 p-4">
+            <div>
+              <span className="text-sm font-medium text-label-2">Theme</span>
+              <ThemeSegmentedPill value={theme} onChange={setTheme} className="mt-2 flex w-full [&>button]:flex-1" />
+            </div>
+            <div className="space-y-2 border-t border-separator pt-4">
+              <span className="text-sm font-medium text-label-2">Account</span>
+              <AccountSwitcher />
+            </div>
           </section>
 
           {/* Personal details */}
