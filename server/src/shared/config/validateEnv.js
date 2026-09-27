@@ -48,7 +48,6 @@ function normalizedProvider(name, fallback) {
 const OPTIONAL_ENV_VARS = [
     'REDIS_URL',
     'ALLOWED_ORIGINS',
-    'COURIER_WHATSAPP_NUMBER',
     'DROPOFF_LOCATION',
     'LOGISTICS_HUB_LABEL',
     'LOGISTICS_HUB_ADDRESS',
@@ -178,7 +177,6 @@ export function validateEnvironment() {
     console.log(`Backend URL: ${process.env.BACKEND_URL}`);
     console.log(`Payment Provider: ${paymentProvider} (M-Pesa)`);
     console.log(`Payout Provider: ${payoutProvider}`);
-    console.log(`Courier WhatsApp: ${process.env.COURIER_WHATSAPP_NUMBER || 'not configured'}`);
     console.log(process.env.REDIS_URL ? 'Redis: Configured' : 'Redis: Not configured');
     console.log('');
 }

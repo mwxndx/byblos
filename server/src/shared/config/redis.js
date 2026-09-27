@@ -127,6 +127,14 @@ const createRedisClient = () => {
         enableOfflineQueue: process.env.NODE_ENV !== 'test', // Don't queue commands when offline during test mode (prevents hanging)
     });
 
+    // ioredis clients extend `Commander`, and several subsystems each attach a
+    // one-shot 'ready' listener to this shared singleton at startup (every
+    // resilient rate limiter, the token blacklist, plus the 'ready' log below).
+    // That legitimately exceeds Node's default MaxListeners of 10 and prints a
+    // spurious "possible EventEmitter memory leak" warning — the listeners are
+    // bounded and self-remove on 'ready'. Raise the cap with headroom.
+    client.setMaxListeners(50);
+
     client.on('error', (err) => {
         // Suppress connection refused errors to avoid log spam in development if Redis isn't running
         if (err.code === 'ECONNREFUSED') {
