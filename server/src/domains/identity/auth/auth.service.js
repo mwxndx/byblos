@@ -681,10 +681,13 @@ class AuthService {
         const normalizedEmail = email.toLowerCase();
         const user = await User.findByEmail(normalizedEmail);
 
+        // Resolves without a value in every case regardless of whether the
+        // email exists — deliberate anti-enumeration, so callers must not
+        // branch on a result (the previous invariant `true` was meaningless).
         if (user) {
-            if (user.is_verified) return true;
+            if (user.is_verified) return;
             await AuthService.sendEmailVerification(normalizedEmail, userType);
-            return true;
+            return;
         }
 
         // Check pending_registrations
@@ -715,8 +718,6 @@ class AuthService {
             const linkRole = pending.role || userType;
             await sendVerificationEmail(normalizedEmail, rawToken, linkRole);
         }
-
-        return true;
     }
 }
 

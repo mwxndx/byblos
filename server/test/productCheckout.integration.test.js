@@ -73,6 +73,12 @@ describe('initiateProductPayment — multi-item bag validation (regression for t
     sellerBUser = await createUser({ role: 'seller' });
     sellerB = await createSeller({ userId: sellerBUser.id });
     otherSellerProduct = await createProduct({ sellerId: sellerB.id, name: 'IT Other Seller Product', price: 400, productType: 'physical' });
+
+    // The later tests depend on all of these fixtures existing; assert the seed
+    // actually produced them so a broken factory fails here, not mid-scenario.
+    for (const id of [sellerA.id, buyer.id, physicalProduct.id, digitalProduct.id, serviceProduct.id, customProduct.id, sellerB.id, otherSellerProduct.id]) {
+      assert.ok(id, 'fixture seeded with an id');
+    }
   });
 
   test('mixing a service into a multi-item bag is a 400 AppError, not a 500', async () => {
