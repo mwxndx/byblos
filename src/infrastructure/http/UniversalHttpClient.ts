@@ -18,7 +18,14 @@ export class UniversalHttpClient {
   private instance: AxiosInstance;
   private authStrategy: AuthStrategy;
   private defaultRole?: AppRole;
-  private refreshPromise: Promise<boolean> | null = null;
+  // Single-flight token refresh, keyed. On Android each role has its OWN
+  // access/refresh token, so a single global promise would let a 401 for role
+  // B await role A's refresh and then retry with B's still-expired token
+  // (spurious logout for B). Key by role there. Web is cookie-based: one shared
+  // session, and a single global promise also avoids racing the server's
+  // refresh-token rotation with concurrent /auth/refresh-token calls — so web
+  // keeps one key.
+  private refreshPromises = new Map<string, Promise<boolean>>();
 
   constructor(options: UniversalHttpClientOptions = {}) {
     const baseURL = buildApiBaseUrl();
@@ -113,13 +120,20 @@ export class UniversalHttpClient {
               throw error;
             }
 
-            if (!this.refreshPromise) {
-              this.refreshPromise = this.authStrategy.handleUnauthorized(role).finally(() => {
-                this.refreshPromise = null;
+            // Per-role single-flight on Android (independent tokens); one
+            // shared key on web (shared cookie session).
+            const refreshKey = this.authStrategy.platform === 'android'
+              ? (role ?? '__none__')
+              : '__session__';
+            let refreshPromise = this.refreshPromises.get(refreshKey);
+            if (!refreshPromise) {
+              refreshPromise = this.authStrategy.handleUnauthorized(role).finally(() => {
+                this.refreshPromises.delete(refreshKey);
               });
+              this.refreshPromises.set(refreshKey, refreshPromise);
             }
 
-            const refreshed = await this.refreshPromise;
+            const refreshed = await refreshPromise;
             if (refreshed) {
               const updatedAuthHeaders = await this.authStrategy.getAuthHeaders(role);
               Object.assign(config.headers, updatedAuthHeaders);
