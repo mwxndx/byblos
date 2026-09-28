@@ -200,16 +200,25 @@ export function useAuthActions({
   }, [login]);
 
   const logout = useCallback(async () => {
-    await clearRoleSessionMarkers();
+    const role = user?.role;
+
+    // Optimistic local logout FIRST: drop the user and leave the authed screen
+    // immediately so the user never watches a blanked-out dashboard. Clearing
+    // the query cache before navigating — and awaiting the (possibly slow,
+    // cold-backend) logout request while still mounted on the dashboard — wiped
+    // the dashboard's data and showed a white screen until the network call
+    // resolved, then finally jumped to the landing page.
+    setUser(null);
+    navigate('/', { replace: true });
+    toast('Logged out', { description: 'You have been successfully logged out.' });
+
+    try { await clearRoleSessionMarkers(); } catch { /* ignore */ }
     queryClient.clear();
 
-    if (!user) {
-      try { await clearRoleSessionMarkers(); } catch { /* ignore */ }
-      return;
-    }
+    if (!role) return;
 
-    const role = user.role;
-
+    // Best-effort server logout + native push cleanup, in the background. The
+    // local session is already cleared, so failures here are non-fatal.
     try {
       await unregisterNativePushNotifications(role);
       const logoutUrl = role === 'seller'
@@ -222,18 +231,8 @@ export function useAuthActions({
               ? '/logistics/logout'
               : '/buyers/logout';
       await apiClient.post(logoutUrl);
-    } catch (error) {
-      // Fail silently
-    } finally {
-      try {
-        await clearRoleSessionMarkers();
-      } catch (error) {
-        // Fail silently, always clear user state.
-      }
-
-      setUser(null);
-      toast('Logged out', { description: 'You have been successfully logged out.' });
-      navigate('/', { replace: true });
+    } catch {
+      // Fail silently — the client is already logged out locally.
     }
   }, [navigate, setUser, user, queryClient]);
 

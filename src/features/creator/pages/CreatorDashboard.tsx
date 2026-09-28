@@ -77,13 +77,15 @@ export default function CreatorDashboard() {
   };
 
   const handleLogout = async () => {
+    // Leave the dashboard immediately, then clear the local session and hit the
+    // server logout in the background — so a slow (cold-backend) request never
+    // freezes the logout button on the authed screen.
+    navigate('/creator/login', { replace: true });
+    try { await clearRoleSession('creator'); } catch { /* ignore */ }
     try {
       await logoutMutation.mutateAsync();
     } catch {
-      // The local session should still end if the network request fails.
-    } finally {
-      await clearRoleSession('creator');
-      navigate('/creator/login', { replace: true });
+      // Best-effort — the local session is already cleared.
     }
   };
 
