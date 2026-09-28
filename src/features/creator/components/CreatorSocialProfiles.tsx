@@ -84,7 +84,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
       </div>
 
       <form onSubmit={handleSave} className="mt-5 space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4">
           {/* Instagram input */}
           <div className="rounded-control border border-separator bg-surface-2 p-4">
             <div className="mb-2 flex items-center justify-between gap-2">

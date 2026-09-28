@@ -14,10 +14,12 @@ interface BuyerProfileContentProps {
   isEditingProfile: boolean;
   isSavingProfile: boolean;
   mobilePayment: string;
+  area: string;
   user: import("@/features/auth/types/authTypes").UserProfile | null;
   whatsappNumber: string;
   onLogout: () => void;
   onMobilePaymentChange: (value: string) => void;
+  onAreaChange: (value: string) => void;
   onSaveProfile: () => void;
   onToggleEdit: () => void;
   onWhatsappNumberChange: (value: string) => void;
@@ -60,7 +62,9 @@ function ProfileDetail({
   editable,
   editing,
   placeholder,
-  onChange
+  onChange,
+  inputMode = 'tel',
+  autoComplete = 'tel',
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
@@ -69,6 +73,8 @@ function ProfileDetail({
   editing?: boolean;
   placeholder?: string;
   onChange?: (value: string) => void;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  autoComplete?: string;
 }) {
   const isInput = Boolean(editable && editing);
   return (
@@ -82,8 +88,8 @@ function ProfileDetail({
           value={value ?? ''}
           onChange={event => onChange?.(event.target.value)}
           placeholder={placeholder}
-          inputMode="tel"
-          autoComplete="tel"
+          inputMode={inputMode}
+          autoComplete={autoComplete}
           className="mt-2 h-9 border border-slate-300 dark:border-separator bg-white dark:bg-[#141414] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 dark:text-white/40 focus-visible:ring-[#F5C518]"
         />
       ) : (
@@ -99,10 +105,12 @@ export function BuyerProfileContent({
   isEditingProfile,
   isSavingProfile,
   mobilePayment,
+  area,
   user,
   whatsappNumber,
   onLogout,
   onMobilePaymentChange,
+  onAreaChange,
   onSaveProfile,
   onToggleEdit,
   onWhatsappNumberChange
@@ -141,7 +149,17 @@ export function BuyerProfileContent({
           <ProfileDetail icon={Mail} label="Email address" value={buyerUser?.email} />
           <div className="grid gap-3 sm:grid-cols-2">
             <ProfileDetail icon={MapPin} label="City" value={buyerUser?.city} />
-            <ProfileDetail icon={MapPin} label="Area" value={buyerUser?.location} />
+            <ProfileDetail
+              icon={MapPin}
+              label="Area"
+              value={area}
+              editable
+              editing={isEditingProfile}
+              placeholder="Your area"
+              onChange={onAreaChange}
+              inputMode="text"
+              autoComplete="address-level2"
+            />
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <ProfileDetail

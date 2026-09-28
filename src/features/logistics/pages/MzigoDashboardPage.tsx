@@ -1,7 +1,6 @@
-import { ArrowLeft, LogOut, MapPin, PackageCheck, RefreshCw, Store, Truck } from '@/shared/ui/icons';
+import { LogOut, MapPin, PackageCheck, Store, Truck } from '@/shared/ui/icons';
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { AppHeader } from '@/shared/ui/AppHeader';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -66,35 +65,24 @@ const MzigoDashboardPage = () => {
     <main className="dashboard-layout mzigo-light-dashboard min-h-[100svh] overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100svh', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, 16px))' } as React.CSSProperties}>
       {/* ── Header ─────────────────────────────────────────────── */}
       <AppHeader
-        left={
-          <>
-            {!isNativeApp() && (
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                aria-label="Home"
-                className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3 py-2 text-sm ${BTN_SECONDARY}`}
-              >
-                <ArrowLeft size={16} />
-              </button>
-            )}
-            <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-yellow-500 dark:text-yellow-400">Mzigo Ego</p>
-              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{partner?.name || 'Logistics partner'}</p>
-            </div>
-          </>
-        }
+        left={<NotificationBell variant="logistics" />}
         right={
           <>
             <button
               type="button"
               onClick={() => requestsQuery.refetch()}
-              aria-label="Refresh"
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm ${BTN_SECONDARY}`}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold ${BTN_SECONDARY}`}
             >
-              <RefreshCw size={15} />
+              Refresh
             </button>
-            <NotificationBell variant="logistics" />
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-500/20 dark:text-red-300"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
           </>
         }
       />
@@ -185,17 +173,6 @@ const MzigoDashboardPage = () => {
         )}
       </section>
 
-      {/* ── Account ──────────────────────────────────────────── */}
-      <section className="w-full px-4 pb-6 sm:px-6 lg:px-8">
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-300 transition hover:bg-red-500/20"
-        >
-          <LogOut size={16} />
-          Logout
-        </button>
-      </section>
     </main>
   );
 };

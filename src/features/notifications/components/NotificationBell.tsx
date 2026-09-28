@@ -16,7 +16,14 @@ export function NotificationBell({ variant = 'default', triggerClassName }: Noti
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <IconButton variant="ghost" className={cn('relative', triggerClassName)} aria-label="Notifications">
+        <IconButton
+          variant="ghost"
+          className={cn(
+            'relative border border-slate-200 bg-slate-100 hover:bg-slate-200 dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.12]',
+            triggerClassName,
+          )}
+          aria-label="Notifications"
+        >
           <Bell className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
           {unreadCount > 0 && (
             <span

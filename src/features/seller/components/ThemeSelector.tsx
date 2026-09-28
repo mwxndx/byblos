@@ -7,7 +7,6 @@ import { useToast } from '@/shared/hooks/use-toast';
 
 const themeColors: { name: string; value: Theme; color: string }[] = [
   { name: 'Default', value: 'default', color: '#f5c518' },
-  { name: 'Black', value: 'black', color: '#000000' },
   { name: 'Yellow', value: 'yellow', color: '#facc15' },
   { name: 'Pink', value: 'pink', color: '#ec4899' },
   { name: 'Purple', value: 'purple', color: '#a855f7' },

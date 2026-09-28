@@ -18,6 +18,8 @@ export function useBuyerProfileForm() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [mobilePayment, setMobilePayment] = useState<string>(user?.mobilePayment || '');
   const [whatsappNumber, setWhatsappNumber] = useState<string>(user?.whatsappNumber || '');
+  // Area only (the buyer's `location` field). City stays read-only.
+  const [area, setArea] = useState<string>(user?.location || '');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // useAuthRevalidation refetches the profile on tab focus / TTL expiry and
@@ -33,17 +35,18 @@ export function useBuyerProfileForm() {
     if (!isEditingProfile) {
       setMobilePayment(user?.mobilePayment || '');
       setWhatsappNumber(user?.whatsappNumber || '');
+      setArea(user?.location || '');
     }
-  }, [isEditingProfile, user?.mobilePayment, user?.whatsappNumber]);
+  }, [isEditingProfile, user?.mobilePayment, user?.whatsappNumber, user?.location]);
 
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
     try {
-      await updateProfile({ mobilePayment, whatsappNumber }, 'buyer');
+      await updateProfile({ mobilePayment, whatsappNumber, location: area }, 'buyer');
 
       toast({
         title: 'Profile Updated',
-        description: 'Your payment and WhatsApp numbers have been saved.',
+        description: 'Your details have been saved.',
       });
 
       setIsEditingProfile(false);
@@ -63,6 +66,7 @@ export function useBuyerProfileForm() {
     isEditingProfile, setIsEditingProfile,
     mobilePayment, setMobilePayment,
     whatsappNumber, setWhatsappNumber,
+    area, setArea,
     isSavingProfile, handleSaveProfile,
   };
 }

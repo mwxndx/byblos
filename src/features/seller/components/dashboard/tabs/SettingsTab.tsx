@@ -151,7 +151,7 @@ export function SettingsTab({
           description="Where buyers can identify and reach your business."
           action={contactsHeaderAction}
         />
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-3">
           <div className="seller-card-soft p-4">
             <p className="seller-label mb-1">Email</p>
             <p className="text-sm sm:text-base lg:text-lg font-semibold text-slate-900 dark:text-white truncate" title={sellerProfile?.email || 'Not set'}>
@@ -232,15 +232,6 @@ export function SettingsTab({
         }}
       />
 
-      <section className="rounded-2xl border border-yellow-400/25 bg-yellow-400/[0.06] p-4 sm:p-5 flex items-center justify-between gap-4">
-        <div>
-          <h4 className="text-base font-semibold text-slate-900 dark:text-white">Creator Partnerships</h4>
-          <p className="mt-0.5 text-xs text-slate-500 dark:text-white/60">
-            Marketplace listings, commission rates, and incoming creator collaboration requests have moved to the dedicated <strong>Creators</strong> tab.
-          </p>
-        </div>
-      </section>
-
       <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
         <SectionHeader title="Legal" description="Review the documents you agreed to when you registered." />
         <div className="mt-4">
@@ -253,7 +244,7 @@ export function SettingsTab({
         <div className="mt-4">
           <Button
             onClick={onLogout}
-            className="h-10 w-full bg-red-600 font-semibold text-slate-900 dark:text-white hover:bg-red-500 sm:w-auto"
+            className="h-10 w-full bg-red-600 font-semibold text-slate-900 dark:text-white hover:bg-red-500"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Logout
