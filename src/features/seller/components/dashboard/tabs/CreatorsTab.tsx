@@ -101,6 +101,25 @@ export function CreatorsTab() {
     }
   };
 
+  // The listing toggle saves itself immediately (no "Save Settings" needed).
+  // It persists with the last-saved commission rate so flipping the switch
+  // never commits an in-progress, unsaved commission edit.
+  const handleToggleMarketplace = async () => {
+    const next = !isMarketplaceEnabled;
+    setIsMarketplaceEnabled(next);
+    try {
+      await updateListingMutation.mutateAsync({
+        isCreatorMarketplaceEnabled: next,
+        creatorCommissionRate: data?.creatorCommissionRate ?? 0.05,
+      });
+      toast.success(next ? 'Shop listed in the Creator Marketplace.' : 'Shop removed from the Creator Marketplace.');
+    } catch (err: unknown) {
+      setIsMarketplaceEnabled(!next); // revert on failure
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(error.response?.data?.message || error.message || 'Could not update marketplace listing.');
+    }
+  };
+
   const handleRespondToRequest = async (requestId: number, action: 'accept' | 'deny') => {
     setRespondingId(requestId);
     try {
@@ -156,7 +175,7 @@ export function CreatorsTab() {
   const manualInvites = data?.manualInvites || [];
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* ── Section 1: Marketplace Listing & Commission ── */}
       <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -197,11 +216,9 @@ export function CreatorsTab() {
                   type="button"
                   role="switch"
                   aria-checked={isMarketplaceEnabled}
-                  onClick={() => {
-                    setIsMarketplaceEnabled(!isMarketplaceEnabled);
-                    setHasUnsavedChanges(true);
-                  }}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  onClick={handleToggleMarketplace}
+                  disabled={updateListingMutation.isPending}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-60 ${
                     isMarketplaceEnabled ? 'bg-yellow-400' : 'bg-white/20'
                   }`}
                 >
@@ -270,6 +287,8 @@ export function CreatorsTab() {
         </div>
       </section>
 
+      {/* ── Incoming Requests + Active Creators, side by side on desktop ── */}
+      <div className="grid gap-6 lg:grid-cols-2 order-3">
       {/* ── Section 2: Incoming Creator Collaboration Requests ── */}
       <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
         <div className="flex items-center justify-between gap-3">
@@ -497,9 +516,10 @@ export function CreatorsTab() {
           )}
         </div>
       </section>
+      </div>
 
-      {/* ── Section 4: Direct Creator Email Invite ── */}
-      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
+      {/* ── Section 4: Direct Creator Email Invite (below Marketplace) ── */}
+      <section className="order-2 rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="rounded-xl p-2 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400">
             <MailPlus className="h-5 w-5" />

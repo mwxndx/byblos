@@ -19,7 +19,8 @@ import { ProductsTab } from '../components/dashboard/tabs/ProductsTab';
 import { SettingsTab } from '../components/dashboard/tabs/SettingsTab';
 import { WithdrawalsTab } from '../components/dashboard/tabs/WithdrawalsTab';
 import { SellerDashboardHeader } from '../components/dashboard/widgets/SellerDashboardHeader';
-import { SellerDashboardErrorState, SellerDashboardLoadingState } from '../components/dashboard/widgets/SellerDashboardState';
+import { SellerDashboardErrorState } from '../components/dashboard/widgets/SellerDashboardState';
+import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
 import { SellerDashboardTabs } from '../components/dashboard/widgets/SellerDashboardTabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import { copyLinkedTextToClipboard, getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
@@ -231,7 +232,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
   }
 
   if (isAuthLoading || isLoading) {
-    return <SellerDashboardLoadingState />;
+    return <DashboardSkeleton />;
   }
 
   if (!analytics || error) {

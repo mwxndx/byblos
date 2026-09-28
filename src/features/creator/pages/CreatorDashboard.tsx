@@ -187,24 +187,16 @@ export default function CreatorDashboard() {
   return (
     <main className="dashboard-layout text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100svh', height: '100svh', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
       <AppHeader
-        left={
-          <div className="min-w-0">
-            <h1 className="truncate text-lg font-semibold tracking-tight text-label sm:text-xl">Creator</h1>
-            <p className="truncate text-xs text-label-2 sm:text-sm">{money(availableBalance)} available</p>
-          </div>
-        }
+        left={<NotificationBell triggerClassName="text-label hover:bg-fill" />}
         right={
-          <>
-            <NotificationBell triggerClassName="text-label hover:bg-fill" />
-            <button
-              type="button"
-              onClick={openProfile}
-              aria-label="Open profile"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
-            >
-              <UserRound className="h-5 w-5" />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={openProfile}
+            aria-label="Open profile"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
+          >
+            <UserRound className="h-5 w-5" />
+          </button>
         }
       />
 

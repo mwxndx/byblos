@@ -1,42 +1,9 @@
 import { RefreshCw } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
-import { Skeleton } from '@/shared/ui/skeleton';
 
 interface SellerDashboardErrorStateProps {
   error: string | null;
   onRetry: () => void;
-}
-
-export function SellerDashboardLoadingState() {
-  return (
-    <div role="status" aria-busy="true" aria-live="polite" className="min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
-      <span className="sr-only">Loading dashboard…</span>
-      <div className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
-        {/* Hero */}
-        <Skeleton className="mb-6 h-56 w-full rounded-3xl sm:h-64" />
-
-        {/* Tabs */}
-        <div className="mb-6 flex flex-wrap justify-center gap-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-10 w-24 rounded-xl" />
-          ))}
-        </div>
-
-        {/* Stat grid */}
-        <div className="mb-4 grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <Skeleton key={i} className="h-20 rounded-2xl" />
-          ))}
-        </div>
-
-        {/* Panels */}
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
-          <Skeleton className="h-64 rounded-2xl" />
-          <Skeleton className="h-64 rounded-2xl" />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function SellerDashboardErrorState({ error, onRetry }: SellerDashboardErrorStateProps) {

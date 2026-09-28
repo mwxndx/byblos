@@ -128,10 +128,9 @@ export function BuyerLogin() {
 
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
-          <div className="space-y-2">
+          <div className="space-y-1.5 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Byblos Marketplace</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
-            <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Browse products, manage orders, and track deliveries.</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
           </div>
 
           <Input
