@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LogOut, Mail, MessageCircle, Phone, UserRound, Loader2, Lock } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
@@ -8,20 +8,16 @@ import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { CreatorSocialProfiles } from '@/features/creator/components/CreatorSocialProfiles';
-import { CreatorWithdrawalPanel } from '@/features/creator/components/CreatorWithdrawalPanel';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useUpdateCreatorProfileMutation } from '@/features/creator/hooks/mutations/useUpdateCreatorProfileMutation';
 import { LegalLinks } from '@/shared/components/LegalLinks';
-import type { CreatorProfile, CreatorClearance, WithdrawalRow } from '@/features/creator/utils/creatorDashboardUtils';
+import type { CreatorProfile } from '@/features/creator/utils/creatorDashboardUtils';
 
 interface CreatorProfileSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   creator: CreatorProfile;
-  clearance?: CreatorClearance;
-  withdrawals: WithdrawalRow[];
   onLogout: () => void;
-  focusWithdrawals?: boolean;
 }
 
 function ReadOnlyDetail({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value?: string | null }) {
@@ -36,10 +32,9 @@ function ReadOnlyDetail({ icon: Icon, label, value }: { icon: React.ComponentTyp
   );
 }
 
-export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, withdrawals, onLogout, focusWithdrawals }: CreatorProfileSheetProps) {
+export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: CreatorProfileSheetProps) {
   const { theme, setTheme } = useThemeScope('creator');
   const updateMutation = useUpdateCreatorProfileMutation();
-  const withdrawRef = useRef<HTMLDivElement>(null);
 
   const [mpesa, setMpesa] = useState(creator.mpesaNumber || '');
   const [whatsapp, setWhatsapp] = useState(creator.whatsappNumber || '');
@@ -48,13 +43,6 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
     setMpesa(creator.mpesaNumber || '');
     setWhatsapp(creator.whatsappNumber || '');
   }, [creator.mpesaNumber, creator.whatsappNumber]);
-
-  useEffect(() => {
-    if (open && focusWithdrawals) {
-      const id = setTimeout(() => withdrawRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 220);
-      return () => clearTimeout(id);
-    }
-  }, [open, focusWithdrawals]);
 
   const contactChanged =
     (mpesa.trim() || '') !== (creator.mpesaNumber || '') ||
@@ -144,11 +132,6 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, clearance, wi
 
           {/* Social media */}
           <CreatorSocialProfiles profile={creator} />
-
-          {/* Withdrawals */}
-          <div ref={withdrawRef} className="scroll-mt-4">
-            <CreatorWithdrawalPanel creator={creator} clearance={clearance} withdrawals={withdrawals} />
-          </div>
 
           {/* Legal */}
           <section className="space-y-2">

@@ -30,8 +30,9 @@ import { CreatorAnalysisCharts } from '@/features/creator/components/CreatorAnal
 import { CreatorLinkedShops } from '@/features/creator/components/CreatorLinkedShops';
 import { CreatorAvailableShops } from '@/features/creator/components/CreatorAvailableShops';
 import { CreatorProfileSheet } from '@/features/creator/components/CreatorProfileSheet';
+import { CreatorWithdrawalPanel } from '@/features/creator/components/CreatorWithdrawalPanel';
 
-type DashboardTab = 'performance' | 'shops';
+type DashboardTab = 'performance' | 'withdrawals' | 'shops';
 
 export default function CreatorDashboard() {
   const navigate = useNavigate();
@@ -43,7 +44,6 @@ export default function CreatorDashboard() {
   const [leavingShopSellerId, setLeavingShopSellerId] = useState<number | null>(null);
   const [leavingBusinessSellerId, setLeavingBusinessSellerId] = useState<number | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [sheetFocusWithdrawals, setSheetFocusWithdrawals] = useState(false);
 
   const dashboardQuery = useCreatorDashboardQuery(analysisPeriod);
   const referralQuery = useCreatorReferralDashboardQuery();
@@ -154,11 +154,9 @@ export default function CreatorDashboard() {
   const monthClicks = Number(latestPeriod?.clicks || 0);
 
   const openWithdrawals = () => {
-    setSheetFocusWithdrawals(true);
-    setSheetOpen(true);
+    setTab('withdrawals');
   };
   const openProfile = () => {
-    setSheetFocusWithdrawals(false);
     setSheetOpen(true);
   };
 
@@ -203,6 +201,7 @@ export default function CreatorDashboard() {
       <div className="px-4 pt-3 sm:px-6 lg:px-8">
         <div role="tablist" aria-label="Dashboard section" className="flex gap-1 rounded-control bg-fill p-1">
           {tabButton('performance', 'Performance')}
+          {tabButton('withdrawals', 'Withdrawals')}
           {tabButton('shops', 'Shops', shopRequests.length)}
         </div>
       </div>
@@ -276,6 +275,12 @@ export default function CreatorDashboard() {
               )}
             </section>
           </>
+        ) : tab === 'withdrawals' ? (
+          <CreatorWithdrawalPanel
+            creator={creator}
+            clearance={clearance}
+            withdrawals={dashboard?.withdrawals || []}
+          />
         ) : (
           <>
             {shopRequests.length > 0 && (
@@ -336,10 +341,7 @@ export default function CreatorDashboard() {
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         creator={creator}
-        clearance={clearance}
-        withdrawals={dashboard?.withdrawals || []}
         onLogout={handleLogout}
-        focusWithdrawals={sheetFocusWithdrawals}
       />
     </main>
   );
