@@ -197,7 +197,7 @@ export default function CreatorRegister() {
   }
 
   return (
-    <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
+    <main className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
       <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
@@ -223,21 +223,21 @@ export default function CreatorRegister() {
         </div>
       </header>
 
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-5xl flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
-        <div className="grid flex-1 items-center gap-6 py-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <section className="space-y-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">
-            {token ? 'Creator invite' : 'Byblos creators'}
-          </p>
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl text-slate-900 dark:text-white">Earn when your audience buys safely.</h1>
-          <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">
-            {invite
-              ? `${invite.shopName} invited you to sell through Byblos.`
-              : 'Create a creator account, invite sellers with your link, and earn when their products sell.'}
-          </p>
-        </section>
+      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
+        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+          <div className="space-y-1.5 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">
+              {token ? 'Creator invite' : 'Byblos creators'}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
+            <p className="text-xs font-medium text-slate-600 dark:text-white/55">
+              {invite
+                ? `${invite.shopName} invited you to sell through Byblos.`
+                : 'Earn when your audience buys safely.'}
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="grid gap-3 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-5 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] sm:grid-cols-2 transition-colors duration-200">
+        <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
           <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <Input

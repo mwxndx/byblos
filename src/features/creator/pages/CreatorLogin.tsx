@@ -92,7 +92,7 @@ export default function CreatorLogin() {
   };
 
   return (
-    <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
+    <main className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
       <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
@@ -120,10 +120,9 @@ export default function CreatorLogin() {
 
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
-          <div className="space-y-2">
+          <div className="space-y-1.5 text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Creator program</p>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h1>
-            <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Track shop links, sales, seller referrals, and M-Pesa withdrawals.</p>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
           </div>
           <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" id="email" name="email" autoComplete="email" aria-label="Email" placeholder="Email" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <div className="relative">
@@ -138,7 +137,7 @@ export default function CreatorLogin() {
             </button>
           </div>
           <Button disabled={loading} className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Log in'}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign In'}
           </Button>
           <p className="text-center">
             <Link to="/creator/forgot-password" className="text-sm font-bold text-slate-600 dark:text-white/60 hover:text-yellow-500 dark:hover:text-yellow-300">
