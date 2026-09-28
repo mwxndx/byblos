@@ -12,8 +12,7 @@ import { useWishlist } from '@/features/buyer/hooks/useWishlist';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import WishlistSection from '../components/WishlistSection';
-import RefundCard from '../components/RefundCard';
-import { RefundHistory } from '../components/RefundHistory';
+import { BuyerRefundsTab } from '../components/BuyerRefundsTab';
 import SellersGrid from '@/features/shop/components/SellersGrid';
 import { BuyerBottomNav } from '../components/dashboard/BuyerBottomNav';
 import { BuyerDashboardHeader } from '../components/dashboard/BuyerDashboardHeader';
@@ -194,12 +193,7 @@ function BuyerDashboard() {
             </div>
           )}
 
-          {activeSection === 'refunds' && (
-            <div className="mx-auto w-full max-w-[560px] space-y-4">
-              <RefundCard refundAmount={refundAmount} compact />
-              <RefundHistory />
-            </div>
-          )}
+          {activeSection === 'refunds' && <BuyerRefundsTab refundAmount={refundAmount} />}
 
         </div>
       </div>
