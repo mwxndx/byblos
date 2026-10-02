@@ -41,8 +41,8 @@ export function ProductsTab({
 
         {/* Single controlled add-product dialog, opened from the header button or the empty-state plus. */}
         <Dialog open={isAddProductModalOpen} onOpenChange={setIsAddProductModalOpen}>
-          <DialogContent className="w-[92vw] max-w-lg sm:max-w-[540px] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
-            <div className="product-modal-light flex h-full min-h-0 flex-col overflow-hidden">
+          <DialogContent className="flex flex-col w-[92vw] max-w-lg sm:max-w-[540px] h-[85dvh] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
+            <div className="product-modal-light flex h-full min-h-0 flex-1 flex-col overflow-hidden">
               <AddProductForm
                 onSuccess={() => {
                   fetchProducts();

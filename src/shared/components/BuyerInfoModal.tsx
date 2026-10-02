@@ -55,7 +55,7 @@ export function BuyerInfoModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={`w-[92vw] max-w-[400px] sm:max-w-[420px] max-h-[85dvh] sm:max-h-[90dvh] p-0 overflow-hidden ${themeClasses.bg} ${themeClasses.text} shadow-2xl rounded-3xl border border-slate-200 dark:border-white/10`}>
+      <DialogContent className={`flex flex-col w-[92vw] max-w-[400px] sm:max-w-[420px] h-[85dvh] max-h-[85dvh] sm:h-[min(90dvh,600px)] p-0 overflow-hidden ${themeClasses.bg} ${themeClasses.text} shadow-2xl rounded-3xl border border-slate-200 dark:border-white/10`}>
         <BuyerInfoForm
           handleSubmit={handleSubmit}
           buyerInfo={buyerInfo}

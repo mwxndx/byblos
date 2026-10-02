@@ -134,7 +134,11 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
       </div>
 
       {/* Content — one scrolling form */}
-      <div ref={contentRef} className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6 sm:py-4">
+      <div
+        ref={contentRef}
+        className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-6 sm:py-4"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
         <AddProductFormSteps
           formData={formData}
           setFormData={setFormData}
