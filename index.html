@@ -57,22 +57,29 @@
   </script>
   <style>
     html,
-    body {
+    body,
+    #root {
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       background-color: #000000;
     }
-    html[data-theme="light"],
-    html[data-theme="light"] body,
-    html.light,
-    html.light body {
+    html[data-theme="light"]:not(.native-app):not(.capacitor-native),
+    html[data-theme="light"]:not(.native-app):not(.capacitor-native) body,
+    html[data-theme="light"]:not(.native-app):not(.capacitor-native) #root,
+    html.light:not(.native-app):not(.capacitor-native),
+    html.light:not(.native-app):not(.capacitor-native) body,
+    html.light:not(.native-app):not(.capacitor-native) #root {
       background-color: #f5f4f0 !important;
       color: #0f0f0e !important;
     }
     html[data-theme="dark"],
     html[data-theme="dark"] body,
+    html[data-theme="dark"] #root,
     html.dark,
-    html.dark body {
+    html.dark body,
+    html.dark #root {
       background-color: #000000 !important;
       color: #f5f5f5 !important;
     }

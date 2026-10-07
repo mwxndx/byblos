@@ -73,7 +73,7 @@ class InventoryReservationService {
             item.productType = product.product_type;
             item.isDigital = product.is_digital;
             item.trackInventory = product.track_inventory;
-            item.availableQuantity = product.quantity;
+            item.availableQuantity = Math.max(0, (product.quantity || 0) - (product.reserved_quantity || 0));
             item.productStatus = product.status;
 
             if (!item.productType && product.service_options) {
@@ -121,17 +121,13 @@ class InventoryReservationService {
 
             const { rows } = await client.query(
                 `UPDATE products AS p
-                 SET quantity = GREATEST(0, p.quantity - v.qty),
-                     reserved_quantity = p.reserved_quantity + v.qty,
-                     status = CASE WHEN (p.quantity - v.qty) <= 0 THEN 'sold' ELSE p.status END,
-                     is_sold = CASE WHEN (p.quantity - v.qty) <= 0 THEN true ELSE p.is_sold END,
-                     sold_at = CASE WHEN (p.quantity - v.qty) <= 0 THEN COALESCE(p.sold_at, NOW()) ELSE p.sold_at END,
+                 SET reserved_quantity = COALESCE(p.reserved_quantity, 0) + v.qty,
                      updated_at = NOW()
                  FROM (SELECT UNNEST($1::int[]) AS id, UNNEST($2::int[]) AS qty) AS v
                  WHERE p.id = v.id
                    AND p.track_inventory = true
                    AND COALESCE(LOWER(p.product_type::text), '') <> 'digital'
-                   AND p.quantity >= v.qty
+                   AND (COALESCE(p.quantity, 0) - COALESCE(p.reserved_quantity, 0)) >= v.qty
                  RETURNING p.id, p.quantity, p.reserved_quantity`,
                 [ids, qtys]
             );
@@ -165,13 +161,15 @@ class InventoryReservationService {
             const ids = trackable.map(item => item.productId);
             const qtys = trackable.map(item => item.quantity);
 
+            // Under Option A: quantity is only deducted when the order is fulfilled/paid.
+            // When a pending reservation fails or is cancelled, we ONLY decrement reserved_quantity.
+            // Do NOT add v.qty back to p.quantity, which caused phantom stock inflation.
             const { rows } = await client.query(
                 `UPDATE products AS p
-                 SET quantity = p.quantity + LEAST(COALESCE(p.reserved_quantity, 0), v.qty),
-                     reserved_quantity = GREATEST(0, COALESCE(p.reserved_quantity, 0) - v.qty),
-                     status = CASE WHEN (p.quantity + LEAST(COALESCE(p.reserved_quantity, 0), v.qty)) > 0 THEN 'available' ELSE p.status END,
-                     is_sold = CASE WHEN (p.quantity + LEAST(COALESCE(p.reserved_quantity, 0), v.qty)) > 0 THEN false ELSE p.is_sold END,
-                     sold_at = CASE WHEN (p.quantity + LEAST(COALESCE(p.reserved_quantity, 0), v.qty)) > 0 THEN NULL ELSE p.sold_at END,
+                 SET reserved_quantity = GREATEST(0, COALESCE(p.reserved_quantity, 0) - v.qty),
+                     status = CASE WHEN p.quantity > 0 THEN 'available' ELSE p.status END,
+                     is_sold = CASE WHEN p.quantity > 0 THEN false ELSE p.is_sold END,
+                     sold_at = CASE WHEN p.quantity > 0 THEN NULL ELSE p.sold_at END,
                      updated_at = NOW()
                  FROM (SELECT UNNEST($1::int[]) AS id, UNNEST($2::int[]) AS qty) AS v
                  WHERE p.id = v.id
@@ -190,7 +188,7 @@ class InventoryReservationService {
             }
 
             releasedCount += rows.length;
-            logger.info(`[RESERVATION-RELEASE] Bulk released inventory for ${rows.length} product(s)`);
+            logger.info(`[RESERVATION-RELEASE] Bulk released reserved inventory for ${rows.length} product(s)`);
         }
 
         if (singlePurchase.length > 0) {
@@ -210,19 +208,21 @@ class InventoryReservationService {
             const ids = trackable.map(item => item.productId);
             const qtys = trackable.map(item => item.quantity);
 
+            // Under Option A: When payment succeeds/fulfills, deduct from quantity and clear reserved_quantity.
             const { rows } = await client.query(
                 `UPDATE products AS p
-                 SET reserved_quantity = GREATEST(0, p.reserved_quantity - v.qty),
-                     status = CASE WHEN p.quantity <= 0 THEN 'sold' ELSE p.status END,
-                     is_sold = CASE WHEN p.quantity <= 0 THEN true ELSE p.is_sold END,
-                     sold_at = CASE WHEN p.quantity <= 0 THEN COALESCE(p.sold_at, NOW()) ELSE p.sold_at END,
+                 SET quantity = GREATEST(0, p.quantity - v.qty),
+                     reserved_quantity = GREATEST(0, p.reserved_quantity - v.qty),
+                     status = CASE WHEN (p.quantity - v.qty) <= 0 THEN 'sold' ELSE p.status END,
+                     is_sold = CASE WHEN (p.quantity - v.qty) <= 0 THEN true ELSE p.is_sold END,
+                     sold_at = CASE WHEN (p.quantity - v.qty) <= 0 THEN COALESCE(p.sold_at, NOW()) ELSE p.sold_at END,
                      updated_at = NOW()
                  FROM (SELECT UNNEST($1::int[]) AS id, UNNEST($2::int[]) AS qty) AS v
                  WHERE p.id = v.id
                    AND p.track_inventory = true
                    AND COALESCE(LOWER(p.product_type::text), '') <> 'digital'
                    AND p.reserved_quantity >= v.qty
-                 RETURNING p.id, p.reserved_quantity`,
+                 RETURNING p.id, p.quantity, p.reserved_quantity`,
                 [ids, qtys]
             );
 

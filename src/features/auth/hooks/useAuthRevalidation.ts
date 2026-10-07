@@ -99,8 +99,14 @@ export function useAuthRevalidation({
       return;
     }
 
+    const isAlreadyAuthenticatedForRole = Boolean(
+      user && user.role === currentRole && user.isAuthenticated
+    );
+
     authCheckInProgress.current = true;
-    setIsLoading(true);
+    if (!isAlreadyAuthenticatedForRole) {
+      setIsLoading(true);
+    }
     authStateManager.setRehydrating(true);
 
     try {

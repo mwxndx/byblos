@@ -235,122 +235,98 @@ export function ShopProductCard({
         </div>
       )}
 
-      {/* Images popup — translucent, blurred backdrop; navigation buttons front and back; closes on outside tap or close button */}
+      {/* Full Image viewer — borderless, clean overlay with only image and close icon */}
       {showImages && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 select-none animate-in fade-in-0 duration-200"
           role="dialog"
           aria-modal="true"
           aria-label={`${product.name} images`}
         >
+          {/* Backdrop */}
           <button
             type="button"
-            aria-label="Close images"
+            aria-label="Close image viewer"
             onClick={() => setShowImages(false)}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            className="absolute inset-0 bg-black/90 backdrop-blur-sm cursor-default"
           />
-          <div
-            className="relative z-10 w-full max-w-sm rounded-2xl border p-4 sm:p-5 shadow-2xl overflow-hidden"
-            style={{
-              ...themeVars,
-              backgroundColor: 'var(--product-card-bg, var(--byblos-surface, #ffffff))',
-              color: 'var(--product-card-text, var(--byblos-text, #0f0f0e))',
-              borderColor: 'var(--product-card-border, var(--byblos-border, rgba(0, 0, 0, 0.12)))',
-            }}
+
+          {/* Close button (top right, safe-area aware) */}
+          <button
+            type="button"
+            onClick={() => setShowImages(false)}
+            aria-label="Close"
+            className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 hover:text-white hover:bg-black/80 transition-colors shadow-lg focus:outline-none"
+            style={{ top: 'max(1rem, env(safe-area-inset-top, 1rem))' }}
           >
-            {/* Modal Header */}
-            <div className="mb-3 flex items-center justify-between gap-2 border-b pb-2.5 border-[var(--byblos-border,rgba(0,0,0,0.1))]">
-              <div className="min-w-0 flex-1">
-                <h3 className="text-sm sm:text-base font-normal truncate text-label">
-                  {product.name}
-                </h3>
-                <p className="text-[11px] font-semibold opacity-70">
-                  Image {productImages.length > 0 ? activeImageIndex + 1 : 0} of {productImages.length || 1}
-                </p>
+            <X className="h-6 w-6" />
+          </button>
+
+          {/* Center full image container (no border, no card background) */}
+          <div className="relative z-10 flex h-full max-h-[90vh] w-full max-w-4xl items-center justify-center">
+            {productImages.length > 0 ? (
+              <img
+                src={productImages[activeImageIndex]}
+                alt={`${product.name} - image ${activeImageIndex + 1}`}
+                className="max-h-[85vh] max-w-[95vw] w-auto h-auto object-contain select-none pointer-events-auto rounded-lg shadow-2xl"
+                onContextMenu={(e) => e.preventDefault()}
+              />
+            ) : (
+              <div className="flex h-64 w-64 items-center justify-center text-white/40">
+                <Package className="h-16 w-16" />
               </div>
-              <button
-                type="button"
-                onClick={() => setShowImages(false)}
-                aria-label="Close"
-                className="-mr-1 -mt-1 rounded-full p-1.5 opacity-70 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+            )}
 
-            {/* Main Image View with Front/Back Navigation Buttons */}
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-black/10 flex items-center justify-center group/img select-none">
-              {productImages.length > 0 ? (
-                <img
-                  src={productImages[activeImageIndex]}
-                  alt={`${product.name} - image ${activeImageIndex + 1}`}
-                  className="h-full w-full object-cover transition-all duration-300 pointer-events-none"
-                  onContextMenu={(e) => e.preventDefault()}
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center opacity-40">
-                  <Package className="h-12 w-12" />
-                </div>
-              )}
-
-              {/* Sleek horizontal watermark banner running across the center */}
-              <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center py-1.5 bg-black/24 backdrop-blur-[1px]">
-                <p className="w-full text-center text-xs sm:text-sm font-normal uppercase tracking-widest text-white/51 drop-shadow-md truncate px-3 select-none">
-                  @{product.seller?.shopName || product.seller?.fullName || 'Shop'} • Byblos
-                </p>
-              </div>
-
-              {/* Navigation Buttons: Front (Next) and Back (Previous) */}
-              {productImages.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      stop(e);
-                      setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
-                    }}
-                    aria-label="Previous image"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md backdrop-blur-sm transition hover:scale-110 hover:bg-black/80 active:scale-95"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      stop(e);
-                      setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
-                    }}
-                    aria-label="Next image"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md backdrop-blur-sm transition hover:scale-110 hover:bg-black/80 active:scale-95"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Thumbnail dots / strip */}
+            {/* Navigation buttons if multiple images */}
             {productImages.length > 1 && (
-              <div className="mt-3 flex items-center justify-center gap-1.5 overflow-x-auto py-1">
-                {productImages.map((imgUrl, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={(e) => {
-                      stop(e);
-                      setActiveImageIndex(idx);
-                    }}
-                    className={cn(
-                      "relative h-9 w-9 shrink-0 overflow-hidden rounded-lg border-2 transition-all",
-                      activeImageIndex === idx
-                        ? "border-[var(--product-card-accent,#f5c518)] scale-105"
-                        : "border-transparent opacity-60 hover:opacity-100"
-                    )}
-                  >
-                    <img src={imgUrl} alt="" className="h-full w-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    stop(e);
+                    setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
+                  }}
+                  aria-label="Previous image"
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:scale-110 hover:bg-black/80 active:scale-95"
+                >
+                  <ChevronLeft className="h-6 w-6 sm:h-7 sm:w-7" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    stop(e);
+                    setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
+                  }}
+                  aria-label="Next image"
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:scale-110 hover:bg-black/80 active:scale-95"
+                >
+                  <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7" />
+                </button>
+
+                {/* Subtle bottom indicator dots */}
+                <div
+                  className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-2 pointer-events-auto"
+                  style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
+                >
+                  {productImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      aria-label={`Go to image ${idx + 1}`}
+                      onClick={(e) => {
+                        stop(e);
+                        setActiveImageIndex(idx);
+                      }}
+                      className={cn(
+                        "h-2 rounded-full transition-all duration-200",
+                        activeImageIndex === idx
+                          ? "w-6 bg-white shadow"
+                          : "w-2 bg-white/40 hover:bg-white/70"
+                      )}
+                    />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
