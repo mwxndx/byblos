@@ -13,7 +13,7 @@ import {
   locationPreview,
   getByReference
 } from '../../domains/orders/order/order.controller.js';
-import { protect } from '../middleware/auth.js';
+import { protect, optionalProtect } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { publicApiRateLimiter } from '../middleware/rateLimiting.js';
 import { enforceIdempotency } from '../middleware/idempotency.middleware.js';
@@ -30,9 +30,9 @@ const router = express.Router();
  * @swagger
  * /api/orders/reference/{reference}:
  *   get:
- *     summary: Get order by order number or payment reference (Public)
+ *     summary: Get order by order number or payment reference (Requires authenticated owner or client checkout token)
  */
-router.get('/reference/:reference', publicApiRateLimiter, getByReference);
+router.get('/reference/:reference', publicApiRateLimiter, optionalProtect, getByReference);
 
 // Apply protection to all other order routes
 router.use(protect);

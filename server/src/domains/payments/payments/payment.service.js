@@ -313,12 +313,6 @@ export class PaymentService {
         }
     }
 
-    static async hasSufficientBalance(requiredAmount, bufferPercent = 10) {
-        const multiplier = 1 + (bufferPercent / 100);
-        const threshold = requiredAmount * multiplier;
-        return true;
-    }
-
     static async _updatePaymentOnSuccess(client, paymentId, providerData) {
         const res = await client.query(
             "UPDATE payments SET status = $1, provider_data = $2, updated_at = NOW() WHERE id = $3 RETURNING *",

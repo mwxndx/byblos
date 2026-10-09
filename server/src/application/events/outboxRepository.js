@@ -109,7 +109,10 @@ class EventOutboxRepository {
                      delivery_attempts = delivery_attempts + 1,
                      updated_at = NOW()
                  WHERE event_id = $1
-                   AND status IN ('pending', 'failed', 'processing')
+                   AND (
+                       status IN ('pending', 'failed')
+                       OR (status = 'processing' AND updated_at < NOW() - INTERVAL '5 minutes')
+                   )
                  RETURNING *`,
                 [eventId]
             );

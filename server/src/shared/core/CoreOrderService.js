@@ -20,14 +20,6 @@ const CoreOrderService = {
     async confirmOrderReceipt(orderId, buyerId) {
         return OrderService.confirmOrderReceipt(orderId, buyerId);
     },
-
-    async getOrders(filters) {
-        return OrderService.getOrders(filters);
-    },
-
-    async getOrderById(orderId, userId) {
-        return OrderService.getOrderById(orderId, userId);
-    },
 };
 
 export default CoreOrderService;

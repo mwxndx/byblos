@@ -54,50 +54,39 @@ export async function normalizeOrderInput(req) {
         || body.idempotencyKey
         || metadata.client_checkout_token;
 
-    // 1. Resolve Identity via Mobile Payment Number (STK Push Contact)
-    const mobilePayment = req.user?.mobile_payment || req.body?.mobilePayment || req.body?.mobile_payment || rawPhone;
-    let existingBuyer = null;
+    // 1. Resolve Mobile Payment Number (STK Push Contact)
+    const mobilePayment = req.body?.mobilePayment || req.body?.mobile_payment || req.user?.mobile_payment || rawPhone;
 
-    if (mobilePayment) {
-        existingBuyer = await Buyer.findByMobilePayment?.(mobilePayment) || await Buyer.findByPhone?.(mobilePayment);
-        if (existingBuyer) {
-            logger.info('Buyer identity resolved from mobile payment lookup', { buyer_id: existingBuyer.id, name: existingBuyer.fullName });
+    // 2. Identity Protection & Resolve Buyer Info (M-02 fix)
+    // Authenticated user always owns the order identity; client-supplied payment phone
+    // must never hijack another buyer's profile. Guest checkouts keep buyerId = null.
+    let loggedInBuyer = null;
+    let buyerId = null;
+    let email = null;
+    let finalName = customerName && customerName !== 'Guest' ? customerName : 'Customer';
+    let buyerCity = body.buyerCity || body.city || null;
+    let buyerArea = body.buyerArea || body.location || null;
+
+    if (user?.id) {
+        loggedInBuyer = await Buyer.findByUserId(user.id);
+        buyerId = loggedInBuyer?.id || null;
+        email = user.email || req.body.email || req.body.customerEmail || null;
+        if (!overrideContact) {
+            finalName = user.name || user.full_name || finalName;
+            buyerCity = user.city || buyerCity;
+            buyerArea = user.location || buyerArea;
         }
+    } else {
+        // Guest checkout: strictly unauthenticated. Never adopt an existing buyer's profile
+        // merely because a phone number matched. Guest orders remain buyerId = null.
+        email = req.body.email || req.body.customerEmail || null;
     }
-
-    // 2. Identity Protection & Resolve Buyer Info
-    const email =
-        req.user?.email ||
-        req.body.email ||
-        req.body.customerEmail ||
-        existingBuyer?.email ||
-        null;
-
-    const buyerCity = body.buyerCity || body.city || (user && !overrideContact ? user.city : existingBuyer?.city) || null;
-    const buyerArea = body.buyerArea || body.location || (user && !overrideContact ? user.location : existingBuyer?.location) || null;
 
     if (!email) {
         throw new Error("Guest orders require a valid contact email address.");
     }
 
-    // CRITICAL: Resolve actual buyers.id if user is logged in (Task BUG-PERSIST-01)
-    let buyerId = existingBuyer?.id || null;
-    if (user && !buyerId) {
-        const loggedInBuyer = await Buyer.findByUserId(user.id);
-        buyerId = loggedInBuyer?.id || null;
-    }
-
-    // Priority: DB Name > Request Name (if not 'Guest') > Fallback
-    let finalName = existingBuyer?.fullName || customerName;
-    if (customerName && customerName !== 'Guest' && !existingBuyer?.fullName) {
-        finalName = customerName;
-    }
-    let finalMobilePayment = mobilePayment;
-
-    if (user && !overrideContact) {
-        finalName = user.name || user.full_name;
-        finalMobilePayment = user.mobile_payment;
-    }
+    let finalMobilePayment = mobilePayment || (user && !overrideContact ? user.mobile_payment : null);
 
     // FIX (audit P1-3 / self-referral): these identity fields come exclusively
     // from `req.user`, which the `protect` auth middleware populates from a
@@ -239,13 +228,13 @@ export async function normalizeOrderInput(req) {
         // Profile Fallback (PIN-15: PROFILE-COORDS)
         // Only if we still haven't found valid coordinates
         if (result.lat === null || result.lng === null || result.lat === 0) {
-            const profileLat = user?.latitude || existingBuyer?.latitude;
-            const profileLng = user?.longitude || existingBuyer?.longitude;
+            const profileLat = user?.latitude || loggedInBuyer?.latitude;
+            const profileLng = user?.longitude || loggedInBuyer?.longitude;
 
             if (profileLat && profileLat !== 0) {
                 result.lat = profileLat;
                 result.lng = profileLng;
-                result.address = result.address ?? (user?.location || existingBuyer?.fullAddress || existingBuyer?.location);
+                result.address = result.address ?? (user?.location || loggedInBuyer?.fullAddress || loggedInBuyer?.location);
                 result.source = user ? 'user_profile' : 'buyer_profile';
             }
         }

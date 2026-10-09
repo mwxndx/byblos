@@ -1,4 +1,5 @@
 import logger from '../../../shared/utils/logger.js';
+import { toCents, roundMoney } from './escrowMoney.utils.js';
 
 const DEFAULT_SETTLEMENT_BUSINESS_DAYS = 2;
 
@@ -141,34 +142,37 @@ class SettlementService {
             return { adjusted: false, reason: 'no_seller_payout' };
         }
 
-        const totalPayoutAmount = Number.parseFloat(payout.amount || 0);
-        if (!Number.isFinite(totalPayoutAmount) || totalPayoutAmount <= 0) {
+        const totalPayoutCents = toCents(payout.amount);
+        if (totalPayoutCents <= 0) {
             return { adjusted: false, reason: 'invalid_payout_amount' };
         }
 
         const existingMetadata = this.parseMetadata(payout.settlement_metadata);
-        const previouslyReversed = Number.parseFloat(existingMetadata.total_reversed || 0);
-        const remainingPayout = Math.max(0, Math.round((totalPayoutAmount - previouslyReversed) * 100) / 100);
+        const previouslyReversedCents = toCents(existingMetadata.total_reversed);
+        const remainingPayoutCents = Math.max(0, totalPayoutCents - previouslyReversedCents);
 
-        if (remainingPayout <= 0) {
+        if (remainingPayoutCents <= 0) {
             return { adjusted: false, reason: 'payout_already_fully_reversed' };
         }
 
-        let reversalAmount = remainingPayout;
-        const numRefund = Number.parseFloat(refundAmount);
-        const numTotal = Number.parseFloat(orderTotal);
+        let reversalCents = remainingPayoutCents;
+        const refundCents = toCents(refundAmount);
+        const totalOrderCents = toCents(orderTotal);
 
-        if (Number.isFinite(numRefund) && Number.isFinite(numTotal) && numTotal > 0 && numRefund < numTotal) {
-            const calculated = Math.round((totalPayoutAmount * (numRefund / numTotal)) * 100) / 100;
-            reversalAmount = Math.min(remainingPayout, calculated);
+        if (refundCents > 0 && totalOrderCents > 0 && refundCents < totalOrderCents) {
+            const calculatedCents = Math.round(totalPayoutCents * (refundCents / totalOrderCents));
+            reversalCents = Math.min(remainingPayoutCents, calculatedCents);
         }
 
-        if (reversalAmount <= 0) {
+        if (reversalCents <= 0) {
             return { adjusted: false, reason: 'zero_reversal_amount' };
         }
 
-        const newTotalReversed = Math.round((previouslyReversed + reversalAmount) * 100) / 100;
-        const isFinal = newTotalReversed >= totalPayoutAmount;
+        const newTotalReversedCents = previouslyReversedCents + reversalCents;
+        const reversalAmount = roundMoney(reversalCents / 100);
+        const newTotalReversed = roundMoney(newTotalReversedCents / 100);
+        const totalPayoutAmount = roundMoney(totalPayoutCents / 100);
+        const isFinal = newTotalReversedCents >= totalPayoutCents;
 
         const updatedHistory = Array.isArray(existingMetadata.reversals) ? [...existingMetadata.reversals] : [];
         updatedHistory.push({

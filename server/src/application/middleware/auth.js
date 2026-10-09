@@ -326,5 +326,18 @@ export const invalidateAuthCache = (token) => {
   }
 };
 
+/**
+ * Optional protection middleware: attaches req.user if a valid token is presented,
+ * but allows the request to continue unauthenticated if no token or an invalid token is provided.
+ */
+export const optionalProtect = async (req, res, next) => {
+  const token = getTokenFromRequest(req);
+  if (!token) return next();
+  return protect(req, res, (err) => {
+    if (err) return next();
+    next();
+  });
+};
+
 
 

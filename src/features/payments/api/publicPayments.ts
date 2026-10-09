@@ -1,8 +1,11 @@
 import apiClient from '@/infrastructure/http/apiClient';
 
-export async function pollPaymentStatus(reference: string, maxAttempts: number = 30): Promise<unknown> {
+export async function pollPaymentStatus(
+  reference: string,
+  maxAttempts: number = 30,
+  interval: number = 5000
+): Promise<unknown> {
   const attempts = 0;
-  const interval = 5000;
 
   return new Promise((resolve, reject) => {
     let currentAttempts = attempts;
@@ -10,10 +13,22 @@ export async function pollPaymentStatus(reference: string, maxAttempts: number =
       try {
         currentAttempts++;
         const response = await apiClient.get(`payments/status/${reference}`);
-        const responseData = response.data as Record<string, unknown>;
-        const status = typeof responseData.status === 'string' ? responseData.status.toLowerCase() : '';
+        const responseData = (response.data || {}) as Record<string, unknown>;
+        const innerData = (responseData.data && typeof responseData.data === 'object'
+          ? responseData.data
+          : null) as Record<string, unknown> | null;
 
-        if (status === 'completed' || status === 'success' || status === 'failed' || status === 'cancelled') {
+        const rawStatus = typeof innerData?.status === 'string'
+          ? innerData.status
+          : typeof responseData.status === 'string'
+            ? responseData.status
+            : '';
+        const status = rawStatus.toLowerCase();
+
+        const isTerminalSuccess = status === 'completed' || status === 'success' || status === 'paid' || status === 'successful';
+        const isTerminalFailure = status === 'failed' || status === 'cancelled' || status === 'rejected';
+
+        if (isTerminalSuccess || isTerminalFailure) {
           resolve(response.data);
         } else if (currentAttempts >= maxAttempts) {
           resolve({ status: 'timeout', message: 'Polling timed out' });

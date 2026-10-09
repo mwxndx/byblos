@@ -385,6 +385,7 @@ class Order {
         o.location_lng as "locationLng",
         o.service_title as "serviceTitle",
         o.notification_sent as "notificationSent",
+        o.client_checkout_token as "clientCheckoutToken",
         ${LOGISTICS_SUMMARY_SELECT},
         json_build_object(
           'id', s.id,

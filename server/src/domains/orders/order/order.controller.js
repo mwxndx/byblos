@@ -325,6 +325,30 @@ export const getByReference = async (req, res) => {
             });
         }
 
+        // Authorization check (M-01): require matching client checkout capability token or authenticated ownership
+        const clientToken = req.headers['x-checkout-token']
+            || req.query.client_checkout_token
+            || req.query.clientCheckoutToken;
+
+        const isTokenAuthorized = Boolean(
+            clientToken && order.clientCheckoutToken && clientToken === order.clientCheckoutToken
+        );
+        const isUserAuthorized = Boolean(
+            req.user && (
+                req.user.role === 'admin'
+                || (req.user.buyerId && String(order.buyerId) === String(req.user.buyerId))
+                || (req.user.sellerId && String(order.sellerId) === String(req.user.sellerId))
+            )
+        );
+
+        if (!isTokenAuthorized && !isUserAuthorized) {
+            return res.status(403).json({
+                status: 'error',
+                code: 'UNAUTHORIZED_ORDER_ACCESS',
+                message: 'Access denied: valid checkout capability token or authenticated ownership required.'
+            });
+        }
+
         // Return a structure compatible with CheckoutPage.tsx
         res.status(200).json({
             success: true,

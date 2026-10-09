@@ -4960,12 +4960,6 @@ CREATE UNIQUE INDEX payout_reconciliation_events_unique_reference ON public.payo
 CREATE UNIQUE INDEX payouts_order_id_unique ON public.payouts USING btree (order_id) WHERE (order_id IS NOT NULL);
 
 
---
--- Name: product_orders_client_checkout_token_unique; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX product_orders_client_checkout_token_unique ON public.product_orders USING btree (client_checkout_token) WHERE (client_checkout_token IS NOT NULL);
-
 
 --
 -- Name: product_orders_client_checkout_token_unique_all; Type: INDEX; Schema: public; Owner: -
@@ -6134,6 +6128,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (107, '20260913140000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (108, '20260914120000_add_admin_directory_created_at_indexes', '2026-09-14 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (109, '20260926120000_drop_dead_buyers_refund_balance_column', '2026-09-26 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (110, '20260926130000_add_product_orders_handoff_confirmed_at', '2026-09-26 13:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (111, '20261010120000_drop_redundant_checkout_token_index', '2026-10-10 12:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the

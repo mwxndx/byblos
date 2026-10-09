@@ -2,6 +2,7 @@ const Fees = {
     PRODUCT_MIN_PRICE: 50,             // Minimum seller product price in KES
     PRODUCT_SERVICE_CHARGE_RATE: 0.02,  // Price-inclusive service charge for operations/transit security
     PLATFORM_COMMISSION_AMOUNT: 10,    // Flat KES 10 platform cut per order
+    COLLECTION_FEE_AMOUNT: 100,        // Flat KES 100 hub collection fee (Mzigo)
     CREATOR_MIN_COMMISSION_RATE: 0.01,  // Minimum allowed creator commission rate (1%)
     CREATOR_MAX_COMMISSION_RATE: 0.30,  // Maximum allowed creator commission rate (30%)
     CREATOR_COMMISSION_RATE: 0.01,     // Default creator cut from seller payout base
