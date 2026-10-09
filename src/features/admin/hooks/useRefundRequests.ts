@@ -9,13 +9,16 @@ export function useRefundRequests() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState('');
+  const [approvedAmount, setApprovedAmount] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [statusFilter, setStatusFilter] = useState('pending');
+  const [isOverdueOnly, setIsOverdueOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<'urgency' | 'newest'>('urgency');
 
   const confirmRefundMutation = useConfirmRefundMutation();
   const rejectRefundMutation = useRejectRefundMutation();
 
-  const refundQuery = useAdminRefundRequestsQuery(statusFilter);
+  const refundQuery = useAdminRefundRequestsQuery(statusFilter, { overdue: isOverdueOnly, sortBy });
 
   // Derived directly during render instead of mirrored into its own state
   // via a useEffect -- matches useDetections.ts's identical pattern
@@ -35,19 +38,32 @@ export function useRefundRequests() {
   const handleConfirmRefund = async () => {
     if (!selectedRequest) return;
 
+    const parsedAmount = approvedAmount ? Number.parseFloat(approvedAmount) : Number.parseFloat(selectedRequest.amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      toast.error('Please enter a valid refund amount');
+      return;
+    }
+    const maxAmount = Number.parseFloat(selectedRequest.amount);
+    if (parsedAmount > maxAmount) {
+      toast.error(`Approved amount cannot exceed requested amount (${maxAmount})`);
+      return;
+    }
+
     setIsProcessing(true);
     try {
-      const idempotencyKey = `refund-confirm-${selectedRequest.id}`;
+      const idempotencyKey = `refund-confirm-${selectedRequest.id}-${parsedAmount}`;
 
       await confirmRefundMutation.mutateAsync({
         id: selectedRequest.id,
         adminNotes,
+        approvedAmount: parsedAmount,
         idempotencyKey
       });
 
-      toast.success('Refund confirmed and processed successfully!');
+      toast.success(parsedAmount < maxAmount ? 'Partial refund confirmed successfully!' : 'Refund confirmed and processed successfully!');
       setIsConfirmDialogOpen(false);
       setAdminNotes('');
+      setApprovedAmount('');
       setSelectedRequest(null);
       fetchRefundRequests();
     } catch (error: unknown) {
@@ -74,6 +90,7 @@ export function useRefundRequests() {
       toast.success('Refund request rejected');
       setIsRejectDialogOpen(false);
       setAdminNotes('');
+      setApprovedAmount('');
       setSelectedRequest(null);
       fetchRefundRequests();
     } catch (error: unknown) {
@@ -94,9 +111,15 @@ export function useRefundRequests() {
     setIsRejectDialogOpen,
     adminNotes,
     setAdminNotes,
+    approvedAmount,
+    setApprovedAmount,
     isProcessing,
     statusFilter,
     setStatusFilter,
+    isOverdueOnly,
+    setIsOverdueOnly,
+    sortBy,
+    setSortBy,
     isLoadingRequests,
     fetchRefundRequests,
     handleConfirmRefund,

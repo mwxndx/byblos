@@ -32,6 +32,8 @@ async function countActivePromotions(client, creatorId, excludeSellerId = null) 
 }
 import { recordFraudEvent } from '../../../shared/utils/fraudEvents.js';
 
+const MIN_CREATOR_COMMISSION_RATE = Number(Fees.CREATOR_MIN_COMMISSION_RATE || 0.01);
+const MAX_CREATOR_COMMISSION_RATE = Number(Fees.CREATOR_MAX_COMMISSION_RATE || 0.30);
 const DEFAULT_CREATOR_COMMISSION_RATE = Number(Fees.CREATOR_COMMISSION_RATE || 0.01);
 const INVITE_EXPIRY_DAYS = 14;
 
@@ -40,7 +42,7 @@ const roundMoney = (amount) => Math.round(Number(amount || 0) * 100) / 100;
 const normalizeCommissionRate = (rate) => {
   const numericRate = Number(rate);
   if (!Number.isFinite(numericRate)) return DEFAULT_CREATOR_COMMISSION_RATE;
-  return Math.min(1, Math.max(DEFAULT_CREATOR_COMMISSION_RATE, numericRate));
+  return Math.min(MAX_CREATOR_COMMISSION_RATE, Math.max(MIN_CREATOR_COMMISSION_RATE, numericRate));
 };
 const CREATOR_ANALYSIS_PERIODS = {
   daily: { unit: 'day', interval: '30 days', labelFormat: 'YYYY-MM-DD' },
@@ -1935,6 +1937,10 @@ class CreatorService {
     }
 
     if (creatorCommissionRate !== undefined) {
+      const numericRate = Number(creatorCommissionRate);
+      if (!Number.isFinite(numericRate) || numericRate < MIN_CREATOR_COMMISSION_RATE || numericRate > MAX_CREATOR_COMMISSION_RATE) {
+        throw new Error('Creator commission must be between 1% and 30%');
+      }
       const normalizedRate = normalizeCommissionRate(creatorCommissionRate);
       updates.push(`creator_commission_rate = $${paramIndex++}`);
       values.push(normalizedRate);

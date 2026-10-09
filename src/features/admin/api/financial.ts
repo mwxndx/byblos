@@ -46,12 +46,17 @@ export async function getPaymentProviderBalances() {
   }
 }
 
-export async function getRefundRequests(status: string) {
-  const response = await api.get(`/admin/refunds?status=${status}`);
+export async function getRefundRequests(status?: string, options?: { overdue?: boolean; sortBy?: string }) {
+  const params = new URLSearchParams();
+  if (status) params.append('status', status);
+  if (options?.overdue) params.append('overdue', 'true');
+  if (options?.sortBy) params.append('sortBy', options.sortBy);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  const response = await api.get(`/admin/refunds${qs}`);
   return response.data;
 }
 
-export async function confirmRefund(id: number | string, data: { adminNotes: string }, headers: Record<string, string>) {
+export async function confirmRefund(id: number | string, data: { adminNotes?: string; approvedAmount?: number }, headers: Record<string, string>) {
   const response = await api.patch(`/admin/refunds/${id}/confirm`, data, { headers });
   return response.data;
 }

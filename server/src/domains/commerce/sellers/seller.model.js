@@ -277,8 +277,8 @@ export const updateSeller = async (id, updates) => {
   const creatorCommissionRateToUpdate = creatorCommissionRate !== undefined ? creatorCommissionRate : creator_commission_rate;
   if (creatorCommissionRateToUpdate !== undefined) {
     const normalizedRate = Number(creatorCommissionRateToUpdate);
-    if (!Number.isFinite(normalizedRate) || normalizedRate < 0.01 || normalizedRate > 1) {
-      throw new Error('Creator commission must be between 1% and 100%');
+    if (!Number.isFinite(normalizedRate) || normalizedRate < 0.01 || normalizedRate > 0.30) {
+      throw new Error('Creator commission must be between 1% and 30%');
     }
     paramCount++;
     updatesList.push(`creator_commission_rate = $${paramCount}`);

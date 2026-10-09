@@ -10,6 +10,7 @@ import { useCreatorWithdrawalMutation } from '@/features/creator/hooks/mutations
 import {
   money,
   MIN_WITHDRAWAL_AMOUNT,
+  MAX_WITHDRAWAL_AMOUNT,
   WITHDRAWAL_FEE_TIERS,
   getWithdrawalFee,
   getMaxWithdrawableAmount,
@@ -54,6 +55,10 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
     const deduction = amount + fee;
     if (!Number.isFinite(amount) || amount < MIN_WITHDRAWAL_AMOUNT) {
       toast.error(`Minimum withdrawal is KSh ${MIN_WITHDRAWAL_AMOUNT}.`);
+      return;
+    }
+    if (amount > MAX_WITHDRAWAL_AMOUNT) {
+      toast.error(`Maximum withdrawal is KSh ${MAX_WITHDRAWAL_AMOUNT.toLocaleString()}.`);
       return;
     }
     if (availableBalance < deduction) {
@@ -158,6 +163,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
           <Input
             type="number"
             min={MIN_WITHDRAWAL_AMOUNT}
+            max={MAX_WITHDRAWAL_AMOUNT}
             value={withdrawalAmount}
             onChange={(event) => setWithdrawalAmount(event.target.value)}
             placeholder="Amount in KSh"

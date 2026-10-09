@@ -204,10 +204,10 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
     }
 
     const creatorCommissionRate = Number(formData.creatorCommissionRate);
-    if (!Number.isFinite(creatorCommissionRate) || creatorCommissionRate < 1 || creatorCommissionRate > 100) {
+    if (!Number.isFinite(creatorCommissionRate) || creatorCommissionRate < 1 || creatorCommissionRate > 30) {
       toast({
         title: 'Error',
-        description: 'Creator commission must be between 1% and 100%',
+        description: 'Creator commission must be between 1% and 30%',
         variant: 'destructive',
       });
       return;

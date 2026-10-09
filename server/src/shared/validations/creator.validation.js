@@ -17,7 +17,11 @@ export const resendVerification = z.object({ email: s }).passthrough();
 export const acceptShopRequest = z.object({ inviteId: id }).passthrough();
 export const denyShopRequest = z.object({ inviteId: id }).passthrough();
 export const generateReferralCode = z.object({}).passthrough();
-export const requestWithdrawal = z.object({ amount: n, mpesaNumber: s, mpesaName: s }).passthrough();
+export const requestWithdrawal = z.object({
+  amount: z.coerce.number().min(50, 'Minimum withdrawal is KES 50').max(250000, 'Maximum withdrawal is KES 250,000'),
+  mpesaNumber: s,
+  mpesaName: s
+}).passthrough();
 export const requestCollaboration = z.object({ sellerId: id }).passthrough();
 export const updateProfile = z.object({
   instagramLink: z.string().nullable().optional(),

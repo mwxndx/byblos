@@ -2,7 +2,7 @@ import { Loader2, Wallet } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { MIN_WITHDRAWAL_AMOUNT, getMaxWithdrawableAmount } from '../dashboardUtils';
+import { MIN_WITHDRAWAL_AMOUNT, MAX_WITHDRAWAL_AMOUNT, getMaxWithdrawableAmount } from '../dashboardUtils';
 import { formatKes } from './withdrawalsTab.utils';
 
 interface WithdrawalRequestFormProps {

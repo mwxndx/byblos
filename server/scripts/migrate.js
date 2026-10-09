@@ -138,67 +138,86 @@ async function run() {
         }
         console.log(`[${new Date().toISOString()}] [SUCCESS] Connection established.`);
 
-        const hasUsers = await tableExists(pool, 'users');
-        const hasPgmigrations = await tableExists(pool, 'pgmigrations');
-        const hasRefundRequests = await tableExists(pool, 'refund_requests');
+        const MIGRATION_ADVISORY_LOCK_ID = 741928374;
+        const lockClient = await pool.connect();
+        let lockAcquired = false;
 
-        if (!hasUsers && !hasPgmigrations && fs.existsSync(SCHEMA_SNAPSHOT_FILE)) {
-            // FRESH / EMPTY database: incremental migrations can't build from
-            // zero (ordering), so provision from the full schema snapshot — the
-            // same known-good path CI uses. The snapshot also records
-            // pgmigrations 1..N (and advances its sequence), so the
-            // node-pg-migrate run below then applies ONLY migrations newer than
-            // the snapshot. Guarded on both `users` and `pgmigrations` being
-            // absent so this only ever fires on a truly empty database.
-            console.log(`[${new Date().toISOString()}] [INFO] Empty database detected — applying full schema snapshot (test/schema.sql) to bootstrap...`);
-            const snapshotSql = fs.readFileSync(SCHEMA_SNAPSHOT_FILE, 'utf8');
-            await pool.query(snapshotSql);
-            console.log(`[${new Date().toISOString()}] [SUCCESS] Schema snapshot applied; incremental migrations newer than the snapshot (if any) will run next.`);
-        } else if (hasUsers && !hasRefundRequests && fs.existsSync(UNIFIED_SCHEMA_FILE)) {
-            console.log(`[${new Date().toISOString()}] [INFO] Applying unified runtime schema bootstrap...`);
-            const unifiedSchemaSql = fs.readFileSync(UNIFIED_SCHEMA_FILE, 'utf8');
-            await pool.query(unifiedSchemaSql);
-            console.log(`[${new Date().toISOString()}] [SUCCESS] Unified runtime schema bootstrap applied.`);
-        }
+        try {
+            console.log(`[${new Date().toISOString()}] [INFO] Acquiring migration advisory lock (${MIGRATION_ADVISORY_LOCK_ID})...`);
+            await lockClient.query('SELECT pg_advisory_lock($1)', [MIGRATION_ADVISORY_LOCK_ID]);
+            lockAcquired = true;
+            console.log(`[${new Date().toISOString()}] [SUCCESS] Migration advisory lock acquired.`);
 
-        // 4. Migration Execution
-        console.log(`[${new Date().toISOString()}] [INFO] Running Migrations...`);
+            const hasUsers = await tableExists(pool, 'users');
+            const hasPgmigrations = await tableExists(pool, 'pgmigrations');
+            const hasRefundRequests = await tableExists(pool, 'refund_requests');
 
-        await migrate({
-            dir: path.resolve(__dirname, '../migrations'), // Ensure absolute path to migrations folder
-            direction: 'up',
-            migrationsTable: 'pgmigrations',
-            // Pass a pg ClientConfig (not a bare string) so node-pg-migrate's
-            // connection uses the same SSL settings as the pre-flight pool.
-            databaseUrl: { connectionString: process.env.DATABASE_URL, ssl: sslConfig },
-            // Refuses to run if the migrations directory's sort order ever
-            // diverges from the DB's real historical run_on order again (see
-            // migrations/ filenames: all now normalized to a real 14-digit
-            // YYYYMMDDHHMMSS prefix so node-pg-migrate's own timestamp
-            // parser -- which only special-cases 13/17-digit prefixes -- sorts
-            // them correctly; any format regression now fails loudly here
-            // instead of being silently tolerated).
-            checkOrder: true,
-            // node-pg-migrate tries to load EVERY file in the migrations directory
-            // (it once choked on a stray Markdown doc placed here and failed the
-            // whole deploy). Ignore Markdown docs as a runtime safety net; keep all
-            // non-migration files out of this directory in the first place (docs
-            // live at server/MIGRATIONS.md — enforced by migrationHygiene.test.js).
-            ignorePattern: '.*\\.md$',
-            verbose: true,
-            logger: {
-                info: console.log,
-                warn: console.warn,
-                error: (msg, ...args) => {
-                    if (typeof msg === 'string' && msg.startsWith("Can't determine timestamp for")) {
-                        return;
-                    }
-                    console.error(msg, ...args);
-                }
+            if (!hasUsers && !hasPgmigrations && fs.existsSync(SCHEMA_SNAPSHOT_FILE)) {
+                // FRESH / EMPTY database: incremental migrations can't build from
+                // zero (ordering), so provision from the full schema snapshot — the
+                // same known-good path CI uses. The snapshot also records
+                // pgmigrations 1..N (and advances its sequence), so the
+                // node-pg-migrate run below then applies ONLY migrations newer than
+                // the snapshot. Guarded on both `users` and `pgmigrations` being
+                // absent so this only ever fires on a truly empty database.
+                console.log(`[${new Date().toISOString()}] [INFO] Empty database detected — applying full schema snapshot (test/schema.sql) to bootstrap...`);
+                const snapshotSql = fs.readFileSync(SCHEMA_SNAPSHOT_FILE, 'utf8');
+                await pool.query(snapshotSql);
+                console.log(`[${new Date().toISOString()}] [SUCCESS] Schema snapshot applied; incremental migrations newer than the snapshot (if any) will run next.`);
+            } else if (hasUsers && !hasRefundRequests && fs.existsSync(UNIFIED_SCHEMA_FILE)) {
+                console.log(`[${new Date().toISOString()}] [INFO] Applying unified runtime schema bootstrap...`);
+                const unifiedSchemaSql = fs.readFileSync(UNIFIED_SCHEMA_FILE, 'utf8');
+                await pool.query(unifiedSchemaSql);
+                console.log(`[${new Date().toISOString()}] [SUCCESS] Unified runtime schema bootstrap applied.`);
             }
-        });
 
-        console.log(`[${new Date().toISOString()}] [SUCCESS] Migrations completed.`);
+            // 4. Migration Execution
+            console.log(`[${new Date().toISOString()}] [INFO] Running Migrations...`);
+
+            await migrate({
+                dir: path.resolve(__dirname, '../migrations'), // Ensure absolute path to migrations folder
+                direction: 'up',
+                migrationsTable: 'pgmigrations',
+                // Pass a pg ClientConfig (not a bare string) so node-pg-migrate's
+                // connection uses the same SSL settings as the pre-flight pool.
+                databaseUrl: { connectionString: process.env.DATABASE_URL, ssl: sslConfig },
+                // Refuses to run if the migrations directory's sort order ever
+                // diverges from the DB's real historical run_on order again (see
+                // migrations/ filenames: all now normalized to a real 14-digit
+                // YYYYMMDDHHMMSS prefix so node-pg-migrate's own timestamp
+                // parser -- which only special-cases 13/17-digit prefixes -- sorts
+                // them correctly; any format regression now fails loudly here
+                // instead of being silently tolerated).
+                checkOrder: true,
+                // node-pg-migrate tries to load EVERY file in the migrations directory
+                // (it once choked on a stray Markdown doc placed here and failed the
+                // whole deploy). Ignore Markdown docs as a runtime safety net; keep all
+                // non-migration files out of this directory in the first place (docs
+                // live at server/MIGRATIONS.md — enforced by migrationHygiene.test.js).
+                ignorePattern: '.*\\.md$',
+                verbose: true,
+                logger: {
+                    info: console.log,
+                    warn: console.warn,
+                    error: (msg, ...args) => {
+                        if (typeof msg === 'string' && msg.startsWith("Can't determine timestamp for")) {
+                            return;
+                        }
+                        console.error(msg, ...args);
+                    }
+                }
+            });
+
+            console.log(`[${new Date().toISOString()}] [SUCCESS] Migrations completed.`);
+        } finally {
+            if (lockAcquired) {
+                await lockClient.query('SELECT pg_advisory_unlock($1)', [MIGRATION_ADVISORY_LOCK_ID]).catch((err) => {
+                    console.warn(`[${new Date().toISOString()}] [WARN] Failed to release migration advisory lock:`, err.message);
+                });
+                console.log(`[${new Date().toISOString()}] [INFO] Released migration advisory lock.`);
+            }
+            lockClient.release();
+        }
 
     } catch (err) {
         console.error(`[${new Date().toISOString()}] [ERROR] Migration failed:`, err);

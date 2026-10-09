@@ -272,7 +272,12 @@ export function BagSheet() {
         initialData={checkout.initialBuyerData}
       />
 
-      <PaymentStatusModal {...checkout.paymentModalData} onClose={checkout.closePaymentModal} />
+      <PaymentStatusModal
+        {...checkout.paymentModalData}
+        onClose={checkout.closePaymentModal}
+        onSuccess={checkout.handlePaymentSuccess}
+        onCancelRetry={checkout.handleCancelRetry}
+      />
     </>
   );
 }

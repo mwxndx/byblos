@@ -112,10 +112,14 @@ eventBus.on(AppEvents.ORDER.FULFILLED, async ({ eventId, order, items = [] }) =>
     const notificationOrder = normalized.order;
     const notificationItems = normalized.items;
     const hasDigital = notificationItems.some(item => item.is_digital || String(item.product_type || '').toUpperCase() === 'DIGITAL');
+    const buyerUserId = notificationOrder?.buyer?.userId || null;
+    const sellerUserId = notificationOrder?.seller?.userId || null;
+    const orderNumber = notificationOrder?.orderNumber || order?.order_number || order?.id;
+
     await deliverAll('Event:OrderFulfilled', eventId, [
-        hasDigital ? feedDelivery(`order:${order.id}:buyer:digital:feed`, notificationOrder.buyer.userId, 'buyer', { type: 'order_digital_ready', title: 'Your files are ready', body: `Download your digital items for order ${notificationOrder.orderNumber}.`, data: { path: '/buyer', orderId: order.id } }) : null,
-        feedDelivery(`order:${order.id}:buyer:payment_success:feed`, notificationOrder.buyer.userId, 'buyer', { type: 'order_payment_success', title: 'Payment confirmed', body: `We received your payment for order ${notificationOrder.orderNumber}.`, data: { path: '/buyer', orderId: order.id } }),
-        feedDelivery(`order:${order.id}:seller:new_order:feed`, notificationOrder.seller.userId, 'seller', { type: 'order_new', title: 'New order received', body: `Order ${notificationOrder.orderNumber} · KES ${Number(notificationOrder.totalAmount || 0).toLocaleString('en-KE')} — tap to review.`, data: { path: '/seller', orderId: order.id } })
+        hasDigital ? feedDelivery(`order:${order.id}:buyer:digital:feed`, buyerUserId, 'buyer', { type: 'order_digital_ready', title: 'Your files are ready', body: `Download your digital items for order ${orderNumber}.`, data: { path: '/buyer', orderId: order.id } }) : null,
+        feedDelivery(`order:${order.id}:buyer:fulfilled:feed`, buyerUserId, 'buyer', { type: 'order_fulfilled', title: 'Order fulfilled', body: `Your order ${orderNumber} has been fulfilled and is on its way.`, data: { path: '/buyer', orderId: order.id } }),
+        feedDelivery(`order:${order.id}:seller:fulfilled:feed`, sellerUserId, 'seller', { type: 'order_fulfilled', title: 'Order fulfilled', body: `Order ${orderNumber} has been fulfilled.`, data: { path: '/seller', orderId: order.id } })
     ]);
 });
 
@@ -125,8 +129,10 @@ eventBus.on(AppEvents.ORDER.FULFILLED, async ({ eventId, order, items = [] }) =>
 eventBus.on(AppEvents.ORDER.CANCELLED, async ({ eventId, order, items, seller, buyer, cancelledBy }) => {
     logger.info(`[Event:OrderCancelled] Processing for Order #${order.id}`);
     const ids = await orderUserIds(order, items || []);
+    const orderRef = ids.orderNumber || order?.order_number || order?.id;
     await deliverAll('Event:OrderCancelled', eventId, [
-        feedDelivery(`order:${order.id}:buyer:cancelled:feed`, ids.buyerUserId, 'buyer', { type: 'order_cancelled', title: `Order ${ids.orderNumber || order.id} cancelled`, body: 'Your order has been cancelled.', data: { path: '/buyer', orderId: order.id } })
+        feedDelivery(`order:${order.id}:buyer:cancelled:feed`, ids.buyerUserId, 'buyer', { type: 'order_cancelled', title: `Order #${orderRef} cancelled`, body: 'Your order has been cancelled.', data: { path: '/buyer', orderId: order.id } }),
+        feedDelivery(`order:${order.id}:seller:cancelled:feed`, ids.sellerUserId, 'seller', { type: 'order_cancelled', title: `Order #${orderRef} cancelled`, body: `Order #${orderRef} has been cancelled.`, data: { path: '/seller', orderId: order.id } })
     ]);
 });
 

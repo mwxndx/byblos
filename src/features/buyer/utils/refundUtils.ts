@@ -1,6 +1,7 @@
 import {
   getWithdrawalFee,
   MIN_WITHDRAWAL_AMOUNT,
+  MAX_WITHDRAWAL_AMOUNT,
   WITHDRAWAL_FEE_TIERS
 } from '@/features/seller/components/dashboard/dashboardUtils';
 import {
@@ -12,6 +13,7 @@ import {
 export {
   getWithdrawalFee,
   MIN_WITHDRAWAL_AMOUNT,
+  MAX_WITHDRAWAL_AMOUNT,
   WITHDRAWAL_FEE_TIERS,
   formatKes,
   formatSettlementDate,
@@ -54,7 +56,8 @@ export function getMaxWithdrawableAmount(availableBalance: number): number {
 
   // Tier 3: >= 20,000, fee = 63. Threshold: 20000 + 63 = 20063
   if (availableBalance >= 20000 + 63) {
-    return Math.floor((availableBalance - 63) * 100) / 100;
+    const net = Math.floor((availableBalance - 63) * 100) / 100;
+    return Math.min(MAX_WITHDRAWAL_AMOUNT, net);
   }
 
   // Tier 2: 1,501 - 19,999.99, fee = 45. Threshold: 1501 + 45 = 1546

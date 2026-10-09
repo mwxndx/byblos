@@ -2,6 +2,7 @@ import type { WithdrawalStatus } from '@/shared/types/api/withdrawal';
 
 export const money = (amount: number | string) => `KSh ${Number(amount || 0).toLocaleString()}`;
 export const MIN_WITHDRAWAL_AMOUNT = 50;
+export const MAX_WITHDRAWAL_AMOUNT = 250_000;
 export const WITHDRAWAL_FEE_TIERS = [
   { min: 50, max: 1500, fee: 21, label: 'KSh 50 - KSh 1,500' },
   { min: 1501, max: 19999.99, fee: 45, label: 'KSh 1,501 - KSh 19,999' },
@@ -110,7 +111,8 @@ export function getMaxWithdrawableAmount(availableBalance: number): number {
     return 0;
   }
   if (availableBalance >= 20000 + 63) {
-    return Math.floor((availableBalance - 63) * 100) / 100;
+    const net = Math.floor((availableBalance - 63) * 100) / 100;
+    return Math.min(MAX_WITHDRAWAL_AMOUNT, net);
   }
   if (availableBalance >= 1501 + 45) {
     const net = Math.floor((availableBalance - 45) * 100) / 100;

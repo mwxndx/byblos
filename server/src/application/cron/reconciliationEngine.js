@@ -7,6 +7,7 @@ import FulfillmentQueueService from '../../domains/orders/fulfillment/fulfillmen
 import InventoryReservationService from '../../domains/commerce/products/inventoryReservation.service.js';
 import escrowManager from '../../domains/orders/escrow/EscrowManager.js';
 import settlementService from '../../domains/orders/escrow/settlement.service.js';
+import eventBus, { AppEvents } from '../events/eventBus.js';
 
 const RECONCILIATION_LOCK_KEY = 'byblos:reconciliation-engine';
 
@@ -66,6 +67,7 @@ class ReconciliationEngine {
             await this.handleMissingFulfillmentJobs();
             await this.handleUnreleasedCompletedOrders();
             await this.handleCompletedRefunds();
+            await this.handleOverdueRefundRequests();
             return { skipped: false };
         } catch (err) {
             logger.error('[RECON] Reconciliation run failed:', err);
@@ -381,6 +383,94 @@ class ReconciliationEngine {
             } catch (err) {
                 await client.query('ROLLBACK').catch(() => {});
                 logger.error(`[RECON] Failed reconciling completed refund ${refund.id}:`, err.message);
+            } finally {
+                client.release();
+            }
+        }
+    }
+
+    /**
+     * Self-healing worker: Scan for refund_requests in 'pending' or 'manual_review'
+     * that have exceeded the 48-hour SLA deadline. Marks them escalated and dispatches AppEvents.REFUND.ESCALATED.
+     */
+    static async handleOverdueRefundRequests() {
+        const { rows: overdueRequests } = await pool.query(
+            `SELECT rr.id, rr.buyer_id, rr.amount, rr.status, rr.requested_at, rr.payment_details,
+                    b.full_name as buyer_name, b.email as buyer_email
+             FROM refund_requests rr
+             LEFT JOIN buyers b ON rr.buyer_id = b.id
+             WHERE rr.status IN ('pending', 'manual_review')
+               AND rr.requested_at < NOW() - INTERVAL '48 hours'
+               AND COALESCE((rr.payment_details->'sla'->>'is_breached')::boolean, false) = false
+             LIMIT 50`
+        );
+
+        if (overdueRequests.length === 0) return;
+
+        logger.warn(`[RECON] Found ${overdueRequests.length} overdue refund requests exceeding 48h SLA. Escalating.`);
+
+        for (const req of overdueRequests) {
+            const client = await pool.connect();
+            try {
+                await client.query('BEGIN');
+
+                const { rows: [locked] } = await client.query(
+                    `SELECT id, payment_details FROM refund_requests
+                     WHERE id = $1 AND status IN ('pending', 'manual_review')
+                     FOR UPDATE SKIP LOCKED`,
+                    [req.id]
+                );
+
+                if (!locked) {
+                    await client.query('ROLLBACK');
+                    continue;
+                }
+
+                const currentDetails = typeof locked.payment_details === 'string'
+                    ? JSON.parse(locked.payment_details)
+                    : (locked.payment_details || {});
+
+                const slaUpdate = {
+                    sla: {
+                        ...(currentDetails.sla || {}),
+                        target_hours: currentDetails.sla?.target_hours || 48,
+                        deadline_at: currentDetails.sla?.deadline_at || new Date(new Date(req.requested_at).getTime() + 48 * 3600 * 1000).toISOString(),
+                        is_breached: true,
+                        escalated_at: new Date().toISOString(),
+                        escalation_level: (currentDetails.sla?.escalation_level || 0) + 1
+                    }
+                };
+
+                await client.query(
+                    `UPDATE refund_requests
+                     SET payment_details = COALESCE(payment_details, '{}'::jsonb) || $1::jsonb,
+                         updated_at = NOW()
+                     WHERE id = $2`,
+                    [JSON.stringify(slaUpdate), locked.id]
+                );
+
+                await client.query('COMMIT');
+
+                logger.warn(`[RECON] Escalated overdue refund request #${locked.id} (amount: ${req.amount}, buyer: ${req.buyer_id})`);
+
+                await eventBus.enqueueAndDispatch(AppEvents.REFUND.ESCALATED, {
+                    eventId: `refund.escalated:${locked.id}`,
+                    refund: {
+                        id: locked.id,
+                        buyer_id: req.buyer_id,
+                        buyer_name: req.buyer_name,
+                        amount: req.amount,
+                        status: req.status,
+                        requested_at: req.requested_at,
+                        escalated_at: slaUpdate.sla.escalated_at,
+                        escalation_level: slaUpdate.sla.escalation_level
+                    }
+                }, 'ReconciliationEngine.handleOverdueRefundRequests').catch(err => {
+                    logger.warn(`[RECON] Failed to dispatch REFUND.ESCALATED event for request #${locked.id}:`, err?.message);
+                });
+            } catch (err) {
+                await client.query('ROLLBACK').catch(() => {});
+                logger.error(`[RECON] Failed escalating overdue refund request #${req.id}:`, err.message);
             } finally {
                 client.release();
             }

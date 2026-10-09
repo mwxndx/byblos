@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRequestWithdrawalMutation } from '@/features/seller/hooks/useSellerWithdrawals';
 import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
-import { getWithdrawalFee, MIN_WITHDRAWAL_AMOUNT } from '../dashboardUtils';
+import { getWithdrawalFee, MIN_WITHDRAWAL_AMOUNT, MAX_WITHDRAWAL_AMOUNT } from '../dashboardUtils';
 import { sellerDashboardQueryKeys } from '../queryKeys';
 import { sellerApi } from '@/features/seller/api';
 import { classifyApiError } from '@/shared/utils/errorClassification';
@@ -93,6 +93,15 @@ export function useSellerWithdrawals({ balance, enabled = true, toast }: UseSell
       toast({
         title: 'Error',
         description: `Minimum withdrawal amount is KSh ${MIN_WITHDRAWAL_AMOUNT}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (amount > MAX_WITHDRAWAL_AMOUNT) {
+      toast({
+        title: 'Error',
+        description: `Maximum withdrawal amount is KSh ${MAX_WITHDRAWAL_AMOUNT.toLocaleString()}`,
         variant: 'destructive',
       });
       return;

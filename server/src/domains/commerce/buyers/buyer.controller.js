@@ -638,6 +638,9 @@ export const requestRefund = async (req, res, next) => {
     if (!Number.isFinite(withdrawalAmount) || withdrawalAmount < Fees.MIN_WITHDRAWAL_AMOUNT) {
       return next(new AppError(`Minimum withdrawal amount is KES ${Fees.MIN_WITHDRAWAL_AMOUNT}`, 400));
     }
+    if (withdrawalAmount > Fees.MAX_WITHDRAWAL_AMOUNT) {
+      return next(new AppError(`Maximum withdrawal amount is KES ${Fees.MAX_WITHDRAWAL_AMOUNT.toLocaleString()}`, 400));
+    }
 
     const withdrawalFee = Fees.calculateWithdrawalFee(withdrawalAmount);
     const totalDeducted = withdrawalAmount + withdrawalFee;

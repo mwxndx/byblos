@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { useGetOrderStatusMutation } from '@/features/buyer/hooks/queries/useOrderStatusQuery';
+import { useGetOrderStatusMutation, useCancelPublicOrderMutation } from '@/features/buyer/hooks/queries/useOrderStatusQuery';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { isNativeApp, APP_DOWNLOAD_URL, getDevicePlatform, getAndroidDeepLink } from '@/infrastructure/navigation/mobileApp';
+import { Loader2 } from '@/shared/ui/icons';
+import { useToast } from '@/shared/hooks/use-toast';
 
 type ModalState = 'POLLING' | 'SUCCESS' | 'FAILED' | 'TIMEOUT';
 
@@ -12,6 +14,7 @@ interface Props {
   invoiceId: string | null;
   onClose: () => void;
   onSuccess?: () => void;
+  onCancelRetry?: () => void;
   isGuest?: boolean;
   email?: string;
   checkoutToken?: string | null;
@@ -29,17 +32,21 @@ export const PaymentStatusModal = ({
   invoiceId,
   onClose,
   onSuccess,
+  onCancelRetry,
   isGuest,
   email,
   checkoutToken,
   paymentSummary
 }: Props) => {
+  const { toast } = useToast();
   const [state, setState] = useState<ModalState>('POLLING');
   const [attempts, setAttempts] = useState(0);
   const [failureReason, setFailureReason] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { loginWithToken } = useGlobalAuth();
   const getOrderStatusMutation = useGetOrderStatusMutation();
+  const cancelPublicOrderMutation = useCancelPublicOrderMutation();
   // Store the latest mutateAsync in a ref so the polling effect doesn't need it as a dep
   const getOrderStatusRef = useRef(getOrderStatusMutation.mutateAsync);
   getOrderStatusRef.current = getOrderStatusMutation.mutateAsync;
@@ -149,6 +156,54 @@ export const PaymentStatusModal = ({
 
 
 
+  const handleRecheck = () => {
+    setAttempts(0);
+    setState('POLLING');
+  };
+
+  const handleCancelAndRetry = async () => {
+    if (!invoiceId) {
+      onCancelRetry?.();
+      onClose();
+      return;
+    }
+    setIsCancelling(true);
+    try {
+      await cancelPublicOrderMutation.mutateAsync({
+        orderNumber: invoiceId,
+        clientCheckoutToken: checkoutToken,
+      });
+      toast({
+        title: 'Prompt Cancelled',
+        description: 'Previous prompt was cancelled. Your bag items are ready.',
+      });
+      onCancelRetry?.();
+      onClose();
+    } catch (err) {
+      console.error('Cancel order error:', err);
+      try {
+        const res = (await getOrderStatusRef.current({ orderNumber: invoiceId, clientCheckoutToken: checkoutToken })) as {
+          paymentStatus?: string;
+          paymentRecordStatus?: string;
+          status?: string;
+        };
+        const status = (res.paymentStatus || '').toLowerCase();
+        if (['completed', 'success', 'paid'].includes(status)) {
+          setState('SUCCESS');
+          onSuccessRef.current?.();
+          return;
+        }
+      } catch {}
+      toast({
+        title: 'Cancellation Notice',
+        description: 'Unable to cancel this order attempt. Please check your orders.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -160,10 +215,10 @@ export const PaymentStatusModal = ({
     >
       <DialogContent
         onPointerDownOutside={(e) => {
-          if (state === 'POLLING') e.preventDefault();
+          if (state === 'POLLING' || isCancelling) e.preventDefault();
         }}
         onEscapeKeyDown={(e) => {
-          if (state === 'POLLING') e.preventDefault();
+          if (state === 'POLLING' || isCancelling) e.preventDefault();
         }}
         className="flex max-h-[85dvh] w-full max-w-[380px] flex-col justify-center overflow-y-auto rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0d0d0d] p-5 sm:p-6 text-slate-950 dark:text-white shadow-2xl transition-colors duration-200 [&>button]:hidden"
       >
@@ -294,7 +349,10 @@ export const PaymentStatusModal = ({
               </p>
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => {
+                  onCancelRetry?.();
+                  onClose();
+                }}
                 className="h-11 w-full rounded-xl bg-yellow-400 text-sm font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98]"
               >
                 Try Again
@@ -307,25 +365,61 @@ export const PaymentStatusModal = ({
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-amber-500/20 bg-amber-500/20">
                 <span className="text-sm font-bold text-amber-700 dark:text-amber-400">...</span>
               </div>
-              <h2 className="mb-2 text-lg font-bold text-slate-950 dark:text-white">Still Waiting</h2>
-              <p className="mb-1 text-xs text-slate-600 dark:text-white/60">Did the prompt reach your phone?</p>
-              <p className="mb-4 text-xs leading-relaxed text-slate-600 dark:text-white/60">
-                If you have already entered your PIN, your order will update automatically once confirmed.
-              </p>
-              <div className="w-full space-y-2">
-                <a
-                  href="/buyer/orders"
-                  className="flex h-11 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-sm font-bold text-white dark:text-slate-950 transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
-                >
-                  Check Order Status
-                </a>
+              <h2 className="mb-2 text-lg font-bold text-slate-950 dark:text-white">Still Waiting for Confirmation</h2>
+              {orderNumber && (
+                <div className="mb-3 flex items-center gap-2 rounded-full bg-slate-100 dark:bg-white/10 px-3 py-1">
+                  <span className="text-xs text-slate-500 dark:text-white/50">Order:</span>
+                  <span className="font-mono text-xs font-bold text-yellow-600 dark:text-yellow-400">#{orderNumber}</span>
+                </div>
+              )}
+              <div className="mb-4 w-full rounded-xl border border-amber-200 dark:border-amber-400/20 bg-amber-50 dark:bg-amber-400/10 p-3 text-left">
+                <p className="text-xs font-semibold text-amber-800 dark:text-amber-200">
+                  M-Pesa prompts expire after 2 minutes.
+                </p>
+                <p className="mt-1 text-[11px] leading-relaxed text-amber-700/90 dark:text-amber-300/80">
+                  If you already entered your PIN on your phone, tap <strong>Check Again</strong>.
+                  If you missed or did not receive the prompt, tap <strong>Cancel & Try Again</strong> to safely release this order and request a fresh prompt.
+                </p>
+              </div>
+              <div className="w-full space-y-2.5">
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="h-10 w-full text-sm font-medium text-slate-500 hover:text-slate-800"
+                  onClick={handleRecheck}
+                  disabled={isCancelling}
+                  className="flex h-11 w-full items-center justify-center rounded-xl bg-yellow-400 text-sm font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98] disabled:opacity-50"
                 >
-                  Close
+                  I entered my PIN — Check Again
                 </button>
+                <button
+                  type="button"
+                  onClick={handleCancelAndRetry}
+                  disabled={isCancelling}
+                  className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 dark:border-white/20 bg-transparent text-sm font-semibold text-slate-800 dark:text-white transition-all hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
+                >
+                  {isCancelling ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Cancelling prompt...
+                    </>
+                  ) : (
+                    "Didn't get prompt? Cancel & Try Again"
+                  )}
+                </button>
+                <div className="flex items-center justify-between pt-1">
+                  <a
+                    href="/buyer/orders"
+                    className="text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-white underline underline-offset-2"
+                  >
+                    View My Orders
+                  </a>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="text-xs font-medium text-slate-500 hover:text-slate-800 dark:hover:text-white"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -334,5 +428,6 @@ export const PaymentStatusModal = ({
     </Dialog>
   );
 };
+
 
 

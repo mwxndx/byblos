@@ -29,7 +29,9 @@ export const AppEvents = {
     },
     REFUND: {
         APPROVED: 'refund.approved',
-        REJECTED: 'refund.rejected'
+        COMPLETED: 'refund.completed',
+        REJECTED: 'refund.rejected',
+        ESCALATED: 'refund.escalated'
     },
     REFERRAL: {
         REWARD_CREATED: 'referral.reward_created'
@@ -42,6 +44,9 @@ export const AppEvents = {
 export const CriticalEvents = new Set([
     AppEvents.ORDER.CREATED,
     AppEvents.PAYMENT.COMPLETED,
+    AppEvents.PAYMENT.FAILED,
+    AppEvents.REFUND.COMPLETED,
+    AppEvents.REFUND.ESCALATED,
     AppEvents.LOGISTICS.NOTIFICATION,
     AppEvents.WITHDRAWAL.COMPLETED,
     AppEvents.WITHDRAWAL.COMPENSATION_REQUIRED

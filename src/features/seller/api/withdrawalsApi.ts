@@ -42,8 +42,8 @@ export const withdrawalService = {
   createRequest: async (data: { amount: string; mpesaNumber: string; mpesaName: string; idempotencyKey: string }) => {
     const amount = parseFloat(data.amount);
 
-    if (isNaN(amount) || amount <= 0 || amount > 1_000_000) {
-      throw new Error('Invalid withdrawal amount');
+    if (isNaN(amount) || amount < 50 || amount > 250_000) {
+      throw new Error('Invalid withdrawal amount. Must be between KSh 50 and KSh 250,000.');
     }
 
     if (!data.idempotencyKey) {

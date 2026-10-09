@@ -79,10 +79,10 @@ export const updateProfile = async (req, res) => {
       const rawRate = req.body.creatorCommissionRate ?? req.body.creator_commission_rate;
       const normalizedRate = Number(rawRate);
 
-      if (!Number.isFinite(normalizedRate) || normalizedRate < 0.01 || normalizedRate > 1) {
+      if (!Number.isFinite(normalizedRate) || normalizedRate < 0.01 || normalizedRate > 0.30) {
         return res.status(400).json({
           status: 'error',
-          message: 'Creator commission must be between 1% and 100%'
+          message: 'Creator commission must be between 1% and 30%'
         });
       }
 

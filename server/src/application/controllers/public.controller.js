@@ -13,10 +13,12 @@ const PAYMENT_SUCCESS_STATUSES = new Set(['completed', 'success', 'paid']);
 const PAYMENT_FAILURE_STATUSES = new Set([
   'failed',
   'cancelled',
+  'abandoned',
   'manual_review_required',
   'payment_mapping_failed',
   'compensation_required'
 ]);
+const STK_PROMPT_EXPIRATION_MS = 3 * 60 * 1000; // 3 minutes M-Pesa STK window
 
 function parseJson(value, fallback = {}) {
   if (!value) return fallback;
@@ -50,11 +52,16 @@ async function syncPendingPaymentFromProvider(row) {
     metadataPatch: { public_status_checked_at: new Date().toISOString() }
   });
 
+  const paymentCreatedAt = row.payment_created_at
+    ? new Date(row.payment_created_at).getTime()
+    : (row.created_at ? new Date(row.created_at).getTime() : 0);
+  const isStale = paymentCreatedAt > 0 && (Date.now() - paymentCreatedAt > STK_PROMPT_EXPIRATION_MS);
+
   try {
     const providerStatus = await paymentService.checkTransactionStatus(reference);
     const normalizedStatus = String(providerStatus.status || '').toLowerCase();
 
-    if (PAYMENT_SUCCESS_STATUSES.has(normalizedStatus) || PAYMENT_FAILURE_STATUSES.has(normalizedStatus)) {
+    if (PAYMENT_SUCCESS_STATUSES.has(normalizedStatus)) {
       await CorePaymentService.completeVerifiedPayment({
         paymentId: row.payment_id,
         reference,
@@ -63,6 +70,27 @@ async function syncPendingPaymentFromProvider(row) {
           status: normalizedStatus
         },
         source: 'public_order_status_poll'
+      });
+
+      return await publicOrderStatusRepository.findStatusByIdentifier(row.order_number) || row;
+    }
+
+    if (PAYMENT_FAILURE_STATUSES.has(normalizedStatus) || (isStale && !PAYMENT_SUCCESS_STATUSES.has(normalizedStatus))) {
+      const isMpesaExpired = isStale && !PAYMENT_FAILURE_STATUSES.has(normalizedStatus);
+      const failureReason = isMpesaExpired
+        ? 'The M-Pesa prompt expired before PIN entry. No money was deducted.'
+        : (providerStatus.message || providerStatus.gateway_response || 'Payment was not completed.');
+
+      await CorePaymentService.completeVerifiedPayment({
+        paymentId: row.payment_id,
+        reference,
+        providerPayload: {
+          ...providerStatus,
+          status: 'failed',
+          gateway_response: failureReason,
+          failure_reason: failureReason
+        },
+        source: isMpesaExpired ? 'public_order_status_timeout' : 'public_order_status_poll'
       });
 
       return await publicOrderStatusRepository.findStatusByIdentifier(row.order_number) || row;
@@ -400,10 +428,11 @@ export const getOrderStatus = async (req, res) => {
     // only non-sensitive status.
     const paymentFailed = String(order.payment_status || '').toLowerCase() === 'failed'
       || String(order.payment_record_status || '').toLowerCase() === 'failed'
-      || String(order.status || '').toUpperCase() === 'FAILED';
+      || String(order.status || '').toUpperCase() === 'FAILED'
+      || String(order.status || '').toUpperCase() === 'CANCELLED';
     const paymentMeta = parseJson(order.payment_metadata);
     const failureReason = paymentFailed
-      ? (paymentMeta?.provider_payload?.gateway_response || paymentMeta?.gateway_response || paymentMeta?.failure_reason || 'Payment was not completed. Please try again.')
+      ? (paymentMeta?.provider_payload?.failure_reason || paymentMeta?.provider_payload?.gateway_response || paymentMeta?.gateway_response || paymentMeta?.failure_reason || 'Payment was not completed. Please try again.')
       : null;
 
     // Seamless post-payment login (ownership-proven). This endpoint is enumerable
@@ -450,3 +479,109 @@ export const getOrderStatus = async (req, res) => {
     });
   }
 };
+
+/**
+ * Safely cancels a pending public order before payment capture.
+ * Validated by matching client_checkout_token.
+ * Verifies with Paystack first: if transaction actually succeeded, marks PAID and rejects cancellation.
+ * Otherwise cancels order, releases inventory/service slots, and marks payment failed.
+ */
+export const cancelPendingPublicOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const clientToken = req.body?.clientCheckoutToken || req.body?.client_checkout_token || req.query?.client_checkout_token;
+
+    if (!clientToken) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Client checkout token is required to cancel this order.'
+      });
+    }
+
+    const order = await publicOrderStatusRepository.findStatusByIdentifier(id);
+    if (!order) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Order not found'
+      });
+    }
+
+    // Verify token ownership
+    if (order.client_checkout_token && order.client_checkout_token !== clientToken) {
+      return res.status(403).json({
+        status: 'error',
+        message: 'Unauthorized: client token does not match order.'
+      });
+    }
+
+    const currentStatus = String(order.status || '').toUpperCase();
+    if (['PAID', 'FULFILLMENT_PENDING', 'FULFILLED', 'DELIVERED', 'COMPLETED'].includes(currentStatus)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Order has already been paid and cannot be cancelled directly.'
+      });
+    }
+
+    if (currentStatus === 'CANCELLED') {
+      return res.status(200).json({
+        status: 'success',
+        message: 'Order is already cancelled.'
+      });
+    }
+
+    // Check with Paystack first to ensure no payment went through
+    const reference = order.provider_reference || order.api_ref;
+    if (reference) {
+      try {
+        const providerStatus = await paymentService.checkTransactionStatus(reference);
+        const normalizedStatus = String(providerStatus.status || '').toLowerCase();
+        if (PAYMENT_SUCCESS_STATUSES.has(normalizedStatus)) {
+          // If Paystack actually succeeded, complete it instead of cancelling!
+          await CorePaymentService.completeVerifiedPayment({
+            paymentId: order.payment_id,
+            reference,
+            providerPayload: {
+              ...providerStatus,
+              status: normalizedStatus
+            },
+            source: 'cancel_check'
+          });
+          return res.status(400).json({
+            status: 'error',
+            message: 'Payment was already completed on M-Pesa. Order cannot be cancelled.'
+          });
+        }
+      } catch (err) {
+        console.warn('[cancelPendingPublicOrder] Provider status check error (proceeding with cancellation):', err.message);
+      }
+    }
+
+    // Safely cancel the order and release inventory/slots
+    const { default: OrderCancellationService } = await import('../../domains/orders/order/orderCancellation.service.js');
+    await OrderCancellationService.cancelOrder(order.id, 'buyer_cancelled_prompt_timeout');
+
+    // Also mark payment row as failed if it was pending
+    if (order.payment_id) {
+      await pool.query(
+        `UPDATE payments
+            SET status = 'failed'::payment_status,
+                metadata = COALESCE(metadata, '{}'::jsonb) || '{"cancelled_by_buyer": true, "cancellation_reason": "prompt_timeout"}'::jsonb,
+                updated_at = NOW()
+          WHERE id = $1 AND status = 'pending'::payment_status`,
+        [order.payment_id]
+      );
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'Order has been safely cancelled and stock released.'
+    });
+  } catch (error) {
+    console.error(`Error cancelling public order ${req.params.id}:`, error);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Failed to cancel order'
+    });
+  }
+};
+

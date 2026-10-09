@@ -22,7 +22,7 @@ export const checkPhone = z.object({ phone: s }).passthrough();
 export const saveInfo = z.object({ email: s, phone: s, fullName: s }).passthrough();
 export const autoLogin = z.object({ autoLoginToken: s, token: s }).passthrough();
 export const refundRequest = z.object({
-  amount: n,
+  amount: z.coerce.number().min(50, 'Minimum withdrawal is KES 50').max(250000, 'Maximum withdrawal is KES 250,000'),
   mpesaNumber: s,
   mpesaName: s
 }).passthrough();

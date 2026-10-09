@@ -1,4 +1,5 @@
 import { query } from '../../../infrastructure/database/database.js';
+import { enrichRequestWithSla } from '../../payments/refunds/refundSla.service.js';
 
 /**
  * Lists a buyer's pending refund requests, newest first.
@@ -53,45 +54,76 @@ const SELECT_WITH_BUYER = `
 `;
 
 /**
- * Lists refund requests joined with buyer details, newest first.
+ * Lists refund requests joined with buyer details, supporting urgency sorting and SLA filters.
  *
  * @param {object} [opts]
- * @param {string} [opts.status]   Optional status filter.
+ * @param {string} [opts.status]       Optional status filter.
+ * @param {boolean} [opts.overdueOnly] Filter to only requests exceeding SLA.
+ * @param {string} [opts.sortBy]       'urgency' or 'newest'.
  * @param {number} opts.limit
  * @param {number} opts.offset
  * @returns {Promise<Array<object>>}
  */
-export async function findAllWithBuyer({ status, limit, offset } = {}) {
+export async function findAllWithBuyer({ status, overdueOnly, sortBy = 'urgency', limit, offset } = {}) {
   const params = [];
+  const conditions = [];
   let sql = SELECT_WITH_BUYER;
+
   if (status) {
     params.push(status);
-    sql += ` WHERE rr.status = $${params.length}`;
+    conditions.push(`rr.status = $${params.length}`);
   }
+  if (overdueOnly) {
+    conditions.push(`rr.status IN ('pending', 'manual_review') AND (rr.requested_at < NOW() - INTERVAL '48 hours' OR (rr.payment_details->'sla'->>'is_breached')::boolean = true)`);
+  }
+  if (conditions.length) {
+    sql += ` WHERE ${conditions.join(' AND ')}`;
+  }
+
+  let orderClause = 'ORDER BY rr.requested_at DESC';
+  if (sortBy === 'urgency') {
+    orderClause = `ORDER BY 
+      CASE 
+        WHEN rr.status IN ('pending', 'manual_review') AND (rr.requested_at < NOW() - INTERVAL '48 hours' OR (rr.payment_details->'sla'->>'is_breached')::boolean = true) THEN 0
+        WHEN rr.status IN ('pending', 'manual_review') AND (rr.requested_at < NOW() - INTERVAL '36 hours') THEN 1
+        ELSE 2
+      END ASC, rr.requested_at ASC`;
+  }
+
   params.push(limit, offset);
-  sql += ` ORDER BY rr.requested_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
+  sql += ` ${orderClause} LIMIT $${params.length - 1} OFFSET $${params.length}`;
   const { rows } = await query(sql, params);
-  return rows;
+  return rows.map(enrichRequestWithSla);
 }
 
 /**
- * Counts refund requests, optionally filtered by status.
+ * Counts refund requests, optionally filtered by status or overdue SLA.
  *
  * @param {object} [opts]
  * @param {string} [opts.status]
+ * @param {boolean} [opts.overdueOnly]
  * @returns {Promise<number>}
  */
-export async function countAll({ status } = {}) {
-  const sql = status
-    ? `SELECT COUNT(*) FROM refund_requests WHERE status = $1`
-    : `SELECT COUNT(*) FROM refund_requests`;
-  const params = status ? [status] : [];
+export async function countAll({ status, overdueOnly } = {}) {
+  const conditions = [];
+  const params = [];
+
+  if (status) {
+    params.push(status);
+    conditions.push(`status = $${params.length}`);
+  }
+  if (overdueOnly) {
+    conditions.push(`status IN ('pending', 'manual_review') AND (requested_at < NOW() - INTERVAL '48 hours' OR (payment_details->'sla'->>'is_breached')::boolean = true)`);
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const sql = `SELECT COUNT(*) FROM refund_requests ${whereClause}`;
   const { rows } = await query(sql, params);
   return parseInt(rows[0].count, 10);
 }
 
 /**
- * Fetches a single refund request joined with buyer details.
+ * Fetches a single refund request joined with buyer details and enriched with SLA.
  *
  * @param {number|string} id
  * @returns {Promise<object|undefined>}
@@ -99,7 +131,7 @@ export async function countAll({ status } = {}) {
 export async function findByIdWithBuyer(id) {
   const sql = `${SELECT_WITH_BUYER} WHERE rr.id = $1`;
   const { rows } = await query(sql, [id]);
-  return rows[0];
+  return rows[0] ? enrichRequestWithSla(rows[0]) : undefined;
 }
 
 /**

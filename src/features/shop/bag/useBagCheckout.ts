@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { useGlobalAuth } from '@/features/auth/contexts';
@@ -14,6 +14,8 @@ import type { DoorDeliverySelection } from '@/shared/components/PhoneCheckModal'
 import type { BuyerInfo } from '@/shared/components/BuyerInfoModal';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { BagContextValue } from './BagContext';
+
+const PENDING_PAYMENT_STORAGE_KEY = 'byblos_pending_payment_attempt';
 
 interface BuyerDetails { fullName: string; email: string; mobilePayment: string; city?: string; location?: string; latitude?: number; longitude?: number; }
 export interface BagBooking { date: Date; time: string; location: string; locationType?: string; serviceRequirements?: string; buyerLocation?: BuyerLocationPayload | null; }
@@ -60,6 +62,22 @@ export function useBagCheckout(bag: BagContextValue) {
 
   const checkoutTokenRef = useRef<string | null>(null);
   const doorDeliveryRef = useRef<DoorDeliverySelection | null>(null);
+
+  // Restore active pending payment attempt if initiated within the last 5 minutes
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(PENDING_PAYMENT_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.expiresAt && Date.now() < parsed.expiresAt && parsed.isOpen && parsed.orderNumber) {
+          checkoutTokenRef.current = parsed.checkoutToken || null;
+          setPaymentModalData(parsed);
+        } else {
+          sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY);
+        }
+      }
+    } catch {}
+  }, []);
 
   const flags = (l: { product: unknown }) => getProductFlags(l.product as unknown as ProductWithApiFields);
   const anyPhysical = bag.items.some((l) => flags(l).isPhysical);
@@ -147,14 +165,26 @@ export function useBagCheckout(bag: BagContextValue) {
         toast({ title: 'STK Push Sent', description: 'Please check your phone to complete the payment.', duration: 10000 });
         const resultData = (data.data ?? {}) as { orderId?: string; orderNumber?: string };
         if (resultData.orderNumber) {
-          checkoutTokenRef.current = null;
-          setPaymentModalData({
-            isOpen: true, orderNumber: resultData.orderNumber, invoiceId: String(resultData.orderNumber || resultData.orderId),
-            isGuest: !isAuthenticated, email: buyer.email, checkoutToken,
+          const modalData: PaymentModalData = {
+            isOpen: true,
+            orderNumber: resultData.orderNumber,
+            invoiceId: String(resultData.orderNumber || resultData.orderId),
+            isGuest: !isAuthenticated,
+            email: buyer.email,
+            checkoutToken,
             paymentSummary: { productAmount: subtotal, deliveryFee, serviceCharge, totalAmount: paymentEstimate },
-          });
+          };
+          setPaymentModalData(modalData);
+          try {
+            sessionStorage.setItem(PENDING_PAYMENT_STORAGE_KEY, JSON.stringify({
+              ...modalData,
+              createdAt: Date.now(),
+              expiresAt: Date.now() + 5 * 60 * 1000,
+            }));
+          } catch {}
           bag.close();
-          bag.clear();
+          // Note: bag.clear() is deferred until payment confirmation (handlePaymentSuccess)
+          // so that timeouts or user cancellations preserve the buyer's cart items.
           setBooking(null);
         }
       } else {
@@ -162,6 +192,7 @@ export function useBagCheckout(bag: BagContextValue) {
       }
     } catch (error) {
       checkoutTokenRef.current = null;
+      try { sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY); } catch {}
       // buyerApi.initiateProduct re-throws the raw axios error uncaught — its
       // .message is axios's own generic "Request failed with status code 400",
       // never the real backend validation reason (e.g. "Custom and imported
@@ -290,5 +321,16 @@ export function useBagCheckout(bag: BagContextValue) {
     hasRegisteredPaymentNumber,
     registeredPaystackPhone,
     closePaymentModal: () => setPaymentModalData((p) => ({ ...p, isOpen: false })),
+    handlePaymentSuccess: () => {
+      bag.clear();
+      checkoutTokenRef.current = null;
+      try { sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY); } catch {}
+    },
+    handleCancelRetry: () => {
+      checkoutTokenRef.current = null;
+      try { sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY); } catch {}
+      setPaymentModalData((p) => ({ ...p, isOpen: false }));
+      bag.open();
+    },
   };
 }

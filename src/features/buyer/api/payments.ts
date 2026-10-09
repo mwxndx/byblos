@@ -63,4 +63,14 @@ export async function getLogisticsQuote(payload: { legType: string; location: { 
   }
 }
 
+export async function cancelPublicOrder(orderNumber: string, clientCheckoutToken?: string | null): Promise<unknown> {
+  try {
+    const response = await apiClient.post(`/public/orders/${orderNumber}/cancel`, { clientCheckoutToken });
+    return response.data;
+  } catch (error) {
+    console.error('Error cancelling public order:', error);
+    throw error;
+  }
+}
+
 

@@ -79,8 +79,8 @@ export function CreatorsTab() {
 
   const handleSaveListing = async () => {
     const rateNumber = parseFloat(commissionRate);
-    if (isNaN(rateNumber) || rateNumber < 1 || rateNumber > 50) {
-      toast.error('Please enter a valid commission rate between 1% and 50%.');
+    if (isNaN(rateNumber) || rateNumber < 1 || rateNumber > 30) {
+      toast.error('Please enter a valid commission rate between 1% and 30%.');
       return;
     }
 
@@ -254,7 +254,7 @@ export function CreatorsTab() {
                 <Input
                   type="number"
                   min="1"
-                  max="50"
+                  max="30"
                   step="0.5"
                   value={commissionRate}
                   onChange={(e) => {

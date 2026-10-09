@@ -10,5 +10,5 @@ const s = z.string().optional();
 const n = z.coerce.number().optional();
 const anyId = z.union([z.string(), z.number()]).optional();
 
-export const confirmRefund = z.object({ id: id, adminNotes: s }).passthrough();
+export const confirmRefund = z.object({ id: id, adminNotes: s, approvedAmount: n }).passthrough();
 export const rejectRefund = z.object({ id: id, adminNotes: s, reason: s }).passthrough();

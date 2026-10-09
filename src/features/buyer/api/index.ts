@@ -3,7 +3,7 @@ import { getBuyerProfile, updateBuyerProfile, getProfile, updateProfile } from '
 import { login, register, resendVerification, forgotPassword, resetPassword, checkBuyerByPhone, saveBuyerInfo, autoLogin, verifyEmail } from './auth';
 import { getOrders, getOrder, cancelOrder, confirmOrderReceipt, markOrderAsCollected, downloadDigitalProduct } from './orders';
 import { getWishlist, addToWishlist, removeFromWishlist, syncWishlist } from './wishlist';
-import { getOrderStatus, initiateProduct, validateDiscountCode, getPaymentStatus, getLogisticsQuote } from './payments';
+import { getOrderStatus, cancelPublicOrder, initiateProduct, validateDiscountCode, getPaymentStatus, getLogisticsQuote } from './payments';
 import { requestRefund, getPendingRefundRequests, getRefundHistory } from './refunds';
 import { getShops } from './shops';
 
@@ -42,6 +42,7 @@ export const buyerApi = {
   getShops,
   verifyEmail,
   getOrderStatus,
+  cancelPublicOrder,
   autoLogin,
   initiateProduct,
   validateDiscountCode,

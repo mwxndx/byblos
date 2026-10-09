@@ -32,6 +32,8 @@ import { releaseOrderReservations } from '../../../shared/utils/reservationRelea
 import { PaymentStatus } from '../../../shared/constants/enums.js';
 import withdrawalService from '../withdrawals/withdrawal.service.js';
 import { reportAlert } from '../../../shared/utils/alerting.js';
+import refundPolicyService from '../refunds/refundPolicy.service.js';
+import refundExecutionService from '../refunds/refundExecution.service.js';
 
 const FULFILLABLE_ORDER_STATUSES = new Set(['CREATED', 'RESERVED', 'HELD', 'PAYMENT_PENDING', 'PENDING']);
 const PAID_TERMINAL_ORDER_STATUSES = new Set([
@@ -565,37 +567,84 @@ const CorePaymentService = {
                             });
 
                             if (orderRow?.buyer_id) {
-                                await client.query(
-                                    `INSERT INTO refund_requests (buyer_id, order_id, amount, status, notes, payment_method, payment_details)
-                                     VALUES ($1, $2, $3, 'manual_review', $4, $5, $6::jsonb)`,
-                                    [
-                                        orderRow.buyer_id,
+                                try {
+                                    const policyResult = await refundPolicyService.evaluateRefundEligibility(client, {
                                         orderId,
-                                        paymentRow.amount,
-                                        `Late payment of ${paymentRow.amount} KES received for cancelled order #${orderRow.order_number || orderId}. Requires manual review / refund.`,
-                                        paymentRow.payment_method || 'mpesa',
-                                        JSON.stringify({
-                                            payment_id: paymentRow.id,
-                                            order_id: orderId,
-                                            order_number: orderRow.order_number,
-                                            provider_reference: providerReference,
-                                            receipt,
-                                            reason: 'late_payment_on_cancelled_order'
-                                        })
-                                    ]
-                                ).catch(err => {
-                                    // Kept non-fatal: the order is already flagged COMPENSATION_REQUIRED
-                                    // in this transaction and the payment must still complete. But a
-                                    // failed insert means the manual-review queue can miss this
-                                    // compensation, so alert instead of only logging.
-                                    logger.error('[CorePaymentService] Failed to record manual review refund request:', err.message);
+                                        buyerId: orderRow.buyer_id,
+                                        amount: paymentRow.amount,
+                                        reason: 'late_payment_on_cancelled_order'
+                                    });
+
+                                    const paymentDetailsPayload = {
+                                        payment_id: paymentRow.id,
+                                        order_id: orderId,
+                                        order_number: orderRow.order_number,
+                                        provider_reference: providerReference,
+                                        receipt,
+                                        reason: 'late_payment_on_cancelled_order',
+                                        policy_decision: policyResult.decision,
+                                        policy_reason: policyResult.reason,
+                                        policy_version: policyResult.policyVersion
+                                    };
+
+                                    if (policyResult.decision === 'AUTO_APPROVE') {
+                                        logger.info('[CorePaymentService] Auto-approving late payment refund', {
+                                            orderId,
+                                            buyerId: orderRow.buyer_id,
+                                            amount: paymentRow.amount,
+                                            reason: policyResult.reason
+                                        });
+
+                                        const autoRefund = await refundExecutionService.createAndExecuteAutoRefundWithClient(client, {
+                                            buyerId: orderRow.buyer_id,
+                                            orderId,
+                                            amount: paymentRow.amount,
+                                            paymentMethod: paymentRow.payment_method || 'mpesa',
+                                            paymentDetails: paymentDetailsPayload,
+                                            reason: policyResult.reason,
+                                            source: 'auto_policy_late_payment'
+                                        });
+
+                                        const buyerName = orderRow.customer_name || null;
+                                        const buyerPhone = orderRow.customer_phone || null;
+                                        refundExecutionService.dispatchRefundCompletedEvent({
+                                            refundRequestId: autoRefund.id,
+                                            buyerId: orderRow.buyer_id,
+                                            amount: Number.parseFloat(paymentRow.amount),
+                                            adminNotes: `Auto-approved by policy: ${policyResult.reason}`,
+                                            buyerName,
+                                            buyerPhone
+                                        }).catch(evtErr => logger.warn('[CorePaymentService] Event dispatch failed for auto-refund:', evtErr.message));
+                                    } else {
+                                        logger.info('[CorePaymentService] Routing late payment refund to manual review', {
+                                            orderId,
+                                            buyerId: orderRow.buyer_id,
+                                            amount: paymentRow.amount,
+                                            reason: policyResult.reason
+                                        });
+
+                                        await client.query(
+                                            `INSERT INTO refund_requests (buyer_id, order_id, amount, status, notes, payment_method, payment_details)
+                                             VALUES ($1, $2, $3, 'manual_review', $4, $5, $6::jsonb)`,
+                                            [
+                                                orderRow.buyer_id,
+                                                orderId,
+                                                paymentRow.amount,
+                                                `Late payment of ${paymentRow.amount} KES received for cancelled order #${orderRow.order_number || orderId}. Manual review: ${policyResult.reason}`,
+                                                paymentRow.payment_method || 'mpesa',
+                                                JSON.stringify(paymentDetailsPayload)
+                                            ]
+                                        );
+                                    }
+                                } catch (err) {
+                                    logger.error('[CorePaymentService] Failed to record/process late payment refund:', err.message);
                                     reportAlert({
                                         level: 'error',
-                                        title: 'Late-payment compensation refund_request insert failed',
-                                        message: `Order ${orderId} is COMPENSATION_REQUIRED but its refund_requests row failed to insert (${err.message}); it may be missing from the manual-review queue.`,
+                                        title: 'Late-payment compensation refund handling failed',
+                                        message: `Order ${orderId} is COMPENSATION_REQUIRED but its refund processing failed (${err.message}).`,
                                         context: { orderId, paymentId: paymentRow.id }
                                     });
-                                });
+                                }
                             }
                         } else {
                             const customProductionPatch = resolveCustomProductionPatch(orderRow, completedAt);

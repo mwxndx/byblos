@@ -2,6 +2,7 @@ import type { AnalyticsData } from './types';
 import type { ProductSummary } from '@/shared/types/view/productSummary';
 
 export const MIN_WITHDRAWAL_AMOUNT = 50;
+export const MAX_WITHDRAWAL_AMOUNT = 250_000;
 export const WITHDRAWAL_FEE_TIERS = [
   { min: 50, max: 1500, fee: 21, label: 'KSh 50 - KSh 1,500' },
   { min: 1501, max: 19999.99, fee: 45, label: 'KSh 1,501 - KSh 19,999' },
@@ -15,6 +16,7 @@ export const getWithdrawalFee = (amount: number) => {
 
 /**
  * Calculates the maximum net withdrawal amount A such that A + getWithdrawalFee(A) <= availableBalance.
+ * Caps at MAX_WITHDRAWAL_AMOUNT (KSh 250,000) per Safaricom M-Pesa B2C limits.
  * Returns 0 if availableBalance is less than MIN_WITHDRAWAL_AMOUNT + minimum fee (KSh 71).
  *
  * WithdrawalRequestForm.tsx previously showed "Max: {balance}" directly — the
@@ -32,7 +34,8 @@ export const getMaxWithdrawableAmount = (availableBalance: number): number => {
 
   // Tier 3: >= 20,000, fee = 63. Threshold: 20000 + 63 = 20063
   if (availableBalance >= 20000 + 63) {
-    return Math.floor((availableBalance - 63) * 100) / 100;
+    const net = Math.floor((availableBalance - 63) * 100) / 100;
+    return Math.min(MAX_WITHDRAWAL_AMOUNT, net);
   }
 
   // Tier 2: 1,501 - 19,999.99, fee = 45. Threshold: 1501 + 45 = 1546

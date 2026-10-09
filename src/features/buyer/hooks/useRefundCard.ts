@@ -6,6 +6,7 @@ import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
 import {
   getWithdrawalFee,
   MIN_WITHDRAWAL_AMOUNT,
+  MAX_WITHDRAWAL_AMOUNT,
   WITHDRAWAL_FEE_TIERS,
   getMaxWithdrawableAmount,
   formatKes
@@ -135,6 +136,11 @@ export function useRefundCard(refundAmount: number, onRefundRequested?: () => vo
       return;
     }
 
+    if (parsedAmount > MAX_WITHDRAWAL_AMOUNT) {
+      toast.error(`Maximum withdrawal amount is KSh ${MAX_WITHDRAWAL_AMOUNT.toLocaleString()}`);
+      return;
+    }
+
     if (totalDeducted > availableBalance) {
       toast.error(`Total deduction (KSh ${totalDeducted}) exceeds your available balance of KSh ${availableBalance}`);
       return;
@@ -198,6 +204,7 @@ export function useRefundCard(refundAmount: number, onRefundRequested?: () => vo
     totalDeducted,
     remainingBalance,
     feeTiers: WITHDRAWAL_FEE_TIERS,
-    minWithdrawalAmount: MIN_WITHDRAWAL_AMOUNT
+    minWithdrawalAmount: MIN_WITHDRAWAL_AMOUNT,
+    maxWithdrawalAmount: MAX_WITHDRAWAL_AMOUNT
   };
 }

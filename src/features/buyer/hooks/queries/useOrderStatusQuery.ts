@@ -19,4 +19,12 @@ export function useGetOrderStatusMutation() {
   });
 }
 
+export function useCancelPublicOrderMutation() {
+  return useMutation({
+    mutationFn: ({ orderNumber, clientCheckoutToken }: { orderNumber: string; clientCheckoutToken?: string | null }) =>
+      buyerApi.cancelPublicOrder(orderNumber, clientCheckoutToken),
+  });
+}
+
+
 

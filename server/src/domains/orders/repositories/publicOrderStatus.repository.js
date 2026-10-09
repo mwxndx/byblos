@@ -8,10 +8,13 @@ const ORDER_STATUS_SELECT = `
          po.buyer_id,
          po.buyer_email,
          po.metadata AS order_metadata,
+         po.client_checkout_token,
+         po.created_at,
          p.id AS payment_id,
          p.status AS payment_record_status,
          p.provider_reference,
          p.api_ref,
+         p.created_at AS payment_created_at,
          p.metadata AS payment_metadata
   FROM product_orders po
   LEFT JOIN LATERAL (
