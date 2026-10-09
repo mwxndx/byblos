@@ -343,6 +343,16 @@ eventBus.on(AppEvents.REFUND.REJECTED, async ({ eventId, refund, buyer }) => {
     }
 });
 
+eventBus.on(AppEvents.REFUND.ESCALATED, async ({ eventId, refund }) => {
+    logger.warn(`[Event:RefundEscalated] Overdue refund request ${refund?.id} escalated after SLA breach`, {
+        refundId: refund?.id,
+        buyerId: refund?.buyer_id,
+        amount: refund?.amount,
+        escalationLevel: refund?.escalation_level,
+        escalatedAt: refund?.escalated_at
+    });
+});
+
 eventBus.on(AppEvents.REFERRAL.REWARD_CREATED, async ({ eventId, seller, reward }) => {
     logger.info(`[Event:ReferralRewardCreated] Seller ${seller?.id} reward ${reward?.amount}`);
     const amount = Number(reward.amount || 0);
