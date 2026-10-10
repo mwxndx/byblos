@@ -7,7 +7,7 @@ import { Calendar as CalendarIcon, Clock, MapPin, Edit2, Loader2 } from '@/share
 import LocationPicker from '@/shared/components/LocationPicker';
 import { Product } from '@/shared/types';
 import { hasPreciseLocation, type BuyerLocationPayload } from '@/infrastructure/location/location';
-import { useServiceBooking, type ProductWithApiFields } from '@/shared/components/useServiceBooking';
+import { useServiceBooking, type ProductWithApiFields } from './useServiceBooking';
 
 
 interface ServiceBookingModalProps {

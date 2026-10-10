@@ -4,7 +4,7 @@ import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import { useBuyerWishlistQuery } from '@/features/buyer/hooks/queries/useBuyerWishlistQuery';
 import { useAddWishlistMutation, useRemoveWishlistMutation } from '@/features/buyer/hooks/mutations/useWishlistMutations';
-import { useWishlistStore } from '@/features/buyer/stores/wishlistStore';
+import { useWishlistStore } from './wishlistStore';
 import { buyerQueryKeys } from '@/features/buyer/api/queryKeys';
 import { useToast } from '@/shared/hooks/use-toast';
 import type { Product, Seller, Aesthetic } from '@/shared/types';

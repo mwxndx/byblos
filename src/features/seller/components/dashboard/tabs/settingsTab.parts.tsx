@@ -1,6 +1,6 @@
 import { Trash2 } from '@/shared/ui/icons';
 import { Input } from '@/shared/ui/input';
-import { socialUrl } from '@/features/shop/utils/socialLinks';
+import { socialUrl } from '@/shared/utils/socialLinks';
 
 export function SectionHeader({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
   return (

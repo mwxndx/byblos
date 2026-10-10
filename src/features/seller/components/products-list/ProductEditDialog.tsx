@@ -7,7 +7,7 @@ import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { Textarea } from '@/shared/ui/textarea';
 import { ArrowLeft, ImagePlus, Loader2, X } from '@/shared/ui/icons';
-import { aestheticCategories } from '@/features/shop/utils/aestheticCategoriesData';
+import { aestheticCategories } from '@/shared/constants/aestheticCategories';
 import { ProductEditPhysicalOptions } from './ProductEditPhysicalOptions';
 
 export interface ProductEditFormData {

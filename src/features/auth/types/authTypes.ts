@@ -1,4 +1,5 @@
-export type UserRole = 'buyer' | 'seller' | 'admin' | 'creator' | 'logistics' | 'marketing';
+import type { UserRole } from '@/shared/types';
+export type { UserRole };
 
 interface BaseUser {
   id: number;

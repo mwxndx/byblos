@@ -8,7 +8,7 @@ import {
   Store, ShoppingBag, Bell
 } from '@/shared/ui/icons';
 import { useNavigate } from 'react-router-dom';
-import { useWishlist } from '@/features/buyer/hooks/useWishlist';
+import { useWishlist } from '@/features/shop/wishlist/useWishlist';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import WishlistSection from '../components/WishlistSection';

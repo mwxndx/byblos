@@ -10,7 +10,7 @@ import { useInitiateProductMutation } from '@/features/buyer/hooks/useBuyerPayme
 import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
 import { calculateBuyerPayableTotal, calculateProductServiceCharge, createCheckoutAttemptToken, getProductFlags, normalizePhone, normalizePhoneForPaystack, type ProductWithApiFields } from '@/features/shop/utils/productCardUtils';
 import { toBuyerLocationPayload, type BuyerLocationPayload } from '@/infrastructure/location/location';
-import type { DoorDeliverySelection } from '@/shared/components/PhoneCheckModal';
+import type { DoorDeliverySelection } from '@/features/shop/components/PhoneCheckModal';
 import type { BuyerInfo } from '@/shared/components/BuyerInfoModal';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { BagContextValue } from './BagContext';

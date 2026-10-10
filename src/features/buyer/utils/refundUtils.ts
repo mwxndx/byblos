@@ -3,12 +3,12 @@ import {
   MIN_WITHDRAWAL_AMOUNT,
   MAX_WITHDRAWAL_AMOUNT,
   WITHDRAWAL_FEE_TIERS
-} from '@/features/seller/components/dashboard/dashboardUtils';
+} from '@/shared/utils/withdrawalFees';
 import {
-  formatKes,
   formatSettlementDate,
   formatSettlementTimeOnly
-} from '@/features/seller/components/dashboard/tabs/withdrawalsTab.utils';
+} from '@/shared/utils/settlementFormatting';
+import { formatCurrency as formatKes } from '@/shared/utils/formatting';
 
 export {
   getWithdrawalFee,

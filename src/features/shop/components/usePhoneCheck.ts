@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import type { DoorDeliverySelection } from '@/shared/components/PhoneCheckModal';
+import type { DoorDeliverySelection } from './PhoneCheckModal';
 import type { OptionalBuyerLocation } from '@/infrastructure/location/location';
 import { getLogisticsQuote } from '@/features/buyer/api/payments';
 import {

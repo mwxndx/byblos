@@ -5,7 +5,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import instagramLogo from '@/assets/social/instagram.png';
 import tiktokLogo from '@/assets/social/tiktok.png';
-import { socialUrl } from '@/features/shop/utils/socialLinks';
+import { socialUrl } from '@/shared/utils/socialLinks';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useUpdateCreatorProfileMutation } from '../hooks/mutations/useUpdateCreatorProfileMutation';
 import type { CreatorProfile } from '../utils/creatorDashboardUtils';

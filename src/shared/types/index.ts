@@ -13,8 +13,8 @@ export type {
   ApiShippingAddress,
 } from './api/order';
 
-import type { ProductType, Theme, OrderStatus, PaymentStatus } from './primitives';
-export type { ProductType, Theme, OrderStatus, PaymentStatus };
+import type { UserRole, ProductType, Theme, OrderStatus, PaymentStatus } from './primitives';
+export type { UserRole, ProductType, Theme, OrderStatus, PaymentStatus };
 
 export type Aesthetic =
   | 'all'

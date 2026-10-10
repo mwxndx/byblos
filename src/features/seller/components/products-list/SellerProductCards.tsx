@@ -13,8 +13,8 @@ import type { Product } from '@/shared/types';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 type ProductWithApiFields = Product & Partial<ApiSellerProduct>;
 import { cn, formatCurrency } from '@/shared/utils/formatting';
-import { useWishlist } from '@/features/buyer/hooks/useWishlist';
-import { useIsProductWishlisted } from '@/features/buyer/stores/wishlistStore';
+import { useWishlist } from '@/features/shop/wishlist/useWishlist';
+import { useIsProductWishlisted } from '@/features/shop/wishlist/wishlistStore';
 
 function ProductWishlistButton({ product }: { product: ProductWithApiFields }) {
   const { addToWishlist, removeFromWishlist } = useWishlist();

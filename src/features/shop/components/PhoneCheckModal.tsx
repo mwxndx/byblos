@@ -7,8 +7,7 @@ import { Textarea } from '@/shared/ui/textarea';
 import { Phone, Loader2, MapPin, Truck, ShieldCheck } from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
 import { createOptionalBuyerLocation, type BuyerLocationPayload } from '@/infrastructure/location/location';
-import LocationPicker from '@/shared/components/LocationPicker';
-import { usePhoneCheck } from '@/shared/components/usePhoneCheck';
+import { usePhoneCheck } from './usePhoneCheck';
 
 
 export interface DoorDeliverySelection {

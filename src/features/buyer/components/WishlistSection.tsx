@@ -1,7 +1,7 @@
 import { Heart, Search } from '@/shared/ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useWishlist } from '@/features/buyer/hooks/useWishlist';
+import { useWishlist } from '@/features/shop/wishlist/useWishlist';
 import { ShopProductCard } from '@/features/shop/components/ShopProductCard';
 import { Input } from '@/shared/ui/input';
 import { useState } from 'react';

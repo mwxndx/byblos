@@ -4,7 +4,7 @@ import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { Textarea } from '@/shared/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { cn } from '@/shared/utils/formatting';
-import { aestheticCategories } from '@/features/shop/utils/aestheticCategoriesData';
+import { aestheticCategories } from '@/shared/constants/aestheticCategories';
 import { Package, FileText, Sparkles, X, ImagePlus, Info, MapPin, CheckCircle2, Clock, ChevronDown } from '@/shared/ui/icons';
 import type { AddProductFormData, FormErrors } from '../utils/addProductFormUtils';
 

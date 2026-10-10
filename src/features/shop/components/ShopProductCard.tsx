@@ -4,8 +4,8 @@ import { Card } from '@/shared/ui/card';
 import type { Product } from '@/shared/types';
 import { cn, formatCurrency, getImageUrl } from '@/shared/utils/formatting';
 import { getProductCardThemeVars, getProductFlags, type ProductWithApiFields, type Theme } from '@/features/shop/utils/productCardUtils';
-import { useWishlist } from '@/features/buyer/hooks/useWishlist';
-import { useIsProductWishlisted } from '@/features/buyer/stores/wishlistStore';
+import { useWishlist } from '@/features/shop/wishlist/useWishlist';
+import { useIsProductWishlisted } from '@/features/shop/wishlist/wishlistStore';
 
 interface ShopProductCardProps {
   product: Product;

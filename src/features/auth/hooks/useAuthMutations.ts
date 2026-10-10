@@ -2,19 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import buyerApi from '@/features/buyer/api';
 import { sellerApi } from '@/features/seller/api';
 import creatorApi from '@/features/creator/api';
-import { getApiForRole } from '@/features/auth/api/authApi';
 import type { UserRole, BuyerRegistrationData, SellerRegistrationData } from '@/features/auth/types/authTypes';
 import { buyerQueryKeys } from '@/features/buyer/api/queryKeys';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
 import { adminQueryKeys } from '@/features/admin/api/queryKeys';
 import { creatorQueryKeys } from '@/features/creator/api/queryKeys';
-
-type AuthApiObject = {
-  register?: (data: unknown) => Promise<unknown>;
-  forgotPassword?: (email: string) => Promise<unknown>;
-  resetPassword?: (token: string, password: string, email: string) => Promise<unknown>;
-  updateProfile?: (updates: Record<string, unknown>) => Promise<unknown>;
-};
 
 import apiClient from '@/infrastructure/http/apiClient';
 
@@ -72,11 +64,10 @@ export function useMarketingLoginMutation() {
 export function useRegisterMutation(role: UserRole) {
   return useMutation({
     mutationFn: (data: unknown) => {
-      const api = getApiForRole(role) as AuthApiObject;
-      if (role === 'buyer' && api.register) {
-        return api.register(data as BuyerRegistrationData);
-      } else if (api.register) {
-        return api.register(data as SellerRegistrationData);
+      if (role === 'buyer') {
+        return buyerApi.register(data as BuyerRegistrationData);
+      } else if (role === 'seller') {
+        return sellerApi.register(data as SellerRegistrationData);
       }
       throw new Error(`Register method not implemented for role: ${role}`);
     },
@@ -86,9 +77,12 @@ export function useRegisterMutation(role: UserRole) {
 export function useForgotPasswordMutation(role: UserRole) {
   return useMutation({
     mutationFn: (email: string) => {
-      const api = getApiForRole(role) as AuthApiObject;
-      if (api.forgotPassword) {
-        return api.forgotPassword(email);
+      if (role === 'buyer') {
+        return buyerApi.forgotPassword(email);
+      } else if (role === 'seller') {
+        return sellerApi.forgotPassword(email);
+      } else if (role === 'creator') {
+        return creatorApi.forgotPassword(email);
       }
       throw new Error(`ForgotPassword method not implemented for role: ${role}`);
     },
@@ -98,13 +92,12 @@ export function useForgotPasswordMutation(role: UserRole) {
 export function useResetPasswordMutation(role: UserRole) {
   return useMutation({
     mutationFn: (args: { token: string; newPassword?: string; password?: string; email: string }) => {
-      const api = getApiForRole(role) as AuthApiObject;
-      if (api.resetPassword) {
-        // seller/creator/buyer resetting signatures might be slightly different in arguments
-        if (role === 'seller') {
-          return api.resetPassword(args.token, args.password || args.newPassword || '', args.email);
-        }
-        return api.resetPassword(args.token, args.newPassword || args.password || '', args.email);
+      if (role === 'buyer') {
+        return buyerApi.resetPassword(args.token, args.newPassword || args.password || '', args.email);
+      } else if (role === 'seller') {
+        return sellerApi.resetPassword(args.token, args.password || args.newPassword || '', args.email);
+      } else if (role === 'creator') {
+        return creatorApi.resetPassword(args.token, args.newPassword || args.password || '', args.email);
       }
       throw new Error(`ResetPassword method not implemented for role: ${role}`);
     },
@@ -115,9 +108,12 @@ export function useUpdateProfileMutation(role: UserRole) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (updates: Record<string, unknown>) => {
-      const api = getApiForRole(role) as AuthApiObject;
-      if (api.updateProfile) {
-        return api.updateProfile(updates);
+      if (role === 'buyer') {
+        return buyerApi.updateProfile(updates);
+      } else if (role === 'seller') {
+        return sellerApi.updateProfile(updates);
+      } else if (role === 'creator') {
+        return creatorApi.updateProfile(updates);
       }
       throw new Error(`UpdateProfile method not implemented for role: ${role}`);
     },

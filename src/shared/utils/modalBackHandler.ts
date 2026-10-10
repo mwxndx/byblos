@@ -1,7 +1,21 @@
 import { useEffect } from 'react';
 import { App } from '@capacitor/app';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-import { router } from '@/app/router';
+export interface NavigationDelegate {
+  getPathname: () => string;
+  navigate: (to: string) => void;
+}
+
+let activeNavigationDelegate: NavigationDelegate = {
+  getPathname: () => window.location.pathname,
+  navigate: (to: string) => {
+    window.location.href = to;
+  }
+};
+
+export function registerNavigationDelegate(delegate: NavigationDelegate) {
+  activeNavigationDelegate = delegate;
+}
 
 type BackHandlerCallback = () => boolean | void;
 
@@ -120,13 +134,13 @@ function handleBuyerRouteBack(pathname: string): boolean {
 
   // Buyer shop page detail -> return to buyer dashboard
   if (cleanPath.startsWith('/buyer/shop/')) {
-    router.navigate('/buyer/dashboard');
+    activeNavigationDelegate.navigate('/buyer/dashboard');
     return true;
   }
 
   // Buyer sub-sections (orders, shops, wishlist, profile) -> return to buyer dashboard root
   if (['/buyer/orders', '/buyer/shops', '/buyer/wishlist', '/buyer/profile'].includes(cleanPath)) {
-    router.navigate('/buyer/dashboard');
+    activeNavigationDelegate.navigate('/buyer/dashboard');
     return true;
   }
 
@@ -163,7 +177,7 @@ export function useAndroidBackHandler() {
         return;
       }
 
-      const currentPathname = router.state.location.pathname;
+      const currentPathname = activeNavigationDelegate.getPathname();
 
       // Priority 3: If current screen is a detail / child screen with a known parent, navigate to parent.
       if (handleBuyerRouteBack(currentPathname)) {

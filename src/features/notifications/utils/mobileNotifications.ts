@@ -4,7 +4,7 @@ import apiClient from '@/infrastructure/http/apiClient';
 import { getNativePlatform, getStableDeviceId, isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { appNavigate } from '@/infrastructure/navigation/navigationService';
 import { getWebPushToken, isWebPushSupported } from '@/features/notifications/webPush';
-import type { UserRole } from '@/features/auth/types/authTypes';
+import type { UserRole } from '@/shared/types';
 
 type AppNotificationRole = UserRole | 'logistics';
 
