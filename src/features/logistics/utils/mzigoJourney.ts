@@ -85,10 +85,7 @@ export function isDeliveryTrackable(status: string | null | undefined) {
   return /out_for_delivery|out for delivery/.test(String(status || '').toLowerCase());
 }
 
-/** A courier request currently in motion on either leg. */
-export function isRequestTrackable(request: LogisticsRequestCard) {
-  return isDeliveryTrackable(request.deliveryLeg?.status) || isPickupTrackable(request.pickupLeg?.status);
-}
+
 
 /**
  * A request is a door delivery when it carries a delivery leg; otherwise the

@@ -134,7 +134,3 @@ export function useBag(): BagContextValue {
   return ctx;
 }
 
-/** Bag access that tolerates absence (shared surfaces like the wishlist have no bag). */
-export function useBagOptional(): BagContextValue | null {
-  return useContext(BagContext);
-}

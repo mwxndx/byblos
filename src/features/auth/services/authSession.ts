@@ -4,8 +4,6 @@ import apiClient from '@/infrastructure/http/apiClient';
 
 const ALL_ROLES: UserRole[] = ['buyer', 'seller', 'admin', 'creator', 'logistics', 'marketing'];
 
-export const ACTIVE_ROLE_KEY = BYBLOS_AUTH_KEYS.ACTIVE_ROLE;
-
 export const getSessionKey = (role: UserRole): string => `${role}SessionActive`;
 
 export const markRoleSessionActive = async (role: UserRole): Promise<void> => {
@@ -23,10 +21,6 @@ export const setActiveRole = async (role: UserRole): Promise<void> => {
 export const getActiveRole = async (): Promise<UserRole | null> => {
   const value = await authStorage.getActiveRole();
   return value && ALL_ROLES.includes(value as UserRole) ? (value as UserRole) : null;
-};
-
-export const clearActiveRole = async (): Promise<void> => {
-  await storage.remove(BYBLOS_AUTH_KEYS.ACTIVE_ROLE);
 };
 
 /**

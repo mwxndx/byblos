@@ -272,16 +272,8 @@ export function BaseDashboardLayout({
 // ROLE-SPECIFIC LAYOUT WRAPPERS
 // ============================================================================
 
-export function BuyerDashboardLayout(props: Omit<BaseDashboardLayoutProps, 'role'>) {
-    return <BaseDashboardLayout role="buyer" {...props} />;
-}
-
 export function SellerDashboardLayout(props: Omit<BaseDashboardLayoutProps, 'role'>) {
     return <BaseDashboardLayout role="seller" {...props} />;
-}
-
-export function AdminDashboardLayout(props: Omit<BaseDashboardLayoutProps, 'role'>) {
-    return <BaseDashboardLayout role="admin" {...props} />;
 }
 
 

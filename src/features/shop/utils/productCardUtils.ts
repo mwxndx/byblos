@@ -4,14 +4,6 @@ import type { ApiSellerProduct, ApiProduct } from '@/shared/types/api/product';
 export type ProductWithApiFields = Product & Partial<ApiSellerProduct> & Partial<ApiProduct>;
 
 
-export interface ProductCardThemeClasses {
-  card: string;
-  price: string;
-  button: string;
-  seller: string;
-  description: string;
-  icon: string;
-}
 
 export interface ProductCardThemeVars {
   '--product-card-bg': string;
@@ -157,43 +149,6 @@ export const getProductFlags = (product: ProductWithApiFields) => {
   };
 };
 
-export const getThemeClasses = (theme: Theme): ProductCardThemeClasses => {
-  switch (theme) {
-    case 'black':
-      return {
-        card: 'border hover:shadow-xl hover:shadow-slate-950/10',
-        price: 'text-[var(--product-card-accent)]',
-        button: 'bg-[var(--product-card-button-bg)] hover:opacity-90 text-[var(--product-card-button-text)] font-semibold shadow-sm',
-        seller: 'text-[var(--product-card-muted)]',
-        description: 'text-[var(--product-card-muted)]',
-        icon: 'text-[var(--product-card-accent)]',
-      };
-    case 'pink':
-    case 'orange':
-    case 'green':
-    case 'red':
-    case 'yellow':
-    case 'brown':
-      return {
-        card: 'border hover:shadow-xl hover:shadow-slate-950/10',
-        price: 'text-[var(--product-card-accent)]',
-        button: 'bg-[var(--product-card-button-bg)] hover:opacity-90 text-[var(--product-card-button-text)] font-semibold shadow-sm',
-        seller: 'text-[var(--product-card-muted)]',
-        description: 'text-[var(--product-card-muted)]',
-        icon: 'text-[var(--product-card-accent)]',
-      };
-    default:
-      return {
-        card: 'border shadow-sm hover:shadow-xl hover:shadow-slate-950/10',
-        price: 'text-[var(--product-card-accent)]',
-        button: 'bg-[var(--product-card-button-bg)] hover:opacity-90 text-[var(--product-card-button-text)] font-semibold shadow-sm',
-        seller: 'text-[var(--product-card-muted)]',
-        description: 'text-[var(--product-card-muted)]',
-        icon: 'text-[var(--product-card-accent)]',
-      };
-  }
-};
-
 const PRODUCT_SERVICE_CHARGE_RATE = 0.02;
 
 // Flat KES 100 hub collection fee (physical orders that don't use door delivery).
@@ -207,52 +162,3 @@ export const calculateProductServiceCharge = (amount: number) =>
 export const calculateBuyerPayableTotal = (productAmount: number, deliveryFee = 0, collectionFee = 0) =>
   Math.ceil(Math.round((productAmount + deliveryFee + collectionFee + calculateProductServiceCharge(productAmount)) * 100) / 100);
 
-export const normalizeProductImages = (product: Product): string[] => {
-  if (!product) return [];
-
-  const rawImageFields = [
-    product.images,
-    (product as { image_urls?: unknown }).image_urls,
-    (product as { imageUrls?: unknown }).imageUrls,
-    (product as { gallery?: unknown }).gallery,
-    (product as { product_images?: unknown }).product_images,
-  ];
-
-  const extracted: string[] = [
-    product.image_url,
-    (product as { imageUrl?: string }).imageUrl,
-  ].filter((img): img is string => typeof img === 'string' && img.trim().length > 0);
-
-  const parseImageValue = (val: unknown): string[] => {
-    if (!val) return [];
-    if (Array.isArray(val)) {
-      return val.flatMap(parseImageValue);
-    }
-    if (typeof val === 'string') {
-      const trimmed = val.trim();
-      if (!trimmed) return [];
-      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-        try {
-          const parsed = JSON.parse(trimmed);
-          if (Array.isArray(parsed)) return parsed.flatMap(parseImageValue);
-        } catch {
-          // fallback to string splitting
-        }
-      }
-      if (trimmed.includes(',')) {
-        return trimmed.split(',').map(s => s.trim()).filter(Boolean);
-      }
-      return [trimmed];
-    }
-    return [];
-  };
-
-  for (const field of rawImageFields) {
-    extracted.push(...parseImageValue(field));
-  }
-
-  return extracted
-    .filter((img): img is string => typeof img === 'string' && img.trim().length > 0)
-    .map(img => img.trim())
-    .filter((img, index, all) => all.indexOf(img) === index);
-};

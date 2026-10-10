@@ -270,6 +270,3 @@ export async function exportCardAsPng(node: HTMLElement): Promise<string> {
     style: { transform: 'none' },
   });
 }
-
-export const CARD_ASPECT = CARD_WIDTH / CARD_HEIGHT;
-export const STORY_SIZE = { width: STORY_WIDTH, height: STORY_HEIGHT };

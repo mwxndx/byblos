@@ -21,13 +21,7 @@ export const pendingOverviewStatuses = new Set([
   'READY_FOR_COLLECTION'
 ]);
 
-export const sellerDashboardTabs = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'products', label: 'Products' },
-  { id: 'orders', label: 'Orders' },
-  { id: 'withdrawals', label: 'Withdrawals' },
-  { id: 'settings', label: 'Settings' }
-] as const;
+
 
 export const getSellerInitials = (name?: string, fallback?: string) => {
   const source = (name || fallback || 'Shop').trim();

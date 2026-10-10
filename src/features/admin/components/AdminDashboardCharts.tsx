@@ -3,49 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/sha
 import { ArrowDownRight, ArrowUpRight } from '@/shared/ui/icons';
 import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-export interface StatsCardProps {
-  title: string;
-  value: string | number;
-  icon: ReactNode;
-  description: string;
-  trend: number | null;
-}
 
-const COLORS = ['#facc15', '#e5e5e5', '#737373', '#d4d4d4', '#f59e0b', '#a3a3a3'];
-
-const hasChartData = (data: Record<string, unknown>[] = []) => data.some(item =>
-  Object.values(item || {}).some(value => typeof value === 'number' && value > 0)
-);
-
-export const StatsCard = ({ title, value, icon, description, trend }: StatsCardProps) => (
-  <div className="relative group">
-    <Card className="relative bg-surface-1 border border-separator shadow-xl rounded-2xl overflow-hidden transition-all duration-300 group-hover:border-yellow-500/30">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 relative z-10">
-        <CardTitle className="text-sm font-semibold text-label-2 tracking-wide">
-          {title}
-        </CardTitle>
-        <div className="h-12 w-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 transition-all duration-500">
-          {icon}
-        </div>
-      </CardHeader>
-
-      <CardContent className="relative z-10 pt-0">
-        <div className="text-3xl font-semibold text-label tracking-tight tabular-nums">
-          {value}
-        </div>
-        <div className="mt-3 flex items-center gap-2">
-          {trend !== null && trend !== undefined && (
-            <div className={`flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${trend >= 0 ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
-              {trend >= 0 ? <ArrowUpRight className="h-2.5 w-2.5 mr-0.5" /> : <ArrowDownRight className="h-2.5 w-2.5 mr-0.5" />}
-              {Math.abs(trend)}%
-            </div>
-          )}
-          <span className="text-xs text-label-3 font-medium truncate">{description}</span>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
 
 export const ChartContainer = ({ title, description, children, className = '' }: { title: string, description: string, children: ReactNode, className?: string }) => (
   <Card className={`${className} bg-surface-1 border border-separator shadow-xl rounded-2xl overflow-hidden group hover:border-yellow-500/30 transition-all duration-300`}>

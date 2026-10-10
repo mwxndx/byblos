@@ -1,5 +1,3 @@
-import { DELIVERY_ACTIONS, PICKUP_ACTIONS } from './mzigoDashboard.constants';
-import type { LogisticsLeg, LogisticsLegType } from '@/features/logistics/api';
 
 export function formatCurrency(value: number | string | null | undefined) {
   const amount = Number(value || 0);
@@ -30,8 +28,4 @@ export function statusLabel(status?: string | null) {
   return String(status || 'not requested').replace(/_/g, ' ');
 }
 
-export function nextActions(legType: LogisticsLegType, leg?: LogisticsLeg | null) {
-  if (!leg?.status) return [];
-  const status = String(leg.status).toLowerCase();
-  return legType === 'pickup' ? PICKUP_ACTIONS[status] || [] : DELIVERY_ACTIONS[status] || [];
-}
+
