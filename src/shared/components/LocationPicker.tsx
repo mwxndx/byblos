@@ -1,355 +1,125 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { Input } from '@/shared/ui/input';
+import { lazy, Suspense } from 'react';
 import { Label } from '@/shared/ui/label';
-import { Loader2, Search, X } from '@/shared/ui/icons';
+import { Input } from '@/shared/ui/input';
+import { Loader2, X } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
-import {
-    DEFAULT_MAP_CENTER,
-    createLocationSelection,
-    normalizeCoordinates,
-    type LocationCoordinates
-} from '@/infrastructure/location/location';
-import { searchLocations, type LocationSearchResult } from '@/infrastructure/location/locationApi';
+import type { LocationCoordinates } from '@/infrastructure/location/location';
+import { useLocationSearch } from './location/useLocationSearch';
+import { useLocationMapState } from './location/useLocationMapState';
+import { LocationSearchCombobox } from './location/LocationSearchCombobox';
 
 const LocationMapView = lazy(() => import('./LocationMapView'));
 
-interface LocationPickerProps {
-    initialAddress?: string;
-    initialCoordinates?: LocationCoordinates | null;
-    onLocationChange: (address: string, coordinates: LocationCoordinates | null) => void;
-    placeholder?: string;
-    label?: string;
-    detailedLabel?: string;
-    className?: string;
-    mapClassName?: string;
-    autoPopulate?: boolean;
-    initialValue?: string;
+export interface LocationPickerProps {
+  initialAddress?: string;
+  initialCoordinates?: LocationCoordinates | null;
+  onLocationChange: (address: string, coordinates: LocationCoordinates | null) => void;
+  placeholder?: string;
+  label?: string;
+  detailedLabel?: string;
+  className?: string;
+  mapClassName?: string;
+  autoPopulate?: boolean;
+  initialValue?: string;
 }
 
 export default function LocationPicker({
-    initialAddress = '',
-    initialCoordinates = null,
-    onLocationChange,
-    placeholder = "Search for a location...",
-    label = "Search Location",
-    detailedLabel = "Detailed Address",
-    className,
-    mapClassName,
-    autoPopulate = true,
-    initialValue = ''
+  initialAddress = '',
+  initialCoordinates = null,
+  onLocationChange,
+  placeholder = 'Search for a location...',
+  label = 'Search Location',
+  detailedLabel = 'Detailed Address',
+  className,
+  mapClassName,
+  autoPopulate = true,
+  initialValue = '',
 }: LocationPickerProps) {
-    const normalizedInitialCoordinates = normalizeCoordinates(initialCoordinates);
-    const [address, setAddress] = useState(initialAddress);
-    const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(normalizedInitialCoordinates ? [normalizedInitialCoordinates.lat, normalizedInitialCoordinates.lng] : null);
-    const [center, setCenter] = useState<[number, number]>(normalizedInitialCoordinates ? [normalizedInitialCoordinates.lat, normalizedInitialCoordinates.lng] : [DEFAULT_MAP_CENTER.lat, DEFAULT_MAP_CENTER.lng]);
-    const [searchQuery, setSearchQuery] = useState(initialValue);
-    const [searchResults, setSearchResults] = useState<LocationSearchResult[]>([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const [showResults, setShowResults] = useState(false);
-    const [searchError, setSearchError] = useState('');
-    const [hasSearched, setHasSearched] = useState(false);
-    // Index of the arrow-key-highlighted result for the ARIA combobox pattern
-    // (-1 = none highlighted). Drives aria-activedescendant so screen readers
-    // announce the focused option while focus stays in the input.
-    const [activeIndex, setActiveIndex] = useState(-1);
-    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const LISTBOX_ID = 'location-search-results';
-    const optionId = (index: number) => `location-search-option-${index}`;
-    const mapWatchKey = `${center[0]}:${center[1]}:${markerPosition?.[0] || ''}:${markerPosition?.[1] || ''}`;
+  const mapState = useLocationMapState({
+    initialAddress,
+    initialCoordinates,
+    autoPopulate,
+    onLocationChange,
+  });
 
-    // Cleanup timeout on unmount
-    useEffect(() => {
-        return () => {
-            if (searchTimeoutRef.current) {
-                clearTimeout(searchTimeoutRef.current);
-            }
-        };
-    }, []);
+  const search = useLocationSearch({
+    initialValue,
+    onApplyResult: mapState.applyLocationResult,
+  });
 
-    const addressRef = useRef(address);
-    addressRef.current = address;
-    const markerPositionRef = useRef(markerPosition);
-    markerPositionRef.current = markerPosition;
+  return (
+    <div className={cn('space-y-4', className)}>
+      <LocationSearchCombobox
+        label={label}
+        placeholder={placeholder}
+        searchQuery={search.searchQuery}
+        isSearching={search.isSearching}
+        showResults={search.showResults}
+        searchResults={search.searchResults}
+        activeIndex={search.activeIndex}
+        searchError={search.searchError}
+        hasSearched={search.hasSearched}
+        onSearchChange={search.handleSearchChange}
+        onSearchKeyDown={search.handleSearchKeyDown}
+        onSelectResult={search.selectLocation}
+        onSetActiveIndex={search.setActiveIndex}
+      />
 
-    useEffect(() => {
-        if (initialAddress && initialAddress !== addressRef.current) {
-            setAddress(initialAddress);
-        }
-        const nextInitialCoordinates = normalizeCoordinates(initialCoordinates);
-        if (nextInitialCoordinates) {
-            const currPos = markerPositionRef.current;
-            if (!currPos || nextInitialCoordinates.lat !== currPos[0] || nextInitialCoordinates.lng !== currPos[1]) {
-                const newPos: [number, number] = [nextInitialCoordinates.lat, nextInitialCoordinates.lng];
-                setMarkerPosition(newPos);
-                setCenter(newPos);
-            }
-        }
-    }, [initialAddress, initialCoordinates]);
-
-    const applyLocationResult = (result: LocationSearchResult, shouldCloseResults: boolean) => {
-        const lat = Number(result.lat);
-        const lng = Number(result.lng);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
-
-        const newPos: [number, number] = [lat, lng];
-        setMarkerPosition(newPos);
-        setCenter(newPos);
-
-        if (shouldCloseResults) {
-            setSearchQuery(result.displayName);
-            setShowResults(false);
-        }
-
-        const finalDetailedAddress = autoPopulate && address.trim() === '' ? result.displayName : address;
-        if (autoPopulate && address.trim() === '') {
-            setAddress(result.displayName);
-        }
-
-        const selectionAddress = autoPopulate ? (finalDetailedAddress || result.displayName) : address;
-        const selection = createLocationSelection(selectionAddress, { lat, lng });
-        onLocationChange(selection.address, selection.coordinates);
-    };
-
-    const searchAddress = async (query: string) => {
-        if (!query.trim()) {
-            setSearchResults([]);
-            setSearchError('');
-            setHasSearched(false);
-            return;
-        }
-
-        setIsSearching(true);
-        setSearchError('');
-        try {
-            const results = await searchLocations(query);
-            setSearchResults(results);
-            setShowResults(true);
-            if (results.length > 0) {
-                applyLocationResult(results[0], false);
-            }
-        } catch (error) {
-            console.error('Error searching address:', error);
-            setSearchError('Location search is temporarily unavailable. Try again in a few seconds.');
-            setSearchResults([]);
-            setShowResults(true);
-        } finally {
-            setHasSearched(true);
-            setIsSearching(false);
-        }
-    };
-
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setSearchQuery(value);
-
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current);
-        }
-
-        if (value.length > 2) {
-            setShowResults(true);
-            setHasSearched(false);
-            setSearchError('');
-            searchTimeoutRef.current = setTimeout(() => {
-                searchAddress(value);
-            }, 500);
-        } else {
-            setSearchResults([]);
-            setShowResults(false);
-            setSearchError('');
-            setHasSearched(false);
-        }
-    };
-
-    // A fresh result set (or a closed list) has no highlight yet.
-    useEffect(() => {
-        setActiveIndex(-1);
-    }, [searchResults, showResults]);
-
-    const selectLocation = (result: LocationSearchResult) => {
-        applyLocationResult(result, true);
-    };
-
-    // ARIA combobox keyboard handling: arrow keys move the highlight, Enter
-    // selects it, Escape closes the list -- keeping the search fully operable
-    // without a pointer (WCAG 2.1.1) and announced via aria-activedescendant.
-    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (!showResults || searchResults.length === 0) return;
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                setActiveIndex((prev) => (prev + 1) % searchResults.length);
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                setActiveIndex((prev) => (prev <= 0 ? searchResults.length - 1 : prev - 1));
-                break;
-            case 'Enter':
-                if (activeIndex >= 0 && activeIndex < searchResults.length) {
-                    e.preventDefault();
-                    selectLocation(searchResults[activeIndex]);
-                }
-                break;
-            case 'Escape':
-                setShowResults(false);
-                break;
-            default:
-                break;
-        }
-    };
-
-    const handleManualAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newAddress = e.target.value;
-        setAddress(newAddress);
-        const selection = createLocationSelection(
-            newAddress,
-            markerPosition ? { lat: markerPosition[0], lng: markerPosition[1] } : null
-        );
-        onLocationChange(selection.address, selection.coordinates);
-    };
-
-    const handleClearDetailedAddress = () => {
-        setAddress('');
-        const selection = createLocationSelection(
-            '',
-            markerPosition ? { lat: markerPosition[0], lng: markerPosition[1] } : null
-        );
-        onLocationChange(selection.address, selection.coordinates);
-    };
-
-    const handleMapClick = (lat: number, lng: number) => {
-        const newPos: [number, number] = [lat, lng];
-        setMarkerPosition(newPos);
-        const selection = createLocationSelection(address, { lat, lng });
-        onLocationChange(selection.address, selection.coordinates);
-    }
-
-    return (
-        <div className={cn("space-y-4", className)}>
-            <div>
-                <Label htmlFor="location-search" className="text-sm font-semibold text-slate-700 block mb-2">
-                    {label}
-                </Label>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 md:pl-3.5 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 md:h-5 md:w-5 text-slate-400" />
-                    </div>
-                    <Input
-                        id="location-search"
-                        type="text"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        onKeyDown={handleSearchKeyDown}
-                        className="pl-12 md:pl-12 h-11 bg-white border-slate-200 text-slate-950 placeholder:text-slate-400"
-                        placeholder={placeholder}
-                        autoComplete="off"
-                        role="combobox"
-                        aria-expanded={showResults}
-                        aria-controls={LISTBOX_ID}
-                        aria-autocomplete="list"
-                        aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
-                    />
-                    {isSearching && (
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <Loader2 className="h-4 w-4 text-slate-400 animate-spin" />
-                        </div>
-                    )}
-
-                    {showResults && (
-                        <div
-                            id={LISTBOX_ID}
-                            role="listbox"
-                            aria-label={label}
-                            className="absolute left-0 right-0 top-full z-[5000] mt-1 max-h-56 overflow-y-auto rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-[#141414] text-slate-900 dark:text-white shadow-2xl"
-                        >
-                            {searchResults.length > 0 ? (
-                                searchResults.map((result, index) => (
-                                    <button
-                                        key={`${result.provider || 'location'}-${result.id || index}`}
-                                        id={optionId(index)}
-                                        type="button"
-                                        role="option"
-                                        aria-selected={index === activeIndex}
-                                        className={cn(
-                                            "w-full border-b border-slate-100 dark:border-white/10 px-3 py-2.5 text-left text-xs leading-snug text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 focus:bg-slate-100 dark:focus:bg-white/10 focus:outline-none sm:text-sm last:border-0",
-                                            index === activeIndex && "bg-slate-100 dark:bg-white/10"
-                                        )}
-                                        onMouseDown={(event) => event.preventDefault()}
-                                        onMouseEnter={() => setActiveIndex(index)}
-                                        onClick={() => selectLocation(result)}
-                                    >
-                                        {result.displayName}
-                                    </button>
-                                ))
-                            ) : (
-                                <div role="status" aria-live="polite" className="px-3 py-3 text-xs font-semibold text-slate-500 dark:text-white/60 sm:text-sm">
-                                    {isSearching
-                                        ? 'Searching locations...'
-                                        : searchError || (hasSearched ? 'No locations found. Try adding Nairobi, Kenya, or a nearby landmark.' : 'Keep typing to search locations.')}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <div>
-                <div className="flex items-center justify-between mb-2">
-                    <Label htmlFor="address-detailed" className="text-sm font-semibold text-slate-700 block">
-                        {detailedLabel}
-                    </Label>
-                    {address && (
-                        <button
-                            type="button"
-                            onClick={handleClearDetailedAddress}
-                            className="text-xs font-semibold text-red-500 hover:text-red-600 dark:text-red-400 flex items-center gap-1"
-                        >
-                            <X className="h-3 w-3" /> Clear
-                        </button>
-                    )}
-                </div>
-                <div className="relative">
-                    <Input
-                        id="address-detailed"
-                        type="text"
-                        value={address}
-                        onChange={handleManualAddressChange}
-                        className="h-11 bg-white border-slate-200 text-slate-950 placeholder:text-slate-400 pr-9"
-                        placeholder="e.g. Building Name, Floor, Office/House No"
-                    />
-                    {address && (
-                        <button
-                            type="button"
-                            onClick={handleClearDetailedAddress}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white"
-                            aria-label="Clear address"
-                            title="Clear address text"
-                        >
-                            <X className="h-4 w-4" />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            <div className={cn("h-56 w-full rounded-xl overflow-hidden border border-white/10 shadow-inner z-0 relative sm:h-64", mapClassName)}>
-                <Suspense fallback={
-                    <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-white/5">
-                        <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
-                    </div>
-                }>
-                    <LocationMapView
-                        center={center}
-                        markerPosition={markerPosition}
-                        watchKey={mapWatchKey}
-                        onMapClick={handleMapClick}
-                    />
-                </Suspense>
-            </div>
-            <p className="text-center text-[10px] font-semibold text-slate-500">
-                Tap the map to pin exact location
-            </p>
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label htmlFor="address-detailed" className="text-sm font-semibold text-slate-700 block">
+            {detailedLabel}
+          </Label>
+          {mapState.address && (
+            <button
+              type="button"
+              onClick={mapState.handleClearAddress}
+              className="text-xs font-semibold text-red-500 hover:text-red-600 dark:text-red-400 flex items-center gap-1"
+            >
+              <X className="h-3 w-3" /> Clear
+            </button>
+          )}
         </div>
-    );
+        <div className="relative">
+          <Input
+            id="address-detailed"
+            type="text"
+            value={mapState.address}
+            onChange={(e) => mapState.handleManualAddressChange(e.target.value)}
+            className="h-11 bg-white border-slate-200 text-slate-950 placeholder:text-slate-400 pr-9"
+            placeholder="e.g. Building Name, Floor, Office/House No"
+          />
+          {mapState.address && (
+            <button
+              type="button"
+              onClick={mapState.handleClearAddress}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              aria-label="Clear address"
+              title="Clear address text"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className={cn('h-56 w-full rounded-xl overflow-hidden border border-white/10 shadow-inner z-0 relative sm:h-64', mapClassName)}>
+        <Suspense fallback={
+          <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-white/5">
+            <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+          </div>
+        }>
+          <LocationMapView
+            center={mapState.center}
+            markerPosition={mapState.markerPosition}
+            watchKey={mapState.mapWatchKey}
+            onMapClick={mapState.handleMapClick}
+          />
+        </Suspense>
+      </div>
+      <p className="text-center text-[10px] font-semibold text-slate-500">
+        Tap the map to pin exact location
+      </p>
+    </div>
+  );
 }
-
-

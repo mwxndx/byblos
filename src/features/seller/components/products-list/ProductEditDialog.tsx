@@ -2,13 +2,9 @@ import type { ChangeEvent } from 'react';
 import { Button } from '@/shared/ui/button';
 import { IconButton } from '@/shared/ui/icon-button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Textarea } from '@/shared/ui/textarea';
-import { ArrowLeft, ImagePlus, Loader2, X } from '@/shared/ui/icons';
-import { aestheticCategories } from '@/shared/constants/aestheticCategories';
-import { ProductEditPhysicalOptions } from './ProductEditPhysicalOptions';
+import { ArrowLeft, Loader2 } from '@/shared/ui/icons';
+import { ProductEditPhotoSlots } from './ProductEditPhotoSlots';
+import { ProductEditFormFields } from './ProductEditFormFields';
 
 export interface ProductEditFormData {
   name: string;
@@ -77,128 +73,16 @@ export function ProductEditDialog({
           </div>
         ) : (
           <div className="space-y-3 py-2">
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="edit-name" className="seller-label font-semibold">Product Name</Label>
-                <Input
-                  id="edit-name"
-                  value={formData.name}
-                  onChange={(event) => onFormDataChange({ ...formData, name: event.target.value })}
-                  className="seller-field h-9 text-sm rounded-lg"
-                  placeholder="Enter product name"
-                />
-              </div>
+            <ProductEditFormFields
+              formData={formData}
+              onFormDataChange={onFormDataChange}
+            />
 
-              <div>
-                <Label htmlFor="edit-price" className="seller-label font-semibold">Price (KES)</Label>
-                <Input
-                  id="edit-price"
-                  type="number"
-                  min={50}
-                  value={formData.price}
-                  onChange={(event) => onFormDataChange({ ...formData, price: event.target.value })}
-                  className="seller-field h-9 text-sm rounded-lg"
-                  placeholder="0"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="edit-description" className="seller-label font-semibold">Description</Label>
-                <Textarea
-                  id="edit-description"
-                  value={formData.description}
-                  onChange={(event) => onFormDataChange({ ...formData, description: event.target.value })}
-                  className="seller-field min-h-[60px] text-sm rounded-lg"
-                  placeholder="Enter product description"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="edit-aesthetic" className="seller-label font-semibold">Category</Label>
-                <Select
-                  value={formData.aesthetic}
-                  onValueChange={(value) => onFormDataChange({ ...formData, aesthetic: value })}
-                >
-                  <SelectTrigger className="seller-field h-9 rounded-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white dark:bg-surface-1 border-slate-200 dark:border-separator text-slate-900 dark:text-white z-[110]">
-                    {aestheticCategories.map((category) => (
-                      <SelectItem key={category.id} value={category.id} className="text-slate-900 dark:text-white focus:bg-[var(--theme-button-bg,#f5c518)] focus:text-[var(--theme-button-text,#000000)]">
-                        {category.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {formData.product_type === 'physical' && (
-                <ProductEditPhysicalOptions formData={formData} onFormDataChange={onFormDataChange} />
-              )}
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label className="seller-label font-semibold">Product Photos</Label>
-                  <span className="text-[10px] font-semibold text-slate-500 dark:text-white/60">
-                    {[formData.imagePreview, ...formData.extraPreviews].filter(Boolean).length} / 3 photos
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 mt-2">
-                  {Array.from({ length: 3 }).map((_, slot) => {
-                    const allPreviews = [formData.imagePreview, ...formData.extraPreviews];
-                    const preview = allPreviews[slot];
-                    const isFirst = slot === 0;
-                    const isDisabled = slot > 0 && !allPreviews[slot - 1];
-
-                    return (
-                      <div key={slot} className="relative aspect-square">
-                        {preview ? (
-                          <>
-                            <img
-                              src={preview}
-                              alt={`Photo ${slot + 1}`}
-                              className="w-full h-full object-cover rounded-lg border border-slate-200 dark:border-separator"
-                            />
-                            {isFirst && (
-                              <span className="absolute bottom-1 left-1 text-[8px] font-bold bg-emerald-600 text-slate-900 dark:text-white px-1 rounded-sm">Main</span>
-                            )}
-                            <button
-                              type="button"
-                              onClick={() => onRemoveImage(slot)}
-                              className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-slate-900 dark:text-white rounded-full h-5 w-5 flex items-center justify-center shadow-md transition-colors z-10"
-                            >
-                              <X className="h-2.5 w-2.5" />
-                            </button>
-                          </>
-                        ) : (
-                          <label
-                            className={`w-full h-full flex flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors duration-200 ${isDisabled
-                              ? 'border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.02] cursor-not-allowed opacity-40'
-                              : 'border-slate-200 dark:border-white/20 bg-fill hover:border-emerald-500 hover:bg-emerald-400/5 cursor-pointer'
-                              }`}
-                          >
-                            <ImagePlus className={`h-4 w-4 mb-1 ${isDisabled ? 'text-slate-500 dark:text-white/40' : 'text-slate-900 dark:text-white'}`} />
-                            <span className={`text-[8px] font-bold ${isDisabled ? 'text-slate-500 dark:text-white/40' : 'text-slate-900 dark:text-white'}`}>
-                              {isFirst ? 'Main photo' : `Photo ${slot + 1}`}
-                            </span>
-                            {!isDisabled && (
-                              <input
-                                type="file"
-                                accept="image/*"
-                                className="sr-only"
-                                onChange={(event) => onImageChange(event, slot)}
-                              />
-                            )}
-                          </label>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-[10px] text-slate-500 dark:text-white/60 mt-2 font-medium">PNG, JPG up to 5MB.</p>
-              </div>
-            </div>
+            <ProductEditPhotoSlots
+              formData={formData}
+              onImageChange={onImageChange}
+              onRemoveImage={onRemoveImage}
+            />
           </div>
         )}
 
@@ -230,5 +114,3 @@ export function ProductEditDialog({
     </Dialog>
   );
 }
-
-

@@ -1,20 +1,20 @@
-import { Dispatch, SetStateAction, useCallback } from 'react';
+import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 import { toast } from 'sonner';
 import apiClient from '@/infrastructure/http/apiClient';
 import { useQueryClient } from '@tanstack/react-query';
-import { clearRoleSession, clearRoleSessionMarkers, enforceSingleActiveRole, markRoleSessionActive, setActiveRole } from '../services/authSession';
+import {
+  clearRoleSession,
+  clearRoleSessionMarkers,
+  enforceSingleActiveRole,
+  markRoleSessionActive,
+  setActiveRole,
+} from '../services/authSession';
 import { registerNativePushNotifications, unregisterNativePushNotifications } from '@/features/notifications/utils/mobileNotifications';
 import { getDashboardPath } from '../utils/authRouting';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { storage } from '@/infrastructure/storage/storage';
 import { classifyApiError } from '@/shared/utils/errorClassification';
-
-
-
-
-
-import { switchAccountRequest, type SwitchableRole } from '@/features/auth/api/account';
 import type {
   GlobalUser,
   UserProfile,
@@ -28,15 +28,15 @@ import {
   useLogisticsLoginMutation,
   useMarketingLoginMutation,
 } from './useAuthMutations';
-import {
-  buyerProfileQueryOptions,
-  sellerProfileQueryOptions,
-  adminProfileQueryOptions,
-  creatorProfileQueryOptions,
-} from './useAuthQueries';
 import { useAuthRegistration } from './useAuthRegistration';
 import { useAuthPasswordReset } from './useAuthPasswordReset';
 import { useAuthProfile } from './useAuthProfile';
+import {
+  executeRoleLogin,
+  getLogoutEndpointForRole,
+  getProfileQueryOptionsForRole,
+} from './authRoleDispatcher';
+import { useAccountSwitching } from './useAccountSwitching';
 
 interface UseAuthActionsOptions {
   navigate: NavigateFunction;
@@ -45,16 +45,6 @@ interface UseAuthActionsOptions {
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   markAuthChecked: () => void;
 }
-
-type AuthRequestError = {
-  response?: {
-    status?: number;
-    data?: {
-      message?: string;
-    };
-  };
-  message?: string;
-};
 
 export function useAuthActions({
   navigate,
@@ -72,46 +62,45 @@ export function useAuthActions({
   const logisticsLoginMut = useLogisticsLoginMutation();
   const marketingLoginMut = useMarketingLoginMutation();
 
+  const mutations = useMemo(() => ({
+    buyer: buyerLoginMut.mutateAsync,
+    seller: sellerLoginMut.mutateAsync,
+    admin: adminLoginMut.mutateAsync,
+    creator: creatorLoginMut.mutateAsync,
+    logistics: logisticsLoginMut.mutateAsync,
+    marketing: marketingLoginMut.mutateAsync,
+  }), [
+    buyerLoginMut.mutateAsync,
+    sellerLoginMut.mutateAsync,
+    adminLoginMut.mutateAsync,
+    creatorLoginMut.mutateAsync,
+    logisticsLoginMut.mutateAsync,
+    marketingLoginMut.mutateAsync,
+  ]);
+
   const { register } = useAuthRegistration({ navigate, setUser, setIsLoading, markAuthChecked });
   const { forgotPassword, resetPassword } = useAuthPasswordReset({ navigate, setIsLoading });
   const { getProfile, updateProfile } = useAuthProfile({ setUser });
+  const { switchAccount, refreshRole } = useAccountSwitching({
+    navigate,
+    setUser,
+    setIsLoading,
+    markAuthChecked,
+    queryClient,
+  });
 
   const login = useCallback(async (email: string, password: string, role: UserRole, acceptTerms?: boolean) => {
     setIsLoading(true);
     try {
-      let response: any;
-      if (role === 'buyer') {
-        response = await buyerLoginMut.mutateAsync({ email, password, acceptTerms });
-      } else if (role === 'seller') {
-        response = await sellerLoginMut.mutateAsync({ email, password, acceptTerms });
-      } else if (role === 'creator') {
-        response = await creatorLoginMut.mutateAsync({ email, password, acceptTerms });
-      } else if (role === 'admin') {
-        response = await adminLoginMut.mutateAsync({ email, password });
-      } else if (role === 'logistics') {
-        response = await logisticsLoginMut.mutateAsync({ email, password });
-      } else if (role === 'marketing') {
-        response = await marketingLoginMut.mutateAsync({ email, password });
-      } else {
-        throw new Error(`Unsupported login role: ${role}`);
-      }
+      const { response, profile } = await executeRoleLogin(mutations, role, { email, password, acceptTerms });
 
-      const profileData = role === 'buyer' ? response.buyer
-        : role === 'creator' ? response.creator
-        : role === 'seller' ? response.seller
-        : role === 'logistics' ? response.partner
-        : response.user || response.data?.user;
-
-      // Single active account: drop any other account's cached data and evict its
-      // stored credentials/session before establishing this one, so the app can
-      // never bind to a leftover session from a different user.
       queryClient.clear();
       await enforceSingleActiveRole(role);
 
       setUser({
         role,
-        profile: profileData as UserProfile,
-        isAuthenticated: true
+        profile,
+        isAuthenticated: true,
       });
 
       if (response.token) {
@@ -129,32 +118,10 @@ export function useAuthActions({
         duration: 2000,
       });
 
-      const redirectPath = sessionStorage.getItem('redirectAfterLogin');
-      if (redirectPath && typeof redirectPath === 'string') {
-        sessionStorage.removeItem('redirectAfterLogin');
-        navigate(redirectPath, { replace: true });
-      } else {
-        const dashboardPath = getDashboardPath(role);
-        if (typeof dashboardPath === 'string') {
-          navigate(dashboardPath, { replace: true });
-        } else {
-          console.error('[Auth] Invalid dashboard path:', dashboardPath);
-          navigate('/', { replace: true });
-        }
-      }
+      handlePostLoginRedirect(navigate, role);
     } catch (error) {
-      try {
-        await clearRoleSession(role);
-        if (isNativeApp()) {
-          await storage.remove(`${role}Token`);
-          await storage.remove(`${role}RefreshToken`);
-        }
-      } catch {
-        // Ignore storage cleanup errors on failed login
-      }
-
+      await handleLoginFailure(role);
       const classified = classifyApiError(error, 'Invalid email or password');
-      // Do not emit generic error toast for verification redirects (which open dedicated modal)
       if (classified.code !== 'PENDING_VERIFICATION' && classified.code !== 'EMAIL_NOT_VERIFIED' && classified.code !== 'TERMS_NOT_ACCEPTED') {
         toast.error('Login Failed', { id: `${role}-login-failed`, description: classified.message });
       }
@@ -162,28 +129,18 @@ export function useAuthActions({
     } finally {
       setIsLoading(false);
     }
-  }, [markAuthChecked, navigate, setIsLoading, setUser, buyerLoginMut, sellerLoginMut, creatorLoginMut, adminLoginMut, logisticsLoginMut, marketingLoginMut, queryClient]);
+  }, [markAuthChecked, navigate, setIsLoading, setUser, mutations, queryClient]);
 
   const loginWithToken = useCallback(async (token: string, role: UserRole) => {
     setIsLoading(true);
     try {
-      let queryOpts;
-      if (role === 'buyer') {
-        queryOpts = buyerProfileQueryOptions;
-      } else if (role === 'seller') {
-        queryOpts = sellerProfileQueryOptions;
-      } else if (role === 'creator') {
-        queryOpts = creatorProfileQueryOptions;
-      } else {
-        queryOpts = adminProfileQueryOptions;
-      }
-
+      const queryOpts = getProfileQueryOptionsForRole(role);
       const profileData = await queryClient.fetchQuery(queryOpts);
 
       setUser({
         role,
         profile: profileData as UserProfile,
-        isAuthenticated: true
+        isAuthenticated: true,
       });
 
       await markRoleSessionActive(role);
@@ -201,13 +158,6 @@ export function useAuthActions({
 
   const logout = useCallback(async () => {
     const role = user?.role;
-
-    // Optimistic local logout FIRST: drop the user and leave the authed screen
-    // immediately so the user never watches a blanked-out dashboard. Clearing
-    // the query cache before navigating — and awaiting the (possibly slow,
-    // cold-backend) logout request while still mounted on the dashboard — wiped
-    // the dashboard's data and showed a white screen until the network call
-    // resolved, then finally jumped to the landing page.
     setUser(null);
     navigate('/', { replace: true });
     toast('Logged out', { description: 'You have been successfully logged out.' });
@@ -217,116 +167,14 @@ export function useAuthActions({
 
     if (!role) return;
 
-    // Best-effort server logout + native push cleanup, in the background. The
-    // local session is already cleared, so failures here are non-fatal.
     try {
       await unregisterNativePushNotifications(role);
-      const logoutUrl = role === 'seller'
-        ? '/sellers/logout'
-        : role === 'admin' || role === 'marketing'
-          ? '/admin/logout'
-          : role === 'creator'
-            ? '/creators/logout'
-            : role === 'logistics'
-              ? '/logistics/logout'
-              : '/buyers/logout';
+      const logoutUrl = getLogoutEndpointForRole(role);
       await apiClient.post(logoutUrl);
     } catch {
-      // Fail silently — the client is already logged out locally.
+      // Fail silently — already logged out locally.
     }
   }, [navigate, setUser, user, queryClient]);
-
-  const switchAccount = useCallback(async (role: SwitchableRole) => {
-    setIsLoading(true);
-    try {
-      const { token, refreshToken } = await switchAccountRequest(role);
-
-      // Establish the target role as the single active account: drop the prior
-      // account's cache + credentials, then persist the freshly-minted token.
-      queryClient.clear();
-      await enforceSingleActiveRole(role);
-      if (isNativeApp() && token) {
-        await storage.set(`${role}Token`, token);
-        if (refreshToken) await storage.set(`${role}RefreshToken`, refreshToken);
-      }
-
-      let queryOpts;
-      if (role === 'buyer') queryOpts = buyerProfileQueryOptions;
-      else if (role === 'seller') queryOpts = sellerProfileQueryOptions;
-      else queryOpts = creatorProfileQueryOptions;
-
-      const profileData = await queryClient.fetchQuery(queryOpts);
-
-      setUser({
-        role,
-        profile: profileData as UserProfile,
-        isAuthenticated: true,
-      });
-
-      await markRoleSessionActive(role);
-      await setActiveRole(role);
-      markAuthChecked();
-      void registerNativePushNotifications(role);
-
-      const dashboardPath = getDashboardPath(role);
-      navigate(typeof dashboardPath === 'string' ? dashboardPath : '/', { replace: true });
-
-      toast.success('Account switched', {
-        description: `You are now using your ${role} account.`,
-        duration: 2000,
-      });
-    } catch (error) {
-      const err = error as AuthRequestError;
-      const message = err.response?.data?.message || err.message || 'Could not switch account';
-      toast.error('Switch failed', { description: message });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [markAuthChecked, navigate, setIsLoading, setUser, queryClient]);
-
-  const refreshRole = useCallback(async (newRole: UserRole) => {
-    setIsLoading(true);
-    try {
-      let queryOpts;
-      if (newRole === 'buyer') {
-        queryOpts = buyerProfileQueryOptions;
-      } else if (newRole === 'seller') {
-        queryOpts = sellerProfileQueryOptions;
-      } else if (newRole === 'creator') {
-        queryOpts = creatorProfileQueryOptions;
-      } else {
-        queryOpts = adminProfileQueryOptions;
-      }
-
-      const profileData = await queryClient.fetchQuery(queryOpts);
-
-      if (!profileData) throw new Error('Failed to fetch profile');
-
-      setUser({
-        role: newRole,
-        profile: profileData as UserProfile,
-        isAuthenticated: true
-      });
-
-      await markRoleSessionActive(newRole);
-      await setActiveRole(newRole);
-      markAuthChecked();
-      void registerNativePushNotifications(newRole);
-
-      toast.success('Role Switched', {
-        description: `Switched to ${newRole} dashboard`,
-        duration: 2000,
-      });
-    } catch (error) {
-      const err = error as AuthRequestError;
-      const message = err.response?.data?.message || 'Failed to switch role';
-      toast.error('Role Switch Failed', { description: message });
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [markAuthChecked, setIsLoading, setUser, queryClient]);
 
   return {
     login,
@@ -343,4 +191,30 @@ export function useAuthActions({
   };
 }
 
+function handlePostLoginRedirect(navigate: NavigateFunction, role: UserRole) {
+  const redirectPath = sessionStorage.getItem('redirectAfterLogin');
+  if (redirectPath && typeof redirectPath === 'string') {
+    sessionStorage.removeItem('redirectAfterLogin');
+    navigate(redirectPath, { replace: true });
+    return;
+  }
+  const dashboardPath = getDashboardPath(role);
+  if (typeof dashboardPath === 'string') {
+    navigate(dashboardPath, { replace: true });
+  } else {
+    console.error('[Auth] Invalid dashboard path:', dashboardPath);
+    navigate('/', { replace: true });
+  }
+}
 
+async function handleLoginFailure(role: UserRole) {
+  try {
+    await clearRoleSession(role);
+    if (isNativeApp()) {
+      await storage.remove(`${role}Token`);
+      await storage.remove(`${role}RefreshToken`);
+    }
+  } catch {
+    // Ignore storage cleanup errors on failed login
+  }
+}

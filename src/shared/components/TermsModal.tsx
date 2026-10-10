@@ -1,56 +1,22 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { useEffect, useState } from 'react';
 import { TermsContent } from './TermsContent';
+import { useTermsScrollSpy } from './terms/useTermsScrollSpy';
 
-interface TermsModalProps {
+export interface TermsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccept?: () => void;
-  /** Section id (without the "section-" prefix) to scroll to when the modal opens.
-   *  Lets separate "View Terms" / "View Privacy Policy" entry points jump straight
-   *  to the relevant part of the combined document instead of always opening at
-   *  the top. Defaults to 'privacy'. */
   initialSection?: string;
 }
 
-const sections = [
-  { id: 'privacy', label: '1. Privacy Policy' },
-  { id: 'agreement', label: '2. Client Agreement' },
-  { id: 'refund', label: '3. Refund Policy' },
-  { id: 'risk', label: '4. Risk Disclosure' },
-  { id: 'ip', label: '5. Intellectual Property' },
-  { id: 'prohibited', label: '6. Prohibited Conduct' },
-  { id: 'liability', label: '7. Limitation of Liability' },
-  { id: 'disputes', label: '8. Dispute Resolution' },
-  { id: 'amendments', label: '9. Amendments' },
-  { id: 'governing', label: '10. Governing Law' },
-];
-
 const TermsModal = ({ isOpen, onClose, onAccept, initialSection = 'privacy' }: TermsModalProps) => {
-  const [activeSection, setActiveSection] = useState(initialSection);
-
-  const scrollTo = (id: string) => {
-    setActiveSection(id);
-    const el = document.getElementById(`section-${id}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  // Keep the sidebar highlight in sync with which section we're about to show.
-  useEffect(() => {
-    if (isOpen) setActiveSection(initialSection);
-  }, [isOpen, initialSection]);
-
-  // Radix mounts DialogContent into its portal asynchronously relative to the
-  // `isOpen` prop flip, so a requestAnimationFrame scheduled from a plain
-  // useEffect can fire before `section-${id}` actually exists in the DOM --
-  // the scroll silently no-ops. `onOpenAutoFocus` fires only once Radix has
-  // finished mounting and is about to move focus into the now-visible
-  // content, which is the first point the section elements are guaranteed
-  // to be present and laid out.
-  const scrollToInitialSection = () => {
-    const el = document.getElementById(`section-${initialSection}`);
-    if (el) el.scrollIntoView({ block: 'start' });
-  };
+  const {
+    activeSection,
+    scrollTo,
+    scrollToInitialSection,
+    handleContentScroll,
+    sections,
+  } = useTermsScrollSpy(isOpen, initialSection);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -131,21 +97,13 @@ const TermsModal = ({ isOpen, onClose, onAccept, initialSection = 'privacy' }: T
           {/* Content */}
           <div
             className="flex-1 overflow-y-auto px-5 sm:px-8 py-6 sm:py-8 text-[13px] sm:text-[13.5px] text-slate-300 bg-[#0d0d0d] leading-relaxed"
-            onScroll={(e) => {
-              const container = e.currentTarget;
-              for (const s of sections) {
-                const el = document.getElementById(`section-${s.id}`);
-                if (el && el.offsetTop - container.scrollTop < 200) setActiveSection(s.id);
-              }
-            }}
+            onScroll={(e) => handleContentScroll(e.currentTarget)}
           >
             <TermsContent />
           </div>
         </div>
 
-        {/* Footer — the accept/decline actions only make sense during
-            registration (onAccept provided). Opened from an account settings
-            page to simply review the documents, this is just a close button. */}
+        {/* Footer */}
         <div className="flex-shrink-0 border-t border-white/10 bg-[#161616] px-5 sm:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-slate-400 italic">
             {onAccept
@@ -162,19 +120,16 @@ const TermsModal = ({ isOpen, onClose, onAccept, initialSection = 'privacy' }: T
                   Decline
                 </button>
                 <button
-                  onClick={() => {
-                    onAccept();
-                    onClose();
-                  }}
-                  className="px-6 py-2 text-xs bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-xl shadow-lg transition-colors tracking-wide"
+                  onClick={onAccept}
+                  className="px-6 py-2 text-xs bg-[#c9a84c] hover:bg-[#b8973b] text-[#1a1a1a] font-bold rounded-xl transition-colors shadow-lg shadow-[#c9a84c]/20"
                 >
-                  I Agree
+                  I Agree to Terms
                 </button>
               </>
             ) : (
               <button
                 onClick={onClose}
-                className="px-6 py-2 text-xs bg-yellow-400 hover:bg-yellow-300 text-black font-bold rounded-xl shadow-lg transition-colors tracking-wide"
+                className="px-6 py-2 text-xs bg-white/10 hover:bg-white/15 text-white font-medium rounded-xl transition-colors"
               >
                 Close
               </button>
