@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { RouteObject } from 'react-router-dom';
+import { RouteObject, Navigate } from 'react-router-dom';
 import { AppProtectedRoute } from '@/app/router/AppProtectedRoute';
 import { safeLazy } from '@/shared/utils/safeLazy';
 import { RouteFallback } from '@/app/router/RouteFallback';
@@ -15,6 +15,10 @@ export const mzigoRoutes: RouteObject[] = [
         <MzigoLogin />
       </Suspense>
     ),
+  },
+  {
+    path: '/mzigo',
+    element: <Navigate to="/mzigo/dashboard" replace />,
   },
   {
     path: '/mzigo/dashboard',
@@ -33,6 +37,10 @@ export const mzigoRoutes: RouteObject[] = [
         <MzigoLogin />
       </Suspense>
     ),
+  },
+  {
+    path: '/logistics',
+    element: <Navigate to="/logistics/dashboard" replace />,
   },
   {
     path: '/logistics/dashboard',

@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { RouteObject } from 'react-router-dom';
+import { RouteObject, Navigate } from 'react-router-dom';
 import { AppProtectedRoute } from '@/app/router/AppProtectedRoute';
 import { safeLazy } from '@/shared/utils/safeLazy';
 import { RouteFallback } from '@/app/router/RouteFallback';
@@ -42,6 +42,10 @@ export const creatorRoutes: RouteObject[] = [
         <CreatorResetPassword />
       </Suspense>
     ),
+  },
+  {
+    path: '/creator',
+    element: <Navigate to="/creator/dashboard" replace />,
   },
   {
     path: '/creator/dashboard',

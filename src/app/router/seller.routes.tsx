@@ -1,15 +1,14 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { RouteObject, Navigate } from 'react-router-dom';
 import { SellerProtectedRoute } from '@/app/router/AppProtectedRoute';
 import { SellerLayout } from '@/app/layouts/SellerLayout';
 import { safeLazy } from '@/shared/utils/safeLazy';
 import { RouteFallback } from '@/app/router/RouteFallback';
-
-const sellerDashboard = safeLazy(() => import('@/features/seller/pages/SellerDashboard'));
-const sellerRegistration = safeLazy(() => import('@/features/seller/pages/SellerRegistration'));
-const sellerLogin = safeLazy(() => import('@/features/seller/pages/SellerLogin').then(m => m.SellerLogin));
-
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
+
+const SellerDashboard = safeLazy(() => import('@/features/seller/pages/SellerDashboard'));
+const SellerRegistration = safeLazy(() => import('@/features/seller/pages/SellerRegistration'));
+const SellerLogin = safeLazy(() => import('@/features/seller/pages/SellerLogin').then(m => m.SellerLogin));
 
 // Create the seller routes
 export const sellerRoutes: RouteObject[] = [
@@ -18,7 +17,7 @@ export const sellerRoutes: RouteObject[] = [
     path: '/seller/login',
     element: (
       <Suspense fallback={<RouteFallback />}>
-        {(() => { const Component = sellerLogin; return <Component />; })()}
+        <SellerLogin />
       </Suspense>
     ),
   },
@@ -26,7 +25,7 @@ export const sellerRoutes: RouteObject[] = [
     path: '/seller/register',
     element: (
       <Suspense fallback={<RouteFallback />}>
-        {(() => { const Component = sellerRegistration; return <Component />; })()}
+        <SellerRegistration />
       </Suspense>
     ),
   },
@@ -34,7 +33,7 @@ export const sellerRoutes: RouteObject[] = [
     path: '/join',
     element: (
       <Suspense fallback={<RouteFallback />}>
-        {(() => { const Component = sellerRegistration; return <Component />; })()}
+        <SellerRegistration />
       </Suspense>
     ),
   },
@@ -60,22 +59,9 @@ export const sellerRoutes: RouteObject[] = [
         path: 'dashboard',
         element: (
           <Suspense fallback={<RouteFallback />}>
-            {(() => { const Component = sellerDashboard; return <Component />; })()}
+            <SellerDashboard />
           </Suspense>
         ),
-        children: [
-          {
-            index: true,
-            element: (
-              <div className="p-6">
-                <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {/* Overview content will be rendered by SellerDashboard */}
-                </div>
-              </div>
-            ),
-          },
-        ],
       },
       // Redirects for protected routes
       {
@@ -89,5 +75,3 @@ export const sellerRoutes: RouteObject[] = [
     ],
   },
 ];
-
-

@@ -98,4 +98,27 @@ describe('UniversalHttpClient — keyed token refresh (Android role race)', () =
     // refresh-token rotation race.
     expect(refreshCalls).toHaveLength(1);
   });
+
+  test('resolves marketing role for /admin/marketing/* endpoints without being shadowed by admin', async () => {
+    const rolesRequested: string[] = [];
+    const strategy: AuthStrategy = {
+      platform: 'web' as AuthPlatform,
+      async getAuthHeaders(role?: AppRole) {
+        rolesRequested.push(role ?? 'none');
+        return {};
+      },
+      async getCsrfHeader() { return {}; },
+      async handleUnauthorized() { return false; },
+      async clearSession() {},
+    };
+    const client = new UniversalHttpClient({ authStrategy: strategy });
+    client.getAxiosInstance().defaults.adapter = async (config) => {
+      return { data: { ok: true }, status: 200, statusText: 'OK', headers: {}, config } as unknown as ReturnType<typeof Promise.resolve>;
+    };
+
+    await client.get('/admin/marketing/overview');
+    await client.get('/admin/sellers');
+
+    expect(rolesRequested).toEqual(['marketing', 'admin']);
+  });
 });

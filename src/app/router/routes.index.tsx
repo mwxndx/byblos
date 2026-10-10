@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- route config module exports a route array, not a fast-refreshable component */
 import { Suspense } from 'react';
+import { Navigate } from 'react-router-dom';
 import { sellerRoutes } from './seller.routes';
 import { buyerRoutes } from './buyer.routes';
 import { adminRoutes } from './admin.routes';
@@ -95,6 +96,15 @@ export const routes = [
         <LegalPage />
       </Suspense>
     ),
+  },
+  // Canonical top-level authentication redirects (must match before seller shortlink wildcard)
+  {
+    path: '/login',
+    element: <Navigate to="/buyer/login" replace />,
+  },
+  {
+    path: '/register',
+    element: <Navigate to="/buyer/register" replace />,
   },
   // Standard public seller short link wildcard (must be matched after specific subpaths)
   {

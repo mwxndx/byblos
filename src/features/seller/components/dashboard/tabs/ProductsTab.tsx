@@ -9,7 +9,7 @@ interface ProductsTabProps {
   fetchProducts: () => Promise<void>;
   isAddProductModalOpen: boolean;
   onDeleteProduct: (id: string) => Promise<void>;
-  onEditProduct: (id: string) => void;
+  onEditProduct?: (id: string) => void;
   onStatusUpdate: (productId: string, newStatus: 'available' | 'sold') => Promise<void>;
   products: ProductSummary[];
   setIsAddProductModalOpen: (open: boolean) => void;

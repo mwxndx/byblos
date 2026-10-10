@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useGlobalAuth, UserRole } from '@/features/auth/contexts';
 import { RouteFallback } from '@/app/router/RouteFallback';
-import { requiresEmailVerification } from '@/features/auth/utils/authRouting';
+import { requiresEmailVerification, getDashboardPath } from '@/features/auth/utils/authRouting';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface AppProtectedRouteProps {
@@ -34,10 +34,10 @@ export function AppProtectedRoute({
             const path = location.pathname;
             if (path.startsWith('/buyer')) return '/buyer/login';
             if (path.startsWith('/seller')) return '/seller/login';
+            if (path.startsWith('/admin/marketing') || path.startsWith('/marketing')) return '/admin/marketing/login';
             if (path.startsWith('/admin')) return '/admin/login';
             if (path.startsWith('/creator')) return '/creator/login';
             if (path.startsWith('/mzigo') || path.startsWith('/logistics')) return '/mzigo/login';
-            if (path.startsWith('/marketing')) return '/marketing/login';
             return '/buyer/login';
         };
 
@@ -70,7 +70,7 @@ export function AppProtectedRoute({
 
     // Wrong role → redirect to own dashboard
     if (role && !allowedRoles.includes(role)) {
-        return <Navigate to={`/${role}/dashboard`} replace />;
+        return <Navigate to={getDashboardPath(role)} replace />;
     }
 
     return <>{children}</>;

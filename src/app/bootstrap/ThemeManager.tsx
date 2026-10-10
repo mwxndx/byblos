@@ -27,6 +27,11 @@ function scopeForPath(pathname: string): ThemeScope {
   if (pathname.startsWith('/creator')) return 'creator';
   if (pathname.startsWith('/buyer')) return 'buyer'; // includes /buyer/shop/*
   if (pathname.startsWith('/shop/')) return 'shop';  // public storefront
+  if (pathname.startsWith('/admin') || pathname.startsWith('/mzigo') || pathname.startsWith('/logistics') || pathname.startsWith('/marketing')) return 'default';
+  const isKnownStatic = ['/track', '/verify-email', '/delete-account', '/legal', '/privacy', '/terms', '/login', '/register', '/join'].some(p => pathname.startsWith(p));
+  if (pathname !== '/' && !isKnownStatic && /^\/[^/]+$/.test(pathname)) {
+    return 'shop'; // Seller shortlink wildcard /:shopName
+  }
   return 'default';
 }
 

@@ -297,7 +297,6 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
             fetchProducts={fetchProducts}
             isAddProductModalOpen={isAddProductModalOpen}
             onDeleteProduct={handleDeleteProduct}
-            onEditProduct={(id) => navigate(`/seller/edit-product/${id}`)}
             onStatusUpdate={handleStatusUpdate}
             products={products}
             setIsAddProductModalOpen={setIsAddProductModalOpen}

@@ -4,7 +4,6 @@ import { AppProviders } from "@/app/providers/AppProviders";
 import { ThemeManager } from "@/app/bootstrap/ThemeManager";
 import { RootErrorElement } from "@/shared/components/ErrorBoundary";
 import NotFound from "@/shared/components/NotFound";
-import { adminRouter } from "@/app/router/admin.routes";
 import { routes } from "@/app/router/routes.index";
 
 export const router = createBrowserRouter([
@@ -18,7 +17,6 @@ export const router = createBrowserRouter([
     errorElement: <RootErrorElement />,
     children: [
       ...routes,
-      ...adminRouter.routes,
       {
         path: "*",
         element: <NotFound />,
@@ -26,7 +24,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-
-
-
-

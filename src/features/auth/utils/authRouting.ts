@@ -2,24 +2,30 @@ import type { UserRole } from '../types/authTypes';
 
 export const AUTH_REVALIDATION_TTL_MS = 5 * 60 * 1000;
 
-export const getLoginPath = (role: UserRole): string => `/${role}/login`;
+export const getLoginPath = (role: UserRole): string => {
+  if (role === 'marketing') return '/admin/marketing/login';
+  return `/${role}/login`;
+};
 
-export const getDashboardPath = (role: UserRole): string => `/${role}/dashboard`;
+export const getDashboardPath = (role: UserRole): string => {
+  if (role === 'marketing') return '/admin/marketing';
+  return `/${role}/dashboard`;
+};
 
 export const getRoleFromRoute = (pathname: string): UserRole | null => {
   if (pathname.startsWith('/buyer')) return 'buyer';
   if (pathname.startsWith('/seller')) return 'seller';
   if (pathname.startsWith('/creator')) return 'creator';
+  if (pathname.startsWith('/admin/marketing') || pathname.startsWith('/marketing')) return 'marketing';
   if (pathname.startsWith('/admin')) return 'admin';
   if (pathname.startsWith('/logistics') || pathname.startsWith('/mzigo')) return 'logistics';
-  if (pathname.startsWith('/marketing')) return 'marketing';
   return null;
 };
 
 export const isPublicRoute = (pathname: string): boolean => {
   if (!pathname || pathname === '/') return true;
 
-  if (pathname === '/marketing' || pathname === '/marketing/' || pathname === '/marketing/login') return true;
+  if (pathname === '/marketing' || pathname === '/marketing/' || pathname === '/marketing/login' || pathname === '/admin/marketing/login') return true;
 
   const publicSuffixes = ['/login', '/register', '/forgot-password', '/reset-password'];
   return publicSuffixes.some(path => pathname.endsWith(path) || pathname.includes(path + '/'));
@@ -28,5 +34,3 @@ export const isPublicRoute = (pathname: string): boolean => {
 export const requiresEmailVerification = (role: UserRole | null): boolean => {
   return role === 'buyer' || role === 'seller';
 };
-
-

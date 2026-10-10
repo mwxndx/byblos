@@ -52,11 +52,11 @@ export class UniversalHttpClient {
   private resolveRole(url: string): AppRole | undefined {
     const cleanUrl = url.split('?')[0];
     if (/(^\/|^\/api\/)notifications\/logistics(\/|$)/.test(cleanUrl)) return 'logistics';
+    if (/(^\/|^\/api\/)(admin\/)?marketing(\/|$)/.test(cleanUrl)) return 'marketing';
     if (/(^\/|^\/api\/)seller(\/|$)/.test(cleanUrl)) return 'seller';
     if (/(^\/|^\/api\/)creator(\/|$)/.test(cleanUrl)) return 'creator';
     if (/(^\/|^\/api\/)admin(\/|$)/.test(cleanUrl)) return 'admin';
     if (/(^\/|^\/api\/)logistics(\/|$)/.test(cleanUrl) || /(^\/|^\/api\/)mzigo(\/|$)/.test(cleanUrl)) return 'logistics';
-    if (/(^\/|^\/api\/)marketing(\/|$)/.test(cleanUrl)) return 'marketing';
     if (/(^\/|^\/api\/)buyer(\/|$)/.test(cleanUrl) || /(^\/|^\/api\/)orders(\/|$)/.test(cleanUrl)) return 'buyer';
     return this.defaultRole;
   }
