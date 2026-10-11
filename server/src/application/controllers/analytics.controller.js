@@ -15,6 +15,93 @@ const SELLER_ANALYTICS_EXCLUDED_STATUSES = [
   'COMPENSATION_REQUIRED'
 ];
 
+const triggerPreAnalyticsTasks = async () => {
+  try {
+    await FulfillmentQueueService.processJobs(5);
+    await ReconciliationEngine.handleUnreleasedCompletedOrders();
+    await promoteSettlementsOnce({ limit: 100 });
+  } catch (settlementError) {
+    logger.warn('[AnalyticsController] Background queue/settlement check before analytics:', settlementError.message);
+  }
+};
+
+const resolveMissingDatabaseTable = (errorMessage = '') => {
+  const tables = ['order_items', 'product_orders', 'seller_knocks', 'wishlists', 'products'];
+  for (const table of tables) {
+    if (errorMessage.includes(table)) {
+      return table;
+    }
+  }
+  return 'required tables';
+};
+
+const mapAnalyticsDto = ({
+  totalProducts,
+  sellerStatsRow,
+  monthlySalesRows,
+  recentOrdersRows,
+  wishlistCount,
+  clickCount
+}) => {
+  const sellerStats = sellerStatsRow || {
+    total_sales: 0,
+    net_revenue: 0,
+    balance: 0,
+    available_balance: 0,
+    pending_settlement_balance: 0,
+    withdrawal_reserved_balance: 0,
+    refund_reserved_balance: 0,
+    next_settlement_at: null,
+    creator_count: 0,
+    creator_generated_sales: 0,
+  };
+
+  return {
+    totalProducts,
+    totalSales: parseFloat(sellerStats.total_sales || 0),
+    totalRevenue: parseFloat(sellerStats.net_revenue || 0),
+    balance: parseFloat(sellerStats.balance || 0),
+    availableBalance: parseFloat(sellerStats.available_balance ?? sellerStats.balance ?? 0),
+    pendingSettlementBalance: parseFloat(sellerStats.pending_settlement_balance || 0),
+    withdrawalReservedBalance: parseFloat(sellerStats.withdrawal_reserved_balance || 0),
+    refundReservedBalance: parseFloat(sellerStats.refund_reserved_balance || 0),
+    nextSettlementAt: sellerStats.next_settlement_at || null,
+    creatorCount: parseInt(sellerStats.creator_count || 0),
+    creatorGeneratedSales: parseFloat(sellerStats.creator_generated_sales || 0),
+    wishlistCount,
+    clickCount,
+    monthlySales: (monthlySalesRows || []).map(row => ({
+      month: row.month,
+      sales: parseFloat(row.sales || 0)
+    })),
+    recentOrders: (recentOrdersRows || []).map(order => ({
+      id: order.id,
+      orderNumber: order.order_number,
+      status: order.status,
+      totalAmount: parseFloat(order.total_amount || 0),
+      createdAt: order.created_at,
+      items: order.items || []
+    })),
+  };
+};
+
+const handleAnalyticsError = (error, next) => {
+  console.error('Error in getSellerAnalytics:', error.message);
+
+  if (error.code === '42P01') {
+    const missingTable = resolveMissingDatabaseTable(error.message);
+    return next(new AppError(`Required table (${missingTable}) missing. Run migrations.`, 500));
+  }
+  if (error.code === '42P02') {
+    return next(new AppError('Database schema mismatch. Run migrations.', 500));
+  }
+  if (error instanceof AppError) {
+    return next(error);
+  }
+
+  return next(new AppError(`Error fetching analytics data: ${error.message}`, 500));
+};
+
 /**
  * @desc    Get analytics data for the authenticated seller
  * @route   GET /api/sellers/analytics
@@ -29,13 +116,7 @@ export const getSellerAnalytics = async (req, res, next) => {
   const excludedStatuses = SELLER_ANALYTICS_EXCLUDED_STATUSES;
 
   try {
-    try {
-      await FulfillmentQueueService.processJobs(5);
-      await ReconciliationEngine.handleUnreleasedCompletedOrders();
-      await promoteSettlementsOnce({ limit: 100 });
-    } catch (settlementError) {
-      logger.warn('[AnalyticsController] Background queue/settlement check before analytics:', settlementError.message);
-    }
+    await triggerPreAnalyticsTasks();
 
     const [
       totalProducts,
@@ -53,68 +134,20 @@ export const getSellerAnalytics = async (req, res, next) => {
       sellerAnalyticsRepository.countRecentKnocks(sellerId),
     ]);
 
-    const sellerStats = sellerStatsRow || {
-      total_sales: 0,
-      net_revenue: 0,
-      balance: 0,
-      available_balance: 0,
-      pending_settlement_balance: 0,
-      withdrawal_reserved_balance: 0,
-      refund_reserved_balance: 0,
-      next_settlement_at: null,
-      creator_count: 0,
-      creator_generated_sales: 0,
-    };
-
-    const analyticsData = {
+    const analyticsData = mapAnalyticsDto({
       totalProducts,
-      totalSales: parseFloat(sellerStats.total_sales || 0),
-      totalRevenue: parseFloat(sellerStats.net_revenue || 0),
-      balance: parseFloat(sellerStats.balance || 0),
-      availableBalance: parseFloat(sellerStats.available_balance ?? sellerStats.balance ?? 0),
-      pendingSettlementBalance: parseFloat(sellerStats.pending_settlement_balance || 0),
-      withdrawalReservedBalance: parseFloat(sellerStats.withdrawal_reserved_balance || 0),
-      refundReservedBalance: parseFloat(sellerStats.refund_reserved_balance || 0),
-      nextSettlementAt: sellerStats.next_settlement_at || null,
-      creatorCount: parseInt(sellerStats.creator_count || 0),
-      creatorGeneratedSales: parseFloat(sellerStats.creator_generated_sales || 0),
+      sellerStatsRow,
+      monthlySalesRows,
+      recentOrdersRows,
       wishlistCount,
-      clickCount,
-      monthlySales: monthlySalesRows.map(row => ({
-        month: row.month,
-        sales: parseFloat(row.sales || 0)
-      })),
-      recentOrders: recentOrdersRows.map(order => ({
-        id: order.id,
-        orderNumber: order.order_number,
-        status: order.status,
-        totalAmount: parseFloat(order.total_amount || 0),
-        createdAt: order.created_at,
-        items: order.items || []
-      })),
-    };
+      clickCount
+    });
 
     return res.status(200).json({
       status: 'success',
       data: analyticsData
     });
-
   } catch (error) {
-    console.error('Error in getSellerAnalytics:', error.message);
-
-    if (error.code === '42P01') {
-      const missingTable = error.message.includes('order_items') ? 'order_items' :
-        error.message.includes('product_orders') ? 'product_orders' :
-          error.message.includes('seller_knocks') ? 'seller_knocks' :
-            error.message.includes('wishlists') ? 'wishlists' :
-              error.message.includes('products') ? 'products' : 'required tables';
-      return next(new AppError(`Required table (${missingTable}) missing. Run migrations.`, 500));
-    }
-    if (error.code === '42P02') {
-      return next(new AppError('Database schema mismatch. Run migrations.', 500));
-    }
-    if (error instanceof AppError) return next(error);
-
-    return next(new AppError(`Error fetching analytics data: ${error.message}`, 500));
+    return handleAnalyticsError(error, next);
   }
 };
