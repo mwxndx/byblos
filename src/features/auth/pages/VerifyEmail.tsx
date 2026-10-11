@@ -13,9 +13,13 @@ const VerifyEmail = () => {
     const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'check-email'>('loading');
     const [message, setMessage] = useState('Verifying your email...');
 
-    const token = searchParams.get('token');
-    const email = searchParams.get('email');
-    const type = searchParams.get('type') as 'buyer' | 'seller' | 'creator' | null;
+    const rawToken = searchParams.get('token');
+    const rawEmail = searchParams.get('email');
+    const rawType = searchParams.get('type');
+
+    const token = rawToken ? rawToken.trim() : null;
+    const email = rawEmail ? rawEmail.trim().toLowerCase() : null;
+    const type = (rawType ? rawType.trim().toLowerCase() : null) as 'buyer' | 'seller' | 'creator' | null;
 
     const buyerVerify = useBuyerVerifyEmailMutation();
     const buyerResend = useBuyerResendVerificationMutation();

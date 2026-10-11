@@ -96,6 +96,8 @@ describe('authRouting utility unit tests', () => {
       expect(isPublicRoute('/admin/login')).toBe(true);
       expect(isPublicRoute('/admin/marketing/login')).toBe(true);
       expect(isPublicRoute('/marketing')).toBe(true);
+      expect(isPublicRoute('/verify-email')).toBe(true);
+      expect(isPublicRoute('/verify-email?token=abc&email=test@test.com&type=seller')).toBe(true);
     });
 
     test('identifies protected routes as non-public', () => {

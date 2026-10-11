@@ -26,6 +26,7 @@ export const isPublicRoute = (pathname: string): boolean => {
   if (!pathname || pathname === '/') return true;
 
   if (pathname === '/marketing' || pathname === '/marketing/' || pathname === '/marketing/login' || pathname === '/admin/marketing/login') return true;
+  if (pathname === '/verify-email' || pathname.startsWith('/verify-email?') || pathname.startsWith('/verify-email/')) return true;
 
   const publicSuffixes = ['/login', '/register', '/forgot-password', '/reset-password'];
   return publicSuffixes.some(path => pathname.endsWith(path) || pathname.includes(path + '/'));
