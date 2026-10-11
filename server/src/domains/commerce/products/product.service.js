@@ -4,6 +4,14 @@ import logger from '../../../shared/utils/logger.js';
 import { pool } from '../../../infrastructure/database/database.js';
 import cacheService from '../../../shared/utils/cache.service.js';
 import Fees from '../../../shared/config/fees.js';
+import {
+    validateProductImage,
+    sanitizeDigitalPath,
+    assertServiceShopLocation,
+    validateProductTypeRules,
+    resolveProductUpdateCustomFields,
+    resolveProductStatusUpdate
+} from './productValidationRules.js';
 
 class ProductService {
     /**
@@ -35,95 +43,25 @@ class ProductService {
             sanitizedDigitalPath = this._sanitizeDigitalPath(digital_file_path);
         }
 
-        const validProductTypes = ['physical', 'digital', 'service'];
-        if (product_type && !validProductTypes.includes(product_type)) {
-            throw new Error('Invalid product type');
-        }
-
         if (product_type === 'service') {
             if (!service_options || !service_options.availability_days) {
                 throw new Error('Availability days are required for services');
             }
-
-            const { rows: sellerRows } = await pool.query(
-                'SELECT latitude, longitude FROM sellers WHERE id = $1',
-                [sellerId]
-            );
-            const seller = sellerRows[0];
-            const lat = seller?.latitude ? Number.parseFloat(seller.latitude) : null;
-            const lng = seller?.longitude ? Number.parseFloat(seller.longitude) : null;
-            if (lat === null || lng === null || !Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) {
-                throw new Error('Pin your shop location coordinates in Settings before offering services');
-            }
+            await assertServiceShopLocation(pool, sellerId);
         }
 
-        const customProduct = product_type === 'physical' && is_custom_product === true;
-        const productionDaysValue = customProduct ? Number.parseInt(production_days, 10) : null;
-        const importedProduct = product_type === 'physical' && is_imported_product === true;
-        const importDaysValue = importedProduct ? Number.parseInt(import_days, 10) : null;
-        if (is_custom_product === true && product_type !== 'physical') {
-            throw new Error('Only physical products can be custom products');
-        }
-        if (is_imported_product === true && product_type !== 'physical') {
-            throw new Error('Only physical products can be imported or pre-order products');
-        }
-        if (customProduct && importedProduct) {
-            throw new Error('Choose either custom product or imported/pre-order product, not both');
-        }
-        if (customProduct && (!Number.isInteger(productionDaysValue) || productionDaysValue < 1 || productionDaysValue > 5)) {
-            throw new Error('Custom physical products require production days between 1 and 5');
-        }
-        if (importedProduct && ![7, 14, 21, 30].includes(importDaysValue)) {
-            throw new Error('Imported physical products require an estimated ready time of 7, 14, 21, or 30 days');
-        }
+        const { customProduct, productionDaysValue, importedProduct, importDaysValue } = validateProductTypeRules({
+            product_type,
+            is_custom_product,
+            production_days,
+            is_imported_product,
+            import_days
+        });
 
-        // Image Handling - now optional
+        // Image Handling with SSRF verification
         let imageData = image_url || image || null;
-
         if (imageData) {
-            // Validate image format only if image is provided
-            // Allow: base64 (data:image/), local fallback (/uploads/), and remote Cloudinary URLs (http/https)
-            const isBase64 = imageData.startsWith('data:image/');
-            const isLocal = imageData.startsWith('/uploads/');
-            const isRemote = imageData.startsWith('http');
-
-            if (isRemote) {
-                try {
-                    const url = new URL(imageData);
-                    const hostname = url.hostname.toLowerCase();
-
-                    // Block internal/private IPs and localhost
-                    const isInternal = hostname === 'localhost' ||
-                        hostname === '127.0.0.1' ||
-                        hostname.startsWith('192.168.') ||
-                        hostname.startsWith('10.') ||
-                        hostname.startsWith('172.16.') ||
-                        hostname.endsWith('.local') ||
-                        hostname.endsWith('.internal');
-
-                    if (isInternal) {
-                        throw new Error('Invalid remote image URL: Internal addresses are not allowed.');
-                    }
-
-                    // Optional: Whitelist Cloudinary if required
-                    // if (!hostname.includes('cloudinary.com')) { ... }
-                } catch (e) {
-                    throw new Error(e.message.includes('Internal addresses') ? e.message : 'Invalid remote image URL format.');
-                }
-            }
-
-            if (!isBase64 && !isLocal && !isRemote) {
-                throw new Error('Invalid image format. Expected base64, local path, or remote URL.');
-            }
-
-            // Size validation only applies to raw base64 data before upload
-            // Remote/Local URLs are already "physical" files on disk or cloud
-            if (isBase64) {
-                const imageSize = (imageData.length * 0.75);
-                if (imageSize > 5 * 1024 * 1024) { // Increased to 5MB for modern assets
-                    throw new Error('Image size exceeds 5MB limit');
-                }
-            }
+            validateProductImage(imageData);
         }
 
         let finalProductType = product_type;
@@ -257,62 +195,25 @@ class ProductService {
                 if (!existing) throw new Error('Product not found');
                 if (existing.seller_id !== sellerId) throw new Error('Unauthorized');
 
-                const nextProductType = data.product_type || existing.product_type || 'physical';
-                const nextCustom = nextProductType === 'physical' && data.is_custom_product === true;
-                const nextProductionDays = nextCustom ? Number.parseInt(data.production_days ?? existing.production_days, 10) : null;
-                const nextImported = nextProductType === 'physical' && data.is_imported_product === true;
-                const nextImportDays = nextImported ? Number.parseInt(data.import_days ?? existing.import_days, 10) : null;
-
-                if (nextProductType === 'service') {
-                    const { rows: sellerRows } = await pool.query(
-                        'SELECT latitude, longitude FROM sellers WHERE id = $1',
-                        [sellerId]
-                    );
-                    const seller = sellerRows[0];
-                    const lat = seller?.latitude ? Number.parseFloat(seller.latitude) : null;
-                    const lng = seller?.longitude ? Number.parseFloat(seller.longitude) : null;
-                    if (lat === null || lng === null || !Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) {
-                        throw new Error('Pin your shop location coordinates in Settings before offering services');
-                    }
+                const customFields = resolveProductUpdateCustomFields(existing, data);
+                if (customFields.nextProductType === 'service') {
+                    await assertServiceShopLocation(pool, sellerId);
                 }
 
-                if (data.is_custom_product === true && nextProductType !== 'physical') {
-                    throw new Error('Only physical products can be custom products');
-                }
-                if (data.is_imported_product === true && nextProductType !== 'physical') {
-                    throw new Error('Only physical products can be imported or pre-order products');
-                }
-                if (nextCustom && nextImported) {
-                    throw new Error('Choose either custom product or imported/pre-order product, not both');
-                }
-                if (nextCustom && (!Number.isInteger(nextProductionDays) || nextProductionDays < 1 || nextProductionDays > 5)) {
-                    throw new Error('Custom physical products require production days between 1 and 5');
-                }
-                if (nextImported && ![7, 14, 21, 30].includes(nextImportDays)) {
-                    throw new Error('Imported physical products require an estimated ready time of 7, 14, 21, or 30 days');
-                }
-
-                updateFields.is_custom_product = nextCustom;
-                updateFields.production_days = nextCustom ? nextProductionDays : null;
-                updateFields.customization_prompt = nextCustom
-                    ? String(data.customization_prompt || existing.customization_prompt || 'Tell the seller exactly what you want customized.').trim().slice(0, 240)
-                    : null;
-                updateFields.is_imported_product = nextImported;
-                updateFields.import_days = nextImported ? nextImportDays : null;
-                updateFields.import_note = nextImported
-                    ? String(data.import_note || existing.import_note || 'Imported item. Delivery starts after seller handoff.').trim().slice(0, 240)
-                    : null;
+                Object.assign(updateFields, {
+                    is_custom_product: customFields.is_custom_product,
+                    production_days: customFields.production_days,
+                    customization_prompt: customFields.customization_prompt,
+                    is_imported_product: customFields.is_imported_product,
+                    import_days: customFields.import_days,
+                    import_note: customFields.import_note
+                });
             }
 
             // Status & SoldAt & IsSold sync
-            const targetStatus = status || (soldAt ? 'sold' : (data.is_sold === false || data.isSold === false ? 'available' : undefined));
-            const targetSoldAt = soldAt !== undefined ? soldAt : (data.sold_at !== undefined ? data.sold_at : (targetStatus === 'available' ? null : undefined));
-            const isMarkedSold = targetStatus === 'sold' || Boolean(targetSoldAt);
-
-            if (targetStatus !== undefined || targetSoldAt !== undefined || data.is_sold !== undefined || data.isSold !== undefined) {
-                updateFields.status = isMarkedSold ? 'sold' : 'available';
-                updateFields.sold_at = isMarkedSold ? (targetSoldAt || new Date().toISOString()) : null;
-                updateFields.is_sold = isMarkedSold;
+            const statusUpdate = resolveProductStatusUpdate(data, status, soldAt);
+            if (statusUpdate) {
+                Object.assign(updateFields, statusUpdate);
             }
 
             const updatedProduct = await ProductModel.update(client, productId, sellerId, updateFields);
@@ -419,27 +320,9 @@ class ProductService {
 
     /**
      * Validate a Cloudinary public_id for storage as digital_file_path.
-     * After migration to Cloudinary, digital_file_path stores a public_id
-     * (e.g. 'byblos/digital_products/abc123') rather than a local filesystem path.
-     * Cloudinary public_ids contain no traversal risk; validation is a basic sanity check.
      */
     static _sanitizeDigitalPath(filePath) {
-        if (!filePath) return null;
-
-        // Reject null bytes and clearly local paths — both indicate a mis-wired upload flow
-        if (filePath.includes('\0') || filePath.startsWith('uploads/')) {
-            throw new Error('Invalid digital file path: expected a Cloudinary public_id');
-        }
-
-        // Reject absolute/protocol-relative URLs. A public_id never has a scheme;
-        // accepting a URL here lets a seller point the download endpoint at an
-        // arbitrary host (SSRF — see downloadDigitalProduct). The download path
-        // has its own Cloudinary-host allowlist as a second layer for legacy rows.
-        if (/^[a-z][a-z0-9+.-]*:\/\//i.test(filePath) || filePath.startsWith('//')) {
-            throw new Error('Invalid digital file path: expected a Cloudinary public_id, not a URL');
-        }
-
-        return filePath;
+        return sanitizeDigitalPath(filePath);
     }
 }
 
