@@ -9,6 +9,7 @@ import { deleteBuyerAccount } from '@/features/buyer/api/profile';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';
 import { LegalLinks } from '@/shared/components/LegalLinks';
+import { IosNotificationProfileRow } from '@/features/notifications/components/IosNotificationProfileRow';
 
 interface BuyerProfileContentProps {
   isEditingProfile: boolean;
@@ -120,8 +121,9 @@ export function BuyerProfileContent({
   return (
     <div className="w-full space-y-4">
       {/* App theme + account switcher - one equal row above account details */}
-      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+      <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
         <BuyerPreferencesRow />
+        <IosNotificationProfileRow />
       </section>
 
       {/* Account Details Section */}

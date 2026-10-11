@@ -1,6 +1,7 @@
 import { CheckCheck, Clock } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
 import { useNotifications, type NotificationVariant } from '../hooks/useNotifications';
+import { IosNotificationBanner } from './IosNotificationBanner';
 
 function timeAgo(iso: string): string {
   const then = new Date(iso).getTime();
@@ -73,6 +74,8 @@ export function NotificationList({
           </button>
         )}
       </div>
+
+      <IosNotificationBanner />
 
       <div className={cn('overflow-y-auto divide-y divide-slate-100 dark:divide-white/5', scrollClassName)}>
         {isLoading ? (

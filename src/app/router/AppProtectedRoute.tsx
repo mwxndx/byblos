@@ -22,8 +22,8 @@ export function AppProtectedRoute({
     const { user, isAuthenticated, isLoading, role } = useGlobalAuth();
     const location = useLocation();
 
-    // Show branded fallback while auth state is resolving
-    if (isLoading) {
+    // Show branded fallback while auth state is resolving only if user is not yet hydrated
+    if (isLoading && !user) {
         return <>{fallback ?? <RouteFallback />}</>;
     }
 

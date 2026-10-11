@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState, ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, ReactNode, Dispatch, SetStateAction } from 'react';
 import { LoadingScreen } from '@/shared/components/LoadingScreen';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthActions } from '../hooks/useAuthActions';
 import { useAuthRevalidation } from '../hooks/useAuthRevalidation';
+import { isPublicRoute } from '../utils/authRouting';
 import { GlobalAuthContext } from './authContextObjects';
 import {
     clearAppNavigator,
@@ -27,18 +28,56 @@ export type {
     UserRole,
 } from '../types/authTypes';
 
+const CACHED_SESSION_KEY = 'byblos.auth.session';
+
+function getInitialUser(): import('../types/authTypes').GlobalUser | null {
+    if (typeof window === 'undefined') return null;
+    try {
+        const raw = localStorage.getItem(CACHED_SESSION_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && parsed.role && parsed.isAuthenticated) {
+            return parsed as import('../types/authTypes').GlobalUser;
+        }
+    } catch {
+        /* ignore parsing errors */
+    }
+    return null;
+}
+
 // ============================================================================
 // PROVIDER COMPONENT
 // ============================================================================
 
 export function AuthCoreProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<import('../types/authTypes').GlobalUser | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    // Separate flag: only true during the very first page-load auth check.
-    // Unlike isLoading, this does NOT become true again during login/register.
-    const [initializing, setInitializing] = useState<boolean>(true);
+    const [user, setUserState] = useState<import('../types/authTypes').GlobalUser | null>(() => getInitialUser());
+    const [isLoading, setIsLoading] = useState<boolean>(() => !getInitialUser());
+    // Only true when on an unauthenticated protected route waiting for storage/network probe.
+    // If a user was already hydrated or path is public, immediately false to prevent loading flash.
+    const [initializing, setInitializing] = useState<boolean>(() => {
+        if (typeof window === 'undefined') return false;
+        if (getInitialUser()) return false;
+        const currentPath = window.location.pathname || '/';
+        return currentPath !== '/' && !isPublicRoute(currentPath);
+    });
     const navigate = useNavigate();
     const location = useLocation();
+
+    const setUser = useCallback<Dispatch<SetStateAction<import('../types/authTypes').GlobalUser | null>>>((action) => {
+        setUserState((prev) => {
+            const next = typeof action === 'function' ? action(prev) : action;
+            try {
+                if (next && next.isAuthenticated) {
+                    localStorage.setItem(CACHED_SESSION_KEY, JSON.stringify(next));
+                } else {
+                    localStorage.removeItem(CACHED_SESSION_KEY);
+                }
+            } catch {
+                /* ignore storage error */
+            }
+            return next;
+        });
+    }, []);
 
     const { markAuthChecked } = useAuthRevalidation({
         pathname: location.pathname,
@@ -119,9 +158,9 @@ export function AuthCoreProvider({ children }: { children: ReactNode }) {
     // RENDER GATING (Prevents Flickering)
     // ============================================================================
 
-    // Only gate on the FIRST page-load auth check.
-    // Using `initializing` (not `isLoading`) so login/register do NOT unmount the active page.
-    if (initializing) {
+    // Only gate on the FIRST page-load auth check when no cached user exists.
+    // Using `initializing && !user` so cached sessions render instantly without loading flash.
+    if (initializing && !user) {
         return <LoadingScreen message="Loading..." />;
     }
 

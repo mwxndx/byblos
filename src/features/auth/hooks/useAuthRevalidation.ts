@@ -67,9 +67,8 @@ export function useAuthRevalidation({
     lastCheckRef.current = Date.now();
   }, []);
 
-  // Track valid sub-page navigation on native app to allow cold-start restoration
+  // Track valid sub-page navigation on native and PWA to allow cold-start restoration
   useEffect(() => {
-    if (!isNativeApp()) return;
     if (!pathname || isPublicRoute(pathname) || isExcludedFromRestoration(pathname)) return;
 
     storage.set(LAST_NATIVE_PATH_KEY, pathname);
@@ -209,25 +208,26 @@ export function useAuthRevalidation({
     (async () => {
       const bootPath = pathname;
       if (getRoleFromRoute(bootPath) || !isPublicRoute(bootPath)) return;
-      if (user) return;
       if (['/reset-password', '/forgot-password', '/payment', '/checkout'].some((p) => bootPath.includes(p))) return;
 
-      // Prefer the explicitly-recorded active account so we restore exactly who
+      // Prefer the hydrated user's role, or the explicitly-recorded active account so we restore exactly who
       // the user last signed in as — not whichever role marker comes first in a
       // fixed priority list (which would silently switch accounts when a stale
       // session from another user is still on the device).
-      let activeRole: UserRole | null = null;
-      const persistedRole = await getActiveRole();
-      if (persistedRole && (await storage.get(getSessionKey(persistedRole))) === 'true') {
-        activeRole = persistedRole;
-      } else {
-        const roles: UserRole[] = ['seller', 'buyer', 'creator', 'logistics', 'admin', 'marketing'];
-        const sessionResults = await Promise.all(
-          roles.map(async (r) => ({ role: r, isActive: (await storage.get(getSessionKey(r))) === 'true' }))
-        );
-        const activeMatch = sessionResults.find((res) => res.isActive);
-        if (activeMatch) {
-          activeRole = activeMatch.role;
+      let activeRole: UserRole | null = user?.role ?? null;
+      if (!activeRole) {
+        const persistedRole = await getActiveRole();
+        if (persistedRole && (await storage.get(getSessionKey(persistedRole))) === 'true') {
+          activeRole = persistedRole;
+        } else {
+          const roles: UserRole[] = ['seller', 'buyer', 'creator', 'logistics', 'admin', 'marketing'];
+          const sessionResults = await Promise.all(
+            roles.map(async (r) => ({ role: r, isActive: (await storage.get(getSessionKey(r))) === 'true' }))
+          );
+          const activeMatch = sessionResults.find((res) => res.isActive);
+          if (activeMatch) {
+            activeRole = activeMatch.role;
+          }
         }
       }
       if (!activeRole || cancelled) {
@@ -236,27 +236,22 @@ export function useAuthRevalidation({
       }
 
       // ── Optimistic navigation ────────────────────────────────────────────
-      // We already know, from the local session marker, which dashboard this
-      // returning user belongs on. Navigate there NOW — before the (possibly
-      // slow, e.g. cold-starting backend) profile fetch — so the user lands on
-      // their dashboard skeleton instead of flashing the public landing page
-      // while the fetch runs. Keep isLoading true so AppProtectedRoute shows its
-      // loading fallback rather than bouncing to /login while `user` is still
-      // null; the fetch below fills the profile in, or clears the session on
-      // failure (which then lets the protected route send them to login).
+      // We already know, from the cached user or local session marker, which dashboard this
+      // returning user belongs on. Navigate there NOW so the user lands on
+      // their dashboard immediately without flashing the landing page or a black loading screen.
       if (bootPath === '/') {
         let destinationPath = getDashboardPath(activeRole);
-        if (isNativeApp()) {
-          const savedPath = await storage.get(LAST_NATIVE_PATH_KEY);
-          if (savedPath && !isPublicRoute(savedPath) && !isExcludedFromRestoration(savedPath)) {
-            const savedRole = getRoleFromRoute(savedPath);
-            if (!savedRole || savedRole === activeRole) {
-              destinationPath = savedPath;
-            }
+        const savedPath = await storage.get(LAST_NATIVE_PATH_KEY);
+        if (savedPath && !isPublicRoute(savedPath) && !isExcludedFromRestoration(savedPath)) {
+          const savedRole = getRoleFromRoute(savedPath);
+          if (!savedRole || savedRole === activeRole) {
+            destinationPath = savedPath;
           }
         }
         if (cancelled) return;
-        setIsLoading(true);
+        if (!user) {
+          setIsLoading(true);
+        }
         setInitializing(false);
         navigate(destinationPath, { replace: true });
       }
@@ -266,6 +261,7 @@ export function useAuthRevalidation({
       else if (activeRole === 'seller') queryOpts = sellerProfileQueryOptions;
       else if (activeRole === 'admin') queryOpts = adminProfileQueryOptions;
       else if (activeRole === 'logistics') queryOpts = logisticsProfileQueryOptions;
+      else if (activeRole === 'marketing') queryOpts = marketingProfileQueryOptions;
       else queryOpts = creatorProfileQueryOptions;
 
       try {
@@ -273,6 +269,7 @@ export function useAuthRevalidation({
         if (cancelled) return;
         if (!profileData) {
           await clearRoleSession(activeRole);
+          setUser(null);
           return;
         }
         setUser({
@@ -290,6 +287,7 @@ export function useAuthRevalidation({
         // session restores on the next launch.
         if (isDefinitiveAuthFailure(error) && !cancelled) {
           await clearRoleSession(activeRole);
+          setUser(null);
         }
       } finally {
         // Always ungate rendering after the restore attempt completes.

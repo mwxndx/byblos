@@ -4,6 +4,7 @@ import { formatCurrency } from '@/shared/utils/formatting';
 import { Badge } from '@/shared/ui/badge';
 import { formatOrderStatusLabel, getPendingStatusStyles } from '../dashboardUtils';
 import { SellerReminders } from '../widgets/SellerReminders';
+import { IosNotificationBanner } from '@/features/notifications/components/IosNotificationBanner';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 import type { AnalyticsData, RecentOrder, SellerTabId } from '../types';
 
@@ -145,6 +146,8 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, o
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white sm:text-xl lg:text-2xl">{greeting.title}</h2>
         <p className="mt-1 text-xs font-medium text-slate-500 dark:text-white/60 sm:text-sm">{greeting.sub}</p>
       </div>
+
+      <IosNotificationBanner role="seller" className="mx-0 my-0" />
 
       <SellerReminders sellerProfile={sellerProfile} totalProducts={liveProducts} onSelectTab={onSelectTab} />
 

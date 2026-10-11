@@ -3,12 +3,18 @@ import { toast as sonnerToast } from "sonner";
 
 type ToastVariant = "default" | "destructive";
 
+type ToastAction = {
+  label: ReactNode;
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+};
+
 type ToastOptions = {
   id?: string;
   title?: ReactNode;
   description?: ReactNode;
   variant?: ToastVariant;
   duration?: number;
+  action?: ToastAction;
 };
 
 type ToastUpdateOptions = Omit<ToastOptions, "id">;
@@ -25,9 +31,9 @@ const getToastContent = ({ title, description }: ToastOptions) => {
 };
 
 function toast(props: ToastOptions) {
-  const { id, variant, duration } = props;
+  const { id, variant, duration, action } = props;
   const { message, options } = getToastContent(props);
-  const toastOptions = { ...options, id, duration };
+  const toastOptions = { ...options, id, duration, action };
 
   const toastId = variant === "destructive"
     ? sonnerToast.error(message, toastOptions)

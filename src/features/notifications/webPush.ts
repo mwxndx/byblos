@@ -1,5 +1,5 @@
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getMessaging, getToken, isSupported, type Messaging } from 'firebase/messaging';
+import { getMessaging, getToken, isSupported, onMessage, type Messaging, type MessagePayload, type Unsubscribe } from 'firebase/messaging';
 
 // Firebase's public web config — client-safe by design (ships in the bundle),
 // distinct from the server-side FIREBASE_SERVICE_ACCOUNT secret. Same Firebase
@@ -70,6 +70,25 @@ export async function getWebPushToken(): Promise<string | null> {
     return token || null;
   } catch (err) {
     console.warn('[WebPush] Failed to obtain web push token', err);
+    return null;
+  }
+}
+
+// Subscribe to incoming FCM push notifications while the web app is active in
+// the foreground. On web and iOS PWA, Firebase suppresses onBackgroundMessage
+// while a window client is visible. This listener enables displaying an in-app
+// toast/alert and invalidating real-time query feeds.
+export function subscribeForegroundMessages(
+  onMessageReceived: (payload: MessagePayload) => void
+): Unsubscribe | null {
+  if (!isWebPushSupported() || !isWebPushConfigured()) return null;
+  try {
+    const messaging = getMessaging(getFirebaseApp());
+    return onMessage(messaging, (payload) => {
+      onMessageReceived(payload);
+    });
+  } catch (err) {
+    console.warn('[WebPush] Failed to subscribe to foreground messages', err);
     return null;
   }
 }
