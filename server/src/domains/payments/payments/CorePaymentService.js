@@ -31,24 +31,20 @@ import { normalizePaystackChargePayload } from '../../../shared/utils/paystackPa
 import { releaseOrderReservations } from '../../../shared/utils/reservationRelease.js';
 import { PaymentStatus } from '../../../shared/constants/enums.js';
 import withdrawalService from '../withdrawals/withdrawal.service.js';
-import { reportAlert } from '../../../shared/utils/alerting.js';
-import refundPolicyService from '../refunds/refundPolicy.service.js';
-import refundExecutionService from '../refunds/refundExecution.service.js';
-
-const FULFILLABLE_ORDER_STATUSES = new Set(['CREATED', 'RESERVED', 'HELD', 'PAYMENT_PENDING', 'PENDING']);
-const PAID_TERMINAL_ORDER_STATUSES = new Set([
-    'PAID',
-    'AWAITING_SELLER_ACTION',
-    'FULFILLING',
-    'READY_FOR_BUYER',
-    'PROCESSING',
-    'FULFILLMENT_PENDING',
-    'FULFILLED',
-    'DELIVERED',
-    'BOOKED',
-    'COMPLETED'
-]);
-const CANNOT_FULFILL_ORDER_STATUSES = new Set(['CANCELLED', 'EXPIRED', 'REFUNDED', 'FAILED', 'MANUAL_REVIEW', 'COMPENSATION_REQUIRED']);
+import {
+    recordFraudEvent,
+    handleAmountMismatch,
+    handleMissingOrderReference
+} from './paymentIntegrityFraud.js';
+import {
+    handleLatePaymentCompensation,
+    handlePaidOrderTransition,
+    handleFailedOrderTransition,
+    resolveCustomProductionPatch,
+    PAID_TERMINAL_ORDER_STATUSES,
+    CANNOT_FULFILL_ORDER_STATUSES,
+    FULFILLABLE_ORDER_STATUSES
+} from './paymentOrderCompletionHelper.js';
 const PAYMENT_AMOUNT_TOLERANCE_KES = 1;
 
 function parseJson(value, fallback = {}) {
@@ -103,94 +99,6 @@ function isSellerPickupFeePayment(metadata = {}) {
         || meta.logistics_payment_type === 'seller_pickup_fee';
 }
 
-function resolveCustomProductionPatch(orderRow = {}, paidAt = new Date()) {
-    const metadata = parseJson(orderRow.metadata);
-    const customProduct = metadata.custom_product || {};
-    const preHandoffSla = metadata.pre_handoff_sla || null;
-    const hasCustomProduct = customProduct.is_custom_product === true;
-    const hasPreHandoffSla = preHandoffSla?.type === 'custom_production' || preHandoffSla?.type === 'import_waiting';
-    if (!hasCustomProduct && !hasPreHandoffSla) return null;
-
-    const readyDays = Number.parseInt(
-        preHandoffSla?.ready_days
-        || preHandoffSla?.production_days
-        || preHandoffSla?.import_days
-        || customProduct.production_days,
-        10
-    );
-    if (!Number.isInteger(readyDays) || readyDays < 1 || readyDays > 30) return null;
-
-    const productionDeadline = new Date(paidAt.getTime() + readyDays * 24 * 60 * 60 * 1000);
-    const graceDeadline = new Date(productionDeadline.getTime() + 24 * 60 * 60 * 1000);
-    const nextPreHandoffSla = preHandoffSla ? {
-        ...preHandoffSla,
-        ready_deadline_at: productionDeadline.toISOString(),
-        ready_grace_deadline_at: graceDeadline.toISOString()
-    } : null;
-
-    return {
-        productionDeadline,
-        graceDeadline,
-        metadataPatch: {
-            ...(nextPreHandoffSla ? { pre_handoff_sla: nextPreHandoffSla } : {}),
-            custom_product: hasCustomProduct ? {
-                ...customProduct,
-                production_deadline_at: productionDeadline.toISOString(),
-                production_grace_deadline_at: graceDeadline.toISOString()
-            } : customProduct
-        }
-    };
-}
-
-async function recordFraudEvent(event) {
-    try {
-        await pool.query(
-            `INSERT INTO fraud_events (
-                 payment_id,
-                 order_id,
-                 provider_reference,
-                 event_type,
-                 expected_amount,
-                 provider_amount,
-                 payload,
-                 details
-             )
-             VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8::jsonb)`,
-            [
-                event.paymentId || null,
-                event.orderId || null,
-                event.providerReference || null,
-                event.eventType,
-                event.expectedAmount ?? null,
-                event.providerAmount ?? null,
-                JSON.stringify(event.payload || {}),
-                JSON.stringify(event.details || {})
-            ]
-        );
-
-        // Real-time push for payment-integrity events (amount mismatch, missing
-        // order reference, etc.) so they surface immediately, not only on the
-        // next Detections-tab visit. Fire-and-forget; reportAlert never throws.
-        reportAlert({
-            level: 'error',
-            title: `Payment fraud event: ${event.eventType}`,
-            message: `A ${event.eventType} fraud event was recorded on a payment.`,
-            context: {
-                eventType: event.eventType,
-                orderId: event.orderId ?? null,
-                paymentId: event.paymentId ?? null,
-                providerReference: event.providerReference ?? null,
-                expectedAmount: event.expectedAmount ?? null,
-                providerAmount: event.providerAmount ?? null
-            }
-        });
-    } catch (error) {
-        logger.error('[CorePaymentService] Failed to persist fraud event', {
-            original: event,
-            error: error.message
-        });
-    }
-}
 
 async function findPaymentByInternalId(client, paymentId) {
     const numericPaymentId = Number.parseInt(paymentId, 10);
@@ -364,65 +272,24 @@ const CorePaymentService = {
 
                 const dbAmount = Number.parseFloat(paymentRow.amount || 0);
                 if (Math.abs(providerAmount - dbAmount) > PAYMENT_AMOUNT_TOLERANCE_KES) {
-                    const orderId = resolveOrderIdFromMetadata(paymentRow.metadata);
-                    fraudEvent = {
-                        paymentId: paymentRow.id,
-                        orderId,
+                    const mismatchResult = await handleAmountMismatch(client, {
+                        paymentRow,
                         providerReference,
-                        eventType: 'amount_mismatch',
-                        expectedAmount: dbAmount,
+                        providerStatus,
                         providerAmount,
-                        payload: providerPayload,
-                        details: {
-                            source,
-                            db_amount: dbAmount,
-                            provider_amount: providerAmount,
-                            detected_at: new Date().toISOString()
-                        }
-                    };
-                    const manualReviewMetadata = {
-                        requires_manual_review: true,
-                        manual_review_reason: 'amount_mismatch',
-                        completion_blocked: {
-                            source,
-                            provider_status: providerStatus,
-                            provider_reference: providerReference,
-                            db_amount: dbAmount,
-                            provider_amount: providerAmount,
-                            provider_payload: providerPayload,
-                            blocked_at: new Date().toISOString()
-                        }
-                    };
-                    const { rows: reviewRows } = await client.query(
-                        `UPDATE payments
-                         SET status = 'manual_review_required'::payment_status,
-                             provider_reference = COALESCE($1, provider_reference),
-                             metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb,
-                             updated_at = NOW()
-                         WHERE id = $3
-                         RETURNING *`,
-                        [
-                            providerReference,
-                            JSON.stringify(manualReviewMetadata),
-                            paymentRow.id
-                        ]
-                    );
-                    paymentRow = reviewRows[0] || paymentRow;
-                    logger.error('[CorePaymentService] Payment amount mismatch rejected', {
-                        paymentId: paymentRow.id,
-                        reference: providerReference,
                         dbAmount,
-                        providerAmount,
-                        source
+                        source,
+                        providerPayload
                     });
+                    paymentRow = mismatchResult.updatedPayment;
                     if (ownsTransaction) await client.query('COMMIT');
-                    await recordFraudEvent(fraudEvent);
+                    await recordFraudEvent(mismatchResult.fraudEvent);
                     return {
                         status: 'requires_manual_review',
                         payment: paymentRow,
                         order: null,
                         paymentId: paymentRow.id,
-                        orderId,
+                        orderId: mismatchResult.orderId,
                         message: 'Payment amount mismatch requires manual review'
                     };
                 }
@@ -430,57 +297,18 @@ const CorePaymentService = {
 
             const orderId = paymentRow.order_id || resolveOrderIdFromMetadata(paymentRow.metadata);
             if (!orderId) {
-                const manualReviewMetadata = {
-                    requires_manual_review: true,
-                    manual_review_reason: 'missing_order_reference',
-                    completion_blocked: {
-                        source,
-                        provider_status: providerStatus,
-                        provider_reference: providerReference,
-                        provider_payload: providerPayload,
-                        blocked_at: new Date().toISOString()
-                    }
-                };
-
-                const { rows: reviewRows } = await client.query(
-                    `UPDATE payments
-                     SET status = 'manual_review_required'::payment_status,
-                         provider_reference = COALESCE($1, provider_reference),
-                         metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb,
-                         updated_at = NOW()
-                     WHERE id = $3
-                     RETURNING *`,
-                    [
-                        providerReference,
-                        JSON.stringify(manualReviewMetadata),
-                        paymentRow.id
-                    ]
-                );
-                paymentRow = reviewRows[0];
-                fraudEvent = {
-                    paymentId: paymentRow.id,
-                    orderId: null,
+                const missingResult = await handleMissingOrderReference(client, {
+                    paymentRow,
                     providerReference,
-                    eventType: 'missing_order_reference',
-                    expectedAmount: Number.parseFloat(paymentRow.amount || 0),
-                    providerAmount: isSuccess ? providerAmount : null,
-                    payload: providerPayload,
-                    details: {
-                        source,
-                        provider_status: providerStatus,
-                        allowed_metadata_keys: ['order_id', 'product_order_id'],
-                        detected_at: new Date().toISOString()
-                    }
-                };
-
-                logger.error('[CorePaymentService] Payment completion blocked for missing order reference', {
-                    paymentId: paymentRow.id,
-                    reference: providerReference,
-                    source
+                    providerStatus,
+                    isSuccess,
+                    providerAmount,
+                    source,
+                    providerPayload
                 });
-
+                paymentRow = missingResult.updatedPayment;
                 if (ownsTransaction) await client.query('COMMIT');
-                await recordFraudEvent(fraudEvent);
+                await recordFraudEvent(missingResult.fraudEvent);
                 return {
                     status: 'requires_manual_review',
                     payment: paymentRow,
@@ -542,174 +370,31 @@ const CorePaymentService = {
 
                     if (isSuccess) {
                         if (CANNOT_FULFILL_ORDER_STATUSES.has(currentStatus)) {
-                            const { rows: latePaymentRows } = await client.query(
-                                `UPDATE product_orders
-                                 SET status = 'COMPENSATION_REQUIRED'::order_status,
-                                     payment_status = 'completed'::payment_status,
-                                     metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb,
-                                     updated_at = NOW()
-                                 WHERE id = $1
-                                 RETURNING *`,
-                                [orderId, JSON.stringify({
-                                    late_payment: {
-                                        payment_id: paymentRow.id,
-                                        previous_status: currentStatus,
-                                        source,
-                                        received_at: new Date().toISOString()
-                                    }
-                                })]
-                            );
-                            orderRow = latePaymentRows[0];
-                            logger.error('[CorePaymentService] Late payment needs compensation review', {
-                                paymentId: paymentRow.id,
+                            orderRow = await handleLatePaymentCompensation({
+                                client,
                                 orderId,
-                                previousStatus: currentStatus
+                                orderRow,
+                                paymentRow,
+                                providerReference,
+                                receipt,
+                                source
                             });
-
-                            if (orderRow?.buyer_id) {
-                                try {
-                                    const policyResult = await refundPolicyService.evaluateRefundEligibility(client, {
-                                        orderId,
-                                        buyerId: orderRow.buyer_id,
-                                        amount: paymentRow.amount,
-                                        reason: 'late_payment_on_cancelled_order'
-                                    });
-
-                                    const paymentDetailsPayload = {
-                                        payment_id: paymentRow.id,
-                                        order_id: orderId,
-                                        order_number: orderRow.order_number,
-                                        provider_reference: providerReference,
-                                        receipt,
-                                        reason: 'late_payment_on_cancelled_order',
-                                        policy_decision: policyResult.decision,
-                                        policy_reason: policyResult.reason,
-                                        policy_version: policyResult.policyVersion
-                                    };
-
-                                    if (policyResult.decision === 'AUTO_APPROVE') {
-                                        logger.info('[CorePaymentService] Auto-approving late payment refund', {
-                                            orderId,
-                                            buyerId: orderRow.buyer_id,
-                                            amount: paymentRow.amount,
-                                            reason: policyResult.reason
-                                        });
-
-                                        const autoRefund = await refundExecutionService.createAndExecuteAutoRefundWithClient(client, {
-                                            buyerId: orderRow.buyer_id,
-                                            orderId,
-                                            amount: paymentRow.amount,
-                                            paymentMethod: paymentRow.payment_method || 'mpesa',
-                                            paymentDetails: paymentDetailsPayload,
-                                            reason: policyResult.reason,
-                                            source: 'auto_policy_late_payment'
-                                        });
-
-                                        const buyerName = orderRow.customer_name || null;
-                                        const buyerPhone = orderRow.customer_phone || null;
-                                        refundExecutionService.dispatchRefundCompletedEvent({
-                                            refundRequestId: autoRefund.id,
-                                            buyerId: orderRow.buyer_id,
-                                            amount: Number.parseFloat(paymentRow.amount),
-                                            adminNotes: `Auto-approved by policy: ${policyResult.reason}`,
-                                            buyerName,
-                                            buyerPhone
-                                        }).catch(evtErr => logger.warn('[CorePaymentService] Event dispatch failed for auto-refund:', evtErr.message));
-                                    } else {
-                                        logger.info('[CorePaymentService] Routing late payment refund to manual review', {
-                                            orderId,
-                                            buyerId: orderRow.buyer_id,
-                                            amount: paymentRow.amount,
-                                            reason: policyResult.reason
-                                        });
-
-                                        await client.query(
-                                            `INSERT INTO refund_requests (buyer_id, order_id, amount, status, notes, payment_method, payment_details)
-                                             VALUES ($1, $2, $3, 'manual_review', $4, $5, $6::jsonb)`,
-                                            [
-                                                orderRow.buyer_id,
-                                                orderId,
-                                                paymentRow.amount,
-                                                `Late payment of ${paymentRow.amount} KES received for cancelled order #${orderRow.order_number || orderId}. Manual review: ${policyResult.reason}`,
-                                                paymentRow.payment_method || 'mpesa',
-                                                JSON.stringify(paymentDetailsPayload)
-                                            ]
-                                        );
-                                    }
-                                } catch (err) {
-                                    logger.error('[CorePaymentService] Failed to record/process late payment refund:', err.message);
-                                    reportAlert({
-                                        level: 'error',
-                                        title: 'Late-payment compensation refund handling failed',
-                                        message: `Order ${orderId} is COMPENSATION_REQUIRED but its refund processing failed (${err.message}).`,
-                                        context: { orderId, paymentId: paymentRow.id }
-                                    });
-                                }
-                            }
                         } else {
-                            const customProductionPatch = resolveCustomProductionPatch(orderRow, completedAt);
-                            if (!PAID_TERMINAL_ORDER_STATUSES.has(currentStatus)) {
-                                const { rows: paidOrders } = await client.query(
-                                    `UPDATE product_orders
-                                     SET status = 'PAID'::order_status,
-                                         payment_status = 'completed'::payment_status,
-                                         custom_production_deadline_at = COALESCE(custom_production_deadline_at, $2),
-                                         custom_production_grace_deadline_at = COALESCE(custom_production_grace_deadline_at, $3),
-                                         metadata = COALESCE(metadata, '{}'::jsonb) || $4::jsonb,
-                                         updated_at = NOW()
-                                     WHERE id = $1
-                                     RETURNING *`,
-                                    [
-                                        orderId,
-                                        customProductionPatch?.productionDeadline || null,
-                                        customProductionPatch?.graceDeadline || null,
-                                        JSON.stringify(customProductionPatch?.metadataPatch || {})
-                                    ]
-                                );
-                                orderRow = paidOrders[0];
-                            } else if (customProductionPatch && !orderRow.custom_production_deadline_at) {
-                                const { rows: updatedCustomRows } = await client.query(
-                                    `UPDATE product_orders
-                                     SET custom_production_deadline_at = $2,
-                                         custom_production_grace_deadline_at = $3,
-                                         metadata = COALESCE(metadata, '{}'::jsonb) || $4::jsonb,
-                                         updated_at = NOW()
-                                     WHERE id = $1
-                                     RETURNING *`,
-                                    [
-                                        orderId,
-                                        customProductionPatch.productionDeadline,
-                                        customProductionPatch.graceDeadline,
-                                        JSON.stringify(customProductionPatch.metadataPatch)
-                                    ]
-                                );
-                                orderRow = updatedCustomRows[0] || orderRow;
-                            }
-
-                            await FulfillmentQueueService.enqueue(client, orderId);
+                            orderRow = await handlePaidOrderTransition({
+                                client,
+                                orderId,
+                                orderRow,
+                                completedAt
+                            });
                         }
                     } else if (isFailed && FULFILLABLE_ORDER_STATUSES.has(currentStatus)) {
-                        const releaseResult = await releaseOrderReservations(client, orderId);
-                        const { rows: failedOrders } = await client.query(
-                            `UPDATE product_orders
-                             SET status = 'FAILED'::order_status,
-                                 payment_status = 'failed'::payment_status,
-                                 metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb,
-                                 updated_at = NOW()
-                             WHERE id = $1
-                             RETURNING *`,
-                            [orderId, JSON.stringify({
-                                payment_failure: {
-                                    payment_id: paymentRow.id,
-                                    source,
-                                    provider_status: providerStatus,
-                                    released_inventory: releaseResult.releasedInventory,
-                                    released_slots: releaseResult.releasedSlots,
-                                    failed_at: new Date().toISOString()
-                                }
-                            })]
-                        );
-                        orderRow = failedOrders[0];
+                        orderRow = await handleFailedOrderTransition({
+                            client,
+                            orderId,
+                            paymentRow,
+                            source,
+                            providerStatus
+                        });
                     }
                 }
             }
@@ -769,11 +454,9 @@ const CorePaymentService = {
      * Handle the Paystack payment webhook after route-level verification.
      */
     async handlePaystackWebhook(webhookData, security = {}) {
-        if (!security.hmacVerified && security.signature && security.rawBody) {
-            if (!this.verifyWebhookSignature(security.signature, security.rawBody)) {
-                throw new Error('Invalid Paystack webhook signature');
-            }
-        } else if (!security.hmacVerified) {
+        const needsVerification = !security.hmacVerified;
+        const hasBufferData = Boolean(security.signature && security.rawBody);
+        if (needsVerification && (!hasBufferData || !this.verifyWebhookSignature(security.signature, security.rawBody))) {
             throw new Error('Invalid Paystack webhook signature');
         }
 

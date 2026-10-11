@@ -29,64 +29,18 @@ import LogisticsQuoteService from '../../logistics/logisticsQuote.service.js';
 import LogisticsRequestService from '../../logistics/logisticsRequest.service.js';
 import { OrderStatus, OrderType } from '../../../shared/constants/enums.js';
 import { deriveOrderFinancials, roundMoney, PLATFORM_COLLECTION_FEE } from './checkoutPricing.js';
+import {
+  MAX_BAG_ITEMS,
+  wantsDoorDelivery,
+  isExplicitProviderFailure,
+  extractDeliveryLocation,
+  parseItems,
+  mergeQuantities,
+  buildValidatedLines,
+  derivePreHandoffSla
+} from './productCheckoutValidation.js';
 
 const PROVIDER = 'paystack';
-const MAX_BAG_ITEMS = 5;
-
-function wantsDoorDelivery(metadata = {}) {
-  const d = metadata.delivery || {};
-  return (
-    d.doorDelivery === true ||
-    d.door_delivery === true ||
-    d.deliveryMode === 'DOOR_DELIVERY' ||
-    d.delivery_mode === 'DOOR_DELIVERY'
-  );
-}
-
-// A 4xx from the provider means the request reached Paystack and was explicitly
-// rejected (the charge did NOT initiate) → safe to mark the order failed.
-// Network/timeout/5xx (no response) is ambiguous → leave the payment pending for
-// the webhook/cron to settle, never falsely fail.
-function isExplicitProviderFailure(err) {
-  const code = err && err.statusCode;
-  return typeof code === 'number' && code >= 400 && code < 500;
-}
-
-function extractDeliveryLocation(metadata = {}, location = {}) {
-  const d = metadata.delivery || {};
-  const loc = d.location || location || {};
-  return {
-    address: loc.address || loc.fullAddress || loc.full_address || location.address || null,
-    lat: loc.lat ?? loc.latitude ?? location.lat ?? null,
-    lng: loc.lng ?? loc.longitude ?? location.lng ?? null,
-  };
-}
-
-// Parse the requested line items (multi-item bag or a single product) WITHOUT
-// merging — the raw length is what the 5-product bag limit checks against.
-function parseItems(normalizedOrder) {
-  const { items, service } = normalizedOrder;
-  let list = [];
-  if (Array.isArray(items) && items.length > 0) {
-    list = items.map((it) => ({
-      productId: Number.parseInt(it.productId ?? it.product_id ?? it.id, 10),
-      quantity: Math.max(1, Number.parseInt(it.quantity ?? 1, 10) || 1),
-    }));
-  } else if (service && service.id !== undefined && service.id !== null) {
-    list = [{
-      productId: Number.parseInt(service.id, 10),
-      quantity: Math.max(1, Number.parseInt(service.quantity ?? 1, 10) || 1),
-    }];
-  }
-  return list.filter((l) => Number.isInteger(l.productId) && l.productId > 0);
-}
-
-// Merge duplicate products into a single line (summing quantities).
-function mergeQuantities(list) {
-  const merged = new Map();
-  for (const l of list) merged.set(l.productId, (merged.get(l.productId) || 0) + l.quantity);
-  return [...merged.entries()].map(([productId, quantity]) => ({ productId, quantity }));
-}
 
 // Columns that are PostgreSQL typed enums — they need explicit casts or PG
 // rejects the INSERT with "column X is of type Y but expression is of type
@@ -208,41 +162,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
   }
 
   // 2. Build line items + secure per-line pricing.
-  const lines = items.map((i) => {
-    const p = productById.get(i.productId);
-    const qty = Math.max(1, Number.parseInt(i.quantity, 10) || 1);
-    const dbPrice = Number.parseFloat(p.price || 0);
-    if (!Number.isFinite(dbPrice) || dbPrice <= 0) {
-      throw new AppError('Invalid order amount after secure calculation', 400);
-    }
-    const lineSubtotal = roundMoney(dbPrice * qty);
-    if (!(lineSubtotal > 0)) throw new AppError('Invalid order amount after secure calculation', 400);
-    const productType = String(p.product_type || '').toLowerCase();
-    const isDigital = p.is_digital === true || productType === 'digital';
-    const isService = productType === 'service';
-    const isPhysical = !isDigital && !isService;
-    return {
-      product: p,
-      quantity: qty,
-      price: roundMoney(dbPrice),
-      lineSubtotal,
-      productType,
-      isDigital,
-      isService,
-      isPhysical,
-      isCustom: isPhysical && p.is_custom_product === true,
-      isImported: isPhysical && p.is_imported_product === true,
-    };
-  });
-
-  // Multi-item bags are physical + digital only (v1).
-  if (isMulti) {
-    for (const l of lines) {
-      if (l.isService) throw new AppError('Services must be booked on their own, not in a bag.', 400);
-      if (l.isCustom || l.isImported) throw new AppError('Custom and imported products must be bought on their own, not in a bag.', 400);
-    }
-  }
-
+  const lines = buildValidatedLines(items, productById, isMulti);
   const subtotal = roundMoney(lines.reduce((sum, l) => sum + l.lineSubtotal, 0));
   const totalQuantity = lines.reduce((sum, l) => sum + l.quantity, 0);
   const allDigital = lines.every((l) => l.isDigital);
@@ -250,42 +170,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
   const singleLine = isMulti ? null : lines[0];
 
   // Custom / imported SLA — single-item only; derived from the AUTHORITATIVE row.
-  const customInstructions = String(
-    metadata.customization_instructions || metadata.custom_instructions || metadata.buyer_instructions || ''
-  ).trim();
-  let preHandoffSla = null;
-  if (singleLine && singleLine.isCustom && singleLine.isImported) {
-    throw new AppError('Product cannot be both custom and imported.', 400);
-  }
-  if (singleLine && singleLine.isCustom) {
-    const productionDays = Number.parseInt(singleLine.product.production_days, 10);
-    if (!Number.isInteger(productionDays) || productionDays < 1 || productionDays > 5) {
-      throw new AppError('Custom product is misconfigured. Please contact the seller.', 400);
-    }
-    if (!customInstructions) {
-      throw new AppError('Customization instructions are required for this custom product.', 400);
-    }
-    preHandoffSla = {
-      type: 'custom_production',
-      production_days: productionDays,
-      customization_prompt: singleLine.product.customization_prompt || 'Describe your customization',
-      buyer_instructions: customInstructions,
-      delivery_starts_after_seller_handoff: true,
-      source_product_id: singleLine.product.id,
-    };
-  } else if (singleLine && singleLine.isImported) {
-    const importDays = Number.parseInt(singleLine.product.import_days, 10);
-    if (![7, 14, 21, 30].includes(importDays)) {
-      throw new AppError('Imported product is misconfigured. Please contact the seller.', 400);
-    }
-    preHandoffSla = {
-      type: 'import_waiting',
-      import_days: importDays,
-      note: singleLine.product.import_note || 'Imported item. Delivery starts after seller handoff.',
-      delivery_starts_after_seller_handoff: true,
-      source_product_id: singleLine.product.id,
-    };
-  }
+  const preHandoffSla = derivePreHandoffSla(singleLine, metadata);
 
   // Delivery (buyer-paid door delivery; requires at least one physical item).
   const door = wantsDoorDelivery(metadata);
