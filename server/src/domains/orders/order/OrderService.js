@@ -243,7 +243,9 @@ export class OrderService {
 
   static async _emitOrderUpdate(orderId, oldStatus, newStatus, notes, source) {
     try {
-      eventBus.emit(AppEvents.ORDER_UPDATED, { orderId, oldStatus, newStatus, notes, source });
+      eventBus.emit(AppEvents.ORDER.UPDATED, {
+        payload: { id: orderId, order_id: orderId, oldStatus, newStatus, notes, source }
+      });
     } catch (err) {
       logger.error('Failed to emit order update event:', err);
     }
