@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { pool } from '../../infrastructure/database/database.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
+import cacheService from '../../shared/utils/cache.service.js';
 
 const TOKEN_VERSION = 'v1';
 const TRACKING_AUDIENCES = ['buyer', 'seller'];
@@ -139,6 +140,13 @@ class LogisticsTrackingLinkService {
 
     static async getSafeTrackingByToken(token) {
         const { audience, publicId } = parseToken(token);
+        const cacheKey = `tracking:safe:${publicId}:${audience}`;
+
+        const cached = await cacheService.get(cacheKey);
+        if (cached) {
+            return cached;
+        }
+
         const { rows } = await pool.query(
             `SELECT
                 l.audience,
@@ -211,7 +219,7 @@ class LogisticsTrackingLinkService {
         const pickup = mapSafeLeg(row, 'pickup', audience);
         const eta = delivery?.eta || pickup?.eta || row.request_deadline_at || null;
 
-        return {
+        const result = {
             audience,
             orderNumber: row.order_number,
             shopName: row.shop_name || row.seller_name || 'Shop',
@@ -232,6 +240,9 @@ class LogisticsTrackingLinkService {
                 createdAt: event.createdAt
             }))
         };
+
+        await cacheService.set(cacheKey, result, 10);
+        return result;
     }
 }
 

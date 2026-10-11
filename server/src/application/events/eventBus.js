@@ -31,6 +31,10 @@ class AppEventBus extends EventEmitter {
      * prefer enqueueInTransaction() + dispatchAfterCommit().
      */
     emit(event, ...args) {
+        if (!event || typeof event !== 'string') {
+            logger.error('[EventBus] Refusing to emit invalid or non-string event name', { event, args });
+            return false;
+        }
         const originalPayload = args[0] && typeof args[0] === 'object' ? args[0] : {};
         const eventId = originalPayload.eventId || `${event}:${crypto.randomUUID()}`;
         const now = Date.now();

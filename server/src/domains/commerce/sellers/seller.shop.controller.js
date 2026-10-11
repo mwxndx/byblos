@@ -3,6 +3,7 @@
 import { query } from '../../../infrastructure/database/database.js';
 import { findSellerByShopName, isShopNameAvailable, findSellerById } from './seller.model.js';
 import { sanitizeSeller, sanitizePublicSeller } from '../../../shared/utils/sanitize.js';
+import cacheService from '../../../shared/utils/cache.service.js';
 
 export const checkShopNameAvailability = async (req, res) => {
   try {
@@ -57,24 +58,37 @@ export const checkShopNameAvailability = async (req, res) => {
 export const getSellerByShopName = async (req, res) => {
   try {
     const { shopName } = req.params;
+    const normalizedName = String(shopName || '').toLowerCase().trim();
+    const cacheKey = `seller:shop:${normalizedName}`;
 
+    const cached = await cacheService.get(cacheKey);
+    if (cached) {
+      res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=120');
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          seller: cached
+        }
+      });
+    }
 
     const seller = await findSellerByShopName(shopName);
 
     if (!seller) {
-
       return res.status(404).json({
         status: 'error',
         message: 'Seller not found'
       });
     }
 
-    // console.log('Found seller:', { ... });
+    const sanitized = sanitizePublicSeller(seller);
+    await cacheService.set(cacheKey, sanitized, 60);
 
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=120');
     res.status(200).json({
       status: 'success',
       data: {
-        seller: sanitizePublicSeller(seller)
+        seller: sanitized
       }
     });
   } catch (error) {
@@ -186,11 +200,26 @@ export const getSellerProducts = async (req, res) => {
     }
 
     const productsLimit = boundedLimit(req.query.limit, SELLER_PRODUCTS_MAX);
+    const offset = boundedOffset(req.query.page, productsLimit);
+    const cacheKey = `seller:${sellerId}:products:${productsLimit}:${offset}`;
+
+    const cached = await cacheService.get(cacheKey);
+    if (cached) {
+      res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=120');
+      return res.status(200).json({
+        status: 'success',
+        data: cached
+      });
+    }
+
     const products = await getSellerProductsFromDB(sellerId, {
       limit: productsLimit,
-      offset: boundedOffset(req.query.page, productsLimit),
+      offset,
     });
 
+    await cacheService.set(cacheKey, products, 60);
+
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=120');
     res.status(200).json({
       status: 'success',
       data: products

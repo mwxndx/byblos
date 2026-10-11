@@ -117,6 +117,10 @@ class ProductService {
             keysToDelete.push(`products:category:${categoryId}`);
         }
         await Promise.all(keysToDelete.map(key => cacheService.delete(key)));
+        await Promise.all([
+            cacheService.clearPattern(`seller:${sellerId}:products:*`),
+            cacheService.clearPattern('products:list:*')
+        ]);
         logger.info(`[PRODUCT_CACHE] Invalidated targeted keys for product ${productId}`);
     }
 

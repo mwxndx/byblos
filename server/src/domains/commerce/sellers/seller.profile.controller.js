@@ -7,6 +7,7 @@ import ImageService from '../../../infrastructure/storage/image.service.js';
 import { getTokenFromRequest } from '../../../shared/utils/jwt.js';
 import { findSellerByUserId, findSellerById, isShopNameAvailable, updateSeller } from './seller.model.js';
 import { sanitizeSeller } from '../../../shared/utils/sanitize.js';
+import cacheService from '../../../shared/utils/cache.service.js';
 
 export const getProfile = async (req, res) => {
   try {
@@ -131,6 +132,10 @@ export const updateProfile = async (req, res) => {
     const currentToken = getTokenFromRequest(req);
     invalidateAuthCache(currentToken);
 
+    if (seller?.shop_name) {
+      await cacheService.delete(`seller:shop:${String(seller.shop_name).toLowerCase().trim()}`);
+    }
+
     res.status(200).json({ status: 'success', data: { seller: sanitizeSeller(seller) } });
   } catch (error) {
     console.error('Error updating profile:', error);
@@ -162,7 +167,7 @@ export const updateTheme = async (req, res) => {
 
     // Update the seller's theme
     const result = await query(
-      'UPDATE sellers SET theme = $1 WHERE id = $2 RETURNING theme',
+      'UPDATE sellers SET theme = $1 WHERE id = $2 RETURNING theme, shop_name',
       [theme, req.user.sellerId]
     );
 
@@ -171,6 +176,10 @@ export const updateTheme = async (req, res) => {
         status: 'error',
         message: 'Seller not found'
       });
+    }
+
+    if (result.rows[0].shop_name) {
+      await cacheService.delete(`seller:shop:${String(result.rows[0].shop_name).toLowerCase().trim()}`);
     }
 
     res.status(200).json({
