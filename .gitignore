@@ -148,3 +148,9 @@ public/firebase-messaging-sw.js
 
 # Committed-by-mistake Python venv (graphify tool site-packages) — not app code
 /Lib/
+/Include/
+.repowise/
+scripts/*.exe
+scripts/__pycache__/
+scripts/jp.py
+scripts/pywin32_*.py
