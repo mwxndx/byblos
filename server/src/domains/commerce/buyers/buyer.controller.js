@@ -16,54 +16,15 @@ import { pool } from '../../../infrastructure/database/database.js';
 import { addBusinessDays } from '../../orders/escrow/settlement.service.js';
 import Fees from '../../../shared/config/fees.js';
 
-// Helper to send token via cookie
-const createSendToken = (data, statusCode, req, res, next) => {
-  let token, buyer, user;
-
-  if (data.token && data.profile) {
-    // Standard AuthService format
-    token = data.token;
-    buyer = data.profile;
-    user = data.user;
-  } else {
-    // Legacy direct buyer object
-    buyer = data;
-    const userId = buyer.user_id || buyer.userId;
-    if (!userId) {
-      // Cannot issue token — buyer not linked to users table
-      logger.error('[AUTH] Cannot create token: buyer has no user_id', buyer.id);
-      return next(new AppError('Authentication error. Please contact support.', 500));
-    }
-    token = signToken(userId, 'buyer');
-  }
-
-  setAuthCookie(res, token);
-  if (buyer.password) buyer.password = undefined;
-
-  // Long-lived rolling refresh token: lets the mobile app silently renew the 24h
-  // access token so a buyer stays logged in without re-entering their details.
-  const buyerUserId = user?.id || buyer?.user_id || buyer?.userId;
-  const refreshToken = buyerUserId ? generateRefreshToken(buyerUserId, 'buyer') : undefined;
-
-  // Ensure is_verified is attached to profile for sanitization
-  if (user && user.is_verified !== undefined) {
-    buyer.is_verified = user.is_verified;
-  }
-
-  return res.status(statusCode).json({
-    status: 'success',
-    message: (statusCode === 201 && !user?.is_verified)
-      ? 'Account created! Please check your email to verify your account.'
-      : (statusCode === 201 ? 'Account updated!' : undefined),
-    data: {
-      buyer: sanitizeBuyer(buyer),
-      token: token,
-      refreshToken: refreshToken,
-      emailVerificationRequired: !user?.is_verified,
-      emailVerificationSent: statusCode === 201 && !user?.is_verified
-    }
-  });
-};
+import {
+  createSendToken,
+  autoProvisionBuyerProfile,
+  updateBuyerProfileHelper,
+  registerBuyerHandler,
+  handleLoginError,
+  verifyEmailHelper,
+  resolveBuyerProfile
+} from './buyerAuthHelper.js';
 
 export const logout = async (req, res) => {
   // Revoke BOTH the access token and the refresh token so the session truly ends.
@@ -74,50 +35,11 @@ export const logout = async (req, res) => {
 
 export const register = async (req, res, next) => {
   try {
-    const { password, confirmPassword } = req.body;
-
-    // 1) Check if passwords match
-    if (password !== confirmPassword) {
-      return next(new AppError('Passwords do not match', 400));
+    const outcome = await registerBuyerHandler({ body: req.body, res, next });
+    if (outcome.isPending) {
+      return res.status(200).json(outcome.response);
     }
-
-    // 2) Validate required location fields
-    if (!req.body.city || !req.body.location) {
-      return next(new AppError('City and location are required', 400));
-    }
-
-    try {
-      // Delegate to AuthService
-      const result = await AuthService.register(req.body, 'buyer');
-
-      if (result.status === 'pending_verification') {
-        return res.status(200).json({
-          status: 'success',
-          message: 'Account pending verification! Please check your email to complete your registration.',
-          data: {
-            email: result.email,
-            emailVerificationRequired: true,
-            emailVerificationSent: true
-          }
-        });
-      }
-
-      // Auto-login for existing users added to buyer role
-      const loginData = await AuthService.login(req.body.email, password, 'buyer');
-
-      createSendToken(loginData, 201, req, res);
-    } catch (err) {
-      if (err.code === '23505') return next(new AppError('Email already in use', 400));
-      // Handle manual duplications checks from Service
-      if (err.message && (
-        err.message.includes('A buyer account with this email already exists') ||
-        err.message.includes('An account with this email already exists')
-      )) {
-        return next(new AppError(err.message, 409));
-      }
-      throw err;
-    }
-
+    return createSendToken(outcome.loginData, 201, req, res);
   } catch (error) {
     next(error);
   }
@@ -137,43 +59,7 @@ export const login = async (req, res, next) => {
 
     createSendToken(data, 200, req, res, next);
   } catch (error) {
-    if (error.isRoleMismatch) {
-      return res.status(401).json({
-        status: 'error',
-        message: error.message,
-        code: 'WRONG_PORTAL'
-      });
-    }
-    if (error.code === 'EMAIL_NOT_VERIFIED') {
-      return res.status(403).json({
-        status: 'error',
-        message: error.message,
-        code: 'EMAIL_NOT_VERIFIED',
-        email: error.email,
-        userType: error.userType
-      });
-    }
-
-    if (error.code === 'PENDING_VERIFICATION') {
-      return res.status(403).json({
-        status: 'error',
-        message: error.message,
-        code: 'PENDING_VERIFICATION',
-        email: error.email,
-        userType: error.userType
-      });
-    }
-
-    if (error.code === 'TERMS_NOT_ACCEPTED') {
-      return res.status(403).json({
-        status: 'error',
-        message: error.message,
-        code: 'TERMS_NOT_ACCEPTED',
-        email: error.email,
-        userType: error.userType
-      });
-    }
-    next(error);
+    handleLoginError(error, res, next);
   }
 };
 
@@ -230,115 +116,57 @@ export const resetPassword = async (req, res, next) => {
 
 export const verifyEmail = async (req, res, next) => {
   try {
-    const { token, email } = req.query
-
-    if (!token || !email) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Token and email are required'
-      })
-    }
-
-    const result = await AuthService.verifyEmail(email, token)
-
-    // Verification doubles as login (magic-link): a valid token proves the person
-    // controls this email, so issue a buyer session and land them signed in — the
-    // Android deep-link uses this to drop straight into the orders tab. (verifyEmail
-    // throws on an invalid/expired token, so reaching here means it was valid.)
-    let sessionToken = null
-    if (result.user?.id && result.user.role === 'buyer') {
-      sessionToken = signToken(result.user.id, 'buyer')
-      setAuthCookie(res, sessionToken)
-    }
+    const { token, email } = req.query;
+    const { message, data } = await verifyEmailHelper({ token, email, res });
 
     return res.status(200).json({
       status: 'success',
-      message: sessionToken
-        ? 'Email verified — you are now signed in.'
-        : (result.alreadyVerified
-          ? 'Your email is already verified. You can log in.'
-          : 'Email verified successfully! You can now log in.'),
-      data: {
-        alreadyVerified: result.alreadyVerified,
-        email: result.user.email,
-        ...(sessionToken ? { token: sessionToken, autoLoggedIn: true } : {})
-      }
-    })
+      message,
+      data
+    });
   } catch (error) {
-    logger.error('Email verification failed:', error.message)
-    return res.status(400).json({
+    logger.error('Email verification failed:', error.message);
+    return res.status(error.statusCode || 400).json({
       status: 'error',
       message: error.message
-    })
+    });
   }
-}
+};
 
 export const resendVerification = async (req, res, next) => {
   try {
-    const { email } = req.body
+    const { email } = req.body;
 
     if (!email) {
       return res.status(400).json({
         status: 'error',
         message: 'Email is required'
-      })
+      });
     }
 
-    await AuthService.resendVerificationEmail(email.toLowerCase().trim(), 'buyer')
+    await AuthService.resendVerificationEmail(email.toLowerCase().trim(), 'buyer');
 
-    // Always return 200 to prevent email enumeration
     return res.status(200).json({
       status: 'success',
       message: 'If an account exists with this email and is unverified, a new verification link has been sent.'
-    })
+    });
   } catch (error) {
-    logger.error('Resend verification failed:', error.message)
-    // Still return 200 — do not reveal whether email exists
+    logger.error('Resend verification failed:', error.message);
     return res.status(200).json({
       status: 'success',
       message: 'If an account exists with this email and is unverified, a new verification link has been sent.'
-    })
+    });
   }
-}
-
-
-// Order fetching functionality has been removed
+};
 
 export const getProfile = async (req, res, next) => {
   try {
-    // Primary: buyers.id, set by auth crossRoles query
-    const buyerLookupId = req.user.buyerId;
-    let buyer = buyerLookupId ? await Buyer.findById(buyerLookupId) : null;
-
-    // Fallback: find by user_id
-    const userId = req.user.userId || req.user.id;
-    if (!buyer && userId) {
-      buyer = await Buyer.findByUserId(userId);
-    }
-
-    // If authenticated user lacks a buyer profile, auto-provision one seamlessly
-    if (!buyer && userId) {
-      const user = await User.findById(userId);
-      if (user) {
-        buyer = await Buyer.create({
-          fullName: user.full_name || user.email?.split('@')[0] || 'Buyer',
-          email: user.email,
-          mobilePayment: user.phone || '',
-          whatsappNumber: user.phone || '',
-          city: 'Nairobi',
-          location: 'Nairobi',
-          userId: user.id,
-          termsAccepted: true
-        });
-        logger.info(`[BUYER-PROFILE] Auto-provisioned buyer profile for user ${userId}`);
-      }
-    }
+    const buyer = await resolveBuyerProfile(req.user);
 
     if (!buyer) {
       return next(new AppError('No buyer profile found for this account', 404));
     }
 
-    // Add verification status from req.user (Task 10 fix)
     buyer.is_verified = req.user.is_verified;
 
     res.status(200).json({
@@ -352,78 +180,20 @@ export const getProfile = async (req, res, next) => {
 
 export const updateProfile = async (req, res, next) => {
   try {
-    // 1) Filter out unwanted fields that are not allowed to be updated directly
-    // password is handled separately
     const { password, passwordConfirm, ...rawUpdateData } = req.body;
-    const allowedProfileFields = new Set([
-      'fullName',
-      'mobilePayment',
-      'whatsappNumber',
-      'city',
-      'location',
-      'latitude',
-      'longitude',
-      'fullAddress'
-    ]);
-    const updateData = Object.fromEntries(
-      Object.entries(rawUpdateData).filter(([key]) => allowedProfileFields.has(key))
-    );
-
-    // 2) Security: Basic Input Validation for Phones
-    const phoneRegex = /^(\+?254|0)?[17]\d{8}$/; // Matches 07xx or 01xx or +2547xx
-
-    if (updateData.whatsappNumber && !phoneRegex.test(updateData.whatsappNumber)) {
-      // Allow empty string if user is clearing it, but valid if provided
-      if (updateData.whatsappNumber.trim() !== '') {
-        return next(new AppError('Invalid WhatsApp number format. Use 07... or 01...', 400));
-      }
-    }
-
-    if (updateData.mobilePayment && !phoneRegex.test(updateData.mobilePayment)) {
-      if (updateData.mobilePayment.trim() !== '') {
-        return next(new AppError('Invalid Mobile Payment number format. Use 07... or 01...', 400));
-      }
-    }
-
-    // 3) If password is being updated, handle it separately
-    if (password) {
-      if (password !== passwordConfirm) {
-        return next(new AppError('Passwords do not match', 400));
-      }
-      // B-2 FIX: Use unified User model for password updates
-      await User.updatePassword(req.user.id, password);
-    }
-
-    // 4) If there's nothing else to update, return early
-    if (Object.keys(updateData).length === 0 && !password) {
-      const currentUser = await Buyer.findById(req.user.buyerId);
-      return res.status(200).json({
-        status: 'success',
-        message: 'No profile updates provided',
-        data: {
-          buyer: sanitizeBuyer(currentUser)
-        }
-      });
-    }
-
-    // 5) Update other buyer data
-    let updatedBuyer = null;
-    if (Object.keys(updateData).length > 0) {
-      updatedBuyer = await Buyer.update(req.user.buyerId, updateData);
-    } else {
-      updatedBuyer = await Buyer.findById(req.user.buyerId);
-    }
-
-    if (!updatedBuyer) {
-      logger.error('Failed to update buyer profile');
-      return next(new AppError('Error updating profile', 500));
-    }
+    const { message, buyer } = await updateBuyerProfileHelper({
+      buyerId: req.user.buyerId,
+      userId: req.user.id,
+      rawUpdateData,
+      password,
+      passwordConfirm
+    });
 
     res.status(200).json({
       status: 'success',
-      message: 'Profile updated successfully',
+      message,
       data: {
-        buyer: sanitizeBuyer(updatedBuyer),
+        buyer: sanitizeBuyer(buyer),
       },
     });
   } catch (error) {
@@ -504,75 +274,8 @@ export const checkBuyerByPhone = async (req, res, next) => {
   }
 };
 
-/**
- * Helper to compute a buyer's T+2 refund clearance state.
- * T+2 holding period applies 2 business days from the moment a refund is credited.
- */
-export async function getBuyerRefundClearance(buyerId) {
-  const [buyerResult, refundRequestsResult, refundedOrdersResult] = await Promise.all([
-    pool.query(`SELECT refunds, mobile_payment, whatsapp_number, full_name FROM buyers WHERE id = $1`, [buyerId]),
-    pool.query(
-      `SELECT id, amount, processed_at, updated_at, requested_at, payment_details
-       FROM refund_requests
-       WHERE buyer_id = $1 AND status = 'completed'
-       ORDER BY COALESCE(processed_at, updated_at, requested_at) DESC`,
-      [buyerId]
-    ),
-    pool.query(
-      `SELECT id, total_amount AS amount, updated_at
-       FROM product_orders
-       WHERE buyer_id = $1 AND status = 'REFUNDED'
-         AND id NOT IN (SELECT order_id FROM refund_requests WHERE buyer_id = $1 AND order_id IS NOT NULL)
-       ORDER BY updated_at DESC`,
-      [buyerId]
-    )
-  ]);
-
-  const buyer = buyerResult.rows[0];
-  const totalRefunds = Number.parseFloat(buyer?.refunds || 0);
-
-  let unclearedAmount = 0;
-  let nextAvailableAt = null;
-  const now = new Date();
-
-  // Aggregate all completed refund events
-  const allEvents = [
-    ...refundRequestsResult.rows.map(rr => ({
-      amount: Number.parseFloat(rr.amount || 0),
-      creditedAt: (rr.payment_details?.credited_at || rr.payment_details?.reconciled_at)
-        ? new Date(rr.payment_details.credited_at || rr.payment_details.reconciled_at)
-        : new Date(rr.updated_at || rr.processed_at || rr.requested_at)
-    })),
-    ...refundedOrdersResult.rows.map(po => ({
-      amount: Number.parseFloat(po.amount || 0),
-      creditedAt: new Date(po.updated_at)
-    }))
-  ];
-
-  for (const event of allEvents) {
-    if (!Number.isFinite(event.amount) || event.amount <= 0) continue;
-    const availableTime = addBusinessDays(event.creditedAt, 2);
-    if (now < availableTime) {
-      unclearedAmount += event.amount;
-      if (!nextAvailableAt || availableTime < nextAvailableAt) {
-        nextAvailableAt = availableTime;
-      }
-    }
-  }
-
-  const clearingBalance = Math.min(totalRefunds, unclearedAmount);
-  const availableBalance = Math.max(0, totalRefunds - clearingBalance);
-
-  return {
-    totalRefunds,
-    availableBalance,
-    clearingBalance,
-    nextAvailableAt: nextAvailableAt ? nextAvailableAt.toISOString() : null,
-    isClearing: clearingBalance > 0,
-    buyerPhone: buyer?.mobile_payment || buyer?.whatsapp_number || '',
-    buyerName: buyer?.full_name || ''
-  };
-}
+import { getBuyerRefundClearance, processBuyerRefundRequest } from './buyerRefund.service.js';
+export { getBuyerRefundClearance };
 
 /**
  * Get buyer's pending refund requests and T+2 clearance status
@@ -633,46 +336,14 @@ export const requestRefund = async (req, res, next) => {
   try {
     const { amount, mpesaNumber, mpesaName } = req.body;
     const buyerId = req.user.buyerId;
+    const idempotencyKey = req.get('Idempotency-Key') || req.body.idempotencyKey || null;
 
-    const withdrawalAmount = Number.parseFloat(amount);
-    if (!Number.isFinite(withdrawalAmount) || withdrawalAmount < Fees.MIN_WITHDRAWAL_AMOUNT) {
-      return next(new AppError(`Minimum withdrawal amount is KES ${Fees.MIN_WITHDRAWAL_AMOUNT}`, 400));
-    }
-    if (withdrawalAmount > Fees.MAX_WITHDRAWAL_AMOUNT) {
-      return next(new AppError(`Maximum withdrawal amount is KES ${Fees.MAX_WITHDRAWAL_AMOUNT.toLocaleString()}`, 400));
-    }
-
-    const withdrawalFee = Fees.calculateWithdrawalFee(withdrawalAmount);
-    const totalDeducted = withdrawalAmount + withdrawalFee;
-
-    const clearance = await getBuyerRefundClearance(buyerId);
-
-    if (totalDeducted > clearance.availableBalance) {
-      if (totalDeducted <= clearance.totalRefunds && clearance.clearingBalance > 0) {
-        const nextDateStr = clearance.nextAvailableAt
-          ? new Date(clearance.nextAvailableAt).toLocaleDateString('en-KE', { month: 'short', day: 'numeric', year: 'numeric' })
-          : 'soon';
-        return next(new AppError(
-          `Your withdrawal of KES ${withdrawalAmount.toLocaleString()} requires KES ${totalDeducted.toLocaleString()} from your balance (including KES ${withdrawalFee} withdrawal charge). KES ${clearance.clearingBalance.toLocaleString()} is currently clearing under the standard T+2 holding period and will be ready for withdrawal on ${nextDateStr}.`,
-          400
-        ));
-      }
-      return next(new AppError(
-        `Insufficient available balance. Available: KES ${clearance.availableBalance.toLocaleString()}, Required: KES ${totalDeducted.toLocaleString()} (including KES ${withdrawalFee} withdrawal charge).`,
-        400
-      ));
-    }
-
-    const payoutPhone = mpesaNumber || clearance.buyerPhone;
-    const payoutName = mpesaName || clearance.buyerName;
-
-    const request = await WithdrawalService.createWithdrawalRequest({
-      entityId: buyerId,
-      entityType: 'buyer_refund',
-      amount: withdrawalAmount,
-      mpesaNumber: payoutPhone,
-      mpesaName: payoutName,
-      idempotencyKey: req.get('Idempotency-Key') || req.body.idempotencyKey || `refund-w-${buyerId}-${Date.now()}`
+    const { request, withdrawalFee, totalDeducted, withdrawalAmount } = await processBuyerRefundRequest({
+      buyerId,
+      amount,
+      mpesaNumber,
+      mpesaName,
+      idempotencyKey
     });
 
     logger.info(`Refund withdrawal request created: ${request.id} for buyer ${buyerId}, amount: ${withdrawalAmount}, fee: ${withdrawalFee}, total: ${totalDeducted}`);
@@ -709,92 +380,23 @@ const buyerInfoSchema = z.object({
   path: ["phone"]
 });
 
+import { processGuestBuyerRegistration } from './guestBuyerRegistration.service.js';
+
 export const saveBuyerInfo = async (req, res, next) => {
   try {
-    // 1. Validate body
     const validatedData = buyerInfoSchema.parse(req.body);
-    const {
-      fullName, email, phone, mobilePayment, whatsappNumber,
-      city, location, password
-    } = validatedData;
 
-    const effectivePhone = phone || mobilePayment || whatsappNumber;
-
-    // Add validation:
     if (!req.body.termsAccepted) {
       return next(new AppError('You must accept the Terms and Conditions to continue.', 400));
     }
 
-    // 2. Register buyer immediately (follows pending registration flow)
-    let result;
-    try {
-      result = await BuyerService.registerGuest({
-        fullName,
-        email,
-        phone: normalizePhoneNumber(effectivePhone),
-        mobilePayment: mobilePayment || effectivePhone,
-        whatsappNumber: whatsappNumber || effectivePhone,
-        city,
-        location: location || city || 'Not specified', // FIXED BUG-GUEST-02: fallback prevents null
-        password,
-        termsAccepted: req.body.termsAccepted === true // Explicitly from frontend
-      });
-      if (result.status === 'identity_required') {
-        result = await AuthService.registerGuestBuyer(result.registrationData);
-      }
-    } catch (err) {
-      if (err.requiresLogin) {
-        return res.status(200).json({
-          status: 'success',
-          data: { requiresLogin: true, exists: true, buyer: { email } }
-        });
-      }
-      throw err;
-    }
-
-    // 3. Handle pending verification (Verify-Before-Create)
-    if (result.status === 'pending_verification') {
-      return res.status(200).json({
-        status: 'success',
-        data: {
-          emailVerificationRequired: true,
-          email: result.email,
-          message: 'Please verify your email address to complete your account setup. You can still proceed with your purchase now.'
-        }
-      });
-    }
-
-    // 4. Handle immediate creation (e.g. if user already existed)
-    const buyerProfile = result.buyer || result.user;
-    if (!buyerProfile) {
-      throw new Error('Failed to create or retrieve buyer profile');
-    }
-
-    // SECURITY FIX: Ensure the user is verified before issuing a token
-    const userId = buyerProfile.user_id || buyerProfile.userId;
-    const user = await User.findById(userId);
-
-    if (user && !user.is_verified) {
-      return res.status(200).json({
-        status: 'success',
-        data: {
-          emailVerificationRequired: true,
-          email: user.email,
-          message: 'Your account is pending verification. Please check your email to complete your account setup.'
-        }
-      });
-    }
-
-    const token = BuyerService.signToken(buyerProfile);
-
-    // 5. Set auth cookie
-    setAuthCookie(res, token);
-
-    return res.status(200).json({
-      status: 'success',
-      data: { buyer: sanitizeBuyer(buyerProfile) }
+    const { statusCode, response } = await processGuestBuyerRegistration({
+      ...validatedData,
+      termsAccepted: req.body.termsAccepted,
+      res
     });
 
+    return res.status(statusCode).json(response);
   } catch (error) {
     logger.error('Error in saveBuyerInfo:', error);
     next(error);

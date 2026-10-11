@@ -14,14 +14,23 @@ import Order from './order.model.js';
 import logger from '../../../shared/utils/logger.js';
 import * as digitalDownloadRepository from '../../commerce/repositories/digitalDownload.repository.js';
 import path from 'path';
-import https from 'node:https';
-import http from 'node:http';
 import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
 import { isCloudinaryAssetUrl } from '../../../shared/utils/assetUrlGuard.js';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
-import { generateSignedDownloadUrl, getDigitalAssetUrls } from '../../../shared/utils/cloudinary.js';
-import LogisticsEtaService from '../../logistics/logisticsEta.service.js';
+import { handleDigitalProductDownload } from './digitalDownloadStreamer.js';
+import {
+    resolvePickupStatusCode,
+    resolveHubStatusCode,
+    resolveReceiptStatusCode,
+    resolveLiveEtaStatusCode,
+    resolveOrderStatusUpdateStatusCode,
+    authorizeOrderReferenceAccess,
+    handleSellerPickupRequest,
+    handleSelectHubDropoff,
+    handleMarkDroppedAtHub,
+    handleConfirmBooking
+} from './orderFulfillmentActions.js';
 
 const OrderService = CoreOrderService;
 
@@ -106,13 +115,7 @@ export const updateOrderStatus = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error updating order status:', error);
-
-        // Prefer the AppError's own status code (e.g. 403 ORDER_UPDATE_FORBIDDEN,
-        // 400 ORDER_STATUS_NOT_ALLOWED / illegal transition); fall back to the
-        // legacy message heuristics for plain errors.
-        const statusCode = error.statusCode ||
-            (error.message.includes('Unauthorized') ? 403 :
-                error.message.includes('Invalid') ? 400 : 500);
+        const statusCode = resolveOrderStatusUpdateStatusCode(error);
 
         res.status(statusCode).json({
             status: 'error',
@@ -129,18 +132,11 @@ export const requestSellerPickup = async (req, res) => {
             return res.status(403).json({ status: 'error', message: 'Seller profile is required' });
         }
 
-        const idempotencyKey = req.headers['idempotency-key']
-            || req.headers['x-checkout-token']
-            || req.body.idempotencyKey
-            || req.body.checkout_token
-            || null;
-
-        const result = await paymentService.initiateSellerPickupPayment({
+        const result = await handleSellerPickupRequest({
             orderId: req.params.id,
             sellerId,
-            pickupLocation: req.body.pickupLocation || req.body.location,
-            mobilePayment: req.body.mobilePayment || req.body.phone,
-            idempotencyKey
+            headers: req.headers,
+            body: req.body
         });
 
         res.status(200).json({
@@ -152,14 +148,7 @@ export const requestSellerPickup = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error requesting seller pickup:', error);
-        // Prefer an explicit statusCode already set on the error (e.g. a provider
-        // failure like a declined Paystack charge) over guessing from the message —
-        // otherwise a routine payment decline gets misreported as a 500.
-        const statusCode = error.statusCode || (error.message?.includes('not found') ? 404
-            : error.message?.includes('already') ? 409
-                : error.message?.includes('only') || error.message?.includes('required') || error.message?.includes('Valid') ? 400
-                    : 500);
-
+        const statusCode = resolvePickupStatusCode(error);
         res.status(statusCode).json({
             status: 'error',
             message: error.message || 'Failed to request pickup'
@@ -174,17 +163,15 @@ export const selectHubDropoff = async (req, res) => {
             return res.status(403).json({ status: 'error', message: 'Seller profile is required' });
         }
 
-        const updatedOrder = await OrderHubDropoffService.selectHubDropoff(req.params.id, sellerId);
+        const sanitizedOrder = await handleSelectHubDropoff({ orderId: req.params.id, sellerId });
         res.status(200).json({
             status: 'success',
             message: 'Hub drop-off selected. Drop the package at the hub within 24 hours.',
-            data: sanitizeOrder(updatedOrder, 'seller')
+            data: sanitizedOrder
         });
     } catch (error) {
         logger.error('Error selecting hub drop-off:', error);
-        const statusCode = error.statusCode || (error.message?.includes('Unauthorized') || error.message?.includes('not found') ? 404
-            : error.message?.includes('only') || error.message?.includes('cannot') || error.message?.includes('after') ? 400
-                : 500);
+        const statusCode = resolveHubStatusCode(error);
         res.status(statusCode).json({ status: 'error', message: error.message || 'Failed to select hub drop-off' });
     }
 };
@@ -196,17 +183,15 @@ export const markDroppedAtHub = async (req, res) => {
             return res.status(403).json({ status: 'error', message: 'Seller profile is required' });
         }
 
-        const updatedOrder = await OrderHubDropoffService.markDroppedAtHub(req.params.id, sellerId);
+        const sanitizedOrder = await handleMarkDroppedAtHub({ orderId: req.params.id, sellerId });
         res.status(200).json({
             status: 'success',
             message: 'Package marked as dropped at the hub.',
-            data: sanitizeOrder(updatedOrder, 'seller')
+            data: sanitizedOrder
         });
     } catch (error) {
         logger.error('Error marking dropped at hub:', error);
-        const statusCode = error.statusCode || (error.message?.includes('Unauthorized') || error.message?.includes('not found') ? 404
-            : error.message?.includes('only') || error.message?.includes('cannot') || error.message?.includes('after') ? 400
-                : 500);
+        const statusCode = resolveHubStatusCode(error);
         res.status(statusCode).json({ status: 'error', message: error.message || 'Failed to mark package dropped at hub' });
     }
 };
@@ -218,17 +203,15 @@ export const confirmBooking = async (req, res) => {
             return res.status(403).json({ status: 'error', message: 'Seller profile is required' });
         }
 
-        const updatedOrder = await OrderService.confirmBooking(req.params.id, sellerId);
+        const sanitizedOrder = await handleConfirmBooking({ orderId: req.params.id, sellerId });
         res.status(200).json({
             status: 'success',
             message: 'Booking confirmed.',
-            data: sanitizeOrder(updatedOrder, 'seller')
+            data: sanitizedOrder
         });
     } catch (error) {
         logger.error('Error confirming booking:', error);
-        const statusCode = error.statusCode || (error.message?.includes('Unauthorized') || error.message?.includes('not found') ? 404
-            : error.message?.includes('only') || error.message?.includes('Cannot') || error.message?.includes('after') ? 400
-                : 500);
+        const statusCode = resolveHubStatusCode(error);
         res.status(statusCode).json({ status: 'error', message: error.message || 'Failed to confirm booking' });
     }
 };
@@ -283,8 +266,7 @@ export const confirmReceipt = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error confirming receipt:', error);
-        const status = error.message.includes('Unauthorized') ? 401 :
-            error.message.includes('not found') ? 404 : 400;
+        const status = resolveReceiptStatusCode(error);
         res.status(status).json({ status: 'error', message: error.message });
     }
 };
@@ -325,23 +307,7 @@ export const getByReference = async (req, res) => {
             });
         }
 
-        // Authorization check (M-01): require matching client checkout capability token or authenticated ownership
-        const clientToken = req.headers['x-checkout-token']
-            || req.query.client_checkout_token
-            || req.query.clientCheckoutToken;
-
-        const isTokenAuthorized = Boolean(
-            clientToken && order.clientCheckoutToken && clientToken === order.clientCheckoutToken
-        );
-        const isUserAuthorized = Boolean(
-            req.user && (
-                req.user.role === 'admin'
-                || (req.user.buyerId && String(order.buyerId) === String(req.user.buyerId))
-                || (req.user.sellerId && String(order.sellerId) === String(req.user.sellerId))
-            )
-        );
-
-        if (!isTokenAuthorized && !isUserAuthorized) {
+        if (!authorizeOrderReferenceAccess({ order, req })) {
             return res.status(403).json({
                 status: 'error',
                 code: 'UNAUTHORIZED_ORDER_ACCESS',
@@ -411,104 +377,7 @@ export const downloadDigitalProduct = async (req, res) => {
         const { orderId, productId } = req.params;
         const buyerProfileId = req.user.buyerId;
 
-        // 1. Verify ownership and payment status before serving the file
-        const data = await digitalDownloadRepository.findVerifiedDigitalItem({
-            orderId,
-            buyerId: buyerProfileId,
-            productId
-        });
-
-        if (!data) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'Digital product not found in this completed order'
-            });
-        }
-
-        const digitalFilePath = data.digital_file_path;
-
-        if (!digitalFilePath) {
-            return res.status(404).json({
-                status: 'error',
-                message: 'File path not configured for this product'
-            });
-        }
-
-        const fileName = data.digital_file_name || path.basename(digitalFilePath) || `digital-product-${productId}`;
-        const ext = path.extname(fileName).toLowerCase() || path.extname(digitalFilePath).toLowerCase() || '.bin';
-        const cleanFileName = fileName.endsWith(ext) ? fileName : `${fileName}${ext}`;
-        const mimeType = getMimeType(ext);
-
-        const candidateUrls = getDigitalAssetUrls(digitalFilePath, 300);
-        logger.info(`[DOWNLOAD] Attempting stream for public_id: ${digitalFilePath} (Order: ${orderId}), candidate count: ${candidateUrls.length}`);
-
-        const tryStream = (index) => {
-            if (index >= candidateUrls.length) {
-                logger.error(`[DOWNLOAD] All stream candidates failed for ${digitalFilePath}`);
-                if (!res.headersSent) {
-                    return res.status(404).json({
-                        status: 'error',
-                        message: 'File could not be retrieved from storage'
-                    });
-                }
-                return;
-            }
-
-            const currentUrl = candidateUrls[index];
-            // SSRF guard: only ever fetch Cloudinary-hosted assets. A seller-supplied
-            // digital_file_path can reach here as a verbatim URL to an arbitrary host.
-            if (!isCloudinaryAssetUrl(currentUrl)) {
-                logger.warn(`[DOWNLOAD] Refusing non-Cloudinary candidate for ${digitalFilePath}, trying next...`);
-                return tryStream(index + 1);
-            }
-            const requester = currentUrl.startsWith('https:') ? https : http;
-
-            const reqStream = requester.get(currentUrl, (streamRes) => {
-                if (streamRes.statusCode === 200) {
-                    res.setHeader('Content-Type', mimeType);
-                    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(cleanFileName)}"`);
-                    if (streamRes.headers['content-length']) {
-                        res.setHeader('Content-Length', streamRes.headers['content-length']);
-                    }
-                    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition, Content-Length');
-                    return streamRes.pipe(res);
-                }
-
-                // If redirected (301/302/307/308), follow redirect
-                if ([301, 302, 307, 308].includes(streamRes.statusCode) && streamRes.headers.location) {
-                    const redirectUrl = streamRes.headers.location;
-                    // SSRF guard: a redirect Location must also stay on Cloudinary.
-                    if (!isCloudinaryAssetUrl(redirectUrl)) {
-                        logger.warn(`[DOWNLOAD] Refusing non-Cloudinary redirect for ${digitalFilePath}, trying next...`);
-                        return tryStream(index + 1);
-                    }
-                    const redirRequester = redirectUrl.startsWith('https:') ? https : http;
-                    return redirRequester.get(redirectUrl, (redirRes) => {
-                        if (redirRes.statusCode === 200) {
-                            res.setHeader('Content-Type', mimeType);
-                            res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(cleanFileName)}"`);
-                            if (redirRes.headers['content-length']) {
-                                res.setHeader('Content-Length', redirRes.headers['content-length']);
-                            }
-                            res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition, Content-Length');
-                            return redirRes.pipe(res);
-                        }
-                        return tryStream(index + 1);
-                    }).on('error', () => tryStream(index + 1));
-                }
-
-                logger.warn(`[DOWNLOAD] Candidate ${index} (${currentUrl}) returned status ${streamRes.statusCode}, trying next candidate...`);
-                return tryStream(index + 1);
-            });
-
-            reqStream.on('error', (err) => {
-                logger.warn(`[DOWNLOAD] Candidate ${index} network error (${err.message}), trying next candidate...`);
-                tryStream(index + 1);
-            });
-        };
-
-        tryStream(0);
-        return;
+        await handleDigitalProductDownload({ orderId, productId, buyerProfileId, res });
     } catch (error) {
         logger.error('Error in downloadDigitalProduct:', error);
         if (!res.headersSent) {
@@ -516,52 +385,6 @@ export const downloadDigitalProduct = async (req, res) => {
         }
     }
 };
-
-/**
- * Helper to get MIME type based on extension
- */
-function getMimeType(ext) {
-    const types = {
-        // Documents
-        '.pdf': 'application/pdf',
-        '.epub': 'application/epub+zip',
-        '.mobi': 'application/x-mobipocket-ebook',
-        '.doc': 'application/msword',
-        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        '.txt': 'text/plain',
-        '.csv': 'text/csv',
-        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        // Archives
-        '.zip': 'application/zip',
-        '.rar': 'application/x-rar-compressed',
-        '.7z': 'application/x-7z-compressed',
-        '.tar': 'application/x-tar',
-        '.gz': 'application/gzip',
-        // Images
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.jpeg': 'image/jpeg',
-        '.webp': 'image/webp',
-        '.svg': 'image/svg+xml',
-        '.gif': 'image/gif',
-        '.bmp': 'image/bmp',
-        '.tiff': 'image/tiff',
-        '.tif': 'image/tiff',
-        '.heic': 'image/heic',
-        '.ico': 'image/x-icon',
-        // Audio & Video
-        '.mp3': 'audio/mpeg',
-        '.wav': 'audio/wav',
-        '.flac': 'audio/flac',
-        '.aac': 'audio/aac',
-        '.ogg': 'audio/ogg',
-        '.mp4': 'video/mp4',
-        '.mov': 'video/quicktime',
-        '.avi': 'video/x-msvideo',
-        '.mkv': 'video/x-matroska'
-    };
-    return types[ext] || 'application/octet-stream';
-}
 export const locationPreview = async (req, res) => {
     try {
         const { latitude, longitude, fullAddress } = req.body;
@@ -606,7 +429,7 @@ export const getOrderLiveEta = async (req, res) => {
         });
     } catch (error) {
         logger.error('Error fetching order live ETA:', error);
-        const statusCode = error.statusCode || (error.message.includes('Unauthorized') ? 403 : error.message.includes('not found') ? 404 : 500);
+        const statusCode = resolveLiveEtaStatusCode(error);
         res.status(statusCode).json({
             status: 'error',
             message: error.message
