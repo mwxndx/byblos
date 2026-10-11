@@ -20,12 +20,27 @@ export type IosPushPermissionState = NotificationPermission | 'unsupported';
  * This hook isolates iOS-specific eligibility, permission state, and provides
  * a gesture-compliant request action.
  */
-export function useIosNotificationPermission(defaultRole?: UserRole) {
-  const isIos = typeof window !== 'undefined' && getDevicePlatform() === 'ios' && !isNativeApp();
-  const isSupported = isWebPushSupported() && isWebPushConfigured();
+export interface UseIosNotificationPermissionOptions {
+  allowAllWeb?: boolean;
+}
+
+export function useIosNotificationPermission(defaultRole?: UserRole, options?: UseIosNotificationPermissionOptions) {
+  const allowAllWeb = options?.allowAllWeb ?? false;
+  const isNative = isNativeApp();
+  const platform = typeof window !== 'undefined' ? getDevicePlatform() : 'desktop';
+  const isIos = platform === 'ios' && !isNative;
+  const isEligibleWeb = !isNative && (isIos || allowAllWeb);
+
+  // In iOS Safari tabs, 'Notification' in window is undefined until added to Home Screen.
+  // In iOS standalone PWA or standard desktop/Android browsers, Notification is in window.
+  const hasNotificationApi = typeof window !== 'undefined' && 'Notification' in window;
+  const isSafariWithoutNotification = isIos && !hasNotificationApi;
+
+  // Browser supports web push or needs iOS Home Screen guidance
+  const isSupported = isWebPushSupported() || isSafariWithoutNotification;
 
   const [permission, setPermission] = useState<IosPushPermissionState>(() => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return 'unsupported';
+    if (!hasNotificationApi) return isSafariWithoutNotification ? 'default' : 'unsupported';
     return Notification.permission;
   });
 
@@ -68,7 +83,7 @@ export function useIosNotificationPermission(defaultRole?: UserRole) {
       if (result === 'denied') {
         toast({
           title: 'Notifications Blocked',
-          description: 'You can enable notifications anytime in iOS Settings > Safari / Byblos > Notifications.',
+          description: 'You can enable notifications anytime in browser / device settings.',
           variant: 'destructive',
         });
         return false;
@@ -81,7 +96,7 @@ export function useIosNotificationPermission(defaultRole?: UserRole) {
     } finally {
       setIsRequesting(false);
     }
-  }, []);
+  }, [defaultRole]);
 
   const dismissPrompt = useCallback(() => {
     setIsDismissed(true);
@@ -92,10 +107,11 @@ export function useIosNotificationPermission(defaultRole?: UserRole) {
     }
   }, []);
 
-  const shouldShowPrompt = isIos && isSupported && permission === 'default' && !isDismissed;
+  const shouldShowPrompt = isEligibleWeb && isSupported && permission === 'default' && !isDismissed;
 
   return {
     isIos,
+    isSafariWithoutNotification,
     isSupported,
     permission,
     isGranted: permission === 'granted',

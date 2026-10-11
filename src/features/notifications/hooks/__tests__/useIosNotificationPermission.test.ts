@@ -96,4 +96,21 @@ describe('useIosNotificationPermission', () => {
     expect(mobileNotifications.registerNativePushNotifications).toHaveBeenCalledWith('buyer');
     expect(result.current.permission).toBe('granted');
   });
+
+  test('shouldShowPrompt is true on Desktop/Android when allowAllWeb is true', () => {
+    vi.mocked(mobileApp.getDevicePlatform).mockReturnValue('desktop');
+    const { result } = renderHook(() => useIosNotificationPermission(undefined, { allowAllWeb: true }));
+    expect(result.current.shouldShowPrompt).toBe(true);
+  });
+
+  test('isSafariWithoutNotification is true on iOS when Notification is not in window', () => {
+    // Delete Notification from window to simulate iOS Safari tab
+    // @ts-expect-error simulating missing Notification API
+    delete window.Notification;
+
+    const { result } = renderHook(() => useIosNotificationPermission());
+    expect(result.current.isIos).toBe(true);
+    expect(result.current.isSafariWithoutNotification).toBe(true);
+    expect(result.current.shouldShowPrompt).toBe(true);
+  });
 });

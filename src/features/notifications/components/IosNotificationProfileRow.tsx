@@ -9,7 +9,7 @@ import { useIosNotificationPermission } from '../hooks/useIosNotificationPermiss
  * or displays current permission status.
  */
 export function IosNotificationProfileRow() {
-  const { isIos, isSupported, permission, isRequesting, requestPermission } = useIosNotificationPermission();
+  const { isIos, isSupported, permission, isRequesting, requestPermission, isSafariWithoutNotification } = useIosNotificationPermission();
 
   if (!isIos || !isSupported) return null;
 
@@ -32,7 +32,8 @@ export function IosNotificationProfileRow() {
       <div className="mt-2 flex items-center justify-between gap-3">
         <div className="text-xs text-slate-600 dark:text-white/70">
           {permission === 'granted' && 'Notifications are active on this device.'}
-          {permission === 'default' && 'Receive alerts for order status, deliveries, and updates.'}
+          {isSafariWithoutNotification && 'Add to Home Screen in Safari to enable push alerts.'}
+          {!isSafariWithoutNotification && permission === 'default' && 'Receive alerts for order status, deliveries, and updates.'}
           {permission === 'denied' && (
             <span className="text-amber-600 dark:text-amber-400">
               Blocked. Enable in iOS Settings &gt; Safari / Byblos.
@@ -40,7 +41,7 @@ export function IosNotificationProfileRow() {
           )}
         </div>
 
-        {permission === 'default' && (
+        {!isSafariWithoutNotification && permission === 'default' && (
           <button
             type="button"
             onClick={() => void requestPermission()}
