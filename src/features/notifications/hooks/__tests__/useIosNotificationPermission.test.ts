@@ -103,14 +103,27 @@ describe('useIosNotificationPermission', () => {
     expect(result.current.shouldShowPrompt).toBe(true);
   });
 
-  test('isSafariWithoutNotification is true on iOS when Notification is not in window', () => {
+  test('isSafariWithoutNotification is true on iOS when Notification is not in window and not installed', () => {
     // Delete Notification from window to simulate iOS Safari tab
     // @ts-expect-error simulating missing Notification API
     delete window.Notification;
+    vi.mocked(mobileApp.isAppInstalled).mockReturnValue(false);
 
     const { result } = renderHook(() => useIosNotificationPermission());
     expect(result.current.isIos).toBe(true);
     expect(result.current.isSafariWithoutNotification).toBe(true);
+    expect(result.current.shouldShowPrompt).toBe(true);
+  });
+
+  test('isSafariWithoutNotification is false when running as installed PWA on iOS', () => {
+    // Delete Notification from window to simulate PWA before API injection
+    // @ts-expect-error simulating missing Notification API
+    delete window.Notification;
+    vi.mocked(mobileApp.isAppInstalled).mockReturnValue(true);
+
+    const { result } = renderHook(() => useIosNotificationPermission());
+    expect(result.current.isIos).toBe(true);
+    expect(result.current.isSafariWithoutNotification).toBe(false);
     expect(result.current.shouldShowPrompt).toBe(true);
   });
 });

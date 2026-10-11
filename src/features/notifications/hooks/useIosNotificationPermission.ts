@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { getDevicePlatform, isNativeApp } from '@/infrastructure/navigation/mobileApp';
+import { getDevicePlatform, isAppInstalled, isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { getActiveRole } from '@/features/auth/services/authSession';
 import { registerNativePushNotifications } from '../utils/mobileNotifications';
-import { isWebPushConfigured, isWebPushSupported } from '../webPush';
+import { isWebPushSupported, registerFirebaseServiceWorker } from '../webPush';
 import { toast } from '@/shared/hooks/use-toast';
 import type { UserRole } from '@/shared/types';
 
@@ -30,18 +30,26 @@ export function useIosNotificationPermission(defaultRole?: UserRole, options?: U
   const platform = typeof window !== 'undefined' ? getDevicePlatform() : 'desktop';
   const isIos = platform === 'ios' && !isNative;
   const isEligibleWeb = !isNative && (isIos || allowAllWeb);
+  const isInstalled = isAppInstalled();
 
-  // In iOS Safari tabs, 'Notification' in window is undefined until added to Home Screen.
-  // In iOS standalone PWA or standard desktop/Android browsers, Notification is in window.
-  const hasNotificationApi = typeof window !== 'undefined' && 'Notification' in window;
-  const isSafariWithoutNotification = isIos && !hasNotificationApi;
+  // Notification API availability state (can update once SW initializes)
+  const [hasNotificationApi, setHasNotificationApi] = useState<boolean>(() => {
+    return typeof window !== 'undefined' && 'Notification' in window;
+  });
 
-  // Browser supports web push or needs iOS Home Screen guidance
-  const isSupported = isWebPushSupported() || isSafariWithoutNotification;
+  // Only consider it "Safari without notification" if running in a regular Safari browser tab.
+  // When running inside the installed PWA on the home screen, the user is NOT in a Safari tab,
+  // so they must see the active "Enable Notifications" button, never the "Add to Home Screen" instructions.
+  const isSafariWithoutNotification = isIos && !hasNotificationApi && !isInstalled;
+
+  // Browser supports web push or needs iOS Home Screen guidance, or is running installed PWA
+  const isSupported = isWebPushSupported() || isSafariWithoutNotification || isInstalled;
 
   const [permission, setPermission] = useState<IosPushPermissionState>(() => {
-    if (!hasNotificationApi) return isSafariWithoutNotification ? 'default' : 'unsupported';
-    return Notification.permission;
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission;
+    }
+    return (isSafariWithoutNotification || isInstalled) ? 'default' : 'unsupported';
   });
 
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
@@ -55,20 +63,58 @@ export function useIosNotificationPermission(defaultRole?: UserRole, options?: U
 
   const [isRequesting, setIsRequesting] = useState<boolean>(false);
 
-  // Sync state if permissions change
+  // Sync state on mount, when service worker activates, and on window focus/visibility changes
   useEffect(() => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    setPermission(Notification.permission);
+    if (typeof window === 'undefined') return;
+
+    const syncApiAndPermission = () => {
+      const available = 'Notification' in window;
+      setHasNotificationApi(available);
+      if (available) {
+        setPermission(Notification.permission);
+      }
+    };
+
+    syncApiAndPermission();
+
+    // Listen for SW activation which exposes Notification in some iOS WebKit contexts
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(() => {
+        syncApiAndPermission();
+      }).catch(() => {});
+    }
+
+    window.addEventListener('focus', syncApiAndPermission);
+    document.addEventListener('visibilitychange', syncApiAndPermission);
+
+    return () => {
+      window.removeEventListener('focus', syncApiAndPermission);
+      document.removeEventListener('visibilitychange', syncApiAndPermission);
+    };
   }, []);
 
   const requestPermission = useCallback(async (): Promise<boolean> => {
-    if (typeof window === 'undefined' || !('Notification' in window)) return false;
-
     setIsRequesting(true);
     try {
-      // Must be invoked directly in response to the user's tap
+      // Ensure the service worker is registered for push events
+      if ('serviceWorker' in navigator) {
+        await registerFirebaseServiceWorker().catch(() => null);
+      }
+
+      // Check Notification API support
+      if (typeof window === 'undefined' || !('Notification' in window)) {
+        toast({
+          title: 'Notifications Not Supported',
+          description: 'Web Push requires iOS 16.4 or later. Please ensure your iPhone is up to date in Settings.',
+          variant: 'destructive',
+        });
+        return false;
+      }
+
+      // Direct synchronous user gesture required by WebKit
       const result = await Notification.requestPermission();
       setPermission(result);
+      setHasNotificationApi(true);
 
       if (result === 'granted') {
         const activeRole = defaultRole || (await getActiveRole()) || 'buyer';
@@ -83,7 +129,7 @@ export function useIosNotificationPermission(defaultRole?: UserRole, options?: U
       if (result === 'denied') {
         toast({
           title: 'Notifications Blocked',
-          description: 'You can enable notifications anytime in browser / device settings.',
+          description: 'You can enable notifications anytime in iPhone Settings > Notifications > Byblos.',
           variant: 'destructive',
         });
         return false;
@@ -92,6 +138,11 @@ export function useIosNotificationPermission(defaultRole?: UserRole, options?: U
       return false;
     } catch (err) {
       console.warn('[useIosNotificationPermission] Failed to request permission', err);
+      toast({
+        title: 'Error',
+        description: 'Failed to request notification permission.',
+        variant: 'destructive',
+      });
       return false;
     } finally {
       setIsRequesting(false);

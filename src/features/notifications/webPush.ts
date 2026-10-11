@@ -41,7 +41,7 @@ function getFirebaseApp(): FirebaseApp {
 // PWA install-eligibility criteria. Safe to call repeatedly (register is
 // idempotent per scope). Called on app boot for web sessions.
 export async function registerFirebaseServiceWorker(): Promise<ServiceWorkerRegistration | null> {
-  if (!isWebPushSupported()) return null;
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return null;
   try {
     return await navigator.serviceWorker.register('/firebase-messaging-sw.js');
   } catch (err) {
