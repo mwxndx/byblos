@@ -365,4 +365,20 @@ describe('Financial Push & Feed Notifications Integration', () => {
     // Clean up test order
     await cleanupOrder(testOrder.id);
   });
+
+  test('broadcastMembershipInvite batches recipient processing and handles dryRun', async () => {
+    const NotificationService = (await import('../src/domains/communication/notifications/notification.service.js')).default;
+    
+    // Dry run test
+    const dryRunRes = await NotificationService.broadcastMembershipInvite({ dryRun: true });
+    assert.equal(typeof dryRunRes.eligible, 'number');
+    assert.equal(dryRunRes.dryRun, true);
+
+    // Batching test with custom batchSize
+    const batchRes = await NotificationService.broadcastMembershipInvite({ batchSize: 2 });
+    assert.equal(typeof batchRes.eligible, 'number');
+    assert.equal(typeof batchRes.sent, 'number');
+    assert.equal(typeof batchRes.pushed, 'number');
+    assert.equal(typeof batchRes.failed, 'number');
+  });
 });

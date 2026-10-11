@@ -277,7 +277,8 @@ class NotificationService {
     // Idempotent: skips buyers who already joined or already got the invite, so
     // it is safe to re-run. Deep-links to the dashboard with ?membership=1 which
     // force-opens the opt-in popup (see MembershipGate).
-    async broadcastMembershipInvite({ dryRun = false } = {}) {
+    // Batched into chunks (default 50) to prevent event loop starvation and request timeouts.
+    async broadcastMembershipInvite({ dryRun = false, batchSize = 50 } = {}) {
         const { rows: recipients } = await pool.query(
             `SELECT b.user_id
                FROM buyers b
@@ -299,28 +300,40 @@ class NotificationService {
             return { eligible: recipients.length, dryRun: true };
         }
 
+        const safeBatchSize = Math.max(1, Math.min(Number.parseInt(batchSize, 10) || 50, 100));
         let sent = 0;
         let pushed = 0;
         let failed = 0;
-        for (const recipient of recipients) {
-            try {
-                const result = await this.send({
-                    recipientUserId: recipient.user_id,
-                    recipientRole: 'buyer',
-                    type: 'membership_invite',
-                    title,
-                    body,
-                    data,
-                    channels: ['in_app', 'push'],
-                });
-                sent += 1;
-                if (result.push?.delivered) pushed += 1;
-            } catch (error) {
-                failed += 1;
-                logger.error('[NotificationService] Membership invite failed', {
-                    userId: recipient.user_id,
-                    error: error.message,
-                });
+
+        for (let i = 0; i < recipients.length; i += safeBatchSize) {
+            const batch = recipients.slice(i, i + safeBatchSize);
+            const settled = await Promise.allSettled(
+                batch.map(recipient =>
+                    this.send({
+                        recipientUserId: recipient.user_id,
+                        recipientRole: 'buyer',
+                        type: 'membership_invite',
+                        title,
+                        body,
+                        data,
+                        channels: ['in_app', 'push'],
+                    }).catch(error => {
+                        logger.error('[NotificationService] Membership invite failed', {
+                            userId: recipient.user_id,
+                            error: error.message,
+                        });
+                        throw error;
+                    })
+                )
+            );
+
+            for (const item of settled) {
+                if (item.status === 'fulfilled') {
+                    sent += 1;
+                    if (item.value?.push?.delivered) pushed += 1;
+                } else {
+                    failed += 1;
+                }
             }
         }
 
