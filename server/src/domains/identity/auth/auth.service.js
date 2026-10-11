@@ -11,69 +11,25 @@ import PendingRegistration from '../../../shared/utils/pendingRegistration.model
 import ReferralService from '../../growth/referrals/referral.service.js';
 import ProfileProvisioningService from '../users/profileProvisioning.service.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
+import {
+    bootstrapPrivilegedAccountIfConfigured,
+    timingSafeStrEqual
+} from './bootstrapPrivilegedAccounts.js';
+import {
+    resolveUserTermsAccepted,
+    resolveCrossRoleAccess
+} from './crossRoleResolver.js';
 
 // FIXED BUG-AUTH-02: cost factor must match bcrypt.hash(password, 12) used in user.model.js
 // Regenerate with: node -e "const b=require('bcrypt');b.hash('__timing_dummy__',12).then(console.log)"
 const TIMING_DUMMY_HASH = '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TgxO7dCVS0VxMhUv8E1Y2d6PJHRW';
 
-// Constant-time string comparison for secrets (env-configured bootstrap
-// passwords). SHA-256 both sides to a fixed 32-byte digest first, so
-// crypto.timingSafeEqual never sees unequal-length buffers (it throws on
-// those, which itself leaks length) and the compare time does not depend on
-// the inputs' lengths or where they first differ — closing the byte-by-byte
-// timing oracle a plain `===` opens on ADMIN_PASSWORD / MARKETING_PASSWORD.
-function timingSafeStrEqual(a, b) {
-    const aHash = crypto.createHash('sha256').update(String(a)).digest();
-    const bHash = crypto.createHash('sha256').update(String(b)).digest();
-    return crypto.timingSafeEqual(aHash, bHash);
-}
-
 class AuthService {
     /**
-     * Self-bootstrap the admin or marketing account from env-configured
-     * credentials on first login, the same pattern
-     * LogisticsDashboardService.bootstrapMzigoAccountIfConfigured() already
-     * uses for the Mzigo Ego partner: rather than requiring a one-off
-     * `node scripts/seed-admin.js` run (which needs shell access to the
-     * server -- not available on Render's free plan), the account
-     * materializes itself the moment someone logs in with the exact
-     * email/password already configured in ADMIN_EMAIL/ADMIN_PASSWORD or
-     * MARKETING_EMAIL/MARKETING_PASSWORD. Only fires when normal lookup
-     * already failed (see login() below), and only when both the email AND
-     * password match one of the configured pairs exactly -- a stranger
-     * guessing at admin@whatever.com can't trigger this without also
-     * knowing the real configured password.
+     * Self-bootstrap the admin or marketing account from env-configured credentials.
      */
     static async bootstrapPrivilegedAccountIfConfigured(normalizedEmail, password) {
-        const candidates = [
-            { email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD, label: 'admin' },
-            { email: process.env.MARKETING_EMAIL, password: process.env.MARKETING_PASSWORD, label: 'marketing' },
-        ];
-
-        const match = candidates.find((c) =>
-            c.email && c.password &&
-            c.email.toLowerCase().trim() === normalizedEmail &&
-            timingSafeStrEqual(c.password, password)
-        );
-        if (!match) return null;
-
-        // Both seed-admin.js and seed-marketing-admin.js write role='admin'
-        // for either account -- the admin/marketing distinction lives
-        // elsewhere in the permission system, not in this column. Matched
-        // exactly here so a self-bootstrapped account behaves identically to
-        // one created by the manual seed scripts.
-        const hash = await bcrypt.hash(password, 12);
-        const { rows } = await pool.query(
-            `INSERT INTO users (email, password_hash, role, is_verified, is_active, created_at, updated_at)
-             VALUES ($1, $2, 'admin', true, true, NOW(), NOW())
-             ON CONFLICT (email)
-             DO UPDATE SET password_hash = EXCLUDED.password_hash, role = 'admin', is_verified = true, is_active = true, updated_at = NOW()
-             RETURNING id, email, password_hash, role, is_verified, is_active`,
-            [normalizedEmail, hash]
-        );
-
-        logger.info(`[AUTH] Bootstrapped ${match.label} account from env-configured credentials: ${normalizedEmail}`);
-        return rows[0];
+        return bootstrapPrivilegedAccountIfConfigured(normalizedEmail, password);
     }
 
     /**
@@ -169,170 +125,13 @@ class AuthService {
             throw err;
         }
 
-        // NEW: Check terms acceptance (Task 10)
-        // Both models return camelCase (SellerModel.findSellerByUserId aliases
-        // its SQL columns; Buyer.findByUserId runs the row through
-        // toCamelCase()) -- reading .terms_accepted here always read undefined,
-        // so this gate never actually fired for anyone regardless of their
-        // real terms_accepted value.
-        let termsAccepted = true;
-        if (user.role === 'seller') {
-            const profile = await SellerModel.findSellerByUserId(user.id);
-            termsAccepted = profile ? profile.termsAccepted : true;
-        } else if (user.role === 'buyer') {
-            const profile = await Buyer.findByUserId(user.id);
-            termsAccepted = profile ? profile.termsAccepted : true;
-        } else if (user.role === 'creator') {
-            // A raw query rather than importing CreatorService: creator.service.js
-            // already imports AuthService (for its own login()/register() delegation),
-            // so importing it back here would be a circular import.
-            const { rows } = await pool.query('SELECT terms_accepted FROM creators WHERE user_id = $1', [user.id]);
-            termsAccepted = rows[0] ? rows[0].terms_accepted : true;
-        }
+        // Check terms acceptance
+        await resolveUserTermsAccepted({ user, pool, Buyer, SellerModel, acceptTerms });
 
-        if (termsAccepted === false) {
-            // Give the caller a way to actually resolve this instead of a dead
-            // end: the login form re-submits with acceptTerms:true (after the
-            // user reviews and accepts the Terms modal) using the SAME
-            // credentials already verified above, so this doesn't need a
-            // separate authenticated endpoint. Record the acceptance and fall
-            // through to the normal login flow below rather than throwing.
-            //
-            // (No resendVerificationEmail call here: is_verified was already
-            // checked above, so by this point the user is guaranteed verified
-            // -- treating an unaccepted-terms block as an email-verification
-            // problem was the original bug. It sent a pointless "verify your
-            // email" email to an already-verified user and, worse, gave the
-            // frontend no way to actually clear the block: resending a
-            // verification email only ever sets is_verified, never
-            // terms_accepted, so the user stayed locked out regardless of
-            // what they clicked.)
-            if (acceptTerms === true) {
-                const termsTable = { seller: 'sellers', buyer: 'buyers', creator: 'creators' }[user.role];
-                if (termsTable) {
-                    await pool.query(
-                        `UPDATE ${termsTable} SET terms_accepted = TRUE, terms_accepted_at = NOW() WHERE user_id = $1`,
-                        [user.id]
-                    );
-                }
-            } else {
-                const err = new AppError('Please accept the terms and conditions to continue.', 403, 'TERMS_NOT_ACCEPTED');
-                err.email = user.email;
-                err.userType = type || user.role;
-                throw err;
-            }
-        }
-
-        // ── Role mismatch handling ──────────────────────────────────────────
+        // Role mismatch handling
         if (type && user.role !== type) {
-
-            // CASE 1: A seller or admin trying to access the BUYER portal
-            // They can if they also have a buyer profile
-            if (type === 'buyer') {
-                let buyerProfile = await Buyer.findByUserId(user.id);
-
-                // Lazy-link legacy buyer profile if it exists by email
-                if (!buyerProfile) {
-                    buyerProfile = await Buyer.findByEmail(user.email);
-                    if (buyerProfile && !buyerProfile.userId) {
-                        await pool.query(
-                            'UPDATE buyers SET user_id = $1 WHERE id = $2 AND user_id IS NULL',
-                            [user.id, buyerProfile.id]
-                        );
-                        buyerProfile.userId = user.id;
-                        buyerProfile.user_id = user.id;
-                    }
-                }
-
-                if (buyerProfile && (buyerProfile.userId === user.id || buyerProfile.user_id === user.id)) {
-                    const token = signToken(user.id, 'buyer');
-                    return { user, profile: buyerProfile, token, crossRole: true };
-                }
-            }
-
-            // CASE 2: A buyer or admin trying to access the SELLER portal
-            // They can if they also have a seller profile
-            if (type === 'seller') {
-                let sellerProfile = await SellerModel.findSellerByUserId(user.id);
-
-                // Lazy-link legacy seller profile if it exists by email
-                if (!sellerProfile) {
-                    sellerProfile = await SellerModel.findSellerByEmail(user.email);
-                    if (sellerProfile && !sellerProfile.userId) {
-                        await pool.query(
-                            'UPDATE sellers SET user_id = $1 WHERE id = $2 AND user_id IS NULL',
-                            [user.id, sellerProfile.id]
-                        );
-                        sellerProfile.userId = user.id;
-                        sellerProfile.user_id = user.id;
-                    }
-                }
-
-                if (sellerProfile && (sellerProfile.userId === user.id || sellerProfile.user_id === user.id)) {
-                    // Issue a token scoped to 'seller' role
-                    const token = signToken(user.id, 'seller');
-                    return { user, profile: sellerProfile, token, crossRole: true };
-                }
-            }
-
-            // CASE 3: An existing buyer/seller/admin accessing the CREATOR portal
-            // They can if they have accepted a creator invite or have creator role assigned.
-            if (type === 'creator') {
-                let creatorResult = await pool.query(
-                    `SELECT * FROM creators WHERE user_id = $1 AND status = 'active' LIMIT 1`,
-                    [user.id]
-                );
-                let creatorProfile = creatorResult.rows[0] || null;
-
-                if (!creatorProfile) {
-                    const roleRes = await pool.query(
-                        `SELECT 1 FROM user_roles ur JOIN roles r ON ur.role_id = r.id WHERE ur.user_id = $1 AND r.slug = 'creator'`,
-                        [user.id]
-                    );
-                    if (roleRes.rows.length > 0) {
-                        const firstName = user.email ? user.email.split('@')[0] : 'Creator';
-                        const newCreatorRes = await pool.query(
-                            `INSERT INTO creators (user_id, first_name, last_name, email, mpesa_number, whatsapp_number, status)
-                             VALUES ($1, $2, 'Creator', $3, '0700000000', '0700000000', 'active')
-                             ON CONFLICT (user_id) DO UPDATE SET updated_at = NOW()
-                             RETURNING *`,
-                            [user.id, firstName, user.email]
-                        );
-                        creatorProfile = newCreatorRes.rows[0];
-                    }
-                }
-
-                if (creatorProfile) {
-                    const token = signToken(user.id, 'creator');
-                    return { user, profile: creatorProfile, token, crossRole: true };
-                }
-            }
-
-            // CASE 4: Marketing / Admin cross-role access (marketing accessing admin or admin accessing marketing)
-            if ((type === 'admin' && user.role === 'marketing') || (type === 'marketing' && user.role === 'admin')) {
-                const issuedRole = type;
-                const token = signToken(user.id, issuedRole);
-                return {
-                    user,
-                    profile: { id: user.id, email: user.email, role: issuedRole },
-                    token,
-                    crossRole: true
-                };
-            }
-
-
-            // No cross-role profile found — typed 401 so controller can give clear message.
-            // `code` matters here too, not just `.isRoleMismatch`: buyer/seller
-            // controllers check .isRoleMismatch directly (never reach the global
-            // handler), but creator/admin/marketing fall through to next(error),
-            // where the global handler only echoes a response `error` field when
-            // `.code` is set — without it those three portals returned this
-            // message with no machine-readable code at all.
-            const err = new AppError(`Wrong portal. This account is registered as a ${user.role}.`, 401, 'WRONG_PORTAL');
-            err.isRoleMismatch = true;
-            throw err;
+            return await resolveCrossRoleAccess({ user, type, signToken, pool, Buyer, SellerModel });
         }
-        // ── End role mismatch handling ──────────────────────────────────────
 
         // Normal path: role matches type (or type is null)
         const targetType = type || user.role;
