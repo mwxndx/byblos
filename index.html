@@ -54,7 +54,7 @@
           doc.classList.remove('dark');
         }
         var meta = document.getElementById('theme-color-meta');
-        if (meta) meta.setAttribute('content', isDark ? '#000000' : '#f5f4f0');
+        if (meta) meta.setAttribute('content', isDark ? '#000000' : '#ffffff');
       } catch (e) {}
     })();
   </script>
@@ -74,7 +74,7 @@
     html.light:not(.native-app):not(.capacitor-native),
     html.light:not(.native-app):not(.capacitor-native) body,
     html.light:not(.native-app):not(.capacitor-native) #root {
-      background-color: #f5f4f0 !important;
+      background-color: #ffffff !important;
       color: #0f0f0e !important;
     }
     html[data-theme="dark"],
@@ -85,6 +85,76 @@
     html.dark #root {
       background-color: #000000 !important;
       color: #f5f5f5 !important;
+    }
+
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      z-index: 99999;
+      background-color: #000000;
+    }
+    .splash-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: env(safe-area-inset-top, 0px) 24px env(safe-area-inset-bottom, 0px) 24px;
+    }
+    .splash-logo {
+      height: auto;
+      width: min(65vw, 240px);
+      max-width: 240px;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .splash-logo-dark {
+      display: block;
+    }
+    .splash-logo-light {
+      display: none;
+    }
+
+    html[data-theme="light"] #app-splash,
+    html.light #app-splash {
+      background-color: #ffffff !important;
+    }
+    html[data-theme="light"] .splash-logo-dark,
+    html.light .splash-logo-dark {
+      display: none !important;
+    }
+    html[data-theme="light"] .splash-logo-light,
+    html.light .splash-logo-light {
+      display: block !important;
+    }
+
+    html[data-theme="dark"] #app-splash,
+    html.dark #app-splash {
+      background-color: #000000 !important;
+    }
+    html[data-theme="dark"] .splash-logo-dark,
+    html.dark .splash-logo-dark {
+      display: block !important;
+    }
+    html[data-theme="dark"] .splash-logo-light,
+    html.dark .splash-logo-light {
+      display: none !important;
+    }
+
+    @media (prefers-color-scheme: light) {
+      html:not(.dark) #app-splash {
+        background-color: #ffffff;
+      }
+      html:not(.dark) .splash-logo-light {
+        display: block;
+      }
+      html:not(.dark) .splash-logo-dark {
+        display: none;
+      }
     }
   </style>
 
@@ -112,6 +182,8 @@
   <link rel="icon" href="/favicon-32x32.png?v=9" type="image/png" sizes="32x32">
   <link rel="icon" href="/favicon-16x16.png?v=9" type="image/png" sizes="16x16">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=9" sizes="180x180">
+  <link rel="apple-touch-startup-image" href="/byblos-mark-dark.png" media="(prefers-color-scheme: dark)">
+  <link rel="apple-touch-startup-image" href="/byblos-mark-light.png" media="(prefers-color-scheme: light)">
   <link rel="shortcut icon" href="/favicon.ico?v=9">
 
   <!-- Fonts — Inter is the licensed SF Pro stand-in for web & Android; Apple
@@ -194,6 +266,12 @@
 
 <body>
   <div id="root">
+    <div id="app-splash" aria-label="Loading Byblos">
+      <div class="splash-inner">
+        <img src="/byblos-mark-dark.png" alt="Byblos" class="splash-logo splash-logo-dark" />
+        <img src="/byblos-mark-light.png" alt="Byblos" class="splash-logo splash-logo-light" />
+      </div>
+    </div>
     <noscript>
       <div class="seo-fallback">
         <header>
