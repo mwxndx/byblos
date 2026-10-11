@@ -11,7 +11,11 @@ import PayoutCallbackStateMachineService, {
 } from '../payouts/payoutCallbackStateMachine.service.js';
 import WithdrawalRetryWorkerService from './withdrawalRetryWorker.service.js';
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
-import { computeClearance } from '../../growth/creators/creatorMoney.utils.js';
+import {
+    computeCreatorClearingBalance,
+    computeBuyerRefundClearingBalance
+} from './withdrawalClearanceHelper.js';
+import { reconcileStuckWithdrawalsHelper } from './withdrawalReconciliationHelper.js';
 
 const AMBIGUOUS_PAYOUT_ERROR_CODES = new Set([
     'CONNECTION_FAILED',
@@ -53,91 +57,7 @@ function getEntityPhone(entity = {}) {
     return entity.whatsapp_number || entity.mpesa_number || entity.mobile_payment || null;
 }
 
-// Recompute the still-clearing (T+2 hold + self-dealing-flag hold) portion of a
-// creator's balance from INSIDE an open transaction, using the caller's locked
-// client. Data sources mirror CreatorService.getCreatorClearance, but running
-// it here — under the same FOR UPDATE that reserves the funds — makes the hold
-// authoritative rather than a read-before-lock advisory, closing the
-// concurrent-request race where two withdrawals each pass the controller's
-// pre-transaction check and then both drain past the clearing hold.
-//
-// Queries WITH the metadata column (present in every schema at/after migration
-// 20260905130000). On a DB that predates it, the 42703 aborts this transaction
-// and the withdrawal fails closed — the correct safe direction, and never hit
-// by any current/test schema. (getCreatorClearance can retry-without-metadata
-// only because it runs on the pool, not inside a transaction.)
-async function computeCreatorClearingBalance(client, creatorId, lockedBalance) {
-    const toEarning = (e) => ({
-        amount: Number.parseFloat(e.amount || 0),
-        createdAt: new Date(e.created_at),
-        flaggedForReview: (e.metadata || {}).flagged_for_review === true
-    });
-    // Fetch every row that could still be held: anything inside the T+2 window
-    // (2 business days spans at most ~4 calendar days, so 10 days is a safe
-    // superset) OR any row flagged for self-dealing review (held indefinitely).
-    // Rows older than the window and unflagged are already cleared and add 0 to
-    // the hold. A previous `ORDER BY created_at DESC LIMIT 50` silently dropped
-    // the 51st+ still-holding row for high-volume creators — and could release
-    // an old flagged row's fraud hold once 50 newer rows accrued.
-    const [salesResult, referralResult] = await Promise.all([
-        client.query(
-            `SELECT id, amount, created_at, metadata
-               FROM creator_earnings
-              WHERE creator_id = $1 AND status = 'credited'
-                AND (created_at >= NOW() - INTERVAL '10 days'
-                     OR (metadata->>'flagged_for_review') = 'true')`,
-            [creatorId]
-        ),
-        client.query(
-            `SELECT id, amount, created_at, metadata
-               FROM creator_referral_earnings
-              WHERE referrer_creator_id = $1 AND status = 'credited'
-                AND (created_at >= NOW() - INTERVAL '10 days'
-                     OR (metadata->>'flagged_for_review') = 'true')`,
-            [creatorId]
-        )
-    ]);
-    const earnings = [...salesResult.rows.map(toEarning), ...referralResult.rows.map(toEarning)];
-    return computeClearance({ totalBalance: lockedBalance, earnings }).clearingBalance;
-}
 
-// Buyer-refund equivalent of computeCreatorClearingBalance: recompute the
-// still-clearing (T+2) portion of a buyer's refund balance inside the locked
-// transaction. Data sources mirror getBuyerRefundClearance; there is no
-// self-dealing flag for refunds, so every event is unflagged. Reuses the same
-// computeClearance math so the hold behaves identically to the advisory check.
-async function computeBuyerRefundClearingBalance(client, buyerId, lockedRefunds) {
-    const [refundRequestsResult, refundedOrdersResult] = await Promise.all([
-        client.query(
-            `SELECT amount, processed_at, updated_at, requested_at, payment_details
-               FROM refund_requests
-              WHERE buyer_id = $1 AND status = 'completed'`,
-            [buyerId]
-        ),
-        client.query(
-            `SELECT total_amount AS amount, updated_at
-               FROM product_orders
-              WHERE buyer_id = $1 AND status = 'REFUNDED'
-                AND id NOT IN (SELECT order_id FROM refund_requests WHERE buyer_id = $1 AND order_id IS NOT NULL)`,
-            [buyerId]
-        )
-    ]);
-    const events = [
-        ...refundRequestsResult.rows.map((rr) => ({
-            amount: Number.parseFloat(rr.amount || 0),
-            createdAt: (rr.payment_details?.credited_at || rr.payment_details?.reconciled_at)
-                ? new Date(rr.payment_details.credited_at || rr.payment_details.reconciled_at)
-                : new Date(rr.updated_at || rr.processed_at || rr.requested_at),
-            flaggedForReview: false
-        })),
-        ...refundedOrdersResult.rows.map((po) => ({
-            amount: Number.parseFloat(po.amount || 0),
-            createdAt: new Date(po.updated_at),
-            flaggedForReview: false
-        }))
-    ];
-    return computeClearance({ totalBalance: lockedRefunds, earnings: events }).clearingBalance;
-}
 
 /**
  * WithdrawalService
@@ -882,100 +802,7 @@ class WithdrawalService {
      * Status checks are best-effort; unresolved stuck requests require manual review.
      */
     async reconcileStuckWithdrawals(hoursAgo = 2) {
-        logger.info(`[WithdrawalService] Reconciling requests stuck > ${hoursAgo} hours`);
-
-        const { rows: stuck } = await pool.query(
-            `SELECT wr.*,
-                    COALESCE(s.full_name, CONCAT_WS(' ', c.first_name, c.last_name), b.full_name) AS entity_name,
-                    COALESCE(s.whatsapp_number, c.whatsapp_number, c.mpesa_number, b.whatsapp_number, b.mobile_payment) AS whatsapp_number
-             FROM withdrawal_requests wr
-             LEFT JOIN sellers s ON wr.seller_id = s.id
-             LEFT JOIN creators c ON wr.creator_id = c.id
-             LEFT JOIN buyers b ON wr.buyer_id = b.id
-             WHERE wr.status = 'processing'
-               AND wr.created_at < NOW() - ($1 * INTERVAL '1 hour')
-               AND wr.created_at > NOW() - INTERVAL '48 hours'
-             ORDER BY wr.created_at ASC
-             LIMIT 50`,
-            [hoursAgo]
-        );
-
-        logger.info(`[WithdrawalService] Found ${stuck.length} stuck request(s)`);
-
-        for (const request of stuck) {
-            try {
-                if (!request.provider_reference) {
-                    // No provider reference stored; provider API may have failed silently.
-                    logger.warn(`[WithdrawalService] Request ${request.id} has no provider_reference.Marking needs_review.`);
-                    await pool.query(
-                        `UPDATE withdrawal_requests 
-                         SET metadata = jsonb_set(COALESCE(metadata, '{}':: jsonb), '{reconciliation_flag}', '"no_provider_reference"':: jsonb)
-                         WHERE id = $1`,
-                        [request.id]
-                    );
-                    continue;
-                }
-
-                // Try provider reconciliation first; only flag for manual review when the provider cannot confirm a terminal state.
-                try {
-                    const statusCheck = await payoutService.checkPayoutStatus(request.provider_reference);
-                    const statusPayload = statusCheck?.raw_response || statusCheck || {};
-                    const providerAmount = Number.parseFloat(statusPayload.amount ?? statusCheck?.amount);
-                    const expectedAmount = Number.parseFloat(request.amount || 0);
-
-                    if (statusCheck?.success && providerPayloadIndicatesSuccess(statusPayload)) {
-                        if (!Number.isNaN(providerAmount) && Math.abs(providerAmount - expectedAmount) > 0.01) {
-                            await pool.query(
-                                `UPDATE withdrawal_requests
-                                 SET metadata = COALESCE(metadata, '{}'::jsonb) || $1::jsonb,
-                                     updated_at = NOW()
-                                 WHERE id = $2`,
-                                [JSON.stringify({
-                                    reconciliation_flag: 'provider_success_amount_mismatch',
-                                    expected_amount: expectedAmount,
-                                    provider_amount: providerAmount,
-                                    needs_manual_review: true
-                                }), request.id]
-                            );
-                            continue;
-                        }
-
-                        await this.updateStatusWithSideEffects(request.id, 'completed', {
-                            provider_reference: request.provider_reference,
-                            mpesa_receipt: statusPayload.third_party_trans_id || statusPayload.mpesa_receipt || null,
-                            remarks: 'Payout confirmed by provider status reconciliation'
-                        });
-                        continue;
-                    }
-
-                    if (statusCheck?.success && providerPayloadIndicatesFailure(statusPayload)) {
-                        await this.updateStatusWithSideEffects(request.id, 'failed', {
-                            provider_reference: request.provider_reference,
-                            remarks: statusPayload.message || 'Payout failed by provider status reconciliation'
-                        });
-                        continue;
-                    }
-                } catch (statusError) {
-                    logger.warn(`[WithdrawalService] Status reconciliation unavailable for request ${request.id}: ${statusError.message}`);
-                }
-
-                await pool.query(
-                    `UPDATE withdrawal_requests 
-                     SET metadata = jsonb_set(
-                COALESCE(metadata, '{}':: jsonb),
-                '{reconciliation_flag}',
-                '"needs_manual_review"':: jsonb
-            )
-                     WHERE id = $1 AND metadata ->> 'reconciliation_flag' IS NULL`,
-                    [request.id]
-                );
-
-                logger.info(`[WithdrawalService] Request ${request.id} (ref: ${request.provider_reference}) flagged for manual review`);
-
-            } catch (err) {
-                logger.error(`[WithdrawalService] Reconcile error for request ${request.id}: `, err.message);
-            }
-        }
+        return reconcileStuckWithdrawalsHelper(this, hoursAgo);
     }
 
     /**
