@@ -5,6 +5,7 @@ import { router } from "@/app/router";
 import { LoadingScreen } from "@/shared/components/LoadingScreen";
 import { useAppTheme } from "@/shared/hooks/useAppTheme";
 import { useAndroidBackHandler, registerNavigationDelegate } from "@/shared/utils/modalBackHandler";
+import { useNativeDeepLinkHandler } from "@/infrastructure/navigation/deepLinkHandler";
 import { InstallPrompt } from "@/features/pwa/InstallPrompt";
 
 // Register router delegation so shared mobile back handler doesn't import app router directly
@@ -20,6 +21,9 @@ function App() {
 
   // Intercept Android hardware back button for active modals/sheets
   useAndroidBackHandler();
+
+  // Handle Capacitor native deep links (verification emails, resets, tracking)
+  useNativeDeepLinkHandler((path) => router.navigate(path));
 
   return (
     <ErrorBoundary>
