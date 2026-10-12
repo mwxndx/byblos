@@ -31,7 +31,7 @@ export function useAdminLoginMutation() {
         ? { email: credentials.email, password: credentials.password }
         : { pin: credentials.pin };
       const response = await apiClient.post('/admin/login', payload);
-      return response.data;
+      return response.data?.data || response.data;
     },
   });
 }

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { CheckCircle, XCircle, Clock, DollarSign, Loader2, AlertTriangle } from '@/shared/ui/icons';
 import { RefundRequestCard } from '../components/RefundRequestCard';
 import { useRefundRequests } from '../hooks/useRefundRequests';
+import type { RefundRequest } from '../types/refunds';
 
 
 export default function RefundRequestsPage() {

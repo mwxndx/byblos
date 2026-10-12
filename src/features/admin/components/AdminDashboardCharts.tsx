@@ -5,6 +5,13 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieCh
 
 
 
+const COLORS = ['#facc15', '#e5e5e5', '#737373', '#d4d4d4', '#f59e0b', '#a3a3a3'];
+
+const hasChartData = (data: Record<string, unknown>[] = []) =>
+  data.some(item =>
+    Object.values(item || {}).some(value => typeof value === 'number' && value > 0)
+  );
+
 export const ChartContainer = ({ title, description, children, className = '' }: { title: string, description: string, children: ReactNode, className?: string }) => (
   <Card className={`${className} bg-surface-1 border border-separator shadow-xl rounded-2xl overflow-hidden group hover:border-yellow-500/30 transition-all duration-300`}>
     <CardHeader className="relative z-10 pb-2">
