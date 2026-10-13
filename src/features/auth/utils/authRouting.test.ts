@@ -94,8 +94,8 @@ describe('authRouting utility unit tests', () => {
       expect(isPublicRoute('/seller/register')).toBe(true);
       expect(isPublicRoute('/creator/login')).toBe(true);
       expect(isPublicRoute('/admin/login')).toBe(true);
+      expect(isPublicRoute('/marketing/login')).toBe(true);
       expect(isPublicRoute('/admin/marketing/login')).toBe(true);
-      expect(isPublicRoute('/marketing')).toBe(true);
       expect(isPublicRoute('/verify-email')).toBe(true);
       expect(isPublicRoute('/verify-email?token=abc&email=test@test.com&type=seller')).toBe(true);
     });
@@ -107,6 +107,9 @@ describe('authRouting utility unit tests', () => {
       expect(isPublicRoute('/admin/dashboard')).toBe(false);
       expect(isPublicRoute('/creator/dashboard')).toBe(false);
       expect(isPublicRoute('/mzigo/dashboard')).toBe(false);
+      expect(isPublicRoute('/marketing')).toBe(false);
+      expect(isPublicRoute('/marketing/')).toBe(false);
+      expect(isPublicRoute('/admin/marketing')).toBe(false);
     });
   });
 
