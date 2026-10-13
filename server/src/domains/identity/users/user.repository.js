@@ -19,9 +19,9 @@ export async function findByIdMinimal(userId) {
 
 export async function findAdminAuthProfile(userId) {
   const userQuery = {
-    name: 'find-admin-auth-profile-v2',
+    name: 'find-admin-auth-profile-v3',
     text: `
-      SELECT u.*, u.id as profile_id
+      SELECT u.id as user_table_id, u.id as profile_id, u.email, u.role, u.is_verified, u.is_active, u.password_changed_at
       FROM users u 
       WHERE u.id = $1 AND (u.role = 'admin' OR u.role = 'marketing') AND u.is_active = true
     `,
