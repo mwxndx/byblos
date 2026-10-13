@@ -200,30 +200,6 @@ const THEME_DEFINITIONS: Record<Theme, ThemeDefinition> = {
     }
 };
 
-export function useShopTheme(
-    themeName: Theme = 'default',
-    targetRef?: RefObject<HTMLElement | null>
-) {
-    const config = useMemo(() => THEME_DEFINITIONS[themeName] || THEME_DEFINITIONS.default, [themeName]);
-
-    useEffect(() => {
-        const targetElement = targetRef?.current || document.documentElement;
-        const currentVars = config.vars;
-
-        Object.entries(currentVars).forEach(([key, value]) => {
-            targetElement.style.setProperty(key, value);
-        });
-
-        return () => {
-            Object.keys(currentVars).forEach((key) => {
-                targetElement.style.removeProperty(key);
-            });
-        };
-    }, [config, targetRef]);
-
-    return config.classes;
-}
-
 // ─── Accent-only variant ─────────────────────────────────────────────────────
 const ACCENT_KEYS = ['--theme-accent', '--theme-accent-rgb', '--theme-button-bg', '--theme-button-text'] as const;
 

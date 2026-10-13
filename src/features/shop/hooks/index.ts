@@ -1,3 +1,3 @@
-export { useShopTheme } from "@/shared/hooks/useShopTheme";
+export { useShopAccentOnly } from "@/shared/hooks/useShopTheme";
 
 
