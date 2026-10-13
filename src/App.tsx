@@ -3,7 +3,6 @@ import { RouterProvider } from "react-router-dom";
 import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { router } from "@/app/router";
 import { LoadingScreen } from "@/shared/components/LoadingScreen";
-import { useAppTheme } from "@/shared/hooks/useAppTheme";
 import { useAndroidBackHandler, registerNavigationDelegate } from "@/shared/utils/modalBackHandler";
 import { useNativeDeepLinkHandler } from "@/infrastructure/navigation/deepLinkHandler";
 import { InstallPrompt } from "@/features/pwa/InstallPrompt";
@@ -15,10 +14,6 @@ registerNavigationDelegate({
 });
 
 function App() {
-  // Bootstrap app theme (light / dark / system) on mount.
-  // This hook applies data-theme to <html> and keeps it in sync.
-  useAppTheme();
-
   // Intercept Android hardware back button for active modals/sheets
   useAndroidBackHandler();
 
