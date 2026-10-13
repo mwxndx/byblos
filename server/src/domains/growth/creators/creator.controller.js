@@ -3,7 +3,7 @@ import AuthService from '../../identity/auth/auth.service.js';
 import WithdrawalService from '../../payments/withdrawals/withdrawal.service.js';
 import { revokeSessionTokens, clearAuthCookies } from '../../../shared/utils/sessionRevocation.js';
 import { sanitizeWithdrawalRequest } from '../../../shared/utils/sanitize.js';
-import { setAuthCookie } from '../../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';
 import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import logger from '../../../shared/utils/logger.js';
 
@@ -119,6 +119,7 @@ export const login = async (req, res, next) => {
     setAuthCookie(res, result.token);
     // Rolling refresh token keeps the creator signed in on the mobile app.
     const refreshToken = result.user?.id ? generateRefreshToken(result.user.id, 'creator') : undefined;
+    setRefreshTokenCookie(res, refreshToken);
     res.status(200).json({
       status: 'success',
       data: {

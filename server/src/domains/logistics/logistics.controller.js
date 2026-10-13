@@ -1,5 +1,6 @@
 import LogisticsDashboardService from './logisticsDashboard.service.js';
-import { setAuthCookie } from '../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../shared/utils/cookie.utils.js';
+import { revokeSessionTokens, clearAuthCookies } from '../../shared/utils/sessionRevocation.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
 
 export const loginLogisticsPartner = async (req, res, next) => {
@@ -8,6 +9,7 @@ export const loginLogisticsPartner = async (req, res, next) => {
         const result = await LogisticsDashboardService.login({ email, password });
 
         setAuthCookie(res, result.token);
+        setRefreshTokenCookie(res, result.refreshToken);
 
         res.status(200).json({
             status: 'success',
@@ -20,13 +22,8 @@ export const loginLogisticsPartner = async (req, res, next) => {
 
 export const logoutLogisticsPartner = async (req, res, next) => {
     try {
-        res.clearCookie('jwt', {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            domain: process.env.COOKIE_DOMAIN || undefined
-        });
+        await revokeSessionTokens(req);
+        clearAuthCookies(res);
 
         res.status(200).json({
             status: 'success',

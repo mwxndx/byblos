@@ -5,7 +5,7 @@
 import { AppError } from '../../shared/utils/errorHandler.js';
 import { signToken } from '../../shared/utils/jwt.js';
 import { generateRefreshToken } from '../../shared/utils/refreshToken.js';
-import { setAuthCookie } from '../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../shared/utils/cookie.utils.js';
 
 const VALID_ROLES = ['buyer', 'seller', 'creator'];
 
@@ -51,6 +51,7 @@ export const switchRole = async (req, res, next) => {
     const token = signToken(req.user.id, role, req.user.email);
     const refreshToken = generateRefreshToken(req.user.id, role);
     setAuthCookie(res, token);
+    setRefreshTokenCookie(res, refreshToken);
 
     res.status(200).json({
       status: 'success',

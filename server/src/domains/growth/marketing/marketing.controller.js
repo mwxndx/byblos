@@ -7,13 +7,15 @@ import * as marketingAnalyticsRepository from './marketingAnalytics.repository.j
 import { AppError } from '../../../shared/utils/errorHandler.js'
 import logger from '../../../shared/utils/logger.js'
 import AuthService from '../../identity/auth/auth.service.js'
-import { setAuthCookie } from '../../../shared/utils/cookie.utils.js'
+import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js'
+import { generateRefreshToken } from '../../../shared/utils/refreshToken.js'
+import { revokeSessionTokens, clearAuthCookies } from '../../../shared/utils/sessionRevocation.js'
 
 // ─── AUTH ────────────────────────────────────────────────────────────────────
 
 /**
  * POST /api/admin/marketing/login
- * Standard login for marketing admin — sets HttpOnly jwt cookie and returns token for native.
+ * Standard login for marketing admin — sets HttpOnly jwt and refresh cookies and returns tokens for native.
  */
 export const marketingLogin = async (req, res, next) => {
   try {
@@ -30,17 +32,37 @@ export const marketingLogin = async (req, res, next) => {
     }
 
     const { user, token } = authResult
+    const refreshToken = user?.id ? generateRefreshToken(user.id, 'marketing') : undefined
 
     logger.info(`[MARKETING-AUTH] Login successful: ${user.email}`)
 
     setAuthCookie(res, token)
+    setRefreshTokenCookie(res, refreshToken)
 
     res.status(200).json({
       status: 'success',
       data: {
         token,
+        refreshToken,
         user: { id: user.id, email: user.email, role: 'marketing', is_verified: true, emailVerified: true }
       }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+/**
+ * POST /api/admin/marketing/logout
+ * Revoke tokens and clear auth cookies.
+ */
+export const marketingLogout = async (req, res, next) => {
+  try {
+    await revokeSessionTokens(req)
+    clearAuthCookies(res)
+    res.status(200).json({
+      status: 'success',
+      message: 'Logged out successfully'
     })
   } catch (err) {
     next(err)

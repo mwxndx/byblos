@@ -9,6 +9,7 @@ import { protect, restrictTo } from '../middleware/auth.js'
 import { authLimiter } from '../middleware/authRateLimiter.js'
 import {
     marketingLogin,
+    marketingLogout,
     getOverview,
     getGmvTrend,
     getUserGrowth,
@@ -24,6 +25,7 @@ const router = express.Router()
 
 // Public: login only
 router.post('/login', authLimiter, validate(V.login), marketingLogin)
+router.post('/logout', marketingLogout)
 
 // All remaining routes require marketing or admin role
 router.use(protect, restrictTo('marketing', 'admin'))

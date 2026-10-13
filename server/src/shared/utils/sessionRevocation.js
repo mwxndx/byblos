@@ -50,6 +50,7 @@ export function clearAuthCookies(res) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
+    domain: process.env.COOKIE_DOMAIN || undefined,
     expires: new Date(0),
   };
   res.cookie('jwt', '', { ...base, path: '/' });

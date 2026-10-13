@@ -5,7 +5,7 @@ import ReferralService from '../../growth/referrals/referral.service.js';
 import logger from '../../../shared/utils/logger.js';
 import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import { revokeSessionTokens, clearAuthCookies } from '../../../shared/utils/sessionRevocation.js';
-import { setAuthCookie } from '../../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';
 import { sanitizeSeller } from '../../../shared/utils/sanitize.js';
 
 // Helper to send token via cookie
@@ -17,6 +17,7 @@ const sendTokenResponse = (data, statusCode, res, message) => {
   // Long-lived rolling refresh token so the mobile app can silently renew the
   // 24h access token and keep the seller logged in across app restarts.
   const refreshToken = user?.id ? generateRefreshToken(user.id, 'seller') : undefined;
+  setRefreshTokenCookie(res, refreshToken);
 
   const registrationMessage = statusCode === 201
     ? 'Account created! Please verify your email before listing products.'

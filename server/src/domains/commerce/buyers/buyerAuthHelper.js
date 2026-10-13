@@ -3,7 +3,7 @@
  *
  * Dedicated helper to encapsulate buyer auth token creation, cookies, and profile provisioning.
  */
-import { setAuthCookie } from '../../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';
 import { signToken } from '../../../shared/utils/jwt.js';
 import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import { sanitizeBuyer } from '../../../shared/utils/sanitize.js';
@@ -34,6 +34,7 @@ export const createSendToken = (data, statusCode, req, res, next) => {
 
   const buyerUserId = user?.id || buyer?.user_id || buyer?.userId;
   const refreshToken = buyerUserId ? generateRefreshToken(buyerUserId, 'buyer') : undefined;
+  setRefreshTokenCookie(res, refreshToken);
 
   if (user && user.is_verified !== undefined) {
     buyer.is_verified = user.is_verified;

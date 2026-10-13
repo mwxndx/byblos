@@ -5,6 +5,7 @@ import logger from '../../shared/utils/logger.js';
 import domainEventDispatcher, { AppEvents, DomainEvents } from '../../shared/core/domainEventDispatcher.js';
 const eventBus = domainEventDispatcher;
 import LogisticsTrackingLinkService from './logisticsTrackingLink.service.js';
+import { generateRefreshToken } from '../../shared/utils/refreshToken.js';
 import {
   MZIGO_EGO_SLUG,
   COMPLETED_PAYMENT_STATUSES,
@@ -188,10 +189,13 @@ class LogisticsDashboardService {
         );
 
         const token = signLogisticsToken(account);
+        const refreshToken = account.user_id ? generateRefreshToken(account.user_id, 'logistics') : undefined;
         return {
             token,
+            refreshToken,
             partner: {
                 id: account.partner_id,
+                userId: account.user_id,
                 name: account.partner_name,
                 slug: account.partner_slug,
                 email: account.partner_email || account.email,

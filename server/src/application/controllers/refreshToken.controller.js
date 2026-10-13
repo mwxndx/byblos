@@ -1,6 +1,6 @@
 import { refreshAccessToken } from '../../shared/utils/refreshToken.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
-import { setAuthCookie } from '../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../shared/utils/cookie.utils.js';
 
 /**
  * Refresh access token using refresh token
@@ -18,16 +18,7 @@ export const refreshToken = async (req, res, next) => {
 
     // Set updated HttpOnly jwt access cookie for Web browser sessions
     setAuthCookie(res, accessToken);
-
-    const isProduction = process.env.NODE_ENV === 'production';
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'lax',
-      path: '/api/auth/refresh-token',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      domain: process.env.COOKIE_DOMAIN || undefined
-    });
+    setRefreshTokenCookie(res, newRefreshToken);
 
     res.status(200).json({
       status: 'success',

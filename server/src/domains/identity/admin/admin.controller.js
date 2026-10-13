@@ -15,7 +15,8 @@ import logger from '../../../shared/utils/logger.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import LogisticsDashboardService from '../../logistics/logisticsDashboard.service.js';
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
-import { setAuthCookie } from '../../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';
+import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import OrderService from '../../orders/order/OrderService.js';
 import CreatorService from '../../growth/creators/creator.service.js';
 import { parsePaginationParams, buildPaginationMeta } from '../../../shared/utils/pagination.utils.js';
@@ -41,13 +42,16 @@ const adminLogin = async (req, res, next) => {
     }
 
     const { user, token } = authResult;
+    const refreshToken = user?.id ? generateRefreshToken(user.id, 'admin') : undefined;
 
     setAuthCookie(res, token);
+    setRefreshTokenCookie(res, refreshToken);
 
     res.status(200).json({
       status: 'success',
       data: {
         token,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
