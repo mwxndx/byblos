@@ -11,6 +11,7 @@ import logger from '../../../shared/utils/logger.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import Buyer from './buyer.model.js';
 import User from '../../identity/users/user.model.js';
+import AuthService from '../../identity/auth/auth.service.js';
 
 export const createSendToken = (data, statusCode, req, res, next) => {
   let token, buyer, user;

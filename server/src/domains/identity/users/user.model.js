@@ -148,7 +148,7 @@ class User {
       SET email_verification_token = $1,
           email_verification_expires = $2,
           updated_at = NOW()
-      WHERE email = $3
+      WHERE LOWER(email) = $3
       RETURNING id, email
     `
         const result = await pool.query(query, [hashedToken, expires, email.toLowerCase()])
