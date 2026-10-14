@@ -76,7 +76,9 @@ export function useBagCheckout(bag: BagContextValue) {
           sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY);
         }
       }
-    } catch {}
+    } catch (e) {
+      console.debug('Failed to restore pending payment state:', e);
+    }
   }, []);
 
   const flags = (l: { product: unknown }) => getProductFlags(l.product as unknown as ProductWithApiFields);
@@ -181,7 +183,9 @@ export function useBagCheckout(bag: BagContextValue) {
               createdAt: Date.now(),
               expiresAt: Date.now() + 5 * 60 * 1000,
             }));
-          } catch {}
+          } catch (e) {
+            console.debug('Failed to persist pending payment state:', e);
+          }
           bag.close();
           // Note: bag.clear() is deferred until payment confirmation (handlePaymentSuccess)
           // so that timeouts or user cancellations preserve the buyer's cart items.
@@ -192,7 +196,11 @@ export function useBagCheckout(bag: BagContextValue) {
       }
     } catch (error) {
       checkoutTokenRef.current = null;
-      try { sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY); } catch {}
+      try {
+        sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY);
+      } catch (e) {
+        console.debug('Failed to clear pending payment state:', e);
+      }
       // buyerApi.initiateProduct re-throws the raw axios error uncaught — its
       // .message is axios's own generic "Request failed with status code 400",
       // never the real backend validation reason (e.g. "Custom and imported
@@ -324,11 +332,19 @@ export function useBagCheckout(bag: BagContextValue) {
     handlePaymentSuccess: () => {
       bag.clear();
       checkoutTokenRef.current = null;
-      try { sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY); } catch {}
+      try {
+        sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY);
+      } catch (e) {
+        console.debug('Failed to clear pending payment state on success:', e);
+      }
     },
     handleCancelRetry: () => {
       checkoutTokenRef.current = null;
-      try { sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY); } catch {}
+      try {
+        sessionStorage.removeItem(PENDING_PAYMENT_STORAGE_KEY);
+      } catch (e) {
+        console.debug('Failed to clear pending payment state on cancel:', e);
+      }
       setPaymentModalData((p) => ({ ...p, isOpen: false }));
       bag.open();
     },

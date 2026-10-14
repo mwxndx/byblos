@@ -34,7 +34,7 @@ describe('useForegroundWebPush', () => {
   test('subscribes to foreground push messages on web/PWA and triggers toast + cache invalidation', () => {
     vi.mocked(mobileApp.isNativeApp).mockReturnValue(false);
 
-    let messageHandler: ((payload: any) => void) | undefined;
+    let messageHandler: ((payload: unknown) => void) | undefined;
     const unsubscribeFn = vi.fn();
 
     vi.mocked(webPush.subscribeForegroundMessages).mockImplementation((handler) => {

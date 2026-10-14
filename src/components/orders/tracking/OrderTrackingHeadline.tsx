@@ -82,9 +82,9 @@ function getHeadlineText(params: {
   isDigital: boolean;
   journey: UseOrderTrackingStateResult['journey'];
   order: ApiOrder;
-  deliveryLeg: any;
-  logistics: any;
-  liveEta: any;
+  deliveryLeg?: { completedAt?: string | number | null } | null;
+  logistics?: { completedAt?: string | number | null } | null;
+  liveEta?: { trackingStatus?: string; etaMinutes?: number; estimatedArrival?: string | number | null } | null;
   etaSource: string | null;
   riderMoving: boolean;
 }): string {

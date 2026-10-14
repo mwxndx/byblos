@@ -1,4 +1,4 @@
-name: Test
+name: Continuous Verification
 
 on:
   push:
@@ -6,19 +6,26 @@ on:
   pull_request:
     branches: [main]
 
-# Cancel superseded runs on the same ref to save CI minutes.
 concurrency:
   group: test-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  quality:
-    name: Quality Gate (Typecheck + Lint)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+permissions:
+  contents: read
 
-      - name: Set up Node
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Quality Gate: Lint, Typecheck, Static Application Contract Audit & Security
+  # ---------------------------------------------------------------------------
+  quality:
+    name: Quality Gate (Typecheck, Lint, Security, App Audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -27,12 +34,21 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
+      - name: Repository hygiene and secret leak check
+        run: |
+          echo "Verifying no unencrypted .env or private key files are committed..."
+          FORBIDDEN_FILES=$(git ls-files | grep -E '(\.env(\.(local|production|staging))?$|\.pem$|\.key$)' || true)
+          if [ -n "$FORBIDDEN_FILES" ]; then
+            echo "::error::Forbidden credential or environment files tracked in git: $FORBIDDEN_FILES"
+            exit 1
+          fi
+          echo "Repository hygiene check passed."
+
       - name: Frontend Typecheck
         run: npm run typecheck
 
-      - name: Frontend Lint (Non-blocking)
+      - name: Frontend Lint
         run: npm run lint
-        continue-on-error: true
 
       - name: Backend Lint
         working-directory: server
@@ -40,14 +56,22 @@ jobs:
           npm ci
           npm run lint
 
+      - name: Static Application Contract Audit (71 checks)
+        run: npm run test:app
+
+  # ---------------------------------------------------------------------------
+  # 2. Frontend Gate: Vitest Unit Tests & Coverage
+  # ---------------------------------------------------------------------------
   frontend:
-    name: Frontend (Vitest + coverage)
+    name: Frontend (Vitest + Coverage)
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -59,18 +83,23 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:coverage
 
-      - name: Upload coverage report
+      - name: Upload frontend coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-coverage
+          name: frontend-coverage-${{ github.run_number }}
           path: coverage/
+          retention-days: 14
           if-no-files-found: ignore
 
+  # ---------------------------------------------------------------------------
+  # 3. Backend & Database Gate: Postgres, Migrations, Integration & Journeys
+  # ---------------------------------------------------------------------------
   backend:
-    name: Backend (node:test unit + integration)
+    name: Backend & Database (Migrations, Integration, Journeys)
     needs: quality
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: server
@@ -101,9 +130,10 @@ jobs:
           --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -113,11 +143,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Write a CI-specific .env.test pointing at the service containers above
-      # (standard ports 5432/6379). We write the file directly rather than using
-      # `test:setup-env` because migrate.js loads .env.test with `override: true`,
-      # so environment overrides alone would be clobbered by the template's local
-      # docker-compose ports. Secrets here are throwaway test values.
       - name: Write CI test environment
         run: |
           cat > .env.test <<'EOF'
@@ -147,14 +172,7 @@ jobs:
           EMAIL_FROM_NAME=Byblos Test
           EOF
 
-      # The repo's incremental migrations can't build from an empty DB, so the
-      # test schema is provisioned from the committed snapshot (server/test/
-      # schema.sql). db:test:setup creates the DB if needed, then applies it.
-      - name: Provision test schema
-        # db:test:* scripts only load server/.env.test when NODE_ENV=test (or
-        # DOTENV_CONFIG_PATH is set); without it they fall back to the absent
-        # server/.env and the safety guard aborts on an empty DB_NAME. The test
-        # steps below set NODE_ENV themselves via test/setup.js.
+      - name: Provision clean test schema
         env:
           NODE_ENV: test
         run: npm run db:test:setup
@@ -165,14 +183,77 @@ jobs:
       - name: Run database integration tests
         run: npm run test:integration
 
+      - name: Run end-to-end business journey tests (Gates 1-4)
+        run: npm run test:journeys
+
+      - name: Capture backend test diagnostics on failure
+        if: failure()
+        run: |
+          mkdir -p ../diagnostics
+          echo "Capturing diagnostic logs..." > ../diagnostics/backend-failure.log
+          git status --short >> ../diagnostics/backend-failure.log
+
+      - name: Upload backend diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-diagnostics-${{ github.run_number }}
+          path: diagnostics/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # 4. E2E Browser Gate: Playwright Smoke Testing
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: Browser E2E (Playwright Smoke)
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build frontend for preview
+        run: npm run build
+
+      - name: Run Playwright smoke tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 14
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # 5. Production Web Build Verification
+  # ---------------------------------------------------------------------------
   build-verification:
     name: Production Build Verification
     needs: [frontend, backend]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Set up Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -183,3 +264,54 @@ jobs:
 
       - name: Verify Production Web Build
         run: npm run build
+
+  # ---------------------------------------------------------------------------
+  # 6. Continuous Verification Aggregate Gate (Single Required PR Status Check)
+  # ---------------------------------------------------------------------------
+  continuous-verification:
+    name: Continuous Verification
+    needs: [quality, frontend, backend, e2e, build-verification]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Evaluate all verification gates
+        run: |
+          echo "========================================================"
+          echo "CONTINUOUS VERIFICATION SUMMARY"
+          echo "========================================================"
+          echo "Quality Gate:              ${{ needs.quality.result }}"
+          echo "Frontend Tests:            ${{ needs.frontend.result }}"
+          echo "Backend & Journeys:        ${{ needs.backend.result }}"
+          echo "Browser E2E:               ${{ needs.e2e.result }}"
+          echo "Production Build:          ${{ needs.build-verification.result }}"
+          echo "========================================================"
+
+          # Check for any failures or cancellations
+          FAILED=0
+          for RESULT in "${{ needs.quality.result }}" "${{ needs.frontend.result }}" "${{ needs.backend.result }}" "${{ needs.e2e.result }}" "${{ needs.build-verification.result }}"; do
+            if [ "$RESULT" != "success" ]; then
+              FAILED=1
+            fi
+          done
+
+          # Output markdown to GitHub Actions Step Summary
+          cat <<EOF >> "$GITHUB_STEP_SUMMARY"
+          # 🛡️ Continuous Verification Results
+
+          | Verification Gate | Result |
+          | :--- | :---: |
+          | **Quality Gate (Typecheck, Lint, Security, App Audit)** | ${{ needs.quality.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | **Frontend (Vitest + Coverage)** | ${{ needs.frontend.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | **Backend & Database (Migrations, Integration, Journeys)** | ${{ needs.backend.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | **Browser E2E (Playwright Smoke)** | ${{ needs.e2e.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+          | **Production Build Verification** | ${{ needs.build-verification.result == 'success' && '✅ PASS' || '❌ FAIL' }} |
+
+          ---
+          **Aggregate Status:** $([ "$FAILED" -eq 0 ] && echo "✅ **ALL VERIFICATION CHECKS PASSED — SAFE TO MERGE**" || echo "❌ **VERIFICATION FAILED — MERGE BLOCKED**")
+          EOF
+
+          if [ "$FAILED" -ne 0 ]; then
+            echo "::error::One or more continuous verification checks failed. Merge is blocked."
+            exit 1
+          fi
+          echo "All continuous verification checks passed successfully."

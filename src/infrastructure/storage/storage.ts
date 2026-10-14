@@ -41,8 +41,9 @@ export const storage = {
       if (val !== null && val !== undefined) {
         return String(val);
       }
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to read ${key} from SecureStorage`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to read ${key} from SecureStorage`, msg);
     }
 
     // 2. Migration fallback: Check Preferences for previously stored tokens
@@ -59,8 +60,9 @@ export const storage = {
         }
         return value;
       }
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to get ${key} from Preferences fallback`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to get ${key} from Preferences fallback`, msg);
     }
 
     try {
@@ -86,12 +88,14 @@ export const storage = {
       await SecureStorage.setItem(key, value);
       // Clean up any stale unencrypted copy in Preferences
       await Preferences.remove({ key }).catch(() => {});
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to set ${key} in SecureStorage, using fallback`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to set ${key} in SecureStorage, using fallback`, msg);
       try {
         await Preferences.set({ key, value });
-      } catch (prefErr: any) {
-        console.warn(`[Storage] Failed to set ${key} in Preferences fallback`, prefErr?.message || prefErr);
+      } catch (prefErr: unknown) {
+        const prefMsg = prefErr instanceof Error ? prefErr.message : String(prefErr);
+        console.warn(`[Storage] Failed to set ${key} in Preferences fallback`, prefMsg);
       }
     }
   },
@@ -109,14 +113,16 @@ export const storage = {
     try {
       const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
       await SecureStorage.removeItem(key);
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to remove ${key} from SecureStorage`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to remove ${key} from SecureStorage`, msg);
     }
 
     try {
       await Preferences.remove({ key });
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to remove ${key} from Preferences`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to remove ${key} from Preferences`, msg);
     }
   },
 
@@ -133,14 +139,16 @@ export const storage = {
     try {
       const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
       await SecureStorage.clear();
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to clear SecureStorage`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to clear SecureStorage`, msg);
     }
 
     try {
       await Preferences.clear();
-    } catch (e: any) {
-      console.warn(`[Storage] Failed to clear Preferences`, e?.message || e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[Storage] Failed to clear Preferences`, msg);
     }
   }
 };

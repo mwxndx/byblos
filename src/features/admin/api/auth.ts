@@ -17,12 +17,8 @@ export async function login(credentials: { email?: string; password?: string; pi
 }
 
 export async function getMe() {
-  try {
-    const { data } = await api.get('/admin/me');
-    return data.data?.user;
-  } catch (error) {
-    throw error;
-  }
+  const { data } = await api.get('/admin/me');
+  return data.data?.user;
 }
 
 

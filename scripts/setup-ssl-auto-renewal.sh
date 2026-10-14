@@ -11,7 +11,7 @@
 # =============================================================================
 set -euo pipefail
 
-DOMAIN="bybloshq.space"
+DOMAIN="${DOMAIN:-byblosafrica.site}"
 PROJECT_DIR="${1:-$(cd "$(dirname "$0")/.." && pwd)}"
 SSL_DIR="$PROJECT_DIR/ssl"
 CERT_PATH="/etc/letsencrypt/live/$DOMAIN"

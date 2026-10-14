@@ -59,8 +59,9 @@ export function useAccountSwitching({
         description: `You are now using your ${role} account.`,
         duration: 2000,
       });
-    } catch (error: any) {
-      const message = error.response?.data?.message || error.message || 'Could not switch account';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      const message = err.response?.data?.message || err.message || 'Could not switch account';
       toast.error('Switch failed', { description: message });
       throw error;
     } finally {
@@ -91,8 +92,9 @@ export function useAccountSwitching({
         description: `Switched to ${newRole} dashboard`,
         duration: 2000,
       });
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to switch role';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
+      const message = err.response?.data?.message || 'Failed to switch role';
       toast.error('Role Switch Failed', { description: message });
       throw error;
     } finally {

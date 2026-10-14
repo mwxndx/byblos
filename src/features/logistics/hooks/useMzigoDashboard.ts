@@ -8,6 +8,7 @@ import {
   fetchLogisticsRequests,
   getStoredLogisticsPartner,
   LogisticsLegType,
+  LogisticsPartner,
   LogisticsSort,
   LogisticsStatusUpdate,
   updateLogisticsLegStatus,
@@ -82,7 +83,7 @@ export function useMzigoDashboard() {
     }
   }, [navigate, partnerQuery.error, partnerQuery.isError, requestsQuery.error, requestsQuery.isError]);
 
-  const partner = partnerQuery.data || (globalUser?.profile as any) || getStoredLogisticsPartner();
+  const partner = partnerQuery.data || (globalUser?.profile as unknown as LogisticsPartner | null) || getStoredLogisticsPartner();
   const dashboard = requestsQuery.data;
 
   const grouped = useMemo(() => ({

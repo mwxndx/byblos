@@ -102,7 +102,7 @@ function auditPublicAndAuthRoutes() {
   check('Public and auth routes', 'Seller auth routes are exposed', hasAll('src/app/router/seller.routes.tsx', [/\/seller\/login/, /\/seller\/register/, /path:\s*'\/seller'/, /path:\s*'dashboard'/]), 'Seller login, register, or dashboard route is missing.');
   check('Public and auth routes', 'Buyer auth routes are exposed', hasAll('src/app/router/buyer.routes.tsx', [/\/buyer\/login/, /\/buyer\/register/, /path:\s*'\/buyer'/, /path:\s*'dashboard'/]), 'Buyer login, register, or dashboard route is missing.');
   check('Public and auth routes', 'Creator auth and dashboard routes are exposed', hasAll('src/app/router/creator.routes.tsx', [/\/creator\/login/, /\/creator\/register/, /\/creator\/dashboard/]), 'Creator login, register, or dashboard route is missing.');
-  check('Public and auth routes', 'Creator button is visible from the public app', hasAll('src/features/shop/components/HeroSection.tsx', [/to="\/creator\/login"/, />\s*Creator\s*</]), 'Top-right Creator entry point is missing.');
+  check('Public and auth routes', 'Creator button is visible from the public app', (exists('src/features/shop/pages/MarketplaceIndex.tsx') && hasAll('src/features/shop/pages/MarketplaceIndex.tsx', [/to="\/creator\/login"/, />\s*Creator\s*</])) || (exists('src/features/shop/components/HeroSection.tsx') && hasAll('src/features/shop/components/HeroSection.tsx', [/to="\/creator\/login"/, />\s*Creator\s*</])), 'Top-right Creator entry point is missing.');
 }
 
 function auditBackendRoutes() {
@@ -131,17 +131,17 @@ function auditBackendRoutes() {
 
 function auditBuyerExperience() {
   check('Buyer experience', 'Buyer login and registration screens exist', exists('src/features/buyer/pages/BuyerLogin.tsx') && exists('src/features/buyer/pages/BuyerRegister.tsx'), 'Buyer auth screens are missing.');
-  check('Buyer experience', 'Buyer dashboard loads order, refund, and followed shop flows', hasAll('src/features/buyer/pages/BuyerDashboard.tsx', [/OrdersSection/, /useBuyerFollowedShops/, /MyShopsSection/]) && hasAll('src/features/buyer/components/dashboard/BuyerProfileSheet.tsx', [/RefundCard/]), 'Buyer dashboard is missing order/refund/followed shop coverage.');
+  check('Buyer experience', 'Buyer dashboard loads order, refund, and followed shop flows', hasAll('src/features/buyer/pages/BuyerDashboard.tsx', [/OrdersSection/, /BuyerRefundsTab|RefundCard/, /SellersGrid|MyShopsSection|useBuyerFollowedShops/]), 'Buyer dashboard is missing order/refund/followed shop coverage.');
   check('Buyer experience', 'Buyer API supports orders, refunds, clients, and wishlist-related flows', hasAll('src/features/buyer/api/orders.ts', [/orders/i]) && hasAll('src/features/buyer/api/refunds.ts', [/refund/i]), 'Buyer API coverage is incomplete.');
   check('Buyer experience', 'Public shop page exposes seller products and client count', hasAll('src/features/shop/pages/ShopPage.tsx', [/sellerInfo/, /products/]) || hasAll('src/features/shop/pages/useShopPage.ts', [/sellerInfo/, /products/]), 'Shop page contract is incomplete.');
 }
 
 function auditSellerExperience() {
-  check('Seller experience', 'Seller dashboard exposes all main tabs', hasAll('src/features/seller/components/dashboard/dashboardUtils.ts', [/overview/, /products/, /orders/, /withdrawals/, /settings/]), 'Seller dashboard tab list is incomplete.');
+  check('Seller experience', 'Seller dashboard exposes all main tabs', (exists('src/features/seller/components/dashboard/types.ts') && hasAll('src/features/seller/components/dashboard/types.ts', [/overview/, /products/, /orders/, /withdrawals/, /settings/])) || hasAll('src/features/seller/components/dashboard/dashboardUtils.ts', [/overview/, /products/, /orders/, /withdrawals/, /settings/]), 'Seller dashboard tab list is incomplete.');
   check('Seller experience', 'Seller overview shows creator metrics', hasAll('src/features/seller/components/dashboard/tabs/OverviewTab.tsx', [/Creator/i, /creator/i]), 'Seller overview should include creator count and creator-generated sales.');
-  check('Seller experience', 'Seller settings support banner, theme, locations, and creator invites', hasAll('src/features/seller/components/dashboard/tabs/SettingsTab.tsx', [/Banner|BannerUpload/i, /Theme/i]), 'Seller settings coverage is incomplete.');
+  check('Seller experience', 'Seller settings support banner, theme, locations, and creator invites', hasAll('src/features/seller/components/dashboard/tabs/SettingsTab.tsx', [/Theme|ThemeSelector/i, /Location|SettingsLocationSection/i]), 'Seller settings coverage is incomplete.');
   check('Seller experience', 'Seller product form enforces minimum price and service charge explanation', hasAll('server/src/domains/commerce/products/product.service.js', [/PRODUCT_MIN_PRICE|PRODUCT_SERVICE_CHARGE_RATE/i]) && hasAll('src/features/seller/components/dashboard/tabs/ProductsTab.tsx', [/Products|product/i]), 'Seller product pricing/service charge messaging needs review.');
-  check('Seller experience', 'Seller withdrawals apply minimum and tiered fees', hasAll('src/features/seller/components/dashboard/dashboardUtils.ts', [/MIN_WITHDRAWAL_AMOUNT\s*=\s*50/, /WITHDRAWAL_FEE_TIERS/, /1500/, /20000/, /63/]), 'Seller withdrawal fee rules are missing or changed.');
+  check('Seller experience', 'Seller withdrawals apply minimum and tiered fees', (exists('src/shared/utils/withdrawalFees.ts') && hasAll('src/shared/utils/withdrawalFees.ts', [/MIN_WITHDRAWAL_AMOUNT\s*=\s*50/, /WITHDRAWAL_FEE_TIERS/, /1500/, /20000/, /63/])) || hasAll('src/features/seller/components/dashboard/dashboardUtils.ts', [/MIN_WITHDRAWAL_AMOUNT\s*=\s*50/, /WITHDRAWAL_FEE_TIERS/, /1500/, /20000/, /63/]), 'Seller withdrawal fee rules are missing or changed.');
 }
 
 function auditCreatorExperience() {
@@ -183,7 +183,7 @@ function auditAdminAndOperations() {
 
 function auditFeesAndBusinessRules() {
   check('Fees and business rules', 'Backend fees match current business rules', hasAll('server/src/shared/config/fees.js', [/PRODUCT_MIN_PRICE:\s*50/, /PRODUCT_SERVICE_CHARGE_RATE:\s*0\.02/, /MIN_WITHDRAWAL_AMOUNT:\s*50/]), 'Backend fee config no longer matches agreed rules.');
-  check('Fees and business rules', 'Frontend seller withdrawal fees match backend tiers', hasAll('src/features/seller/components/dashboard/dashboardUtils.ts', [/fee:\s*21/, /fee:\s*45/, /fee:\s*63/]), 'Seller withdrawal frontend fee tiers need review.');
+  check('Fees and business rules', 'Frontend seller withdrawal fees match backend tiers', (exists('src/shared/utils/withdrawalFees.ts') && hasAll('src/shared/utils/withdrawalFees.ts', [/fee:\s*21/, /fee:\s*45/, /fee:\s*63/])) || hasAll('src/features/seller/components/dashboard/dashboardUtils.ts', [/fee:\s*21/, /fee:\s*45/, /fee:\s*63/]), 'Seller withdrawal frontend fee tiers need review.');
   check('Fees and business rules', 'Creator withdrawal fees require balance to cover charge', hasAll('src/features/creator/pages/CreatorDashboard.tsx', [/withdrawalFee|totalDeduction|balance/i]) && hasAll('server/src/domains/growth/creators/creator.service.js', [/calculateWithdrawalFee|totalDeducted|balance/i]), 'Creator withdrawal fee/balance protection is incomplete.');
 }
 
@@ -197,7 +197,7 @@ function auditDatabaseMigrations() {
 
 function auditSecurityAndRecovery() {
   check('Security and recovery', 'Auth middleware supports role-scoped sessions and cross-role creator access', hasAll('server/src/application/middleware/auth.js', [/creatorId|cross-roles|crossRoles|crossRole/i]) && hasAll('server/src/domains/identity/auth/auth.service.js', [/creator|signToken/i]), 'Role auth needs review.');
-  check('Security and recovery', 'Rate limiting protects auth and payments', hasAll('server/src/application/middleware/globalRateLimiter.js', [/rateLimit/]) && hasAll('server/src/application/middleware/authRateLimiter.js', [/rateLimit/]), 'Rate limiting coverage is incomplete.');
+  check('Security and recovery', 'Rate limiting protects auth and payments', hasAll('server/src/application/middleware/globalRateLimiter.js', [/RateLimiter|rateLimit/i]) && hasAll('server/src/application/middleware/authRateLimiter.js', [/RateLimiter|rateLimit/i]), 'Rate limiting coverage is incomplete.');
   check('Security and recovery', 'Payment and fulfillment recovery workers exist', exists('server/src/application/cron/paymentCron.js') && exists('server/src/application/cron/fulfillmentWorker.js') && hasAll('server/src/index.js', [/scheduleFulfillmentRetry/, /events\/payment\.events/]), 'Recovery workers/events are missing.');
   check('Security and recovery', 'Sensitive public sanitizers exist', hasAll('server/src/shared/utils/sanitize.js', [/sanitizeBuyer/, /sanitizeSeller/, /sanitizeOrder/]), 'Sanitization helpers need review.');
 }

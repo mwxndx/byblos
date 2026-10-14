@@ -22,6 +22,8 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+test-results/
+playwright-report/
 
 # nyc test coverage
 .nyc_output
@@ -154,3 +156,6 @@ scripts/*.exe
 scripts/__pycache__/
 scripts/jp.py
 scripts/pywin32_*.py
+
+# Test execution summaries and reports
+staging-smoke-summary.json

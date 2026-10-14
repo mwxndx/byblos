@@ -13,7 +13,7 @@ export function useSellerOrders() {
     refetchInterval: (query) => {
       const orders = query.state.data;
       if (!Array.isArray(orders)) return false;
-      const hasActive = orders.some((o: any) =>
+      const hasActive = orders.some((o: { status?: string }) =>
         ['PAID', 'FULFILLING', 'PROCESSING', 'READY_FOR_BUYER', 'COLLECTION_PENDING', 'DELIVERY_PENDING'].includes(
           String(o.status || '').toUpperCase()
         )

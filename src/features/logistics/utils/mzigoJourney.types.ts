@@ -1,5 +1,4 @@
-import type { LogisticsLeg, LogisticsLegType, LogisticsLocation, LogisticsRequestCard, LogisticsStatusUpdate } from '@/features/logistics/api';
-import type { ApiOrder, ApiOrderLogisticsDeliveryLeg } from '@/shared/types';
+import type { LogisticsLegType, LogisticsStatusUpdate } from '@/features/logistics/api';
 
 export type JourneyState = 'normal' | 'delayed' | 'attention';
 

@@ -21,16 +21,16 @@ export const safeLazy = <T extends ComponentType<unknown>>(
                 return { default: component.default as T };
             }
 
-            return { default: component as T };
-        } catch (error: any) {
-            console.error('safeLazy caught a chunk loading error:', error?.message || error);
+        } catch (error: unknown) {
+            const err = error as { name?: string; message?: string } | undefined;
+            console.error('safeLazy caught a chunk loading error:', err?.message || error);
 
             // Check if it's a dynamic import failure
             const isChunkError =
-                error.name === 'ChunkLoadError' ||
-                error.message?.includes('Failed to fetch dynamically imported module') ||
-                error.message?.includes('Importing a module script failed') ||
-                error.message?.includes('Loading chunk');
+                err?.name === 'ChunkLoadError' ||
+                Boolean(err?.message?.includes('Failed to fetch dynamically imported module')) ||
+                Boolean(err?.message?.includes('Importing a module script failed')) ||
+                Boolean(err?.message?.includes('Loading chunk'));
 
             if (isChunkError && !isNativeApp()) {
                 // Prevent infinite reload loops by checking session storage

@@ -193,7 +193,9 @@ export const PaymentStatusModal = ({
           onSuccessRef.current?.();
           return;
         }
-      } catch {}
+      } catch (error) {
+        console.debug('Failed to verify status before cancellation notice:', error);
+      }
       toast({
         title: 'Cancellation Notice',
         description: 'Unable to cancel this order attempt. Please check your orders.',

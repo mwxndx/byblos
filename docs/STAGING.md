@@ -48,9 +48,9 @@ the production topology:
 4. **Smoke test** once containers are healthy:
    ```bash
    # DB-backed liveness (checks a real SELECT 1 against Postgres)
-   curl -fsS https://staging.bybloshq.space/api/health   | jq .
+   curl -fsS https://staging.byblosafrica.site/api/health   | jq .
    # readiness probe
-   curl -fsS https://staging.bybloshq.space/api/health/ready | jq .
+   curl -fsS https://staging.byblosafrica.site/api/health/ready | jq .
    ```
    Then run the real Paystack **test-mode** round trip described in the sandbox
    scripts (`server/scripts/manual-paystack-sandbox-*.mjs`) against the staging
@@ -67,7 +67,7 @@ the production topology:
 | Redis                  | real container        | real container                   | ✅ |
 | Database               | production DB         | **separate** `byblos_staging`    | ⚠ intentional |
 | Paystack keys          | `sk_live_` / `pk_live_` | **`sk_test_` / `pk_test_`**    | ⚠ intentional |
-| Domain                 | bybloshq.space        | staging.bybloshq.space           | ⚠ intentional |
+| Domain                 | byblosafrica.site        | staging.byblosafrica.site           | ⚠ intentional |
 | Secrets (JWT, admin…)  | production values     | throwaway staging values         | ⚠ intentional |
 
 ## Findings from the pre-staging audit
@@ -165,7 +165,7 @@ scrubs secrets/PII from alert context, and is a pure log-only no-op when
 
 ## What only you can do (needs infrastructure this repo can't provide)
 
-- Provision the staging host and DNS record (`staging.bybloshq.space`).
+- Provision the staging host and DNS record (`staging.byblosafrica.site`).
 - Issue/mount the staging TLS certificate.
 - Populate `.env` with real staging secrets and Paystack **test-mode** keys.
 - Register the staging webhook URL in the Paystack dashboard's test-mode

@@ -1,6 +1,6 @@
 import type { LogisticsLeg, LogisticsLegType, LogisticsLocation, LogisticsRequestCard } from '@/features/logistics/api';
 import { DELIVERY_ACTIONS, PICKUP_ACTIONS } from '@/features/logistics/utils/mzigoDashboard.constants';
-import { MZIGO_CBD_HUB, type NextAction, type RequestStage } from './mzigoJourney.types';
+import { MZIGO_CBD_HUB, type NextAction } from './mzigoJourney.types';
 
 /**
  * The single "next thing the courier does".

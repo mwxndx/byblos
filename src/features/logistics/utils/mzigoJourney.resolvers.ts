@@ -1,6 +1,5 @@
 import type { LogisticsLeg, LogisticsRequestCard } from '@/features/logistics/api';
 import type { ApiOrder, ApiOrderLogisticsDeliveryLeg } from '@/shared/types';
-import { hasBuyerPaidDoorDelivery } from '@/features/seller/utils/sellerOrders.utils';
 import {
   DOOR_DELIVERY_JOURNEY_STEPS,
   HUB_COLLECTION_JOURNEY_STEPS,
@@ -14,7 +13,7 @@ import {
 export function isRiderMoving(deliveryLeg?: ApiOrderLogisticsDeliveryLeg | LogisticsLeg | null): boolean {
   if (!deliveryLeg) return false;
   const status = String(deliveryLeg.status || '').toLowerCase();
-  return status === 'out_for_delivery' || Boolean((deliveryLeg as any).startedAt && status !== 'delivered' && status !== 'failed');
+  return status === 'out_for_delivery' || Boolean((deliveryLeg as { startedAt?: string | number | null }).startedAt && status !== 'delivered' && status !== 'failed');
 }
 
 export function isPickupTrackable(status: string | null | undefined): boolean {

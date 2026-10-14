@@ -1,5 +1,5 @@
 import type { UserRole } from '../types/authTypes';
-import { storage, authStorage, BYBLOS_AUTH_KEYS } from '@/infrastructure/storage/storage';
+import { storage, authStorage } from '@/infrastructure/storage/storage';
 import apiClient from '@/infrastructure/http/apiClient';
 
 const ALL_ROLES: UserRole[] = ['buyer', 'seller', 'admin', 'creator', 'logistics', 'marketing'];

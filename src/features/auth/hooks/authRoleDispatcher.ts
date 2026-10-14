@@ -7,7 +7,7 @@ import {
   creatorProfileQueryOptions,
 } from './useAuthQueries';
 
-export type LoginMutationFn = UseMutateAsyncFunction<any, Error, { email: string; password: string; acceptTerms?: boolean }>;
+export type LoginMutationFn = UseMutateAsyncFunction<unknown, Error, { email: string; password: string; acceptTerms?: boolean }>;
 
 export interface LoginMutations {
   buyer: LoginMutationFn;
@@ -22,8 +22,8 @@ export async function executeRoleLogin(
   mutations: LoginMutations,
   role: UserRole,
   credentials: { email: string; password: string; acceptTerms?: boolean }
-): Promise<{ response: any; profile: UserProfile }> {
-  let response: any;
+): Promise<{ response: unknown; profile: UserProfile }> {
+  let response: unknown;
 
   switch (role) {
     case 'buyer':
@@ -52,18 +52,20 @@ export async function executeRoleLogin(
   return { response, profile };
 }
 
-export function extractProfileForRole(role: UserRole, response: any): UserProfile {
+export function extractProfileForRole(role: UserRole, response: unknown): UserProfile {
+  const r = (response && typeof response === 'object' ? response : {}) as Record<string, unknown>;
+  const nestedData = (r.data && typeof r.data === 'object' ? r.data : {}) as Record<string, unknown>;
   switch (role) {
     case 'buyer':
-      return response.buyer as UserProfile;
+      return r.buyer as UserProfile;
     case 'seller':
-      return response.seller as UserProfile;
+      return r.seller as UserProfile;
     case 'creator':
-      return response.creator as UserProfile;
+      return r.creator as UserProfile;
     case 'logistics':
-      return response.partner as UserProfile;
+      return r.partner as UserProfile;
     default:
-      return (response.user || response.data?.user) as UserProfile;
+      return (r.user || nestedData.user) as UserProfile;
   }
 }
 

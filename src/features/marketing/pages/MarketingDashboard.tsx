@@ -5,7 +5,7 @@ import { AreaChart, Area,
     BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
-import { marketingApi } from '../api/marketingApi';
+import { marketingApi, type MarketingOverview, type MarketingRecord } from '../api/marketingApi';
 import { StatCard } from '../components/StatCard';
 import { ChartCard } from '../components/ChartCard';
 import { SectionTitle } from '../components/SectionTitle';
@@ -62,15 +62,15 @@ export default function MarketingDashboard() {
     const [error, setError] = useState<string>('');
 
     // Data state
-    const [overview, setOverview] = useState<any>(null);
-    const [gmvTrend, setGmvTrend] = useState<any[]>([]);
-    const [userGrowth, setUserGrowth] = useState<any[]>([]);
-    const [productMix, setProductMix] = useState<any>(null);
-    const [orderFunnel, setOrderFunnel] = useState<any>(null);
-    const [geography, setGeography] = useState<any>(null);
-    const [topPerfs, setTopPerfs] = useState<any>(null);
-    const [referrals, setReferrals] = useState<any>(null);
-    const [activity, setActivity] = useState<any[]>([]);
+    const [overview, setOverview] = useState<MarketingOverview | null>(null);
+    const [gmvTrend, setGmvTrend] = useState<MarketingRecord[]>([]);
+    const [userGrowth, setUserGrowth] = useState<MarketingRecord[]>([]);
+    const [productMix, setProductMix] = useState<MarketingRecord[] | null>(null);
+    const [orderFunnel, setOrderFunnel] = useState<MarketingRecord[] | null>(null);
+    const [geography, setGeography] = useState<MarketingRecord[] | null>(null);
+    const [topPerfs, setTopPerfs] = useState<MarketingRecord | null>(null);
+    const [referrals, setReferrals] = useState<MarketingRecord | null>(null);
+    const [activity, setActivity] = useState<MarketingRecord[]>([]);
 
     const user = globalUser?.profile || JSON.parse(sessionStorage.getItem('marketing_user') || '{}');
 
@@ -89,17 +89,19 @@ export default function MarketingDashboard() {
                 marketingApi.getReferrals(),
                 marketingApi.getActivity(20)
             ]);
-            const extractArray = (res: any) => {
-                const payload = res?.data?.data ?? res?.data;
-                return Array.isArray(payload) ? payload : [];
+            const extractArray = (res: unknown): MarketingRecord[] => {
+                const r = res as { data?: { data?: unknown } } | undefined;
+                const payload = r?.data?.data ?? r?.data;
+                return Array.isArray(payload) ? (payload as MarketingRecord[]) : [];
             };
 
-            const extractObject = (res: any) => {
-                const payload = res?.data?.data ?? res?.data;
-                return payload && typeof payload === 'object' ? payload : null;
+            const extractObject = (res: unknown): MarketingRecord | null => {
+                const r = res as { data?: { data?: unknown } } | undefined;
+                const payload = r?.data?.data ?? r?.data;
+                return payload && typeof payload === 'object' && !Array.isArray(payload) ? (payload as MarketingRecord) : null;
             };
 
-            setOverview(extractObject(ov));
+            setOverview(extractObject(ov) as MarketingOverview | null);
             setGmvTrend(extractArray(gmv));
             setUserGrowth(extractArray(ug));
             setProductMix(extractArray(pm));
@@ -249,7 +251,7 @@ export default function MarketingDashboard() {
                                     outerRadius={80}
                                     label={({ category }) => category}
                                 >
-                                    {productMix.map((entry: any, index: number) => (
+                                    {productMix.map((_entry: MarketingRecord, index: number) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
@@ -276,14 +278,14 @@ export default function MarketingDashboard() {
                 {Array.isArray(geography) && geography.length > 0 && (
                     <ChartCard title="Top Buyer Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
-                            {geography.map((item: any, i: number) => (
-                                <div key={item.city || i} className="flex items-center justify-between border-b border-separator pb-2">
-                                    <span className="text-xs font-medium text-label-2">{item.city}</span>
+                            {geography.map((item: MarketingRecord, i: number) => (
+                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2">
+                                    <span className="text-xs font-medium text-label-2">{String(item.city || '')}</span>
                                     <div className="flex items-center gap-3">
                                         <div className="w-24 bg-white/10 h-2 rounded-full overflow-hidden">
-                                            <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${item.percentage || 0}%` }} />
+                                            <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${Number(item.percentage || 0)}%` }} />
                                         </div>
-                                        <span className="text-xs font-bold text-label w-10 text-right">{item.percentage}%</span>
+                                        <span className="text-xs font-bold text-label w-10 text-right">{Number(item.percentage || 0)}%</span>
                                     </div>
                                 </div>
                             ))}
@@ -294,17 +296,17 @@ export default function MarketingDashboard() {
 
             {/* Section 3: Top Performers & Referrals */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                {Array.isArray(topPerfs?.sellers) && topPerfs.sellers.length > 0 && (
+                {Array.isArray(topPerfs?.sellers) && (topPerfs.sellers as MarketingRecord[]).length > 0 && (
                     <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Top Performing Shops" subtitle="Highest GMV sellers this month" />
                         <div className="divide-y divide-separator">
-                            {topPerfs.sellers.map((s: any, idx: number) => (
-                                <div key={s.id || idx} className="py-3 flex items-center justify-between">
+                            {(topPerfs.sellers as MarketingRecord[]).map((s: MarketingRecord, idx: number) => (
+                                <div key={String(s.id || idx)} className="py-3 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs font-bold text-yellow-500 w-5">#{idx + 1}</span>
                                         <div>
-                                            <p className="text-sm font-semibold text-label">{s.shopName || s.name}</p>
-                                            <p className="text-xs text-label-2">{s.category || 'General'}</p>
+                                            <p className="text-sm font-semibold text-label">{String(s.shopName || s.name || '')}</p>
+                                            <p className="text-xs text-label-2">{String(s.category || 'General')}</p>
                                         </div>
                                     </div>
                                     <span className="text-sm font-bold text-label">KSh {Number(s.gmvKsh || 0).toLocaleString()}</span>
@@ -314,17 +316,17 @@ export default function MarketingDashboard() {
                     </div>
                 )}
 
-                {Array.isArray(referrals?.creators) && referrals.creators.length > 0 && (
+                {Array.isArray(referrals?.creators) && (referrals.creators as MarketingRecord[]).length > 0 && (
                     <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Creator Referrals" subtitle="Top performing creators" />
                         <div className="divide-y divide-separator">
-                            {referrals.creators.map((c: any, idx: number) => (
-                                <div key={c.id || idx} className="py-3 flex items-center justify-between">
+                            {(referrals.creators as MarketingRecord[]).map((c: MarketingRecord, idx: number) => (
+                                <div key={String(c.id || idx)} className="py-3 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs font-bold text-yellow-500 w-5">#{idx + 1}</span>
                                         <div>
-                                            <p className="text-sm font-semibold text-label">{c.name}</p>
-                                            <p className="text-xs text-label-2">{c.referredSellersCount || 0} sellers invited</p>
+                                            <p className="text-sm font-semibold text-label">{String(c.name || '')}</p>
+                                            <p className="text-xs text-label-2">{Number(c.referredSellersCount || 0)} sellers invited</p>
                                         </div>
                                     </div>
                                     <span className="text-sm font-bold text-yellow-400">KSh {Number(c.earnedKsh || 0).toLocaleString()}</span>
@@ -340,13 +342,13 @@ export default function MarketingDashboard() {
                 <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
                     <SectionTitle title="Live Platform Activity" subtitle="Recent signups, orders, and referrals" />
                     <div className="space-y-3 mt-4">
-                        {activity.map((item: any, idx: number) => (
-                            <div key={item.id || idx} className="flex items-center justify-between text-xs py-2 border-b border-separator last:border-0">
+                        {activity.map((item: MarketingRecord, idx: number) => (
+                            <div key={String(item.id || idx)} className="flex items-center justify-between text-xs py-2 border-b border-separator last:border-0">
                                 <div className="flex items-center gap-3">
                                     <span className="w-2 h-2 rounded-full bg-yellow-400" />
-                                    <span className="text-label-2 font-medium">{item.description}</span>
+                                    <span className="text-label-2 font-medium">{String(item.description || '')}</span>
                                 </div>
-                                <span className="text-label-3 font-mono">{item.timeAgo || 'Just now'}</span>
+                                <span className="text-label-3 font-mono">{String(item.timeAgo || 'Just now')}</span>
                             </div>
                         ))}
                     </div>

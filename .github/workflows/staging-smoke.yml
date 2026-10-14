@@ -1,0 +1,68 @@
+name: Staging Smoke Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      staging_url:
+        description: 'Staging target URL (must not be production)'
+        required: true
+        default: 'https://staging.byblosafrica.site'
+      timeout_seconds:
+        description: 'Per-request timeout in seconds'
+        required: false
+        default: '15'
+  workflow_call:
+    inputs:
+      staging_url:
+        description: 'Staging target URL'
+        required: false
+        type: string
+        default: 'https://staging.byblosafrica.site'
+      timeout_seconds:
+        description: 'Per-request timeout in seconds'
+        required: false
+        type: string
+        default: '15'
+
+concurrency:
+  group: staging-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    name: Staging Health & Smoke Verification
+    runs-on: ubuntu-latest
+    environment: staging
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Execute automated staging smoke suite
+        env:
+          STAGING_URL: ${{ inputs.staging_url || vars.STAGING_URL || 'https://staging.byblosafrica.site' }}
+          TIMEOUT_MS: ${{ (inputs.timeout_seconds || 15) * 1000 }}
+        run: |
+          node scripts/staging-smoke-test.mjs --target="${STAGING_URL}" --timeout="${TIMEOUT_MS}"
+
+      - name: Upload smoke test summary artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-smoke-summary-${{ github.run_number }}
+          path: staging-smoke-summary.json
+          retention-days: 14
+          if-no-files-found: ignore

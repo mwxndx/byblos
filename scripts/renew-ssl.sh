@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# renew-ssl.sh — Renew the Let's Encrypt certificate for bybloshq.space
+# renew-ssl.sh — Renew the Let's Encrypt certificate for byblosafrica.site
 #
 # Uses the WEBROOT authenticator so renewal works WITHOUT stopping nginx (the
 # Dockerized nginx permanently holds port 80, which is why the old standalone
@@ -16,7 +16,7 @@
 # =============================================================================
 set -euo pipefail
 
-DOMAIN="bybloshq.space"
+DOMAIN="${DOMAIN:-byblosafrica.site}"
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SSL_DIR="$PROJECT_DIR/ssl"
 WEBROOT="$PROJECT_DIR/certbot-webroot"

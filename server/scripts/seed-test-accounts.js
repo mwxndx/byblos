@@ -44,8 +44,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 })();
 
 // --- Safety guards ----------------------------------------------------------
-if (process.env.SEED_TEST_ACCOUNTS !== 'true') {
-  console.error('Refusing to run: set SEED_TEST_ACCOUNTS=true to confirm you want to seed test accounts into this database.');
+if (process.env.SEED_TEST_ACCOUNTS !== 'true' && process.env.NODE_ENV !== 'test') {
+  console.error('Refusing to run: set SEED_TEST_ACCOUNTS=true or run with NODE_ENV=test to confirm you want to seed test accounts into this database.');
   process.exit(1);
 }
 {
@@ -177,6 +177,104 @@ async function ensureSellerCreatorLink(client, sellerId, creatorId, code) {
   );
 }
 
+const SAMPLE_PRODUCTS = [
+  {
+    name: 'Byblos Obsidian Oversized Hoodie',
+    price: 4500.00,
+    description: 'Heavyweight oversized hoodie crafted from premium 450gsm organic cotton fleece.',
+    aesthetic: 'noir',
+    status: 'available',
+    productType: 'physical',
+    isDigital: false,
+    trackInventory: true,
+    quantity: 50,
+    lowStockThreshold: 5
+  },
+  {
+    name: 'Handcrafted Brass Signet Ring',
+    price: 2200.00,
+    description: 'Minimalist solid brass signet ring with hand-engraved atelier detailing.',
+    aesthetic: 'minimal',
+    status: 'available',
+    productType: 'physical',
+    isDigital: false,
+    trackInventory: true,
+    quantity: 20,
+    lowStockThreshold: 3
+  },
+  {
+    name: 'Digital Lookbook & Atelier Patterns',
+    price: 1000.00,
+    description: 'Downloadable high-resolution editorial lookbook and pattern templates.',
+    aesthetic: 'editorial',
+    status: 'available',
+    productType: 'digital',
+    isDigital: true,
+    digitalFileName: 'byblos-atelier-patterns-2026.pdf',
+    digitalFilePath: 'downloads/byblos-atelier-patterns-2026.pdf',
+    trackInventory: false,
+    quantity: 0,
+    lowStockThreshold: 0
+  }
+];
+
+async function upsertProduct(client, sellerId, product) {
+  const existing = await client.query(
+    'SELECT id FROM products WHERE seller_id = $1 AND name = $2',
+    [sellerId, product.name]
+  );
+  if (existing.rows[0]) {
+    await client.query(
+      `UPDATE products
+       SET price = $2, description = $3, aesthetic = $4, status = $5,
+           product_type = $6, is_digital = $7, digital_file_name = $8,
+           digital_file_path = $9, track_inventory = $10, quantity = $11,
+           low_stock_threshold = $12, updated_at = NOW()
+       WHERE id = $1`,
+      [
+        existing.rows[0].id,
+        product.price,
+        product.description,
+        product.aesthetic,
+        product.status,
+        product.productType,
+        product.isDigital,
+        product.digitalFileName || null,
+        product.digitalFilePath || null,
+        product.trackInventory,
+        product.quantity,
+        product.lowStockThreshold || 0
+      ]
+    );
+    return existing.rows[0].id;
+  }
+  const { rows } = await client.query(
+    `INSERT INTO products (
+       seller_id, name, price, description, aesthetic, status,
+       product_type, is_digital, digital_file_name, digital_file_path,
+       track_inventory, quantity, low_stock_threshold, created_at, updated_at
+     )
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW(), NOW())
+     RETURNING id`,
+    [
+      sellerId,
+      product.name,
+      product.price,
+      product.description,
+      product.aesthetic,
+      product.status,
+      product.productType,
+      product.isDigital,
+      product.digitalFileName || null,
+      product.digitalFilePath || null,
+      product.trackInventory,
+      product.quantity,
+      product.lowStockThreshold || 0
+    ]
+  );
+  return rows[0].id;
+}
+
 async function main() {
   const client = await pool.connect();
   try {
@@ -209,6 +307,13 @@ async function main() {
     });
     await ensureSellerCreatorLink(client, sellerId, creatorId, 'TESTCREATORLINK');
 
+    // Seed deterministic sample catalog products for Test Atelier
+    const productIds = [];
+    for (const product of SAMPLE_PRODUCTS) {
+      const prodId = await upsertProduct(client, sellerId, product);
+      productIds.push({ id: prodId, name: product.name, price: product.price, type: product.productType });
+    }
+
     // Independent, legitimate buyer (no relationship to the creator).
     const buyerUserId = await upsertUser(client, ACCOUNTS.buyer);
     await ensureRoleLink(client, buyerUserId, 'buyer');
@@ -225,6 +330,8 @@ async function main() {
       { role: 'creator', email: ACCOUNTS.creator.email, password: ACCOUNTS.creator.password, ids: `user=${creatorUserId} creator=${creatorId} ownBuyer=${creatorOwnBuyerId}` },
       { role: 'buyer',   email: ACCOUNTS.buyer.email,   password: ACCOUNTS.buyer.password,   ids: `user=${buyerUserId} buyer=${buyerId}` }
     ]);
+    console.log('\nProducts seeded for "Test Atelier":');
+    console.table(productIds);
     console.log('\nRelationships wired:');
     console.log(`  • seller "Test Atelier" (id ${sellerId}) is linked to creator ${creatorId} (seller_creator_links code TESTCREATORLINK, ${COMMISSION_RATE * 100}% commission)`);
     console.log(`  • seller ${sellerId}.referred_by_creator_id = ${creatorId} (creator referral reward path)`);

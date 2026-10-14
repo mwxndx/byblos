@@ -8,7 +8,7 @@ export interface RefundRequest {
   amount: string;
   status: string;
   payment_method: string;
-  payment_details: Record<string, any> | string;
+  payment_details: Record<string, unknown> | string;
   notes: string;
   admin_notes: string;
   requested_at: string;
