@@ -73,6 +73,25 @@ describe('Forensic audit P1 fixes: M-01 and M-02', () => {
     assert.equal(normalized.buyer.email, 'guest@example.com');
   });
 
+  test('M-02: unauthenticated caller passing spoofed buyerId in request body is ignored and forced to null', async () => {
+    const spoofReq = {
+      user: null,
+      body: {
+        buyerId: buyer1.id,
+        buyer_id: buyer1.id,
+        mobilePayment: '+254799999999',
+        customerEmail: 'attacker@example.com',
+        customerName: 'Spoofer',
+        items: [{ id: 1, quantity: 1 }]
+      },
+      headers: {}
+    };
+
+    const normalized = await normalizeOrderInput(spoofReq, 'token-spoof-789');
+    assert.equal(normalized.buyer.id, null, 'spoofed buyerId in body must be ignored for unauthenticated checkout');
+    assert.equal(normalized.buyer.userId, null);
+  });
+
   test('M-01: getByReference denies unauthenticated caller without checkout token and permits authorized caller', async () => {
     seller = await createSeller({});
     order = await createCompletedOrder({
