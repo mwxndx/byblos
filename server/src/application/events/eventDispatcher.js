@@ -17,22 +17,23 @@ class EventDispatcher {
         if (!claim.claimed) {
             return { claimed: false, claim };
         }
+        const claimAttempts = 1;
 
         listeners = Array.isArray(listeners) ? listeners : this.listeners(event);
         if (this.criticalEvents.has(event) && listeners.length === 0) {
             const error = new Error(`Critical event ${event} has no registered listeners`);
             error.retryable = true;
-            await this.markOutboxFailed(eventId, error);
+            await this.markOutboxFailed(eventId, error, claimAttempts);
             return { claimed: true, completed: false, failed: true, error };
         }
 
         const errors = await this.dispatchEvent(event, payload, listeners, extraArgs);
         if (errors.length === 0) {
-            await this.markOutboxCompleted(eventId);
+            await this.markOutboxCompleted(eventId, claimAttempts);
             return { claimed: true, completed: true, failed: false };
         }
 
-        await this.markOutboxFailed(eventId, errors[0]);
+        await this.markOutboxFailed(eventId, errors[0], claimAttempts);
         return { claimed: true, completed: false, failed: true, error: errors[0] };
     }
 
@@ -52,17 +53,17 @@ class EventDispatcher {
             eventId: row.event_id
         };
         if (this.criticalEvents.has(row.event_name) && listeners.length === 0) {
-            await this.markOutboxFailed(row.event_id, new Error(`Critical event ${row.event_name} has no registered listeners`));
+            await this.markOutboxFailed(row.event_id, new Error(`Critical event ${row.event_name} has no registered listeners`), row.attempts);
             return { completed: 0, failed: 1 };
         }
 
         const errors = await this.dispatchEvent(row.event_name, payload, listeners);
         if (errors.length === 0) {
-            await this.markOutboxCompleted(row.event_id);
+            await this.markOutboxCompleted(row.event_id, row.attempts);
             return { completed: 1, failed: 0 };
         }
 
-        await this.markOutboxFailed(row.event_id, errors[0]);
+        await this.markOutboxFailed(row.event_id, errors[0], row.attempts);
         return { completed: 0, failed: 1 };
     }
 
@@ -93,12 +94,12 @@ class EventDispatcher {
         logger.info('[EventBus] Required critical listeners registered', { events: Array.from(this.criticalEvents) });
     }
 
-    async markOutboxCompleted(eventId) {
-        return EventOutboxRepository.markCompleted(eventId);
+    async markOutboxCompleted(eventId, claimAttempts = null) {
+        return EventOutboxRepository.markCompleted(eventId, claimAttempts);
     }
 
-    async markOutboxFailed(eventId, error) {
-        return EventOutboxRepository.markFailed(eventId, error, this.classifyDeliveryError(error));
+    async markOutboxFailed(eventId, error, claimAttempts = null) {
+        return EventOutboxRepository.markFailed(eventId, error, this.classifyDeliveryError(error), claimAttempts);
     }
 
     classifyDeliveryError(error) {
@@ -133,16 +134,16 @@ class EventDispatcher {
                 eventId: row.event_id
             };
             if (this.criticalEvents.has(row.event_name) && listeners.length === 0) {
-                await this.markOutboxFailed(row.event_id, new Error(`Critical event ${row.event_name} has no registered listeners`));
+                await this.markOutboxFailed(row.event_id, new Error(`Critical event ${row.event_name} has no registered listeners`), row.attempts);
                 failed++;
                 continue;
             }
             const errors = await this.dispatchEvent(row.event_name, payload, listeners);
             if (errors.length === 0) {
-                await this.markOutboxCompleted(row.event_id);
+                await this.markOutboxCompleted(row.event_id, row.attempts);
                 completed++;
             } else {
-                await this.markOutboxFailed(row.event_id, errors[0]);
+                await this.markOutboxFailed(row.event_id, errors[0], row.attempts);
                 failed++;
             }
         }

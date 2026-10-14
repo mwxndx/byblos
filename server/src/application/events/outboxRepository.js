@@ -165,29 +165,33 @@ class EventOutboxRepository {
         }
     }
 
-    static async markCompleted(eventId) {
+    static async markCompleted(eventId, claimAttempts = null) {
         try {
-            await pool.query(
+            const result = await pool.query(
                 `UPDATE event_outbox
                  SET status = 'completed',
                      processed_at = NOW(),
                      updated_at = NOW(),
                      last_error = NULL,
                      last_error_type = NULL
-                 WHERE event_id = $1`,
-                [eventId]
+                 WHERE event_id = $1
+                   AND ($2::integer IS NULL OR attempts = $2::integer)`,
+                [eventId, claimAttempts]
             );
+            return result.rowCount > 0;
         } catch (error) {
             logger.warn('[EventBus] Failed to mark outbox event completed', {
                 eventId,
+                claimAttempts,
                 error: error.message
             });
+            return false;
         }
     }
 
-    static async markFailed(eventId, error, classification) {
+    static async markFailed(eventId, error, classification, claimAttempts = null) {
         try {
-            await pool.query(
+            const result = await pool.query(
                 `UPDATE event_outbox
                  SET status = CASE
                          WHEN $3::boolean = FALSE OR attempts >= 10 THEN 'permanently_failed'
@@ -204,14 +208,18 @@ class EventOutboxRepository {
                          ELSE final_failure_at
                      END,
                      updated_at = NOW()
-                 WHERE event_id = $1`,
-                [eventId, error?.message || String(error), classification.retryable, classification.errorType]
+                 WHERE event_id = $1
+                   AND ($5::integer IS NULL OR attempts = $5::integer)`,
+                [eventId, error?.message || String(error), classification.retryable, classification.errorType, claimAttempts]
             );
+            return result.rowCount > 0;
         } catch (markError) {
             logger.error('[EventBus] Failed to mark outbox event failed', {
                 eventId,
+                claimAttempts,
                 error: markError.message
             });
+            return false;
         }
     }
 }

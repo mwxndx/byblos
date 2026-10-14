@@ -62,4 +62,43 @@ describe('Concurrency: outbox event leased atomic claims', () => {
     assert.equal(reclaim.status, 'processing');
     assert.equal(reclaim.attempts, 2);
   });
+
+  test('stale worker with old claim attempts cannot complete or fail a reclaimed event', async () => {
+    const durableEvent = await EventOutboxRepository.enqueue('order.fulfilled', {
+      orderId: 999993
+    });
+    createdEventIds.push(durableEvent.eventId);
+
+    // Worker 1 claims event (attempts = 1)
+    const worker1Claim = await EventOutboxRepository.claimOutboxEvent(durableEvent.eventId);
+    assert.ok(worker1Claim, 'Worker 1 should claim event');
+    assert.equal(worker1Claim.attempts, 1);
+
+    // Stale timeout expires
+    await pool.query(
+      "UPDATE event_outbox SET updated_at = NOW() - INTERVAL '6 minutes' WHERE event_id = $1",
+      [durableEvent.eventId]
+    );
+
+    // Worker 2 reclaims event (attempts = 2)
+    const worker2Claim = await EventOutboxRepository.claimOutboxEvent(durableEvent.eventId);
+    assert.ok(worker2Claim, 'Worker 2 should reclaim event');
+    assert.equal(worker2Claim.attempts, 2);
+
+    // Worker 1 finishes late and tries to complete attempt 1
+    const worker1Success = await EventOutboxRepository.markCompleted(durableEvent.eventId, worker1Claim.attempts);
+    assert.equal(worker1Success, false, 'Worker 1 with stale attempts cannot complete event');
+
+    // Verify row status is still processing and attempts is still 2
+    const checkRow = await pool.query('SELECT status, attempts FROM event_outbox WHERE event_id = $1', [durableEvent.eventId]);
+    assert.equal(checkRow.rows[0].status, 'processing');
+    assert.equal(checkRow.rows[0].attempts, 2);
+
+    // Worker 2 finishes and completes attempt 2
+    const worker2Success = await EventOutboxRepository.markCompleted(durableEvent.eventId, worker2Claim.attempts);
+    assert.equal(worker2Success, true, 'Worker 2 with active lease completes event');
+
+    const completedRow = await pool.query('SELECT status FROM event_outbox WHERE event_id = $1', [durableEvent.eventId]);
+    assert.equal(completedRow.rows[0].status, 'completed');
+  });
 });
