@@ -120,6 +120,7 @@ describe('Forensic audit P1 fixes: M-01 and M-02', () => {
     assert.equal(statusSuccess, 200);
     assert.equal(jsonSuccess.status, 'success');
     assert.equal(jsonSuccess.data.orderNumber, order.order_number);
+    assert.equal(jsonSuccess.data.id, undefined, 'Internal database order id must not be exposed in reference lookup');
 
     // 3. Authenticated request as the buyer -> 200 OK
     let statusAuth = null;

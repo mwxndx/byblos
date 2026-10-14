@@ -4,10 +4,19 @@
  * Dedicated helper isolating order pickup, hub dropoff, and booking workflows.
  * Extracts nested error-mapping heuristics from order.controller.js.
  */
+import crypto from 'node:crypto';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
 import CoreOrderService from '../../../shared/core/CoreOrderService.js';
 import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
+
+export function safeTokenCompare(a, b) {
+    if (typeof a !== 'string' || typeof b !== 'string') return false;
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) return false;
+    return crypto.timingSafeEqual(bufA, bufB);
+}
 
 export function resolvePickupStatusCode(error) {
     if (error.statusCode) return error.statusCode;
@@ -87,7 +96,7 @@ export function authorizeOrderReferenceAccess({ order, req }) {
         || req.query.clientCheckoutToken;
 
     const isTokenAuthorized = Boolean(
-        clientToken && order.clientCheckoutToken && clientToken === order.clientCheckoutToken
+        clientToken && order.clientCheckoutToken && safeTokenCompare(clientToken, order.clientCheckoutToken)
     );
     const isUserAuthorized = Boolean(
         req.user && (

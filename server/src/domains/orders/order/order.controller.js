@@ -320,7 +320,6 @@ export const getByReference = async (req, res) => {
             success: true,
             status: 'success',
             data: {
-                id: order.id,
                 orderNumber: order.orderNumber,
                 status: order.status.toLowerCase(),
                 message: `Order status is ${order.status}`,
