@@ -98,6 +98,46 @@ describe('pollPaymentStatus', () => {
     });
   });
 
+  it('continues polling when backend returns envelope success with data: null until completed', async () => {
+    // 1st call: backend returns HTTP envelope 'success', but data is null (asynchronous payment initializing)
+    mockedGet.mockResolvedValueOnce({
+      data: {
+        status: 'success',
+        message: 'Payment status retrieved successfully',
+        data: null
+      }
+    });
+
+    // 2nd call: payment completed
+    mockedGet.mockResolvedValueOnce({
+      data: {
+        status: 'success',
+        message: 'Payment status retrieved successfully',
+        data: {
+          status: 'completed',
+          orderNumber: 'ORD-999',
+          amount: 2500,
+          currency: 'KES',
+          reference: 'pay_ref_null_init'
+        }
+      }
+    });
+
+    const result = await pollPaymentStatus('pay_ref_null_init', 5, 10);
+    expect(mockedGet).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({
+      status: 'success',
+      message: 'Payment status retrieved successfully',
+      data: {
+        status: 'completed',
+        orderNumber: 'ORD-999',
+        amount: 2500,
+        currency: 'KES',
+        reference: 'pay_ref_null_init'
+      }
+    });
+  });
+
   it('resolves with timeout when maxAttempts is reached without terminal status', async () => {
     mockedGet.mockResolvedValue({
       data: {

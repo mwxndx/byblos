@@ -20,12 +20,16 @@ export async function pollPaymentStatus(
 
         const rawStatus = typeof innerData?.status === 'string'
           ? innerData.status
-          : typeof responseData.status === 'string'
-            ? responseData.status
-            : '';
+          : typeof innerData?.paymentStatus === 'string'
+            ? innerData.paymentStatus
+            : !responseData.data && typeof responseData.paymentStatus === 'string'
+              ? responseData.paymentStatus
+              : '';
         const status = rawStatus.toLowerCase();
 
-        const isTerminalSuccess = status === 'completed' || status === 'success' || status === 'paid' || status === 'successful';
+        // Terminal success requires an explicit payment completion state from the payload,
+        // never from the generic HTTP envelope status.
+        const isTerminalSuccess = status === 'completed' || status === 'paid' || status === 'successful' || (innerData !== null && status === 'success');
         const isTerminalFailure = status === 'failed' || status === 'cancelled' || status === 'rejected';
 
         if (isTerminalSuccess || isTerminalFailure) {
