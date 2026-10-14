@@ -4,6 +4,7 @@ import payoutService from './payout.service.js';
 import domainEventDispatcher, { AppEvents, DomainEvents } from '../../../shared/core/domainEventDispatcher.js';
 const eventBus = domainEventDispatcher;
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
+import { toCents } from '../../orders/escrow/escrowMoney.utils.js';
 
 const PAYOUT_SUCCESS_STATUSES = new Set(['0', 'success', 'successful', 'completed', 'complete', 'paid', 'sent', 'delivered']);
 const PAYOUT_FAILURE_STATUSES = new Set(['failed', 'failure', 'cancelled', 'canceled', 'rejected', 'reversed', 'error']);
@@ -150,7 +151,7 @@ class PayoutCallbackStateMachineService {
                 return { status: 'rejected_missing_amount', withdrawalId };
             }
 
-            if (isSuccess && Math.abs(providerAmount - dbAmount) > 0.01) {
+            if (isSuccess && Math.abs(toCents(data.amount) - toCents(request.amount)) > 1) {
                 await this.markPayoutCallbackRejected(client, request, 'amount_mismatch', {
                     expected_amount: dbAmount,
                     provider_amount: providerAmount,

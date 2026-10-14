@@ -134,22 +134,27 @@ export const reverseOrderSettlementForRefundHelper = async (client, orderId, sou
 };
 
 const reverseSingleCreatorEarning = async (client, earning, source, isPartialOrder, numRefund, numTotal, parseMeta, balanceField, table, creatorIdField) => {
-    const totalAmount = Number.parseFloat(earning.amount || 0);
-    if (totalAmount <= 0 || earning.status === 'reversed') return null;
+    const totalAmountCents = toCents(earning.amount);
+    if (totalAmountCents <= 0 || earning.status === 'reversed') return null;
 
     const earningMeta = parseMeta(earning.metadata);
-    const prevReversed = Number.parseFloat(earningMeta.total_reversed || 0);
-    const remaining = Math.max(0, Math.round((totalAmount - prevReversed) * 100) / 100);
+    const prevReversedCents = toCents(earningMeta.total_reversed);
+    const remainingCents = Math.max(0, totalAmountCents - prevReversedCents);
 
-    let deduction = remaining;
-    if (isPartialOrder) {
-        const calc = Math.round((totalAmount * (numRefund / numTotal)) * 100) / 100;
-        deduction = Math.min(remaining, calc);
+    let deductionCents = remainingCents;
+    const refundCents = toCents(numRefund);
+    const totalOrderCents = toCents(numTotal);
+
+    if (isPartialOrder && refundCents > 0 && totalOrderCents > 0) {
+        const calcCents = Math.round(totalAmountCents * (refundCents / totalOrderCents));
+        deductionCents = Math.min(remainingCents, calcCents);
     }
-    if (deduction <= 0) return null;
+    if (deductionCents <= 0) return null;
 
-    const newTotalReversed = Math.round((prevReversed + deduction) * 100) / 100;
-    const isFinal = newTotalReversed >= totalAmount;
+    const newTotalReversedCents = prevReversedCents + deductionCents;
+    const deduction = roundMoney(deductionCents / 100);
+    const newTotalReversed = roundMoney(newTotalReversedCents / 100);
+    const isFinal = newTotalReversedCents >= totalAmountCents;
 
     const updatedHistory = Array.isArray(earningMeta.reversals) ? [...earningMeta.reversals] : [];
     updatedHistory.push({
@@ -173,9 +178,10 @@ const reverseSingleCreatorEarning = async (client, earning, source, isPartialOrd
     );
 
     if (creatorRows.length === 0) return null;
-    const currentBalance = Number.parseFloat(creatorRows[0].balance || 0);
+    const currentBalanceCents = toCents(creatorRows[0].balance);
+    const currentBalance = roundMoney(currentBalanceCents / 100);
 
-    if (currentBalance >= deduction) {
+    if (currentBalanceCents >= deductionCents) {
         await client.query(
             `UPDATE creators
              SET balance = balance - $1,
@@ -195,6 +201,9 @@ const reverseSingleCreatorEarning = async (client, earning, source, isPartialOrd
         return { adjusted: true, amount: deduction, [creatorIdField]: creatorId, isFinal };
     }
 
+    const deficitCents = deductionCents - currentBalanceCents;
+    const deficitAmount = roundMoney(deficitCents / 100);
+
     await client.query(
         `UPDATE ${table}
          SET status = 'reversal_compensation_required',
@@ -205,7 +214,7 @@ const reverseSingleCreatorEarning = async (client, earning, source, isPartialOrd
             JSON.stringify({
                 ...newMeta,
                 deficit: true,
-                shortfall: deduction - currentBalance,
+                shortfall: deficitAmount,
                 available_balance: currentBalance,
                 reason: `${creatorIdField}_balance_insufficient`,
                 manual_compensation_required: true,
@@ -217,7 +226,7 @@ const reverseSingleCreatorEarning = async (client, earning, source, isPartialOrd
     return {
         adjusted: false,
         reason: 'creator_balance_insufficient',
-        deficit: deduction - currentBalance,
+        deficit: deficitAmount,
         [creatorIdField]: creatorId
     };
 };
@@ -236,9 +245,9 @@ export const reverseCreatorEarningsForRefundHelper = async (client, orderId, sou
         referralCommission: null
     };
 
-    const numRefund = Number.parseFloat(refundAmount);
-    const numTotal = Number.parseFloat(orderTotal);
-    const isPartialOrder = Number.isFinite(numRefund) && Number.isFinite(numTotal) && numTotal > 0 && numRefund < numTotal;
+    const refundCents = toCents(refundAmount);
+    const totalOrderCents = toCents(orderTotal);
+    const isPartialOrder = refundCents > 0 && totalOrderCents > 0 && refundCents < totalOrderCents;
 
     // 1. Reversal for creator sales earnings
     const { rows: earningsRows } = await client.query(
@@ -255,8 +264,8 @@ export const reverseCreatorEarningsForRefundHelper = async (client, orderId, sou
             earningsRows[0],
             source,
             isPartialOrder,
-            numRefund,
-            numTotal,
+            refundAmount,
+            orderTotal,
             parseMeta,
             'total_earnings',
             'creator_earnings',
@@ -279,8 +288,8 @@ export const reverseCreatorEarningsForRefundHelper = async (client, orderId, sou
             refEarningsRows[0],
             source,
             isPartialOrder,
-            numRefund,
-            numTotal,
+            refundAmount,
+            orderTotal,
             parseMeta,
             'total_referral_earnings',
             'creator_referral_earnings',

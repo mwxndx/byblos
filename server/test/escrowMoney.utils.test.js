@@ -77,4 +77,20 @@ describe('toCents / roundMoney', () => {
   test('roundMoney round-trips through cents', () => {
     assert.equal(roundMoney(10.005), 10.01);
   });
+
+  test('avoids IEEE-754 precision drift on fractional additions and subtractions', () => {
+    // 0.1 + 0.2 in standard JS floating point is 0.30000000000000004
+    const floatSum = 0.1 + 0.2;
+    assert.notEqual(floatSum, 0.3);
+    assert.equal(roundMoney(0.1 + 0.2), 0.3);
+    assert.equal(toCents(0.1) + toCents(0.2), toCents(0.3));
+
+    // Difference between 100.20 and 100.19 in IEEE-754 is 0.010000000000005116
+    const diff = 100.20 - 100.19;
+    assert.ok(diff > 0.01); // floating point bug!
+    // with integer cents:
+    const diffCents = Math.abs(toCents(100.20) - toCents(100.19));
+    assert.equal(diffCents, 1); // exactly 1 cent, within banking tolerance <= 1
+  });
 });
+
