@@ -16,10 +16,12 @@ export const safeLazy = <T extends ComponentType<unknown>>(
             const component = await importFn();
 
             // Handle both default and non-default exports
-            // Some routes use .then(m => ({ default: m.ComponentName }))
-            if ('default' in component) {
-                return { default: component.default as T };
+            // Some routes use .then(m => ({ default: m.ComponentName })) or .then(m => m.ComponentName)
+            if (component && typeof component === 'object' && 'default' in component) {
+                return { default: (component as { default: T }).default };
             }
+
+            return { default: component as T };
 
         } catch (error: unknown) {
             const err = error as { name?: string; message?: string } | undefined;
