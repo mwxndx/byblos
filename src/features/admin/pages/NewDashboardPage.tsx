@@ -192,17 +192,6 @@ const NewAdminDashboard = () => {
             }}
           />
 
-          <AdminEntityModals
-            selectedSeller={selectedSeller as Record<string, unknown> | null}
-            isLoadingSeller={isLoadingSeller}
-            closeSellerModal={closeSellerModal}
-            selectedBuyer={selectedBuyer as Record<string, unknown> | null}
-            isLoadingBuyer={isLoadingBuyer}
-            closeBuyerModal={closeBuyerModal}
-            safeFormatDate={safeFormatDate}
-            inspectionSessionId={inspectionSessionId}
-          />
-
           <TabsContent value="overview" className="space-y-6">
             {/* At a glance — business metrics, on Overview only. */}
             <div>
@@ -306,6 +295,17 @@ const NewAdminDashboard = () => {
             />
           </TabsContent>
         </Tabs>
+
+        <AdminEntityModals
+          selectedSeller={selectedSeller as Record<string, unknown> | null}
+          isLoadingSeller={isLoadingSeller}
+          closeSellerModal={closeSellerModal}
+          selectedBuyer={selectedBuyer as Record<string, unknown> | null}
+          isLoadingBuyer={isLoadingBuyer}
+          closeBuyerModal={closeBuyerModal}
+          safeFormatDate={safeFormatDate}
+          inspectionSessionId={inspectionSessionId}
+        />
       </div>
     </div>
   );

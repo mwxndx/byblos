@@ -240,7 +240,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
   }
 
   return (
-    <div className="seller-surface flex flex-col" style={{ minHeight: '100svh', height: '100svh', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+    <div className="seller-surface flex flex-1 min-h-0 flex-col" style={{ minHeight: '100%', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
       <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       <div
@@ -250,7 +250,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
         className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
         // The seller tabs are a fixed bottom bar (h-14) on web and native alike,
         // so reserve matching space so the last content clears it.
-        style={{ paddingBottom: 'calc(3.5rem + env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'calc(4rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
       >
         <div className="mb-5 mt-1 sm:mb-6">
           <SellerProfileHero

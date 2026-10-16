@@ -208,7 +208,7 @@ export default function CreatorDashboard() {
         </div>
       </div>
 
-      <div className="space-y-5 px-4 py-6 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom, 0px))' }}>
+      <div className="space-y-5 px-4 pt-3.5 pb-8 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(2.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}>
         {tab === 'performance' ? (
           <>
             <CreatorEarningsHero

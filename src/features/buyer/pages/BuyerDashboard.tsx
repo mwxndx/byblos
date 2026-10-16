@@ -134,9 +134,6 @@ function BuyerDashboard() {
       {/* Dashboard Body: establishes positioning context for drawer and overlay immediately below header */}
       <div
         className="relative flex-1 min-h-0 flex flex-col overflow-hidden"
-        style={{
-          marginBottom: 'calc(3.5rem + env(safe-area-inset-bottom, 0px))',
-        }}
       >
         <BuyerDashboardSearch
           activeSection={activeSection}
@@ -150,7 +147,7 @@ function BuyerDashboard() {
           overflowY: 'auto',
           overflowX: 'hidden',
           padding: 'clamp(10px, 4vw, 18px)',
-          paddingBottom: '1rem',
+          paddingBottom: 'calc(4rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
           WebkitOverflowScrolling: 'touch',
           scrollBehavior: 'smooth',
           overscrollBehavior: 'none',
