@@ -9,7 +9,8 @@ const VALID_ROLES = new Set(['buyer', 'seller', 'creator', 'admin', 'logistics']
 
 function normalizeRole(role) {
     const normalized = String(role || '').toLowerCase().trim();
-    return normalized === 'mzigo' ? 'logistics' : normalized;
+    if (normalized === 'mzigo' || normalized === 'partner') return 'logistics';
+    return normalized;
 }
 
 function normalizeChannels(channels = ['in_app']) {
@@ -216,17 +217,27 @@ class NotificationService {
         return { delivered: responses.some(item => item.ok), responses };
     }
 
-    async listForUser({ userId, limit = 50, unreadOnly = false }) {
+    async listForUser({ userId, role = null, limit = 50, unreadOnly = false }) {
         const safeLimit = Math.min(Math.max(Number.parseInt(limit, 10) || 50, 1), 100);
-        const { rows } = await pool.query(
-            `SELECT id, recipient_role, type, title, body, data, channels, read_at, created_at
-             FROM app_notifications
-             WHERE recipient_user_id = $1
-               AND ($2::boolean = FALSE OR read_at IS NULL)
-             ORDER BY created_at DESC
-             LIMIT $3`,
-            [Number(userId), Boolean(unreadOnly), safeLimit]
-        );
+        const normalizedRole = role ? normalizeRole(role) : null;
+        let query = `
+            SELECT id, recipient_role, type, title, body, data, channels, read_at, created_at
+            FROM app_notifications
+            WHERE recipient_user_id = $1
+              AND ($2::boolean = FALSE OR read_at IS NULL)
+        `;
+        const params = [Number(userId), Boolean(unreadOnly)];
+        if (normalizedRole && VALID_ROLES.has(normalizedRole)) {
+            params.push(normalizedRole);
+            query += ` AND recipient_role = $${params.length}`;
+        }
+        params.push(safeLimit);
+        query += `
+            ORDER BY created_at DESC
+            LIMIT $${params.length}
+        `;
+
+        const { rows } = await pool.query(query, params);
         return rows;
     }
 
@@ -242,14 +253,20 @@ class NotificationService {
         return rows[0] || null;
     }
 
-    async markAllRead({ userId }) {
-        const { rowCount } = await pool.query(
-            `UPDATE app_notifications
-             SET read_at = COALESCE(read_at, NOW())
-             WHERE recipient_user_id = $1
-               AND read_at IS NULL`,
-            [Number(userId)]
-        );
+    async markAllRead({ userId, role = null }) {
+        const normalizedRole = role ? normalizeRole(role) : null;
+        let query = `
+            UPDATE app_notifications
+            SET read_at = COALESCE(read_at, NOW())
+            WHERE recipient_user_id = $1
+              AND read_at IS NULL
+        `;
+        const params = [Number(userId)];
+        if (normalizedRole && VALID_ROLES.has(normalizedRole)) {
+            params.push(normalizedRole);
+            query += ` AND recipient_role = $${params.length}`;
+        }
+        const { rowCount } = await pool.query(query, params);
         return rowCount;
     }
 

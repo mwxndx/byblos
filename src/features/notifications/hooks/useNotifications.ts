@@ -23,15 +23,16 @@ const basePath = (variant: NotificationVariant) =>
  * role on web or app (plain API, no push permission needed). Pass
  * variant="logistics" for the Mzigo partner (separate auth endpoint).
  */
-export function useNotifications(variant: NotificationVariant = 'default', enabled = true) {
+export function useNotifications(variant: NotificationVariant = 'default', enabled = true, role?: string) {
   const queryClient = useQueryClient();
-  const queryKey = ['notifications', variant] as const;
+  const queryKey = ['notifications', variant, role ?? 'auto'] as const;
   const base = basePath(variant);
 
   const query = useQuery({
     queryKey,
     queryFn: async (): Promise<AppNotification[]> => {
-      const res = await apiClient.get(`${base}?limit=30`);
+      const url = role ? `${base}?limit=30&role=${encodeURIComponent(role)}` : `${base}?limit=30`;
+      const res = await apiClient.get(url);
       return (res.data?.data ?? []) as AppNotification[];
     },
     enabled,
@@ -60,7 +61,8 @@ export function useNotifications(variant: NotificationVariant = 'default', enabl
 
   const markAllReadMutation = useMutation({
     mutationFn: async () => {
-      await apiClient.patch(`${base}/read-all`);
+      const url = role ? `${base}/read-all?role=${encodeURIComponent(role)}` : `${base}/read-all`;
+      await apiClient.patch(url);
     },
     onSuccess: () => {
       queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>

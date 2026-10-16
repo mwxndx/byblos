@@ -72,8 +72,12 @@ export const listNotifications = async (req, res) => {
         return res.status(401).json({ status: 'error', message: 'Authentication required' });
     }
 
+    const allRoles = req.query.allRoles === 'true' || req.query.all_roles === 'true';
+    const role = allRoles ? null : (req.query.role || currentRole(req));
+
     const notifications = await NotificationService.listForUser({
         userId,
+        role,
         limit: req.query.limit,
         unreadOnly: req.query.unreadOnly === 'true' || req.query.unread_only === 'true'
     });
@@ -114,8 +118,12 @@ export const markAllNotificationsRead = async (req, res) => {
         return res.status(401).json({ status: 'error', message: 'Authentication required' });
     }
 
+    const allRoles = req.body?.allRoles === true || req.query.allRoles === 'true' || req.query.all_roles === 'true';
+    const role = allRoles ? null : (req.body?.role || req.query.role || currentRole(req));
+
     const updated = await NotificationService.markAllRead({
-        userId
+        userId,
+        role
     });
 
     res.status(200).json({
@@ -130,7 +138,8 @@ export const getUnreadNotificationCount = async (req, res) => {
         return res.status(401).json({ status: 'error', message: 'Authentication required' });
     }
 
-    const role = currentRole(req);
+    const allRoles = req.query.allRoles === 'true' || req.query.all_roles === 'true';
+    const role = allRoles ? null : (req.query.role || currentRole(req));
     const unreadCount = await NotificationService.getUnreadCount({
         userId,
         role

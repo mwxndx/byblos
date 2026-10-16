@@ -381,4 +381,96 @@ describe('Financial Push & Feed Notifications Integration', () => {
     assert.equal(typeof batchRes.pushed, 'number');
     assert.equal(typeof batchRes.failed, 'number');
   });
+
+  test('listForUser and markAllRead respect role scoping for multi-role users', async () => {
+    const NotificationService = (await import('../src/domains/communication/notifications/notification.service.js')).default;
+    const multiRoleUser = await createUser({ role: 'buyer' });
+
+    try {
+      // 1. Create a buyer notification and a seller notification for the same user
+      await NotificationService.createInAppNotification({
+        recipientUserId: multiRoleUser.id,
+        recipientRole: 'buyer',
+        type: 'buyer_order_placed',
+        title: 'Order Confirmation',
+        body: 'Your buyer order has been placed'
+      });
+
+      await NotificationService.createInAppNotification({
+        recipientUserId: multiRoleUser.id,
+        recipientRole: 'seller',
+        type: 'seller_new_sale',
+        title: 'New Sale Received',
+        body: 'You received a new seller order'
+      });
+
+      // 2. Verify listForUser filtering by role
+      const buyerList = await NotificationService.listForUser({ userId: multiRoleUser.id, role: 'buyer' });
+      assert.equal(buyerList.length, 1);
+      assert.equal(buyerList[0].recipient_role, 'buyer');
+      assert.equal(buyerList[0].type, 'buyer_order_placed');
+
+      const sellerList = await NotificationService.listForUser({ userId: multiRoleUser.id, role: 'seller' });
+      assert.equal(sellerList.length, 1);
+      assert.equal(sellerList[0].recipient_role, 'seller');
+      assert.equal(sellerList[0].type, 'seller_new_sale');
+
+      const allList = await NotificationService.listForUser({ userId: multiRoleUser.id, role: null });
+      assert.equal(allList.length, 2);
+
+      // 3. Verify unread counts
+      const initialBuyerCount = await NotificationService.getUnreadCount({ userId: multiRoleUser.id, role: 'buyer' });
+      const initialSellerCount = await NotificationService.getUnreadCount({ userId: multiRoleUser.id, role: 'seller' });
+      const initialTotalCount = await NotificationService.getUnreadCount({ userId: multiRoleUser.id });
+      assert.equal(initialBuyerCount, 1);
+      assert.equal(initialSellerCount, 1);
+      assert.equal(initialTotalCount, 2);
+
+      // 4. Mark all read for 'buyer' role only
+      const updatedBuyerCount = await NotificationService.markAllRead({ userId: multiRoleUser.id, role: 'buyer' });
+      assert.equal(updatedBuyerCount, 1);
+
+      // Buyer unread should now be 0, while seller unread remains 1
+      const postBuyerCount = await NotificationService.getUnreadCount({ userId: multiRoleUser.id, role: 'buyer' });
+      const postSellerCount = await NotificationService.getUnreadCount({ userId: multiRoleUser.id, role: 'seller' });
+      assert.equal(postBuyerCount, 0);
+      assert.equal(postSellerCount, 1);
+
+      // 5. Mark all read for 'seller' role
+      const updatedSellerCount = await NotificationService.markAllRead({ userId: multiRoleUser.id, role: 'seller' });
+      assert.equal(updatedSellerCount, 1);
+      assert.equal(await NotificationService.getUnreadCount({ userId: multiRoleUser.id }), 0);
+    } finally {
+      await pool.query('DELETE FROM app_notifications WHERE recipient_user_id = $1', [multiRoleUser.id]);
+      await pool.query('DELETE FROM users WHERE id = $1', [multiRoleUser.id]);
+    }
+  });
+
+  test('registerDeviceToken maps partner and mzigo roles to logistics', async () => {
+    const NotificationService = (await import('../src/domains/communication/notifications/notification.service.js')).default;
+    const testPartnerUser = await createUser({ role: 'logistics' });
+    const token = `partner-test-token-${Date.now()}`;
+
+    try {
+      const device = await NotificationService.registerDeviceToken({
+        userId: testPartnerUser.id,
+        role: 'partner',
+        platform: 'android',
+        token,
+        deviceId: 'partner-device-1'
+      });
+
+      assert.equal(device.role, 'logistics', 'partner role was mapped to logistics');
+      assert.equal(device.platform, 'android');
+      assert.equal(device.is_active, true);
+
+      const { rows } = await pool.query('SELECT * FROM notification_device_tokens WHERE token = $1', [token]);
+      assert.equal(rows.length, 1);
+      assert.equal(rows[0].role, 'logistics');
+      assert.equal(rows[0].token, token);
+    } finally {
+      await pool.query('DELETE FROM notification_device_tokens WHERE token = $1', [token]);
+      await pool.query('DELETE FROM users WHERE id = $1', [testPartnerUser.id]);
+    }
+  });
 });
