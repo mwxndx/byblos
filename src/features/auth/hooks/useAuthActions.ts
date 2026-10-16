@@ -121,8 +121,12 @@ export function useAuthActions({
       handlePostLoginRedirect(navigate, role);
     } catch (error) {
       await handleLoginFailure(role);
-      const classified = classifyApiError(error, 'Invalid email or password');
-      if (classified.code !== 'PENDING_VERIFICATION' && classified.code !== 'EMAIL_NOT_VERIFIED' && classified.code !== 'TERMS_NOT_ACCEPTED') {
+      if (
+        classified.code !== 'PENDING_VERIFICATION' &&
+        classified.code !== 'EMAIL_NOT_VERIFIED' &&
+        classified.code !== 'TERMS_NOT_ACCEPTED' &&
+        classified.code !== 'WRONG_PORTAL'
+      ) {
         toast.error('Login Failed', { id: `${role}-login-failed`, description: classified.message });
       }
       throw error;

@@ -121,4 +121,40 @@ describe('UniversalHttpClient — keyed token refresh (Android role race)', () =
 
     expect(rolesRequested).toEqual(['marketing', 'admin']);
   });
+
+  test('resolves both plural and singular routes for sellers, buyers, creators, and wishlist', async () => {
+    const rolesRequested: string[] = [];
+    const strategy: AuthStrategy = {
+      platform: 'web' as AuthPlatform,
+      async getAuthHeaders(role?: AppRole) {
+        rolesRequested.push(role ?? 'none');
+        return {};
+      },
+      async getCsrfHeader() { return {}; },
+      async handleUnauthorized() { return false; },
+      async clearSession() {},
+    };
+    const client = new UniversalHttpClient({ authStrategy: strategy });
+    client.getAxiosInstance().defaults.adapter = async (config) => {
+      return { data: { ok: true }, status: 200, statusText: 'OK', headers: {}, config } as unknown as ReturnType<typeof Promise.resolve>;
+    };
+
+    await client.get('/sellers/products');
+    await client.get('/seller/orders');
+    await client.get('/buyers/profile');
+    await client.get('/buyer/orders');
+    await client.get('/creators/dashboard');
+    await client.get('/creator/links');
+    await client.get('/wishlist');
+
+    expect(rolesRequested).toEqual([
+      'seller',
+      'seller',
+      'buyer',
+      'buyer',
+      'creator',
+      'creator',
+      'buyer'
+    ]);
+  });
 });

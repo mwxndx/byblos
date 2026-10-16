@@ -10,6 +10,8 @@ import { classifyApiError } from '@/shared/utils/errorClassification';
 import { VerifyEmailModal } from '@/features/auth/components/VerifyEmailModal';
 import TermsModal from '@/shared/components/TermsModal';
 import { toast } from 'sonner';
+import { getLoginPath } from '@/features/auth/utils/authRouting';
+import type { UserRole } from '@/features/auth/types/authTypes';
 
 export default function CreatorLogin() {
   const [email, setEmail] = useState('');
@@ -68,6 +70,19 @@ export default function CreatorLogin() {
         // real Terms so the user can accept and retry.
         setPendingCredentials({ email: targetEmail, password: targetPassword });
         setIsTermsModalOpen(true);
+        return;
+      }
+      if (classified.code === 'WRONG_PORTAL') {
+        const correctRole = (classified.userType || (classified.message.includes('seller') ? 'seller' : classified.message.includes('buyer') ? 'buyer' : 'seller')) as UserRole;
+        toast.error('Wrong Portal', {
+          id: 'creator-wrong-portal',
+          description: classified.message,
+          action: {
+            label: `Go to ${correctRole.charAt(0).toUpperCase() + correctRole.slice(1)} Login`,
+            onClick: () => navigate(getLoginPath(correctRole)),
+          },
+          duration: 8000,
+        });
         return;
       }
       // Other errors: handled inside useAuthActions with a toast

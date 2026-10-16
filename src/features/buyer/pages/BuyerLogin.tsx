@@ -9,6 +9,8 @@ import { VerifyEmailModal } from '@/features/auth/components/VerifyEmailModal';
 import TermsModal from '@/shared/components/TermsModal';
 import { toast } from 'sonner';
 import { classifyApiError } from '@/shared/utils/errorClassification';
+import { getLoginPath } from '@/features/auth/utils/authRouting';
+import type { UserRole } from '@/features/auth/types/authTypes';
 
 export function BuyerLogin() {
   const [email, setEmail] = useState('');
@@ -75,6 +77,19 @@ export function BuyerLogin() {
         // button can never fix.
         setPendingCredentials({ email: targetEmail, password: targetPassword });
         setIsTermsModalOpen(true);
+        return;
+      }
+      if (classified.code === 'WRONG_PORTAL') {
+        const correctRole = (classified.userType || (classified.message.includes('seller') ? 'seller' : classified.message.includes('creator') ? 'creator' : 'seller')) as UserRole;
+        toast.error('Wrong Portal', {
+          id: 'buyer-wrong-portal',
+          description: classified.message,
+          action: {
+            label: `Go to ${correctRole.charAt(0).toUpperCase() + correctRole.slice(1)} Login`,
+            onClick: () => navigate(getLoginPath(correctRole)),
+          },
+          duration: 8000,
+        });
         return;
       }
       // Error toast is handled inside useAuthActions

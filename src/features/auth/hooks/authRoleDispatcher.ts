@@ -5,6 +5,8 @@ import {
   sellerProfileQueryOptions,
   adminProfileQueryOptions,
   creatorProfileQueryOptions,
+  logisticsProfileQueryOptions,
+  marketingProfileQueryOptions,
 } from './useAuthQueries';
 
 export type LoginMutationFn = UseMutateAsyncFunction<unknown, Error, { email: string; password: string; acceptTerms?: boolean }>;
@@ -77,6 +79,10 @@ export function getProfileQueryOptionsForRole(role: UserRole) {
       return sellerProfileQueryOptions;
     case 'creator':
       return creatorProfileQueryOptions;
+    case 'logistics':
+      return logisticsProfileQueryOptions;
+    case 'marketing':
+      return marketingProfileQueryOptions;
     default:
       return adminProfileQueryOptions;
   }

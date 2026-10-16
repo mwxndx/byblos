@@ -53,11 +53,11 @@ export class UniversalHttpClient {
     const cleanUrl = url.split('?')[0];
     if (/(^\/|^\/api\/)notifications\/logistics(\/|$)/.test(cleanUrl)) return 'logistics';
     if (/(^\/|^\/api\/)(admin\/)?marketing(\/|$)/.test(cleanUrl)) return 'marketing';
-    if (/(^\/|^\/api\/)seller(\/|$)/.test(cleanUrl)) return 'seller';
-    if (/(^\/|^\/api\/)creator(\/|$)/.test(cleanUrl)) return 'creator';
+    if (/(^\/|^\/api\/)sellers?(\/|$)/.test(cleanUrl)) return 'seller';
+    if (/(^\/|^\/api\/)creators?(\/|$)/.test(cleanUrl)) return 'creator';
     if (/(^\/|^\/api\/)admin(\/|$)/.test(cleanUrl)) return 'admin';
     if (/(^\/|^\/api\/)logistics(\/|$)/.test(cleanUrl) || /(^\/|^\/api\/)mzigo(\/|$)/.test(cleanUrl)) return 'logistics';
-    if (/(^\/|^\/api\/)buyer(\/|$)/.test(cleanUrl) || /(^\/|^\/api\/)orders(\/|$)/.test(cleanUrl)) return 'buyer';
+    if (/(^\/|^\/api\/)buyers?(\/|$)/.test(cleanUrl) || /(^\/|^\/api\/)orders(\/|$)/.test(cleanUrl) || /(^\/|^\/api\/)wishlist(\/|$)/.test(cleanUrl)) return 'buyer';
     return this.defaultRole;
   }
 
@@ -112,7 +112,7 @@ export class UniversalHttpClient {
           const url = config.url || '';
           if (!url.includes('/auth/refresh-token') && !url.includes('/login') && !url.includes('/logout')) {
             config._refreshRetried = true;
-            const role = this.resolveRole(url);
+            const role = this.resolveRole(url) || this.defaultRole;
 
             if (role === 'marketing') {
               await this.authStrategy.clearSession('marketing');

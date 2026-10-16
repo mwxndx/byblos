@@ -47,6 +47,51 @@ export const resolveCrossRoleAccess = async ({ user, type, signToken, pool, Buye
             }
         }
 
+        // Auto-provision a buyer profile if seller or creator is accessing buyer portal
+        if (!buyerProfile && (user.role === 'seller' || user.role === 'creator')) {
+            const fallbackName = user.email ? user.email.split('@')[0] : 'Buyer';
+            let phone = null;
+            let fullName = fallbackName;
+            let city = 'Nairobi';
+            let location = 'Nairobi';
+
+            if (user.role === 'seller') {
+                const seller = await SellerModel.findSellerByUserId(user.id);
+                if (seller) {
+                    fullName = seller.fullName || seller.full_name || seller.shopName || fallbackName;
+                    phone = seller.whatsappNumber || seller.whatsapp_number;
+                    city = seller.city || city;
+                    location = seller.location || location;
+                }
+            } else if (user.role === 'creator') {
+                const { rows } = await pool.query('SELECT first_name, last_name, mpesa_number, whatsapp_number FROM creators WHERE user_id = $1', [user.id]);
+                if (rows[0]) {
+                    fullName = `${rows[0].first_name || ''} ${rows[0].last_name || ''}`.trim() || fallbackName;
+                    phone = rows[0].mpesa_number || rows[0].whatsapp_number;
+                }
+            }
+
+            buyerProfile = await Buyer.create({
+                fullName,
+                email: user.email,
+                mobilePayment: phone,
+                whatsappNumber: phone,
+                city,
+                location,
+                userId: user.id,
+                termsAccepted: true
+            });
+
+            // Ensure buyer role in user_roles
+            const roleRes = await pool.query("SELECT id FROM roles WHERE slug = 'buyer'");
+            if (roleRes.rows[0]) {
+                await pool.query(
+                    'INSERT INTO user_roles (user_id, role_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+                    [user.id, roleRes.rows[0].id]
+                );
+            }
+        }
+
         if (buyerProfile && (buyerProfile.userId === user.id || buyerProfile.user_id === user.id)) {
             const token = signToken(user.id, 'buyer');
             return { user, profile: buyerProfile, token, crossRole: true };
@@ -121,5 +166,6 @@ export const resolveCrossRoleAccess = async ({ user, type, signToken, pool, Buye
     // No cross-role profile found
     const err = new AppError(`Wrong portal. This account is registered as a ${user.role}.`, 401, 'WRONG_PORTAL');
     err.isRoleMismatch = true;
+    err.userType = user.role;
     throw err;
 };

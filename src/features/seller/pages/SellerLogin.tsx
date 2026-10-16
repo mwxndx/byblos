@@ -10,6 +10,8 @@ import TermsModal from '@/shared/components/TermsModal';
 import { SellerForgotPasswordDialog } from '../components/SellerForgotPasswordDialog';
 import { toast } from 'sonner';
 import { classifyApiError } from '@/shared/utils/errorClassification';
+import { getLoginPath } from '@/features/auth/utils/authRouting';
+import type { UserRole } from '@/features/auth/types/authTypes';
 
 export function SellerLogin() {
   const navigate = useNavigate();
@@ -72,6 +74,19 @@ export function SellerLogin() {
         // verification email" button that can never clear this block.
         setPendingCredentials({ email: targetEmail, password: targetPassword });
         setIsTermsModalOpen(true);
+        return;
+      }
+      if (classified.code === 'WRONG_PORTAL') {
+        const correctRole = (classified.userType || (classified.message.includes('buyer') ? 'buyer' : classified.message.includes('creator') ? 'creator' : 'buyer')) as UserRole;
+        toast.error('Wrong Portal', {
+          id: 'seller-wrong-portal',
+          description: classified.message,
+          action: {
+            label: `Go to ${correctRole.charAt(0).toUpperCase() + correctRole.slice(1)} Login`,
+            onClick: () => navigate(getLoginPath(correctRole)),
+          },
+          duration: 8000,
+        });
         return;
       }
       // Error toast handled inside useAuthActions
