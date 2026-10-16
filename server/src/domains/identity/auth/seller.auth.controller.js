@@ -86,7 +86,7 @@ export const register = async (req, res) => {
     }
   } catch (error) {
     if (error.message.includes('exists')) {
-      return res.status(400).json({ status: 'error', message: error.message });
+      return res.status(409).json({ status: 'error', message: error.message });
     }
     console.error('Registration error:', error);
     res.status(500).json({ status: 'error', message: error.message });

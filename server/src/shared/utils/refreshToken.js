@@ -66,9 +66,23 @@ export const refreshAccessToken = async (refreshToken) => {
     throw new Error('Refresh token has been revoked. Please log in again.');
   }
 
+  // Blacklist the consumed refresh token (token rotation: old token is invalidated)
+  await tokenBlacklist.addToken(refreshToken, decoded.exp);
+
+  // Verify the user exists and is still active in the database
+  const { pool } = await import('../../infrastructure/database/database.js');
+  const { rows } = await pool.query(
+    'SELECT id, email, role, is_active, is_verified FROM users WHERE id = $1',
+    [decoded.id]
+  );
+  const user = rows[0];
+  if (!user || user.is_active === false) {
+    throw new Error('User account is invalid or deactivated. Please log in again.');
+  }
+
   // Access token always uses JWT_SECRET — separate from refresh secret
   const accessToken = jwt.sign(
-    { id: decoded.id, role: decoded.role },
+    { id: decoded.id, role: decoded.role, email: user.email },
     process.env.JWT_SECRET,
     { algorithm: 'HS256', expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
   );
@@ -83,7 +97,8 @@ export const refreshAccessToken = async (refreshToken) => {
     refreshToken: newRefreshToken,
     user: {
       id: decoded.id,
-      role: decoded.role
+      role: decoded.role,
+      email: user.email
     }
   };
 };

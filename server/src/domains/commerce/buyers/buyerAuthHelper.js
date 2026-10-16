@@ -171,7 +171,7 @@ export const registerBuyerHandler = async ({ body, res, next }) => {
       loginData
     };
   } catch (err) {
-    if (err.code === '23505') throw new AppError('Email already in use', 400);
+    if (err.code === '23505') throw new AppError('Email already in use', 409);
     if (err.message && (
       err.message.includes('A buyer account with this email already exists') ||
       err.message.includes('An account with this email already exists')

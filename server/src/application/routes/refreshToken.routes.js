@@ -25,9 +25,15 @@ router.post('/revoke-token', async (req, res) => {
 
   try {
     const tokenBlacklist = (await import('../../domains/identity/tokens/tokenBlacklist.service.js')).default;
+    const { verifyRefreshToken } = await import('../../shared/utils/refreshToken.js');
     for (const t of tokens) {
       try {
-        const decoded = verifyToken(t);
+        let decoded = null;
+        try {
+          decoded = verifyToken(t);
+        } catch {
+          decoded = verifyRefreshToken(t);
+        }
         if (decoded && decoded.exp) {
           await tokenBlacklist.addToken(t, decoded.exp);
         }

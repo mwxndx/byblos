@@ -5,9 +5,10 @@ import { AppError } from '../../../shared/utils/errorHandler.js';
 import { sanitizeBuyer, sanitizeOrder, sanitizeWithdrawalRequest } from '../../../shared/utils/sanitize.js';
 import logger from '../../../shared/utils/logger.js';
 import AuthService from '../../identity/auth/auth.service.js';
-import { setAuthCookie } from '../../../shared/utils/cookie.utils.js';
+import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';
 import { signToken, verifyToken } from '../../../shared/utils/jwt.js';
 import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
+import tokenBlacklist from '../../identity/tokens/tokenBlacklist.service.js';
 import { revokeSessionTokens, clearAuthCookies } from '../../../shared/utils/sessionRevocation.js';
 import OrderModel from "../../orders/order/order.model.js";
 import { OrderStatus } from "../../../shared/constants/enums.js";
@@ -424,15 +425,24 @@ export const autoLogin = async (req, res, next) => {
       return next(new AppError('Invalid token type', 401));
     }
 
+    // Verify it's not already used (single-use auto-login token)
+    const isUsed = await tokenBlacklist.isBlacklisted(autoLoginToken);
+    if (isUsed) {
+      return next(new AppError('Auto-login token has already been used.', 401));
+    }
+    await tokenBlacklist.addToken(autoLoginToken, decoded.exp);
+
     // Fetch the buyer profile
     const buyer = await Buyer.findByUserId(decoded.id);
     if (!buyer) {
       return next(new AppError('Buyer profile not found', 404));
     }
 
-    // Exchange the short-lived auto-login token for a normal buyer session cookie.
+    // Exchange the short-lived auto-login token for full session credentials
     const sessionToken = signToken(decoded.id, 'buyer');
+    const refreshToken = generateRefreshToken(decoded.id, 'buyer');
     setAuthCookie(res, sessionToken);
+    setRefreshTokenCookie(res, refreshToken);
 
     logger.info(`[AUTO-LOGIN] Buyer ${buyer.id} auto-logged in after payment success`);
 
@@ -441,6 +451,8 @@ export const autoLogin = async (req, res, next) => {
       message: 'Logged in successfully',
       data: {
         buyer: sanitizeBuyer(buyer),
+        token: sessionToken,
+        refreshToken,
         redirectTo: '/buyer/orders' // tells frontend where to go
       }
     });

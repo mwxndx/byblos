@@ -80,6 +80,21 @@ class AuthorizationService {
             if ((user.userType === 'buyer' || user.hasBuyerProfile) && buyerPerms.includes(permission)) {
                 return true;
             }
+
+            const creatorPerms = ['manage-profile', 'view-orders', 'request-payouts'];
+            if ((user.userType === 'creator' || user.hasCreatorProfile) && creatorPerms.includes(permission)) {
+                return true;
+            }
+
+            const logisticsPerms = ['manage-deliveries', 'view-orders', 'update-tracking'];
+            if ((user.userType === 'logistics' || user.role === 'logistics') && logisticsPerms.includes(permission)) {
+                return true;
+            }
+
+            const marketingPerms = ['view-analytics', 'manage-campaigns'];
+            if ((user.userType === 'marketing' || user.role === 'marketing') && marketingPerms.includes(permission)) {
+                return true;
+            }
         }
 
         return basicResult;

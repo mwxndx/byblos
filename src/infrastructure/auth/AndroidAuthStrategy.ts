@@ -39,8 +39,12 @@ export class AndroidAuthStrategy implements AuthStrategy {
   }
 
   async handleUnauthorized(role?: AppRole): Promise<boolean> {
-    if (!role) return false;
-    const refreshToken = await this.storageAdapter.getItem(`${role}RefreshToken`);
+    let targetRole = role;
+    if (!targetRole) {
+      targetRole = (await this.storageAdapter.getItem(BYBLOS_AUTH_KEYS.ACTIVE_ROLE)) as AppRole | null;
+    }
+    if (!targetRole) return false;
+    const refreshToken = await this.storageAdapter.getItem(`${targetRole}RefreshToken`);
     if (!refreshToken) return false;
 
     try {
@@ -53,13 +57,13 @@ export class AndroidAuthStrategy implements AuthStrategy {
       const data = (resp.data as { data?: { accessToken?: string; refreshToken?: string } })?.data;
       if (!data?.accessToken) return false;
 
-      await this.storageAdapter.setItem(`${role}Token`, data.accessToken);
+      await this.storageAdapter.setItem(`${targetRole}Token`, data.accessToken);
       if (data.refreshToken) {
-        await this.storageAdapter.setItem(`${role}RefreshToken`, data.refreshToken);
+        await this.storageAdapter.setItem(`${targetRole}RefreshToken`, data.refreshToken);
       }
       return true;
     } catch {
-      await this.storageAdapter.removeItem(`${role}RefreshToken`);
+      await this.storageAdapter.removeItem(`${targetRole}RefreshToken`);
       return false;
     }
   }
