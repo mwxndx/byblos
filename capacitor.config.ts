@@ -7,6 +7,9 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https'
   },
+  ios: {
+    contentInset: 'never'
+  },
   android: {
     // No static WebView backgroundColor: it would show a light frame on a dark
     // cold launch. MainActivity sets the WebView background from the

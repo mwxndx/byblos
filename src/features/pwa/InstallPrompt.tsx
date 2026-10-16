@@ -78,7 +78,7 @@ export function InstallPrompt() {
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-50 border-t border-separator bg-surface-1 px-4 pt-3 text-label shadow-[0_-4px_20px_rgba(0,0,0,0.25)]"
-      style={{ paddingBottom: 'calc(0.75rem + var(--sab, 12px))' }}
+      style={{ paddingBottom: 'calc(0.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
       role="dialog"
       aria-label="Install Byblos"
     >

@@ -240,7 +240,7 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
   }
 
   return (
-    <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ minHeight: '100dvh', height: '100dvh', overflowY: 'hidden' } as React.CSSProperties}>
+    <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ minHeight: '100%', height: '100%', overflowY: 'hidden' } as React.CSSProperties}>
       <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       {/* Main Content Area */}

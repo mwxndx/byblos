@@ -125,8 +125,8 @@ function BuyerDashboard() {
   return (
     <div className="page-enter dashboard-layout min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
       display: 'flex', flexDirection: 'column',
-      minHeight: '100dvh',
-      height: '100dvh',
+      minHeight: '100%',
+      height: '100%',
       overflowY: 'hidden',
     }}>
       <BuyerDashboardHeader onOpenProfile={() => setIsProfileOpen(true)} />

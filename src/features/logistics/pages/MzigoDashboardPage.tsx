@@ -62,7 +62,7 @@ const MzigoDashboardPage = () => {
   ];
 
   return (
-    <main className="dashboard-layout mzigo-light-dashboard min-h-[100dvh] overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100dvh', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, 16px))' } as React.CSSProperties}>
+    <main className="dashboard-layout mzigo-light-dashboard min-h-full overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, env(safe-area-inset-bottom, 0px)))' } as React.CSSProperties}>
       {/* ── Header ─────────────────────────────────────────────── */}
       <AppHeader
         left={<NotificationBell variant="logistics" />}

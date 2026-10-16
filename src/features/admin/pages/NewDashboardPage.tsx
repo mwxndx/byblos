@@ -120,7 +120,7 @@ const NewAdminDashboard = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4 text-center sm:p-6">
+      <div className="flex min-h-full items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4 text-center sm:p-6">
         <div className="max-w-md space-y-6 rounded-3xl border border-separator bg-surface-1 p-8 shadow-xl">
           <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto border border-red-500/20">
             <XCircle className="h-10 w-10 text-red-500" />
@@ -138,7 +138,7 @@ const NewAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-[100dvh] overflow-x-hidden bg-[var(--bg)] text-label font-sans">
+    <div className="min-h-full overflow-x-hidden bg-[var(--bg)] text-label font-sans">
       <AppHeader
         left={
           <div className="flex items-baseline gap-2 sm:gap-3">

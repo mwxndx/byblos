@@ -92,7 +92,7 @@ export function BaseDashboardLayout({
     };
 
     return (
-        <div className="dashboard-layout flex min-h-[100dvh] overflow-x-hidden bg-[var(--bg)] text-label">
+        <div className="dashboard-layout flex min-h-full overflow-x-hidden bg-[var(--bg)] text-label">
             {/* Skip to Content for Accessibility */}
             <a
                 href="#main-content"
@@ -116,7 +116,7 @@ export function BaseDashboardLayout({
                     {/* Sidebar */}
                     <aside
                         className={cn(
-                            'fixed lg:sticky top-0 left-0 h-[100dvh] w-64 bg-chrome backdrop-blur-md border-r border-separator z-[101] lg:z-10 transition-transform duration-300 ease-in-out',
+                            'fixed lg:sticky top-0 left-0 h-full w-64 bg-chrome backdrop-blur-md border-r border-separator z-[101] lg:z-10 transition-transform duration-300 ease-in-out',
                             sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
                         )}
                         aria-label={`${role} sidebar navigation`}
