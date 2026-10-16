@@ -34,6 +34,19 @@ const router = express.Router();
  */
 router.get('/reference/:reference', publicApiRateLimiter, optionalProtect, getByReference);
 
+/**
+ * @swagger
+ * /api/orders/{orderId}/download/{productId}:
+ *   get:
+ *     summary: Download digital product (Requires authenticated owner or client checkout token)
+ */
+router.get(
+  '/:orderId/download/:productId',
+  publicApiRateLimiter,
+  optionalProtect,
+  downloadDigitalProduct
+);
+
 // Apply protection to all other order routes
 router.use(protect);
 
@@ -129,17 +142,6 @@ router.patch(
   sellerCancelOrder
 );
 
-
-/**
- * @swagger
- * /api/orders/{orderId}/download/{productId}:
- *   get:
- *     summary: Download digital product
- */
-router.get(
-  '/:orderId/download/:productId',
-  downloadDigitalProduct
-);
 
 router.post(
   '/location-preview',

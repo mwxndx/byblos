@@ -125,6 +125,26 @@ function buildEmailPayload({ payment, order, fullOrder, items }) {
     || fullOrder.payment_reference
     || receiptId;
 
+  const frontendUrl = process.env.FRONTEND_URL || 'https://byblosafrica.site';
+  const digitalItems = (items || []).filter(i => i.is_digital || i.product_type === 'digital');
+  let downloadUrl = orderMetadata.download_url || orderMetadata.downloadUrl || null;
+  const downloadUrls = Array.isArray(orderMetadata.download_urls) ? [...orderMetadata.download_urls] : [];
+
+  if (digitalItems.length > 0 && downloadUrls.length === 0) {
+    const tokenParam = fullOrder.client_checkout_token ? `?client_checkout_token=${encodeURIComponent(fullOrder.client_checkout_token)}` : '';
+    for (const item of digitalItems) {
+      const prodId = item.product_id || item.productId;
+      if (prodId) {
+        const itemUrl = `${frontendUrl}/api/orders/${fullOrder.id || fullOrder.order_number}/download/${prodId}${tokenParam}`;
+        const name = item.name || item.product_name || 'Digital Product';
+        downloadUrls.push({ name, url: itemUrl });
+      }
+    }
+    if (downloadUrls.length === 1 && !downloadUrl) {
+      downloadUrl = downloadUrls[0].url;
+    }
+  }
+
   return {
     ...fullOrder,
     buyer_name: fullOrder.buyer_name_actual || fullOrder.buyer_name || order?.buyer_name || 'Customer',
@@ -138,12 +158,20 @@ function buildEmailPayload({ payment, order, fullOrder, items }) {
     receipt_id: receiptId,
     paid_at: paidAt,
     created_at: fullOrder.created_at || order?.created_at || paidAt,
-    metadata: orderMetadata,
+    metadata: {
+      ...orderMetadata,
+      ...(downloadUrl ? { download_url: downloadUrl } : {}),
+      ...(downloadUrls.length > 0 ? { download_urls: downloadUrls } : {})
+    },
     payment_metadata: paymentMetadata,
     pre_handoff_sla: orderMetadata.pre_handoff_sla || null,
     custom_product: orderMetadata.custom_product || null,
     custom_production_deadline_at: fullOrder.custom_production_deadline_at || orderMetadata.pre_handoff_sla?.ready_deadline_at || orderMetadata.custom_product?.production_deadline_at || null,
     custom_production_grace_deadline_at: fullOrder.custom_production_grace_deadline_at || orderMetadata.pre_handoff_sla?.ready_grace_deadline_at || orderMetadata.custom_product?.production_grace_deadline_at || null,
+    download_url: downloadUrl,
+    download_urls: downloadUrls,
+    downloadUrl,
+    downloadUrls,
     items
   };
 }

@@ -374,9 +374,19 @@ export const sellerCancelOrder = async (req, res) => {
 export const downloadDigitalProduct = async (req, res) => {
     try {
         const { orderId, productId } = req.params;
-        const buyerProfileId = req.user.buyerId;
+        const buyerProfileId = req.user?.buyerId;
+        const clientCheckoutToken = req.headers['x-checkout-token']
+            || req.query.client_checkout_token
+            || req.query.clientCheckoutToken;
 
-        await handleDigitalProductDownload({ orderId, productId, buyerProfileId, res });
+        if (!buyerProfileId && !clientCheckoutToken) {
+            return res.status(401).json({
+                status: 'error',
+                message: 'Authentication or checkout token is required to download this product'
+            });
+        }
+
+        await handleDigitalProductDownload({ orderId, productId, buyerProfileId, clientCheckoutToken, res });
     } catch (error) {
         logger.error('Error in downloadDigitalProduct:', error);
         if (!res.headersSent) {

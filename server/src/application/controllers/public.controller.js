@@ -446,16 +446,24 @@ export const getOrderStatus = async (req, res) => {
     const paid = ['completed', 'success', 'paid'].includes(String(order.payment_status || '').toLowerCase());
     if (clientToken && paid && order.order_number) {
       const { rows } = await pool.query(
-        `SELECT u.id AS user_id
+        `SELECT u.id AS user_id, b.id AS buyer_id, po.id AS order_id, po.buyer_id AS current_buyer_id
            FROM product_orders po
-           JOIN buyers b ON b.id = po.buyer_id
-           JOIN users u ON u.id = b.user_id
+           LEFT JOIN buyers b ON (b.id = po.buyer_id OR LOWER(b.email) = LOWER(po.buyer_email))
+           LEFT JOIN users u ON u.id = b.user_id
           WHERE po.order_number = $1
             AND po.client_checkout_token = $2
-            AND u.is_verified = true`,
+            AND u.is_verified = true
+          ORDER BY (po.buyer_id = b.id) DESC, b.id DESC NULLS LAST
+          LIMIT 1`,
         [order.order_number, clientToken]
       );
-      if (rows[0]?.user_id) {
+      if (rows[0]?.user_id && rows[0]?.buyer_id) {
+        if (!rows[0].current_buyer_id) {
+          await pool.query(
+            `UPDATE product_orders SET buyer_id = $1 WHERE id = $2 AND buyer_id IS NULL`,
+            [rows[0].buyer_id, rows[0].order_id]
+          );
+        }
         autoLoginToken = signAutoLoginToken(rows[0].user_id, 'buyer', 'payment_success');
       }
     }

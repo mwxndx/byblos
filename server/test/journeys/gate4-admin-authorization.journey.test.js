@@ -67,16 +67,24 @@ after(async () => {
     await new Promise((resolve) => appServer.close(resolve));
   }
 
+  // Allow in-flight async payout provider tasks to settle before cleanup
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  // Cleanup withdrawal and payout provider attempts for all created sellers and withdrawals
+  if (createdSellerIds.length > 0) {
+    await pool.query('DELETE FROM payout_provider_attempts WHERE seller_id = ANY($1)', [createdSellerIds]).catch(() => {});
+    await pool.query('DELETE FROM payouts WHERE seller_id = ANY($1)', [createdSellerIds]).catch(() => {});
+    await pool.query('DELETE FROM withdrawal_requests WHERE seller_id = ANY($1)', [createdSellerIds]).catch(() => {});
+  }
+
   // Cleanup withdrawal records
   if (createdWithdrawalIds.length > 0) {
-    await pool.query('DELETE FROM payout_provider_attempts WHERE withdrawal_request_id = ANY($1)', [createdWithdrawalIds]);
-    await pool.query('DELETE FROM withdrawal_requests WHERE id = ANY($1)', [createdWithdrawalIds]);
+    await pool.query('DELETE FROM payout_provider_attempts WHERE withdrawal_request_id = ANY($1)', [createdWithdrawalIds]).catch(() => {});
+    await pool.query('DELETE FROM withdrawal_requests WHERE id = ANY($1)', [createdWithdrawalIds]).catch(() => {});
   }
 
   // Cleanup sellers
   for (const sellerId of createdSellerIds) {
-    await pool.query('DELETE FROM payouts WHERE seller_id = $1', [sellerId]).catch(() => {});
-    await pool.query('DELETE FROM withdrawal_requests WHERE seller_id = $1', [sellerId]).catch(() => {});
     await cleanupSeller(sellerId).catch(() => {});
   }
 
@@ -122,7 +130,7 @@ describe('GATE 4: Administration & Authorization Business Journey', () => {
       role: 'seller'
     });
     createdUserIds.push(sellerUser.id);
-    testSeller = await createSeller({ userId: sellerUser.id, shopName: 'Mod Shop' });
+    testSeller = await createSeller({ userId: sellerUser.id, shopName: `Mod Shop ${Date.now()}` });
     createdSellerIds.push(testSeller.id);
     sellerToken = signToken(sellerUser.id, 'seller');
 
@@ -323,7 +331,7 @@ describe('GATE 4: Administration & Authorization Business Journey', () => {
 
     test('Valid admin override to completed finalizes request and clears reserve', async () => {
       // 1. Create seller with balance and withdrawal request
-      const overrideSeller = await createSeller({ shopName: 'Override Shop' });
+      const overrideSeller = await createSeller({ shopName: `Override Shop ${Date.now()}` });
       createdSellerIds.push(overrideSeller.id);
       await pool.query('UPDATE sellers SET balance = 5000, withdrawal_reserved_balance = 0 WHERE id = $1', [overrideSeller.id]);
 

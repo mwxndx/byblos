@@ -125,10 +125,11 @@ import * as digitalDownloadRepository from '../../commerce/repositories/digitalD
 import path from 'path';
 import { getDigitalAssetUrls } from '../../../shared/utils/cloudinary.js';
 
-export async function handleDigitalProductDownload({ orderId, productId, buyerProfileId, res }) {
+export async function handleDigitalProductDownload({ orderId, productId, buyerProfileId, clientCheckoutToken, res }) {
     const data = await digitalDownloadRepository.findVerifiedDigitalItem({
         orderId,
         buyerId: buyerProfileId,
+        clientCheckoutToken,
         productId
     });
 

@@ -86,7 +86,8 @@ class OrderReadService {
     if (fullOrderResult.rows.length === 0) return null;
 
     const itemsResult = await pool.query(
-      `SELECT oi.*, p.product_type::text as product_type, p.is_digital, p.name as product_name
+      `SELECT oi.*, p.product_type::text as product_type, p.is_digital, p.name as product_name,
+              p.digital_file_path, p.digital_file_name
        FROM order_items oi
        LEFT JOIN products p ON oi.product_id = p.id
        WHERE oi.order_id = $1`,

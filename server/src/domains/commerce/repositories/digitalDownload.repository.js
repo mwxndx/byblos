@@ -22,19 +22,20 @@ export async function generateSecureDownloadUrl(digitalFilePath, userId) {
 }
 
 /**
- * Verifies that a buyer owns a paid digital product inside a specific
+ * Verifies that a buyer or tokenized guest owns a paid digital product inside a specific
  * order, and returns the data needed to serve the file.
  *
- * Returns undefined when the buyer does not own a matching completed
+ * Returns undefined when neither buyerId nor clientCheckoutToken owns a matching completed
  * digital item.
  *
  * @param {object} input
  * @param {number|string} input.orderId
- * @param {number|string} input.buyerId
+ * @param {number|string} [input.buyerId]
+ * @param {string} [input.clientCheckoutToken]
  * @param {number|string} input.productId
  * @returns {Promise<{order_id: number, product_id: number, product_name: string, digital_file_path: string|null, digital_file_name: string|null, download_url?: string|null}|undefined>}
  */
-export async function findVerifiedDigitalItem({ orderId, buyerId, productId }) {
+export async function findVerifiedDigitalItem({ orderId, buyerId, clientCheckoutToken, productId }) {
   const sql = `
     SELECT
       po.id as order_id,
@@ -45,18 +46,26 @@ export async function findVerifiedDigitalItem({ orderId, buyerId, productId }) {
     FROM product_orders po
     JOIN order_items oi ON po.id = oi.order_id
     JOIN products p ON oi.product_id = p.id
-    WHERE po.id = $1
-      AND po.buyer_id = $2
-      AND oi.product_id = $3
+    WHERE (po.id::text = $1::text OR po.order_number = $1::text)
+      AND oi.product_id = $2
       AND po.payment_status = 'completed'
       AND (p.product_type = 'digital' OR p.is_digital = true)
+      AND (
+        ($3::int IS NOT NULL AND po.buyer_id = $3::int)
+        OR ($4::text IS NOT NULL AND po.client_checkout_token = $4::text)
+      )
   `;
-  const { rows } = await query(sql, [orderId, buyerId, productId]);
+  const { rows } = await query(sql, [
+    orderId,
+    productId,
+    buyerId ? Number(buyerId) : null,
+    clientCheckoutToken ? String(clientCheckoutToken).trim() : null
+  ]);
   const item = rows[0];
   if (!item) return undefined;
 
   if (item.digital_file_path) {
-    item.download_url = await generateSecureDownloadUrl(item.digital_file_path, buyerId);
+    item.download_url = await generateSecureDownloadUrl(item.digital_file_path, buyerId || item.order_id);
   }
   return item;
 }

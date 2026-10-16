@@ -156,6 +156,18 @@ class AuthService {
                         profile.user_id = user.id;
                     }
                 }
+                if (profile?.id) {
+                    const linked = await pool.query(
+                        'UPDATE product_orders SET buyer_id = $1 WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL',
+                        [profile.id, normalizedEmail]
+                    );
+                    if (linked.rowCount > 0) {
+                        logger.info('[AUTH] Linked guest orders on buyer login', {
+                            buyerId: profile.id,
+                            linkedOrders: linked.rowCount
+                        });
+                    }
+                }
                 break;
             case 'admin':
                 if (user.role === 'admin') profile = { id: user.id, email: user.email, role: 'admin' };
