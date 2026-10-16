@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import { isDynamicImportError } from '@/shared/utils/safeLazy';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Props {
@@ -13,15 +14,6 @@ interface State {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
-}
-
-// ─── Chunk error detection ────────────────────────────────────────────────────
-function isChunkError(error: Error | null): boolean {
-  if (!error) return false;
-  return (
-    error.message?.includes('Failed to fetch dynamically imported module') ||
-    error.message?.includes('Importing a module script failed')
-  );
 }
 
 // ─── Main ErrorBoundary class ─────────────────────────────────────────────────
@@ -63,7 +55,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
 
-      const chunkError = isChunkError(this.state.error);
+      const chunkError = isDynamicImportError(this.state.error);
 
       // Chunk-load failure UI (new deployment)
       if (chunkError) {
@@ -173,11 +165,10 @@ export class ErrorBoundary extends Component<Props, State> {
  * into ChunkErrorBoundary.
  */
 export function RootErrorElement() {
-  const error = useRouteError() as { message?: string };
+  const error = useRouteError();
 
   const isChunk =
-    error?.message?.includes('Failed to fetch dynamically imported module') ||
-    error?.message?.includes('Importing a module script failed') ||
+    isDynamicImportError(error) ||
     (isRouteErrorResponse(error) && error.status === 404);
 
   if (isChunk) {
@@ -218,10 +209,16 @@ export function RootErrorElement() {
         </div>
         <h1 className="text-2xl font-semibold text-white mb-3">Page Error</h1>
         <p className="text-gray-400 mb-6">An unexpected routing error occurred.</p>
-        <Button onClick={() => window.location.href = '/'} variant="byblos" size="lg" className="gap-2">
-          <Home className="h-5 w-5" />
-          Go Home
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Button onClick={() => window.location.reload()} variant="outline" size="lg" className="gap-2">
+            <RefreshCw className="h-5 w-5" />
+            Try Again
+          </Button>
+          <Button onClick={() => (window.location.href = '/')} variant="byblos" size="lg" className="gap-2">
+            <Home className="h-5 w-5" />
+            Go Home
+          </Button>
+        </div>
       </div>
     </div>
   );
