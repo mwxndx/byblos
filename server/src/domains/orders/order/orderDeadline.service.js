@@ -442,6 +442,8 @@ class OrderDeadlineService {
                         ]
                     );
 
+                    const refundAmount = Number.parseFloat(lockedOrder.total_amount || 0);
+                    let buyerRefunded = false;
                     if (lockedOrder.buyer_id) {
                         await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedOrder.buyer_id]);
                         await client.query(
@@ -449,7 +451,34 @@ class OrderDeadlineService {
                              SET refunds = COALESCE(refunds, 0) + $1,
                                  updated_at = NOW()
                              WHERE id = $2`,
-                            [lockedOrder.total_amount, lockedOrder.buyer_id]
+                            [refundAmount, lockedOrder.buyer_id]
+                        );
+                        buyerRefunded = true;
+                    } else if (lockedOrder.buyer_email) {
+                        const { rows: bRows } = await client.query(
+                            `UPDATE buyers
+                             SET refunds = COALESCE(refunds, 0) + $1,
+                                 updated_at = NOW()
+                             WHERE LOWER(email) = LOWER($2)
+                             RETURNING id`,
+                            [refundAmount, lockedOrder.buyer_email]
+                        );
+                        if (bRows.length > 0) buyerRefunded = true;
+                    }
+
+                    if (!buyerRefunded && refundAmount > 0) {
+                        await client.query(
+                            `UPDATE product_orders
+                             SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
+                             WHERE id = $1`,
+                            [lockedOrder.id, refundAmount]
+                        );
+                    } else {
+                        await client.query(
+                            `UPDATE product_orders
+                             SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
+                             WHERE id = $1`,
+                            [lockedOrder.id]
                         );
                     }
 
@@ -539,13 +568,43 @@ class OrderDeadlineService {
                 [reason, lockedOrder.id]
             );
 
+            const refundAmount = Number.parseFloat(lockedOrder.total_amount || 0);
+            let buyerRefunded = false;
             if (lockedOrder.buyer_id) {
                 await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedOrder.buyer_id]);
                 await client.query(
                     `UPDATE buyers 
-                     SET refunds = refunds + $1 
+                     SET refunds = COALESCE(refunds, 0) + $1,
+                         updated_at = NOW()
                      WHERE id = $2`,
-                    [lockedOrder.total_amount, lockedOrder.buyer_id]
+                    [refundAmount, lockedOrder.buyer_id]
+                );
+                buyerRefunded = true;
+            } else if (lockedOrder.buyer_email) {
+                const { rows: bRows } = await client.query(
+                    `UPDATE buyers 
+                     SET refunds = COALESCE(refunds, 0) + $1,
+                         updated_at = NOW()
+                     WHERE LOWER(email) = LOWER($2)
+                     RETURNING id`,
+                    [refundAmount, lockedOrder.buyer_email]
+                );
+                if (bRows.length > 0) buyerRefunded = true;
+            }
+
+            if (!buyerRefunded && refundAmount > 0) {
+                await client.query(
+                    `UPDATE product_orders
+                     SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
+                     WHERE id = $1`,
+                    [lockedOrder.id, refundAmount]
+                );
+            } else {
+                await client.query(
+                    `UPDATE product_orders
+                     SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
+                     WHERE id = $1`,
+                    [lockedOrder.id]
                 );
             }
 

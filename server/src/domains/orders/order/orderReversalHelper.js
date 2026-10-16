@@ -49,15 +49,37 @@ export const executeExceptionalReversalHelper = async ({
     // 1. Buyer Refund: Credit buyer refund balance if order was paid or completed
     let buyerRefundResult = null;
     if (order.payment_status === 'completed' || ['PAID', 'COMPLETED', 'FULFILLING', 'DELIVERED', 'READY_FOR_BUYER'].includes(order.status)) {
-      if (order.buyer_id && refundAmount > 0) {
-        await client.query(
-          `UPDATE buyers 
-           SET refunds = COALESCE(refunds, 0) + $1,
-               updated_at = NOW()
-           WHERE id = $2`,
-          [refundAmount, order.buyer_id]
-        );
-        buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: order.buyer_id };
+      if (refundAmount > 0) {
+        if (order.buyer_id) {
+          await client.query(
+            `UPDATE buyers 
+             SET refunds = COALESCE(refunds, 0) + $1,
+                 updated_at = NOW()
+             WHERE id = $2`,
+            [refundAmount, order.buyer_id]
+          );
+          buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: order.buyer_id };
+        } else if (order.buyer_email) {
+          const { rows: bRows } = await client.query(
+            `UPDATE buyers 
+             SET refunds = COALESCE(refunds, 0) + $1,
+                 updated_at = NOW()
+             WHERE LOWER(email) = LOWER($2)
+             RETURNING id`,
+            [refundAmount, order.buyer_email]
+          );
+          if (bRows.length > 0) {
+            buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: bRows[0].id };
+          } else {
+            await client.query(
+              `UPDATE product_orders
+               SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
+               WHERE id = $1`,
+              [orderId, refundAmount]
+            );
+            buyerRefundResult = { refunded: false, pending_account_creation: true, amount: refundAmount };
+          }
+        }
       }
     }
 

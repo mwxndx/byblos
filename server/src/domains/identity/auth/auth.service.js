@@ -158,7 +158,10 @@ class AuthService {
                 }
                 if (profile?.id) {
                     const linked = await pool.query(
-                        'UPDATE product_orders SET buyer_id = $1 WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL',
+                        `UPDATE product_orders 
+                         SET buyer_id = $1 
+                         WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL
+                         RETURNING id, status, payment_status, total_amount, metadata`,
                         [profile.id, normalizedEmail]
                     );
                     if (linked.rowCount > 0) {
@@ -166,6 +169,35 @@ class AuthService {
                             buyerId: profile.id,
                             linkedOrders: linked.rowCount
                         });
+
+                        let uncreditedRefund = 0;
+                        const ordersToMarkCredited = [];
+                        for (const ord of linked.rows) {
+                            const isCancelledPaid = String(ord.status).toUpperCase() === 'CANCELLED' && ord.payment_status === 'completed';
+                            const uncreditedAmt = Number.parseFloat(ord.metadata?.uncredited_refund_amount || 0);
+                            const alreadyCredited = ord.metadata?.refund_credited === true;
+                            if (!alreadyCredited && (isCancelledPaid || uncreditedAmt > 0)) {
+                                uncreditedRefund += (uncreditedAmt > 0 ? uncreditedAmt : Number.parseFloat(ord.total_amount || 0));
+                                ordersToMarkCredited.push(ord.id);
+                            }
+                        }
+                        if (uncreditedRefund > 0) {
+                            await pool.query(
+                                `UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2`,
+                                [uncreditedRefund, profile.id]
+                            );
+                            await pool.query(
+                                `UPDATE product_orders 
+                                 SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
+                                 WHERE id = ANY($1)`,
+                                [ordersToMarkCredited]
+                            );
+                            logger.info('[AUTH] Credited pending guest refunds on buyer login', {
+                                buyerId: profile.id,
+                                amount: uncreditedRefund,
+                                orders: ordersToMarkCredited
+                            });
+                        }
                     }
                 }
                 break;
@@ -455,7 +487,10 @@ class AuthService {
                 // Search for any orders made with this email while it was pending and associate them
                 // This ensures checkout flow continues seamlessly for unregistered buyers
                 const linkResult = await client.query(
-                    'UPDATE product_orders SET buyer_id = $1 WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL',
+                    `UPDATE product_orders 
+                     SET buyer_id = $1 
+                     WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL
+                     RETURNING id, status, payment_status, total_amount, metadata`,
                     [profile.id, pending.email.toLowerCase()]
                 );
 
@@ -464,6 +499,35 @@ class AuthService {
                         buyerId: profile.id,
                         linkedOrders: linkResult.rowCount
                     });
+
+                    let uncreditedRefund = 0;
+                    const ordersToMarkCredited = [];
+                    for (const ord of linkResult.rows) {
+                        const isCancelledPaid = String(ord.status).toUpperCase() === 'CANCELLED' && ord.payment_status === 'completed';
+                        const uncreditedAmt = Number.parseFloat(ord.metadata?.uncredited_refund_amount || 0);
+                        const alreadyCredited = ord.metadata?.refund_credited === true;
+                        if (!alreadyCredited && (isCancelledPaid || uncreditedAmt > 0)) {
+                            uncreditedRefund += (uncreditedAmt > 0 ? uncreditedAmt : Number.parseFloat(ord.total_amount || 0));
+                            ordersToMarkCredited.push(ord.id);
+                        }
+                    }
+                    if (uncreditedRefund > 0) {
+                        await client.query(
+                            `UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2`,
+                            [uncreditedRefund, profile.id]
+                        );
+                        await client.query(
+                            `UPDATE product_orders 
+                             SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
+                             WHERE id = ANY($1)`,
+                            [ordersToMarkCredited]
+                        );
+                        logger.info('[AUTH] Credited pending guest refunds on buyer email verification', {
+                            buyerId: profile.id,
+                            amount: uncreditedRefund,
+                            orders: ordersToMarkCredited
+                        });
+                    }
                 }
             }
 

@@ -225,4 +225,146 @@ describe('Buyer & Guest Payment Remediations Integration Tests', () => {
     assert.ok(payload.download_url.includes(token), 'download_url should include client_checkout_token');
     assert.equal(payload.download_urls.length, 1);
   });
+
+  test('5. OrderCancellationService preserves uncredited refund for guest order and credits on login', async () => {
+    const unregEmail = `unreg-guest-${Date.now()}@byblos.test`;
+    const token = `tok-cancel-${Date.now()}`;
+    const orderNumber = `BYB-CANCEL-${Date.now()}`;
+
+    // 1. Create a guest order with payment completed
+    const { rows: orderRows } = await pool.query(
+      `INSERT INTO product_orders (
+         order_number, buyer_id, seller_id, total_amount, platform_fee_amount,
+         seller_payout_amount, payment_method, buyer_name, buyer_email,
+         buyer_mobile_payment, status, payment_status, order_type, client_checkout_token
+       ) VALUES (
+         $1, NULL, $2, 600, 60, 540, 'paystack', 'Guest Cancel', $3,
+         '0712345678', 'PAID'::order_status, 'completed'::payment_status, 'PHYSICAL'::order_type, $4
+       ) RETURNING *`,
+      [orderNumber, seller.id, unregEmail, token]
+    );
+    const order = orderRows[0];
+    createdOrderIds.push(order.id);
+
+    // Cancel order via OrderCancellationService
+    const { default: OrderCancellationService } = await import('../src/domains/orders/order/orderCancellation.service.js');
+    await OrderCancellationService.cancelOrder(order.id, 'out_of_stock');
+
+    // Verify order metadata recorded uncredited_refund_amount
+    const { rows: cancelledRows } = await pool.query(
+      'SELECT status, metadata FROM product_orders WHERE id = $1',
+      [order.id]
+    );
+    assert.equal(cancelledRows[0].status, 'CANCELLED');
+    assert.equal(Number(cancelledRows[0].metadata?.uncredited_refund_amount), 600, 'Uncredited refund amount must be tracked in metadata');
+
+    // 2. Now the guest signs up / creates a buyer account with the same email
+    const passwordHash = await bcrypt.hash(testPassword, 10);
+    const { rows: userRows } = await pool.query(
+      `INSERT INTO users (email, password_hash, role, is_verified, is_active, created_at, updated_at)
+       VALUES ($1, $2, 'buyer', true, true, NOW(), NOW())
+       RETURNING *`,
+      [unregEmail, passwordHash]
+    );
+    const newBuyerUser = userRows[0];
+    const newBuyer = await createBuyer({ userId: newBuyerUser.id, email: unregEmail, termsAccepted: true });
+
+    // Verify buyer initial refunds is 0
+    assert.equal(Number(newBuyer.refunds || 0), 0);
+
+    // 3. Buyer logs in
+    await AuthService.login(unregEmail, testPassword, 'buyer', true);
+
+    // Check DB: buyer refunds should now be 600, and order metadata marked refund_credited
+    const { rows: updatedBuyerRows } = await pool.query(
+      'SELECT refunds FROM buyers WHERE id = $1',
+      [newBuyer.id]
+    );
+    assert.equal(Number(updatedBuyerRows[0].refunds), 600, 'Buyer wallet should be credited with 600 KES from previous guest order');
+
+    const { rows: reloadedOrderRows } = await pool.query(
+      'SELECT buyer_id, metadata FROM product_orders WHERE id = $1',
+      [order.id]
+    );
+    assert.equal(reloadedOrderRows[0].buyer_id, newBuyer.id, 'Order buyer_id should be linked');
+    assert.equal(reloadedOrderRows[0].metadata?.refund_credited, true, 'Order should be marked refund_credited');
+
+    await cleanupBuyer(newBuyer.id);
+    await cleanupUser(newBuyerUser.id);
+  });
+
+  test('6. getOrderStatus returns digitalDownloads when client_checkout_token matches on paid digital orders', async () => {
+    const token = `tok-digital-status-${Date.now()}`;
+    const orderNumber = `BYB-DIGSTATUS-${Date.now()}`;
+
+    const { rows: orderRows } = await pool.query(
+      `INSERT INTO product_orders (
+         order_number, buyer_id, seller_id, total_amount, platform_fee_amount,
+         seller_payout_amount, payment_method, buyer_name, buyer_email,
+         buyer_mobile_payment, status, payment_status, order_type, client_checkout_token
+       ) VALUES (
+         $1, NULL, $2, 250, 25, 225, 'paystack', 'Digital Guest', 'guest-dig@test.local',
+         '0712345678', 'COMPLETED'::order_status, 'completed'::payment_status, 'DIGITAL'::order_type, $3
+       ) RETURNING *`,
+      [orderNumber, seller.id, token]
+    );
+    const order = orderRows[0];
+    createdOrderIds.push(order.id);
+
+    await pool.query(
+      `INSERT INTO order_items (order_id, product_id, name, product_name, price, product_price, quantity, subtotal)
+       VALUES ($1, $2, 'Test E-Book', 'Test E-Book', 250, 250, 1, 250)`,
+      [order.id, digitalProd.id]
+    );
+
+    let capturedResponse = null;
+    const req = {
+      params: { id: orderNumber },
+      query: { client_checkout_token: token }
+    };
+    const res = {
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(data) {
+        capturedResponse = data;
+        return this;
+      }
+    };
+
+    await getOrderStatus(req, res);
+
+    assert.equal(res.statusCode, 200);
+    assert.ok(capturedResponse?.data?.digitalDownloads, 'Response should contain digitalDownloads');
+    assert.equal(capturedResponse.data.digitalDownloads.length, 1);
+    assert.equal(capturedResponse.data.digitalDownloads[0].productId, digitalProd.id);
+    assert.ok(capturedResponse.data.digitalDownloads[0].downloadUrl.includes(token));
+  });
+
+  test('7. getFulfillmentNotificationDetails falls back to order buyer fields when buyer_id is null', async () => {
+    const orderNumber = `BYB-NOTIF-${Date.now()}`;
+    const token = `tok-notif-${Date.now()}`;
+    const { rows: orderRows } = await pool.query(
+      `INSERT INTO product_orders (
+         order_number, buyer_id, seller_id, total_amount, platform_fee_amount,
+         seller_payout_amount, payment_method, buyer_name, buyer_email,
+         buyer_mobile_payment, buyer_whatsapp_number, status, payment_status, order_type, client_checkout_token
+       ) VALUES (
+         $1, NULL, $2, 500, 50, 450, 'paystack', 'Guest Customer', 'guest-customer@test.local',
+         '0799887766', '0799887766', 'PAID'::order_status, 'completed'::payment_status, 'PHYSICAL'::order_type, $3
+       ) RETURNING *`,
+      [orderNumber, seller.id, token]
+    );
+    const order = orderRows[0];
+    createdOrderIds.push(order.id);
+
+    const { default: OrderReadService } = await import('../src/domains/orders/order/orderRead.service.js');
+    const details = await OrderReadService.getFulfillmentNotificationDetails(order.id);
+
+    assert.ok(details, 'Notification details should be returned');
+    assert.equal(details.buyer_name, 'Guest Customer', 'buyer_name should fall back to order.buyer_name');
+    assert.equal(details.buyer_email, 'guest-customer@test.local', 'buyer_email should fall back to order.buyer_email');
+    assert.equal(details.buyer_mobile_payment, '0799887766', 'buyer_mobile_payment should fall back to order.buyer_mobile_payment');
+  });
 });

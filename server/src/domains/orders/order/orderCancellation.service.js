@@ -46,13 +46,43 @@ class OrderCancellationService {
       if (updatedOrder) {
         if (order.payment_status === 'completed') {
           const refundAmount = Number.parseFloat(order.total_amount);
-          await client.query(
-            `UPDATE buyers 
-             SET refunds = COALESCE(refunds, 0) + $1,
-                 updated_at = NOW()
-             WHERE id = $2`,
-            [refundAmount, order.buyer_id]
-          );
+          let buyerRefunded = false;
+          if (order.buyer_id) {
+            await client.query(
+              `UPDATE buyers 
+               SET refunds = COALESCE(refunds, 0) + $1,
+                   updated_at = NOW()
+               WHERE id = $2`,
+              [refundAmount, order.buyer_id]
+            );
+            buyerRefunded = true;
+          } else if (order.buyer_email) {
+            const { rowCount } = await client.query(
+              `UPDATE buyers 
+               SET refunds = COALESCE(refunds, 0) + $1,
+                   updated_at = NOW()
+               WHERE LOWER(email) = LOWER($2)`,
+              [refundAmount, order.buyer_email]
+            );
+            if (rowCount > 0) buyerRefunded = true;
+          }
+
+          if (!buyerRefunded && refundAmount > 0) {
+            await client.query(
+              `UPDATE product_orders
+               SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
+               WHERE id = $1`,
+              [orderId, refundAmount]
+            );
+          } else {
+            await client.query(
+              `UPDATE product_orders
+               SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
+               WHERE id = $1`,
+              [orderId]
+            );
+          }
+
           await settlementService.reverseOrderSettlementForRefund(client, orderId, 'order_cancellation');
           // Defence-in-depth, symmetric with the refund/reversal paths. Today this
           // is a no-op: creator earnings are only created at escrow release

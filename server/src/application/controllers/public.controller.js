@@ -468,6 +468,25 @@ export const getOrderStatus = async (req, res) => {
       }
     }
 
+    let digitalDownloads = null;
+    if (clientToken && paid && order.client_checkout_token === clientToken) {
+      const { rows: digRows } = await pool.query(
+        `SELECT oi.product_id, p.name, p.digital_file_name
+           FROM order_items oi
+           JOIN products p ON oi.product_id = p.id
+          WHERE oi.order_id = $1
+            AND (p.product_type = 'digital' OR p.is_digital = true)`,
+        [order.id]
+      );
+      if (digRows.length > 0) {
+        digitalDownloads = digRows.map((d) => ({
+          productId: d.product_id,
+          name: d.name,
+          downloadUrl: `/api/orders/${order.id}/download/${d.product_id}?client_checkout_token=${encodeURIComponent(clientToken)}`
+        }));
+      }
+    }
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -476,7 +495,8 @@ export const getOrderStatus = async (req, res) => {
         paymentStatus: order.payment_status,
         paymentRecordStatus: order.payment_record_status || null,
         failureReason,
-        ...(autoLoginToken ? { autoLoginToken } : {})
+        ...(autoLoginToken ? { autoLoginToken } : {}),
+        ...(digitalDownloads ? { digitalDownloads } : {})
       }
     });
   } catch (error) {
