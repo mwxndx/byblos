@@ -114,6 +114,15 @@ describe('recordRiderLocation — validation & guards (no Redis needed)', () => 
       (e) => e.statusCode === 403
     );
   });
+
+  test('rejects a missing partnerId on recordRiderLocation (403)', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+    await assert.rejects(
+      () => LogisticsEtaService.recordRiderLocation({ partnerId: null, legId: f.legId, latitude: FAR.lat, longitude: FAR.lng, accuracy: 10 }),
+      (e) => e.statusCode === 403
+    );
+  });
 });
 
 describe('recordRiderLocation -> getOrderLiveEta round trip (real Redis)', () => {
@@ -179,6 +188,22 @@ describe('getOrderLiveEta — ownership & fallbacks', () => {
     const eta = await LogisticsEtaService.getOrderLiveEta({ orderId: f.order.id, user: { role: 'admin' } });
     assert.equal(eta.trackingStatus, 'delivered');
     assert.equal(eta.routeProgress, 1.0);
+  });
+
+  test('a cancelled order reports cancelled at 0% progress', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit({ orderStatus: 'CANCELLED' });
+    const eta = await LogisticsEtaService.getOrderLiveEta({ orderId: f.order.id, user: { role: 'admin' } });
+    assert.equal(eta.trackingStatus, 'cancelled');
+    assert.equal(eta.routeProgress, 0.0);
+  });
+
+  test('a refunded order reports refunded at 0% progress', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit({ orderStatus: 'REFUNDED' });
+    const eta = await LogisticsEtaService.getOrderLiveEta({ orderId: f.order.id, user: { role: 'admin' } });
+    assert.equal(eta.trackingStatus, 'refunded');
+    assert.equal(eta.routeProgress, 0.0);
   });
 
   test('an in-transit leg with no GPS yet reports waiting_for_location', async (t) => {

@@ -80,7 +80,7 @@ export class LogisticsEtaService {
     const leg = rows[0];
 
     // 5. Verify partner ownership
-    if (partnerId && String(leg.partner_id) !== String(partnerId)) {
+    if (!partnerId || String(leg.partner_id) !== String(partnerId)) {
       throw new AppError('Unauthorized: Partner is not assigned to this logistics leg', 403);
     }
 
@@ -212,7 +212,7 @@ export class LogisticsEtaService {
       throw new AppError('Unauthorized access to order tracking', 403);
     }
 
-    // 3. If order is already completed
+    // 3. If order is already completed, cancelled, or refunded
     if (order.status === 'COMPLETED') {
       return {
         orderId: String(order.id),
@@ -221,6 +221,32 @@ export class LogisticsEtaService {
         etaMinutes: 0,
         estimatedArrival: null,
         routeProgress: 1.0,
+        lastUpdatedAt: order.updated_at ? new Date(order.updated_at).toISOString() : new Date().toISOString(),
+        isStale: false
+      };
+    }
+
+    if (order.status === 'CANCELLED') {
+      return {
+        orderId: String(order.id),
+        legId: null,
+        trackingStatus: 'cancelled',
+        etaMinutes: 0,
+        estimatedArrival: null,
+        routeProgress: 0.0,
+        lastUpdatedAt: order.updated_at ? new Date(order.updated_at).toISOString() : new Date().toISOString(),
+        isStale: false
+      };
+    }
+
+    if (order.status === 'REFUNDED') {
+      return {
+        orderId: String(order.id),
+        legId: null,
+        trackingStatus: 'refunded',
+        etaMinutes: 0,
+        estimatedArrival: null,
+        routeProgress: 0.0,
         lastUpdatedAt: order.updated_at ? new Date(order.updated_at).toISOString() : new Date().toISOString(),
         isStale: false
       };
