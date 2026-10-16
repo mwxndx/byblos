@@ -40,7 +40,7 @@ class TokenBlacklistService {
         }
 
         // Cleanup interval for the in-memory fallback
-        this.cleanupInterval = setInterval(() => this._cleanupMemory(), 15 * 60 * 1000);
+        this.cleanupInterval = setInterval(() => this._cleanupMemory(), 15 * 60 * 1000).unref();
         logger.info('[TOKEN-BLACKLIST] Service initialized (Redis + in-memory fallback)');
     }
 
@@ -50,9 +50,13 @@ class TokenBlacklistService {
      * @param {number} expiresAt - Unix timestamp when the token expires (seconds or ms)
      */
     async addToken(token, expiresAt) {
-        let expSec = typeof expiresAt === 'number' ? expiresAt : Math.floor(Date.now() / 1000) + 86400;
-        if (expSec > 100000000000) { // If in milliseconds
-            expSec = Math.floor(expSec / 1000);
+        let expSec;
+        if (expiresAt instanceof Date) {
+            expSec = Math.floor(expiresAt.getTime() / 1000);
+        } else if (typeof expiresAt === 'number') {
+            expSec = expiresAt > 100000000000 ? Math.floor(expiresAt / 1000) : expiresAt;
+        } else {
+            expSec = Math.floor(Date.now() / 1000) + 86400;
         }
         const ttl = expSec - Math.floor(Date.now() / 1000);
         if (ttl <= 0) return; // Token already expired — nothing to do

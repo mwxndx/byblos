@@ -195,6 +195,7 @@ export default async (app) => {
             req.path.includes('/register') ||
             req.path.includes('/forgot-password') ||
             req.path.includes('/reset-password') ||
+            req.path.includes('/refresh-token') ||
             req.path.startsWith('/api/public/');
 
         if (isExcluded) return next();

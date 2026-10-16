@@ -69,15 +69,22 @@ export const refreshAccessToken = async (refreshToken) => {
   // Blacklist the consumed refresh token (token rotation: old token is invalidated)
   await tokenBlacklist.addToken(refreshToken, decoded.exp);
 
-  // Verify the user exists and is still active in the database
+  // Verify the user exists, is active, and password was not changed after token issuance
   const { pool } = await import('../../infrastructure/database/database.js');
   const { rows } = await pool.query(
-    'SELECT id, email, role, is_active, is_verified FROM users WHERE id = $1',
+    'SELECT id, email, role, is_active, is_verified, password_changed_at FROM users WHERE id = $1',
     [decoded.id]
   );
   const user = rows[0];
   if (!user || user.is_active === false) {
     throw new Error('User account is invalid or deactivated. Please log in again.');
+  }
+
+  if (user.password_changed_at) {
+    const changedTimestamp = Math.floor(new Date(user.password_changed_at).getTime() / 1000);
+    if (decoded.iat && decoded.iat < changedTimestamp) {
+      throw new Error('Your password was recently changed. Please log in again.');
+    }
   }
 
   // Access token always uses JWT_SECRET — separate from refresh secret

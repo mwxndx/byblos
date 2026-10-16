@@ -149,7 +149,7 @@ export const getTokenFromRequest = (req) => {
  */
 export const changedPasswordAfter = (passwordChangedAt, iat) => {
   if (passwordChangedAt) {
-    const changedTimestamp = Math.floor(passwordChangedAt.getTime() / 1000);
+    const changedTimestamp = Math.floor(new Date(passwordChangedAt).getTime() / 1000);
     return iat < changedTimestamp;
   }
   return false;

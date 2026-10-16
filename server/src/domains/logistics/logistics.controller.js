@@ -37,10 +37,17 @@ export const logoutLogisticsPartner = async (req, res, next) => {
 
 export const getLogisticsMe = async (req, res, next) => {
     try {
+        const partner = req.logisticsPartner || req.user?.profile || (req.user?.profileId ? {
+            id: req.user.profileId,
+            name: req.user.partner_name || req.user.name,
+            slug: req.user.partner_slug,
+            email: req.user.email
+        } : null);
+
         res.status(200).json({
             status: 'success',
             data: {
-                partner: req.logisticsPartner
+                partner
             }
         });
     } catch (error) {

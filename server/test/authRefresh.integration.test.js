@@ -62,6 +62,10 @@ after(async () => {
     await pool.query('DELETE FROM user_roles WHERE user_id = ANY($1)', [createdUserIds]);
     await pool.query('DELETE FROM users WHERE id = ANY($1)', [createdUserIds]);
   }
+  if (tokenBlacklist.redis) {
+    tokenBlacklist.redis.disconnect();
+  }
+  await pool.end();
 });
 
 async function createTestAccount(role) {

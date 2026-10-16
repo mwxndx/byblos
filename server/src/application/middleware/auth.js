@@ -154,6 +154,10 @@ export const protect = async (req, res, next) => {
         }
         req.user = cached.user;
         res.locals.user = cached.user;
+        if (cached.logisticsPartner) {
+          req.logisticsPartner = cached.logisticsPartner;
+          res.locals.logisticsPartner = cached.logisticsPartner;
+        }
         return next();
       }
     }
@@ -256,6 +260,7 @@ export const protect = async (req, res, next) => {
         email: userData.email
       };
       res.locals.logisticsPartner = req.logisticsPartner;
+      user.profile = req.logisticsPartner;
     }
 
     if (userType !== 'admin') {
@@ -291,6 +296,7 @@ export const protect = async (req, res, next) => {
 
       _authCache.set(token, {
         user,
+        logisticsPartner: req.logisticsPartner || null,
         expiresAt: Date.now() + AUTH_CACHE_TTL_MS
       });
     }

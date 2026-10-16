@@ -95,7 +95,7 @@ export const register = async (req, res, next) => {
       return res.status(404).json({ status: 'fail', message });
     }
     if (error.code === 'EXISTING_ACCOUNT' || message.includes('already has a Byblos account')) {
-      return res.status(400).json({
+      return res.status(409).json({
         status: 'fail',
         code: 'EXISTING_ACCOUNT',
         message,
