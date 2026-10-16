@@ -319,8 +319,8 @@ body.android-native {
 
     /* Auth pages: always dark background, always full safe-area coverage */
     .auth-page {
-        min-height: 100svh;
-        min-height: calc(100svh + var(--sat) + var(--sab));
+        min-height: 100dvh;
+        min-height: calc(100dvh + var(--sat) + var(--sab));
         padding-bottom: var(--sab);
     }
 

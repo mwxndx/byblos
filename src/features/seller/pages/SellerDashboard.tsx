@@ -240,70 +240,77 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
   }
 
   return (
-    <div className="seller-surface flex flex-1 min-h-0 flex-col" style={{ minHeight: '100%', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+    <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ minHeight: '100dvh', height: '100dvh', overflowY: 'hidden' } as React.CSSProperties}>
       <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
 
+      {/* Main Content Area */}
       <div
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
-        className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
-        // The seller tabs are a fixed bottom bar (h-14) on web and native alike,
-        // so reserve matching space so the last content clears it.
-        style={{ paddingBottom: 'calc(4rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
+        style={{
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth',
+          overscrollBehavior: 'none',
+        }}
       >
-        <div className="mb-5 mt-1 sm:mb-6">
-          <SellerProfileHero
-            sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
-            shopUsername={getShopUsername(sellerProfile?.shopName)}
-            onCopyShopLink={handleCopyShopLink}
-            canEdit
-          />
+        <div
+          className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
+          style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+        >
+          <div className="mb-5 mt-1 sm:mb-6">
+            <SellerProfileHero
+              sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
+              shopUsername={getShopUsername(sellerProfile?.shopName)}
+              onCopyShopLink={handleCopyShopLink}
+              canEdit
+            />
+          </div>
+
+          {activeTab === 'orders' && <OrdersTab />}
+
+          {activeTab === 'withdrawals' && (
+            <WithdrawalsTab
+              balance={analytics.availableBalance ?? analytics.balance}
+              pendingSettlementBalance={analytics.pendingSettlementBalance}
+              withdrawalReservedBalance={analytics.withdrawalReservedBalance}
+              refundReservedBalance={analytics.refundReservedBalance}
+              nextSettlementAt={analytics.nextSettlementAt}
+              {...withdrawals}
+            />
+          )}
+
+          {activeTab === 'creators' && <CreatorsTab />}
+
+          {activeTab === 'overview' && (
+            <OverviewTab
+              analytics={analytics}
+              pendingOverviewOrders={pendingOverviewOrders}
+              sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
+              onSelectTab={handleSelectTab}
+            />
+          )}
+
+          {activeTab === 'products' && (
+            <ProductsTab
+              fetchProducts={fetchProducts}
+              isAddProductModalOpen={isAddProductModalOpen}
+              onDeleteProduct={handleDeleteProduct}
+              onStatusUpdate={handleStatusUpdate}
+              products={products}
+              setIsAddProductModalOpen={setIsAddProductModalOpen}
+            />
+          )}
         </div>
-
-        <SellerDashboardTabs
-          activeTab={activeTab}
-          hasUnreadOrders={hasUnreadOrders}
-          pendingCreatorsCount={pendingCreatorsCount}
-          onSelectTab={handleSelectTab}
-        />
-
-        {activeTab === 'orders' && <OrdersTab />}
-
-        {activeTab === 'withdrawals' && (
-          <WithdrawalsTab
-            balance={analytics.availableBalance ?? analytics.balance}
-            pendingSettlementBalance={analytics.pendingSettlementBalance}
-            withdrawalReservedBalance={analytics.withdrawalReservedBalance}
-            refundReservedBalance={analytics.refundReservedBalance}
-            nextSettlementAt={analytics.nextSettlementAt}
-            {...withdrawals}
-          />
-        )}
-
-        {activeTab === 'creators' && <CreatorsTab />}
-
-        {activeTab === 'overview' && (
-          <OverviewTab
-            analytics={analytics}
-            pendingOverviewOrders={pendingOverviewOrders}
-            sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
-            onSelectTab={handleSelectTab}
-          />
-        )}
-
-        {activeTab === 'products' && (
-          <ProductsTab
-            fetchProducts={fetchProducts}
-            isAddProductModalOpen={isAddProductModalOpen}
-            onDeleteProduct={handleDeleteProduct}
-            onStatusUpdate={handleStatusUpdate}
-            products={products}
-            setIsAddProductModalOpen={setIsAddProductModalOpen}
-          />
-        )}
-
       </div>
+
+      <SellerDashboardTabs
+        activeTab={activeTab}
+        hasUnreadOrders={hasUnreadOrders}
+        pendingCreatorsCount={pendingCreatorsCount}
+        onSelectTab={handleSelectTab}
+      />
 
       {/* Profile / settings as a right-side slide-over — same UX as the creator
           profile, opened from the header profile icon. The .seller-surface
