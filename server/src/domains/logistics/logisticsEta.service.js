@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { pool } from '../../infrastructure/database/database.js';
 import getRedisClient from '../../shared/config/redis.js';
 import { LogisticsQuoteService, DEFAULT_HUB } from './logisticsQuote.service.js';
@@ -163,12 +164,12 @@ export class LogisticsEtaService {
    * Retrieves sanitized live ETA for an order.
    * STRICT SECURITY: Zero coordinates, zero speeds, zero raw GPS data returned.
    */
-  static async getOrderLiveEta({ orderId, user }) {
+  static async getOrderLiveEta({ orderId, user, clientCheckoutToken = null }) {
     if (!orderId) throw new AppError('Order ID is required', 400);
 
     // 1. Fetch order for tenant ownership verification
     const { rows: orderRows } = await pool.query(
-      `SELECT id, buyer_id, seller_id, status, fulfillment_type, updated_at, created_at
+      `SELECT id, buyer_id, seller_id, status, fulfillment_type, updated_at, created_at, client_checkout_token
        FROM product_orders
        WHERE id = $1`,
       [orderId]
@@ -181,11 +182,33 @@ export class LogisticsEtaService {
     const order = orderRows[0];
 
     // 2. Validate tenant ownership
-    const isBuyer = user && (String(order.buyer_id) === String(user.profile_id) || String(order.buyer_id) === String(user.id));
-    const isSeller = user && (String(order.seller_id) === String(user.sellerId) || String(order.seller_id) === String(user.profile_id) || String(order.seller_id) === String(user.id));
+    const isBuyer = user && (
+      String(order.buyer_id) === String(user.buyerId)
+      || String(order.buyer_id) === String(user.buyerProfileId)
+      || String(order.buyer_id) === String(user.profileId)
+      || String(order.buyer_id) === String(user.profile_id)
+      || String(order.buyer_id) === String(user.id)
+    );
+    const isSeller = user && (
+      String(order.seller_id) === String(user.sellerId)
+      || String(order.seller_id) === String(user.sellerProfileId)
+      || String(order.seller_id) === String(user.profileId)
+      || String(order.seller_id) === String(user.profile_id)
+      || String(order.seller_id) === String(user.id)
+    );
     const isAdmin = user && ['admin', 'logistics'].includes(user.role || user.userType);
+    const isTokenAuthorized = Boolean(
+      clientCheckoutToken
+      && order.client_checkout_token
+      && (function timingSafeCompare(a, b) {
+        if (typeof a !== 'string' || typeof b !== 'string') return false;
+        const bufA = Buffer.from(a.trim());
+        const bufB = Buffer.from(b.trim());
+        return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+      })(String(clientCheckoutToken), String(order.client_checkout_token))
+    );
 
-    if (!isBuyer && !isSeller && !isAdmin) {
+    if (!isBuyer && !isSeller && !isAdmin && !isTokenAuthorized) {
       throw new AppError('Unauthorized access to order tracking', 403);
     }
 

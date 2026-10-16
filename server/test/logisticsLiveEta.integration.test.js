@@ -16,6 +16,8 @@ import assert from 'node:assert/strict';
 const { pool } = await import('../src/infrastructure/database/database.js');
 const getRedisClient = (await import('../src/shared/config/redis.js')).default;
 const LogisticsEtaService = (await import('../src/domains/logistics/logisticsEta.service.js')).default;
+const { getOrderLiveEta: getOrderLiveEtaController } =
+  await import('../src/domains/orders/order/order.controller.js');
 const { createBuyer, createSeller, createCompletedOrder, cleanupOrder, cleanupSeller, cleanupBuyer } =
   await import('./helpers/factories.js');
 
@@ -186,4 +188,106 @@ describe('getOrderLiveEta — ownership & fallbacks', () => {
     const eta = await LogisticsEtaService.getOrderLiveEta({ orderId: f.order.id, user: { role: 'admin' } });
     assert.equal(eta.trackingStatus, 'waiting_for_location');
   });
+
+  test('buyer can access live ETA via user.buyerId even when user.id differs', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+    const eta = await LogisticsEtaService.getOrderLiveEta({
+      orderId: f.order.id,
+      user: { id: 999999, profile_id: 888888, buyerId: f.buyer.id, role: 'buyer' }
+    });
+    assert.ok(eta);
+    assert.equal(eta.orderId, String(f.order.id));
+  });
+
+  test('guest can access live ETA with matching clientCheckoutToken', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+    const eta = await LogisticsEtaService.getOrderLiveEta({
+      orderId: f.order.id,
+      user: null,
+      clientCheckoutToken: f.order.client_checkout_token
+    });
+    assert.ok(eta);
+    assert.equal(eta.orderId, String(f.order.id));
+  });
+
+  test('guest with invalid clientCheckoutToken is refused (403)', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+    await assert.rejects(
+      () => LogisticsEtaService.getOrderLiveEta({
+        orderId: f.order.id,
+        user: null,
+        clientCheckoutToken: 'invalid-token-here'
+      }),
+      (e) => e.statusCode === 403
+    );
+  });
+
+  test('unauthenticated request with no clientCheckoutToken is refused (403)', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+    await assert.rejects(
+      () => LogisticsEtaService.getOrderLiveEta({
+        orderId: f.order.id,
+        user: null,
+        clientCheckoutToken: null
+      }),
+      (e) => e.statusCode === 403
+    );
+  });
 });
+
+describe('getOrderLiveEta controller endpoint', () => {
+  test('guest request with x-checkout-token header succeeds with 200 and sanitized DTO', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+
+    let statusCode = null;
+    let jsonBody = null;
+    const res = {
+      status(code) { statusCode = code; return this; },
+      json(data) { jsonBody = data; return this; }
+    };
+
+    const req = {
+      params: { id: f.order.id },
+      headers: { 'x-checkout-token': f.order.client_checkout_token },
+      query: {},
+      user: null
+    };
+
+    await getOrderLiveEtaController(req, res);
+
+    assert.equal(statusCode, 200);
+    assert.equal(jsonBody.status, 'success');
+    assert.equal(jsonBody.data.orderId, String(f.order.id));
+    assert.equal(jsonBody.data.trackingStatus, 'waiting_for_location');
+  });
+
+  test('guest request without token is rejected with 403', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+
+    let statusCode = null;
+    let jsonBody = null;
+    const res = {
+      status(code) { statusCode = code; return this; },
+      json(data) { jsonBody = data; return this; }
+    };
+
+    const req = {
+      params: { id: f.order.id },
+      headers: {},
+      query: {},
+      user: null
+    };
+
+    await getOrderLiveEtaController(req, res);
+
+    assert.equal(statusCode, 403);
+    assert.equal(jsonBody.status, 'error');
+  });
+});
+

@@ -14,7 +14,6 @@ import { registerNativePushNotifications, unregisterNativePushNotifications } fr
 import { getDashboardPath } from '../utils/authRouting';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { storage } from '@/infrastructure/storage/storage';
-import { classifyApiError } from '@/shared/utils/errorClassification';
 import type {
   GlobalUser,
   UserProfile,

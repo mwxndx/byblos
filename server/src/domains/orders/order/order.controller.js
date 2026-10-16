@@ -18,6 +18,7 @@ import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
 import { isCloudinaryAssetUrl } from '../../../shared/utils/assetUrlGuard.js';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
+import LogisticsEtaService from '../../logistics/logisticsEta.service.js';
 import { handleDigitalProductDownload } from './digitalDownloadStreamer.js';
 import {
     resolvePickupStatusCode,
@@ -427,9 +428,14 @@ export const locationPreview = async (req, res) => {
 export const getOrderLiveEta = async (req, res) => {
     try {
         const { id } = req.params;
+        const clientCheckoutToken = req.headers['x-checkout-token']
+            || req.query.client_checkout_token
+            || req.query.clientCheckoutToken;
+
         const result = await LogisticsEtaService.getOrderLiveEta({
             orderId: id,
-            user: req.user
+            user: req.user,
+            clientCheckoutToken
         });
 
         res.status(200).json({

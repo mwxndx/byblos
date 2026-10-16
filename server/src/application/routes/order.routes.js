@@ -47,6 +47,19 @@ router.get(
   downloadDigitalProduct
 );
 
+/**
+ * @swagger
+ * /api/orders/{id}/live-eta:
+ *   get:
+ *     summary: Get live movement-based ETA for active order (Sanitized DTO; authenticated owner or valid client checkout token)
+ */
+router.get(
+  '/:id/live-eta',
+  publicApiRateLimiter,
+  optionalProtect,
+  getOrderLiveEta
+);
+
 // Apply protection to all other order routes
 router.use(protect);
 
@@ -85,14 +98,6 @@ router.get('/seller', getSellerOrders);
  *     summary: Get order by ID
  */
 router.get('/:id', getOrderById);
-
-/**
- * @swagger
- * /api/orders/{id}/live-eta:
- *   get:
- *     summary: Get live movement-based ETA for active order (Sanitized DTO)
- */
-router.get('/:id/live-eta', getOrderLiveEta);
 
 /**
  * @swagger
