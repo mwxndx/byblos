@@ -7,8 +7,10 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https'
   },
+  backgroundColor: '#000000',
   ios: {
-    contentInset: 'never'
+    contentInset: 'never',
+    backgroundColor: '#000000'
   },
   android: {
     // No static WebView backgroundColor: it would show a light frame on a dark
