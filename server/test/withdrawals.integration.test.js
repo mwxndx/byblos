@@ -19,6 +19,7 @@ process.env.PAYOUT_PROVIDER = 'paystack';
 const { pool } = await import('../src/infrastructure/database/database.js');
 const WithdrawalService = (await import('../src/domains/payments/withdrawals/withdrawal.service.js')).default;
 const Fees = (await import('../src/shared/config/fees.js')).default;
+const { getBuyerRefundClearance } = await import('../src/domains/commerce/buyers/buyerRefund.service.js');
 const { createBuyer, createSeller, createCreator, createCompletedOrder, cleanupBuyer, cleanupSeller, cleanupCreator, cleanupOrder } =
   await import('./helpers/factories.js');
 
@@ -395,3 +396,100 @@ describe('Withdrawal — clearing-hold race (creator & buyer_refund)', () => {
     assert.ok(b.refunds >= UNCLEARED, `clearing hold preserved: refunds ${b.refunds} >= uncleared ${UNCLEARED}`);
   });
 });
+
+describe('Withdrawal — remediations & edge cases', () => {
+  test('buyer_refund: cancelled paid order balance is subject to T+2 clearance hold', async (t) => {
+    let buyer, seller, order;
+    t.after(async () => {
+      if (order) await cleanupOrder(order.id).catch(() => {});
+      if (seller) await cleanupSeller(seller.id).catch(() => {});
+      if (buyer) await cleanupEntity(ENTITIES.buyer_refund, buyer.id).catch(() => {});
+    });
+
+    seller = await createSeller({});
+    buyer = await createBuyer({});
+    // Seed refunds balance matching the cancelled order
+    await pool.query('UPDATE buyers SET refunds = 1000 WHERE id = $1', [buyer.id]);
+    // Create an order cancelled after payment completion (status CANCELLED, payment_status completed)
+    order = await createCompletedOrder({
+      buyerId: buyer.id,
+      sellerId: seller.id,
+      totalAmount: 1000,
+      sellerPayoutAmount: 900,
+      status: 'CANCELLED',
+      paymentStatus: 'completed'
+    });
+
+    const clearance = await getBuyerRefundClearance(buyer.id);
+    assert.equal(clearance.totalRefunds, 1000);
+    assert.equal(clearance.clearingBalance, 1000);
+    assert.equal(clearance.availableBalance, 0);
+    assert.equal(clearance.isClearing, true);
+
+    // Attempting to withdraw immediately must fail due to T+2 clearance hold
+    await assert.rejects(
+      WithdrawalService.createWithdrawalRequest({
+        entityId: buyer.id,
+        entityType: 'buyer_refund',
+        amount: 500,
+        mpesaNumber: PHONE,
+        idempotencyKey: `cancel-test-${buyer.id}`
+      }),
+      /clearing under the standard T\+2 holding period|Insufficient available balance|Insufficient balance/i
+    );
+  });
+
+  test('updateStatusWithSideEffects joins buyers and handles buyer phone lookup cleanly', async (t) => {
+    let buyer;
+    t.after(async () => {
+      if (buyer) await cleanupEntity(ENTITIES.buyer_refund, buyer.id).catch(() => {});
+    });
+
+    buyer = await createBuyer({ mobilePayment: '0711223344' });
+    await pool.query('UPDATE buyers SET refunds = 2000, mobile_payment = $2 WHERE id = $1', [buyer.id, '0711223344']);
+
+    const req = await WithdrawalService.createWithdrawalRequest({
+      entityId: buyer.id,
+      entityType: 'buyer_refund',
+      amount: 500,
+      mpesaNumber: '0711223344',
+      mpesaName: 'Buyer Test',
+      idempotencyKey: `buyer-side-fx-${buyer.id}`
+    });
+
+    const updated = await WithdrawalService.updateStatusWithSideEffects(req.id, 'completed', {
+      mpesa_receipt: 'MOCK_BUYER_RCP_1',
+      remarks: 'Payout complete'
+    });
+
+    assert.equal(updated.status, 'completed');
+    const { rows: [reqRow] } = await pool.query('SELECT status, metadata FROM withdrawal_requests WHERE id = $1', [req.id]);
+    assert.equal(reqRow.status, 'completed');
+    assert.equal(reqRow.metadata?.mpesa_receipt, 'MOCK_BUYER_RCP_1');
+  });
+
+  test('seller withdrawal list filter accepts manual_review', async (t) => {
+    let seller;
+    t.after(async () => {
+      if (seller) await cleanupSeller(seller.id).catch(() => {});
+    });
+
+    seller = await createSeller({});
+    await pool.query(
+      `INSERT INTO withdrawal_requests (seller_id, amount, mpesa_number, mpesa_name, status, idempotency_key, created_at)
+       VALUES ($1, 500, '0712345678', 'Seller Test', 'manual_review', $2, NOW())`,
+      [seller.id, `manual-review-idem-${seller.id}`]
+    );
+
+    const { rows, total } = await WithdrawalService.getWithdrawalsForSeller(seller.id, {
+      limit: 10,
+      offset: 0,
+      status: 'manual_review'
+    });
+
+    assert.equal(total, 1);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].status, 'manual_review');
+  });
+});
+

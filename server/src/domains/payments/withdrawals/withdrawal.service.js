@@ -199,10 +199,11 @@ class WithdrawalService {
 
             const { rows: [request] } = await client.query(
                 `SELECT wr.*,
-                        COALESCE(s.whatsapp_number, c.whatsapp_number, c.mpesa_number) as entity_phone
+                        COALESCE(s.whatsapp_number, c.whatsapp_number, c.mpesa_number, b.whatsapp_number, b.mobile_payment) as entity_phone
                  FROM withdrawal_requests wr 
                  LEFT JOIN sellers s ON wr.seller_id = s.id
                  LEFT JOIN creators c ON wr.creator_id = c.id
+                 LEFT JOIN buyers b ON wr.buyer_id = b.id
                  WHERE wr.id = $1 FOR UPDATE OF wr`,
                 [requestId]
             );
@@ -250,7 +251,7 @@ class WithdrawalService {
             if (newStatus === 'failed' && !skipRefund) {
                 // ENSURE: refundToWallet uses the SAME client for atomicity
                 newBalance = await payoutService.refundToWallet(client, request);
-                logger.info(`[WithdrawalService] Request ${requestId} failed. Refunded KES ${request.amount} to ${getEntityType(request)} ${request.seller_id || request.creator_id}`);
+                logger.info(`[WithdrawalService] Request ${requestId} failed. Refunded KES ${request.amount} to ${getEntityType(request)} ${request.seller_id || request.creator_id || request.buyer_id}`);
             } else if (newStatus === 'failed') {
                 logger.warn(`[WithdrawalService] Request ${requestId} marked failed without refund: ${remarks || 'skipRefund=true'}`);
             } else if (newStatus === 'completed') {

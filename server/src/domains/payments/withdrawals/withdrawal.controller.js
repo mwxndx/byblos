@@ -89,7 +89,7 @@ export const getWithdrawals = async (req, res, next) => {
     const limit = Math.min(50, parseInt(req.query.limit ?? '20', 10) || 20);
     const offset = (page - 1) * limit;
 
-    const ALLOWED_STATUSES = new Set(['processing', 'completed', 'failed']);
+    const ALLOWED_STATUSES = new Set(['processing', 'completed', 'failed', 'manual_review', 'compensation_required']);
     const statusFilter = ALLOWED_STATUSES.has(req.query.status) ? req.query.status : null;
 
     try {

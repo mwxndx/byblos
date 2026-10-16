@@ -20,7 +20,8 @@ export async function getBuyerRefundClearance(buyerId) {
     pool.query(
       `SELECT id, total_amount AS amount, updated_at
        FROM product_orders
-       WHERE buyer_id = $1 AND status = 'REFUNDED'
+       WHERE buyer_id = $1
+         AND ((status = 'REFUNDED') OR (status = 'CANCELLED' AND payment_status = 'completed'))
          AND id NOT IN (SELECT order_id FROM refund_requests WHERE buyer_id = $1 AND order_id IS NOT NULL)
        ORDER BY updated_at DESC`,
       [buyerId]
