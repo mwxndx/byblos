@@ -473,4 +473,26 @@ describe('Financial Push & Feed Notifications Integration', () => {
       await pool.query('DELETE FROM users WHERE id = $1', [testPartnerUser.id]);
     }
   });
+
+  test('resolveSellerUserId resolves userId via sellerUserId, sellerId, or sellerPhone', async () => {
+    const NotificationService = (await import('../src/domains/communication/notifications/notification.service.js')).default;
+
+    // 1. Direct sellerUserId
+    const directResult = await NotificationService.resolveSellerUserId({ sellerUserId: 9999 });
+    assert.equal(directResult, 9999);
+
+    // 2. Resolve via sellerId
+    const byIdResult = await NotificationService.resolveSellerUserId({ sellerId: seller.id });
+    assert.equal(byIdResult, sellerUser.id);
+
+    // 3. Resolve via sellerPhone (whatsappNumber)
+    const testPhone = '254711223344';
+    await pool.query('UPDATE sellers SET whatsapp_number = $1 WHERE id = $2', [testPhone, seller.id]);
+    const byPhoneResult = await NotificationService.resolveSellerUserId({ sellerPhone: testPhone });
+    assert.equal(byPhoneResult, sellerUser.id);
+
+    // 4. Returns null when not found
+    const notFoundResult = await NotificationService.resolveSellerUserId({ sellerId: 9999999 });
+    assert.equal(notFoundResult, null);
+  });
 });

@@ -415,6 +415,39 @@ class NotificationService {
             return null;
         }
     }
+
+    /**
+     * Resolves a seller's user_id from either sellerUserId, sellerId, or sellerPhone (whatsappNumber).
+     * Centralizes entity user lookups behind the notification module.
+     */
+    async resolveSellerUserId({ sellerUserId, sellerId, sellerPhone } = {}) {
+        if (sellerUserId) return Number(sellerUserId);
+        try {
+            if (sellerId) {
+                const numericId = Number(sellerId);
+                if (Number.isInteger(numericId) && numericId > 0) {
+                    const { rows } = await pool.query(
+                        `SELECT user_id FROM sellers WHERE id = $1 LIMIT 1`,
+                        [numericId]
+                    );
+                    if (rows[0]?.user_id) return rows[0].user_id;
+                }
+            }
+            if (sellerPhone) {
+                const cleanedPhone = String(sellerPhone).trim();
+                if (cleanedPhone) {
+                    const { rows } = await pool.query(
+                        `SELECT user_id FROM sellers WHERE whatsapp_number = $1 LIMIT 1`,
+                        [cleanedPhone]
+                    );
+                    if (rows[0]?.user_id) return rows[0].user_id;
+                }
+            }
+        } catch (error) {
+            logger.warn('[NotificationService] Failed to resolve seller userId', { error: error.message });
+        }
+        return null;
+    }
 }
 
 

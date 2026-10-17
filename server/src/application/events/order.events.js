@@ -1,6 +1,5 @@
 import eventBus, { AppEvents } from './eventBus.js';
 import notificationService from '../../domains/communication/notifications/notification.service.js';
-import { findSellerById, findSellerByWhatsappNumber } from '../../domains/commerce/sellers/seller.model.js';
 import logger from '../../shared/utils/logger.js';
 import OrderReadService from '../../domains/orders/order/orderRead.service.js';
 import OrderNotificationPayloadService from '../../domains/orders/order/orderNotificationPayload.service.js';
@@ -154,28 +153,8 @@ eventBus.on(AppEvents.ORDER.CUSTOM_PRODUCTION_EXPIRED, async ({ eventId, order, 
     ]);
 });
 
-// Inventory alerts moved from WhatsApp to the in-app feed (+ push). Emit sites
-// historically passed only a seller phone, so resolve the seller's userId from
-// sellerUserId | sellerId | whatsapp_number before writing the feed entry.
-async function resolveSellerUserId({ sellerUserId, sellerId, sellerPhone }) {
-    if (sellerUserId) return sellerUserId;
-    try {
-        if (sellerId) {
-            const byId = await findSellerById(sellerId);
-            if (byId?.userId) return byId.userId;
-        }
-        if (sellerPhone) {
-            const byPhone = await findSellerByWhatsappNumber(sellerPhone);
-            if (byPhone?.userId) return byPhone.userId;
-        }
-    } catch (error) {
-        logger.warn('[Event:Inventory] Failed to resolve seller userId', { error: error.message });
-    }
-    return null;
-}
-
 eventBus.on(AppEvents.INVENTORY.LOW_STOCK, async ({ sellerUserId, sellerId, sellerPhone, productName, currentQuantity, threshold }) => {
-    const userId = await resolveSellerUserId({ sellerUserId, sellerId, sellerPhone });
+    const userId = await notificationService.resolveSellerUserId({ sellerUserId, sellerId, sellerPhone });
     if (!userId) return;
     await notificationService.send({
         recipientUserId: userId,
@@ -189,7 +168,7 @@ eventBus.on(AppEvents.INVENTORY.LOW_STOCK, async ({ sellerUserId, sellerId, sell
 });
 
 eventBus.on(AppEvents.INVENTORY.OUT_OF_STOCK, async ({ sellerUserId, sellerId, sellerPhone, productName }) => {
-    const userId = await resolveSellerUserId({ sellerUserId, sellerId, sellerPhone });
+    const userId = await notificationService.resolveSellerUserId({ sellerUserId, sellerId, sellerPhone });
     if (!userId) return;
     await notificationService.send({
         recipientUserId: userId,
