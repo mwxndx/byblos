@@ -1,15 +1,15 @@
 /**
  * order.controller.js
  *
- * Delegates runtime order actions to CoreOrderService.
+ * Delegates runtime order actions to OrderService.
  *
- * Architecture after refactor:
- *   OrderController -> CoreOrderService -> hardened order service
+ * Architecture:
+ *   OrderController -> OrderService (hardened order module)
  *
- * The hardened order service owns durable order lifecycle outbox events so
- * WhatsApp and other side effects are fully decoupled from the transaction.
+ * OrderService owns durable order lifecycle outbox events so WhatsApp and
+ * other side effects are fully decoupled from the transaction.
  */
-import CoreOrderService from '../../../shared/core/CoreOrderService.js';
+import OrderService from './OrderService.js';
 import Order from './order.model.js';
 import logger from '../../../shared/utils/logger.js';
 import * as digitalDownloadRepository from '../../commerce/repositories/digitalDownload.repository.js';
@@ -32,8 +32,6 @@ import {
     handleMarkDroppedAtHub,
     handleConfirmBooking
 } from './orderFulfillmentActions.js';
-
-const OrderService = CoreOrderService;
 
 export const getSellerOrders = async (req, res) => {
     try {

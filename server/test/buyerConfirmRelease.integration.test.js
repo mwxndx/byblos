@@ -2,7 +2,7 @@
 // escrow and completes fulfilment for a Mzigo Ego (hub-routed physical) order.
 //
 // This drives the REAL buyer-confirm path the controller uses
-// (CoreOrderService.markAsCollected -> OrderService._buyerComplete), which does
+// (OrderService.markAsCollected -> OrderService._buyerComplete), which does
 // the actual UPDATE product_orders SET status = 'COMPLETED' and then calls
 // escrowManager.releaseFunds. That UPDATE->COMPLETED transition is exactly the
 // path the legacy handle_order_completion_trigger used to intercept and block
@@ -12,7 +12,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 
 const { pool } = await import('../src/infrastructure/database/database.js');
-const CoreOrderService = (await import('../src/shared/core/CoreOrderService.js')).default;
+const OrderService = (await import('../src/domains/orders/order/OrderService.js')).default;
 const {
   createBuyer, createSeller, createCreator, createSellerCreatorLink,
   createCompletedOrder, createPayment,
@@ -88,7 +88,7 @@ describe('Buyer confirm -> escrow release + completion (Mzigo Ego delivered orde
     f = await seedMzigoOrder();
     const before = await sellerPending(f.seller.id);
 
-    const result = await CoreOrderService.markAsCollected(f.order.id, f.buyer.id);
+    const result = await OrderService.markAsCollected(f.order.id, f.buyer.id);
 
     // Fulfilment completed.
     assert.equal(result.status, 'COMPLETED');
@@ -107,7 +107,7 @@ describe('Buyer confirm -> escrow release + completion (Mzigo Ego delivered orde
     let f; t.after(() => cleanup(f || {}));
     f = await seedMzigoOrder({ withCreator: true });
 
-    await CoreOrderService.markAsCollected(f.order.id, f.buyer.id);
+    await OrderService.markAsCollected(f.order.id, f.buyer.id);
 
     const { rows: [ce] } = await pool.query('SELECT amount::float AS amount FROM creator_earnings WHERE order_id = $1', [f.order.id]);
     assert.ok(ce, 'a creator_earnings row was created on release');
@@ -121,9 +121,9 @@ describe('Buyer confirm -> escrow release + completion (Mzigo Ego delivered orde
     f = await seedMzigoOrder();
     const before = await sellerPending(f.seller.id);
 
-    await CoreOrderService.markAsCollected(f.order.id, f.buyer.id);
+    await OrderService.markAsCollected(f.order.id, f.buyer.id);
     // A second confirmation (e.g. double-tap / retry) must be a no-op for money.
-    await CoreOrderService.markAsCollected(f.order.id, f.buyer.id);
+    await OrderService.markAsCollected(f.order.id, f.buyer.id);
 
     assert.equal(await sellerPending(f.seller.id), before + SELLER_PAYOUT, 'credited exactly once');
     const { rows: [{ n }] } = await pool.query("SELECT count(*)::int AS n FROM payouts WHERE order_id = $1", [f.order.id]);
@@ -135,7 +135,7 @@ describe('Buyer confirm -> escrow release + completion (Mzigo Ego delivered orde
     f = await seedMzigoOrder({ legStatus: 'failed' });
     const before = await sellerPending(f.seller.id);
 
-    await CoreOrderService.markAsCollected(f.order.id, f.buyer.id);
+    await OrderService.markAsCollected(f.order.id, f.buyer.id);
 
     // The logistics hold in EscrowManager.releaseFunds blocks the payout.
     assert.equal(await sellerPending(f.seller.id), before, 'seller NOT credited while logistics is in a failed state');

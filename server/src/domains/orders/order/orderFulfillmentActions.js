@@ -7,7 +7,7 @@
 import crypto from 'node:crypto';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
-import CoreOrderService from '../../../shared/core/CoreOrderService.js';
+import OrderService from './OrderService.js';
 import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
 
 export function safeTokenCompare(a, b) {
@@ -62,7 +62,7 @@ export async function handleMarkDroppedAtHub({ orderId, sellerId }) {
 }
 
 export async function handleConfirmBooking({ orderId, sellerId }) {
-    const updatedOrder = await CoreOrderService.confirmBooking(orderId, sellerId);
+    const updatedOrder = await OrderService.confirmBooking(orderId, sellerId);
     return sanitizeOrder(updatedOrder, 'seller');
 }
 
