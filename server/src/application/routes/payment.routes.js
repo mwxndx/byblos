@@ -6,6 +6,7 @@ import { protect, hasPermission } from '../middleware/auth.js';
 import { requirePaystackWebhookHmac, verifyPaystackWebhook, webhookRateLimiter } from '../middleware/paystackWebhookSecurity.js';
 import paymentRequestLogger from '../middleware/payment-logger.middleware.js';
 import { paymentRateLimiter } from '../middleware/rateLimiting.js';
+import { enforceIdempotency } from '../middleware/idempotency.middleware.js';
 
 const router = express.Router();
 
@@ -66,6 +67,7 @@ publicRouter.post(
   '/initiate-product',
   paymentRateLimiter,
   validate(initiateProductSchema),
+  enforceIdempotency(300),
   paymentController.initiateProductPayment
 );
 

@@ -107,7 +107,9 @@ async function findPaymentByInternalId(client, paymentId) {
     }
 
     const { rows } = await client.query(
-        `SELECT * FROM payments WHERE id = $1 FOR UPDATE`,
+        `SELECT id, order_id, invoice_id, amount, currency, status, payment_method,
+                metadata, provider_reference, api_ref, mpesa_receipt, created_at, updated_at
+         FROM payments WHERE id = $1 FOR UPDATE`,
         [numericPaymentId]
     );
     return rows[0] || null;
@@ -120,7 +122,8 @@ async function findPaymentByProviderReference(client, providerReference, source 
     }
 
     const { rows } = await client.query(
-        `SELECT *
+        `SELECT id, order_id, invoice_id, amount, currency, status, payment_method,
+                metadata, provider_reference, api_ref, mpesa_receipt, created_at, updated_at
          FROM payments
          WHERE provider_reference = $1
             OR api_ref = $1
@@ -354,7 +357,13 @@ const CorePaymentService = {
 
             if (orderId) {
                 const { rows: orderRows } = await client.query(
-                    `SELECT * FROM product_orders WHERE id = $1 FOR UPDATE`,
+                    `SELECT id, order_number, buyer_id, seller_id, total_amount, platform_fee_amount,
+                            seller_payout_amount, status, payment_status, payment_method,
+                            buyer_name, buyer_email, buyer_mobile_payment, buyer_whatsapp_number,
+                            shipping_address, delivery_location, fulfillment_type, order_type,
+                            custom_production_deadline_at, custom_production_grace_deadline_at,
+                            metadata, created_at, updated_at, paid_at
+                     FROM product_orders WHERE id = $1 FOR UPDATE`,
                     [orderId]
                 );
                 orderRow = orderRows[0] || null;

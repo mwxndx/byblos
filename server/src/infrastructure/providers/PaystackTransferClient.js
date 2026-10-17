@@ -6,6 +6,7 @@ import {
     normalizePaystackTransferPayload,
     normalizePaystackTransferStatus
 } from '../../shared/utils/paystackTransferNormalizer.js';
+import { executeWithRetry } from '../../shared/utils/retryUtils.js';
 
 class PaystackTransferClient {
     constructor() {
@@ -65,9 +66,9 @@ class PaystackTransferClient {
             currency: normalizedCurrency
         };
 
-        const response = await this.client.post('/transferrecipient', payload, {
+        const response = await executeWithRetry(() => this.client.post('/transferrecipient', payload, {
             headers: { Authorization: this.getAuthHeader() }
-        });
+        }), { maxRetries: 3, baseDelayMs: 300 });
 
         const data = response.data?.data || response.data || {};
         const recipientCode = data.recipient_code || data.recipientCode;
@@ -106,25 +107,25 @@ class PaystackTransferClient {
             recipient: recipient.recipient_code
         });
 
-        const response = await this.client.post('/transfer', payload, {
+        const response = await executeWithRetry(() => this.client.post('/transfer', payload, {
             headers: { Authorization: this.getAuthHeader() }
-        });
+        }), { maxRetries: 2, baseDelayMs: 500 });
 
         return this.normalizePaystackTransferPayload(response.data, transferReference);
     }
 
     async verifyTransfer(reference) {
         if (!reference) throw new Error('Transfer reference is required');
-        const response = await this.client.get(`/transfer/verify/${encodeURIComponent(reference)}`, {
+        const response = await executeWithRetry(() => this.client.get(`/transfer/verify/${encodeURIComponent(reference)}`, {
             headers: { Authorization: this.getAuthHeader() }
-        });
+        }), { maxRetries: 3, baseDelayMs: 300 });
         return this.normalizePaystackTransferPayload(response.data, reference);
     }
 
     async checkBalance() {
-        const response = await this.client.get('/balance', {
+        const response = await executeWithRetry(() => this.client.get('/balance', {
             headers: { Authorization: this.getAuthHeader() }
-        });
+        }), { maxRetries: 3, baseDelayMs: 300 });
         const balances = response.data?.data || [];
         const kes = Array.isArray(balances)
             ? balances.find(row => String(row.currency || '').toUpperCase() === 'KES') || balances[0] || {}

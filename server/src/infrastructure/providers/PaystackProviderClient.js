@@ -7,6 +7,7 @@ import {
     normalizePaystackChargePayload,
     normalizePaystackPaymentStatus
 } from '../../shared/utils/paystackPaymentNormalizer.js';
+import { executeWithRetry } from '../../shared/utils/retryUtils.js';
 
 class PaystackProviderClient {
     constructor() {
@@ -210,13 +211,13 @@ class PaystackProviderClient {
 
             logger.info('[PAYSTACK-STATUS] Verifying transaction', { reference });
 
-            const response = await this.client.get(`/transaction/verify/${encodeURIComponent(reference)}`, {
+            const response = await executeWithRetry(() => this.client.get(`/transaction/verify/${encodeURIComponent(reference)}`, {
                 headers: {
                     Authorization: this.getAuthHeader(),
                     Accept: 'application/json'
                 },
                 timeout: 30000
-            });
+            }), { maxRetries: 3, baseDelayMs: 300 });
 
             const normalized = this.normalizePaystackChargePayload(response.data, reference);
 

@@ -60,6 +60,18 @@ describe('enforceIdempotency', () => {
         assert.deepEqual(res.sentBody, { deleted: true });
     });
 
+    test('replays the cached response when idempotency token is passed in request body', async () => {
+        const cacheKey = 'idempotency:checkout-token-999';
+        const client = makeReadyClient({ [cacheKey]: JSON.stringify({ status: 200, body: { orderId: 123 } }) });
+        const mw = enforceIdempotency(300, { getClient: () => client });
+        const res = makeRes();
+        let nextCalled = false;
+        await mw({ headers: {}, body: { clientCheckoutToken: 'checkout-token-999' } }, res, () => { nextCalled = true; });
+        assert.equal(nextCalled, false, 'body token should trigger cached replay');
+        assert.equal(res.sentStatus, 200);
+        assert.deepEqual(res.sentBody, { orderId: 123 });
+    });
+
     test('cache miss: calls next, then caches a 2xx response under the supplied TTL', async () => {
         const client = makeReadyClient();
         const mw = enforceIdempotency(60, { getClient: () => client });

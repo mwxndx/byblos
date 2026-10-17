@@ -34,7 +34,12 @@ const withTimeout = (promise, ms) => {
  * @param {number} [deps.readTimeoutMs] cache-lookup timeout; defaults to REDIS_READ_TIMEOUT_MS.
  */
 export const enforceIdempotency = (ttlSeconds = DEFAULT_TTL_SECONDS, { getClient = getRedisClient, readTimeoutMs = REDIS_READ_TIMEOUT_MS } = {}) => async (req, res, next) => {
-  const idempotencyKey = req.headers['idempotency-key'] || req.headers['x-idempotency-key'];
+  const idempotencyKey = req.headers['idempotency-key']
+    || req.headers['x-idempotency-key']
+    || (typeof req.body?.idempotencyKey === 'string' && req.body.idempotencyKey.trim())
+    || (typeof req.body?.clientCheckoutToken === 'string' && req.body.clientCheckoutToken.trim())
+    || (typeof req.body?.checkoutAttemptId === 'string' && req.body.checkoutAttemptId.trim())
+    || null;
   if (!idempotencyKey) return next();
 
   let redisClient = null;
