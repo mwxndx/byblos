@@ -1,13 +1,17 @@
 /**
  * digitalDownloadStreamer.js
  *
- * Dedicated streaming and SSRF verification handler for digital products.
- * Isolates HTTP piping, redirect recursion, and MIME resolution from order.controller.js.
+ * Dedicated streaming, SSRF verification, and resolution handler for digital products.
+ * Encapsulates repository verification, SSRF check, candidate URL resolution, and HTTP piping.
  */
 import https from 'node:https';
 import http from 'node:http';
+import path from 'node:path';
 import logger from '../../../shared/utils/logger.js';
 import { isCloudinaryAssetUrl } from '../../../shared/utils/assetUrlGuard.js';
+import { getDigitalAssetUrls } from '../../../shared/utils/cloudinary.js';
+import * as digitalDownloadRepository from '../../commerce/repositories/digitalDownload.repository.js';
+
 
 const MIME_MAP = {
     // Documents
@@ -121,10 +125,6 @@ export function streamCandidateUrls({ candidateUrls, digitalFilePath, cleanFileN
     tryStream(0);
 }
 
-import * as digitalDownloadRepository from '../../commerce/repositories/digitalDownload.repository.js';
-import path from 'path';
-import { getDigitalAssetUrls } from '../../../shared/utils/cloudinary.js';
-
 export async function handleDigitalProductDownload({ orderId, productId, buyerProfileId, clientCheckoutToken, res }) {
     const data = await digitalDownloadRepository.findVerifiedDigitalItem({
         orderId,
@@ -159,8 +159,12 @@ export async function handleDigitalProductDownload({ orderId, productId, buyerPr
     streamCandidateUrls({ candidateUrls, digitalFilePath, cleanFileName, mimeType, res });
 }
 
+export const fulfillDigitalDownload = handleDigitalProductDownload;
+
 export default {
     getMimeType,
     streamCandidateUrls,
-    handleDigitalProductDownload
+    handleDigitalProductDownload,
+    fulfillDigitalDownload
 };
+

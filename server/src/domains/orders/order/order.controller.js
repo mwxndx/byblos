@@ -12,14 +12,12 @@
 import OrderService from './OrderService.js';
 import Order from './order.model.js';
 import logger from '../../../shared/utils/logger.js';
-import * as digitalDownloadRepository from '../../commerce/repositories/digitalDownload.repository.js';
-import path from 'path';
 import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
-import { isCloudinaryAssetUrl } from '../../../shared/utils/assetUrlGuard.js';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
 import LogisticsEtaService from '../../logistics/logisticsEta.service.js';
-import { handleDigitalProductDownload } from './digitalDownloadStreamer.js';
+import { fulfillDigitalDownload } from './digitalDownloadStreamer.js';
+
 import {
     resolvePickupStatusCode,
     resolveHubStatusCode,
@@ -385,7 +383,8 @@ export const downloadDigitalProduct = async (req, res) => {
             });
         }
 
-        await handleDigitalProductDownload({ orderId, productId, buyerProfileId, clientCheckoutToken, res });
+        await fulfillDigitalDownload({ orderId, productId, buyerProfileId, clientCheckoutToken, res });
+
     } catch (error) {
         logger.error('Error in downloadDigitalProduct:', error);
         if (!res.headersSent) {
