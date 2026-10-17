@@ -2,10 +2,9 @@ import type { ApiPublicSeller } from '@/shared/types/api/seller';
 export type { ApiPublicSeller };
 
 
-export function transformSeller(seller: unknown): ApiPublicSeller | null {
-  if (!seller) return null;
-  const sObj = seller as Record<string, unknown>;
-  const str = (v: unknown, fallback = ''): string => (v === null || v === undefined || v === '') ? fallback : String(v);
+const str = (v: unknown, fallback = ''): string => (v === null || v === undefined || v === '') ? fallback : String(v);
+
+function extractSellerIdentity(sObj: Record<string, unknown>) {
   return {
     id: str(sObj.id),
     fullName: str(sObj.full_name || sObj.fullName, 'Unknown Seller'),
@@ -18,27 +17,60 @@ export function transformSeller(seller: unknown): ApiPublicSeller | null {
     theme: str(sObj.theme, 'default'),
     ...(sObj.bio ? { bio: str(sObj.bio) } : {}),
     ...(sObj.avatar_url ? { avatarUrl: str(sObj.avatar_url) } : {}),
-    ...(sObj.avatarUrl ? { avatarUrl: str(sObj.avatarUrl) } : {}),
-    ...(sObj.location ? { location: str(sObj.location) } : {}),
-    ...(sObj.city ? { city: str(sObj.city) } : {}),
-    ...(sObj.website ? { website: str(sObj.website) } : {}),
-    ...(sObj.social_media ? { socialMedia: sObj.social_media as Record<string, string> } : {}),
-    ...(sObj.socialMedia ? { socialMedia: sObj.socialMedia as Record<string, string> } : {}),
-    hasPhysicalShop: Boolean(sObj.hasPhysicalShop || sObj.has_physical_shop || sObj.physicalAddress || sObj.physical_address),
-    ...(sObj.physicalAddress ? { physicalAddress: str(sObj.physicalAddress) } : {}),
-    ...(sObj.physical_address ? { physicalAddress: str(sObj.physical_address) } : {}),
-    ...(sObj.latitude ? { latitude: Number(sObj.latitude) } : {}),
-    ...(sObj.longitude ? { longitude: Number(sObj.longitude) } : {}),
-    ...((sObj.instagramLink || sObj.instagram_link) ? { instagramLink: str(sObj.instagramLink || sObj.instagram_link) } : {}),
-    ...((sObj.tiktokLink || sObj.tiktok_link) ? { tiktokLink: str(sObj.tiktokLink || sObj.tiktok_link) } : {}),
-    ...((sObj.facebookLink || sObj.facebook_link) ? { facebookLink: str(sObj.facebookLink || sObj.facebook_link) } : {}),
-    ...(sObj.totalWishlistCount !== undefined ? { totalWishlistCount: Number(sObj.totalWishlistCount) } : {}),
-    ...(sObj.total_wishlist_count !== undefined ? { totalWishlistCount: Number(sObj.total_wishlist_count) } : {}),
-    ...(sObj.wishlistCount !== undefined ? { wishlistCount: Number(sObj.wishlistCount) } : {}),
-    ...(sObj.wishlist_count !== undefined ? { wishlistCount: Number(sObj.wishlist_count) } : {}),
-    ...(sObj.knockCount !== undefined ? { knockCount: Number(sObj.knockCount) } : {}),
-    ...(sObj.knock_count !== undefined ? { knockCount: Number(sObj.knock_count) } : {})
+    ...(sObj.avatarUrl ? { avatarUrl: str(sObj.avatarUrl) } : {})
   };
 }
+
+function extractSellerLocation(sObj: Record<string, unknown>) {
+  const physicalAddress = sObj.physicalAddress || sObj.physical_address;
+  return {
+    ...(sObj.location ? { location: str(sObj.location) } : {}),
+    ...(sObj.city ? { city: str(sObj.city) } : {}),
+    hasPhysicalShop: Boolean(sObj.hasPhysicalShop || sObj.has_physical_shop || physicalAddress),
+    ...(physicalAddress ? { physicalAddress: str(physicalAddress) } : {}),
+    ...(sObj.latitude ? { latitude: Number(sObj.latitude) } : {}),
+    ...(sObj.longitude ? { longitude: Number(sObj.longitude) } : {})
+  };
+}
+
+function extractSellerSocial(sObj: Record<string, unknown>) {
+  const socialMedia = sObj.social_media || sObj.socialMedia;
+  const instagram = sObj.instagramLink || sObj.instagram_link;
+  const tiktok = sObj.tiktokLink || sObj.tiktok_link;
+  const facebook = sObj.facebookLink || sObj.facebook_link;
+
+  return {
+    ...(sObj.website ? { website: str(sObj.website) } : {}),
+    ...(socialMedia ? { socialMedia: socialMedia as Record<string, string> } : {}),
+    ...(instagram ? { instagramLink: str(instagram) } : {}),
+    ...(tiktok ? { tiktokLink: str(tiktok) } : {}),
+    ...(facebook ? { facebookLink: str(facebook) } : {})
+  };
+}
+
+function extractSellerMetrics(sObj: Record<string, unknown>) {
+  const totalWishlist = sObj.totalWishlistCount ?? sObj.total_wishlist_count;
+  const wishlist = sObj.wishlistCount ?? sObj.wishlist_count;
+  const knock = sObj.knockCount ?? sObj.knock_count;
+
+  return {
+    ...(totalWishlist !== undefined ? { totalWishlistCount: Number(totalWishlist) } : {}),
+    ...(wishlist !== undefined ? { wishlistCount: Number(wishlist) } : {}),
+    ...(knock !== undefined ? { knockCount: Number(knock) } : {})
+  };
+}
+
+export function transformSeller(seller: unknown): ApiPublicSeller | null {
+  if (!seller) return null;
+  const sObj = seller as Record<string, unknown>;
+
+  return {
+    ...extractSellerIdentity(sObj),
+    ...extractSellerLocation(sObj),
+    ...extractSellerSocial(sObj),
+    ...extractSellerMetrics(sObj)
+  };
+}
+
 
 
