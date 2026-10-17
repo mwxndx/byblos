@@ -7,6 +7,10 @@ import { useAndroidBackHandler, registerNavigationDelegate } from "@/shared/util
 import { useNativeDeepLinkHandler } from "@/infrastructure/navigation/deepLinkHandler";
 import { InstallPrompt } from "@/features/pwa/InstallPrompt";
 
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import { isNativeApp } from "@/infrastructure/navigation/mobileApp";
+
 // Register router delegation so shared mobile back handler doesn't import app router directly
 registerNavigationDelegate({
   getPathname: () => router.state.location.pathname,
@@ -20,6 +24,8 @@ function App() {
   // Handle Capacitor native deep links (verification emails, resets, tracking)
   useNativeDeepLinkHandler((path) => router.navigate(path));
 
+  const isNative = isNativeApp();
+
   return (
     <ErrorBoundary>
       <RouterProvider
@@ -27,6 +33,12 @@ function App() {
         fallbackElement={<LoadingScreen />}
       />
       <InstallPrompt />
+      {!isNative && (
+        <>
+          <Analytics />
+          <SpeedInsights />
+        </>
+      )}
     </ErrorBoundary>
   );
 }
