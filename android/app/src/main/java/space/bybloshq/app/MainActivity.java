@@ -6,6 +6,7 @@ import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 import androidx.core.content.ContextCompat;
+import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -13,6 +14,9 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Handle Android 12+ / core-splashscreen transition before BridgeActivity initializes
+        SplashScreen.installSplashScreen(this);
+
         // Register the custom native share plugin before the bridge starts.
         registerPlugin(SocialSharePlugin.class);
         super.onCreate(savedInstanceState);
