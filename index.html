@@ -111,7 +111,7 @@
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      background-color: #000000 !important;
+      background-color: #000000;
       z-index: 99999;
       pointer-events: none;
       padding-top: env(safe-area-inset-top, 0px);
@@ -126,10 +126,43 @@
       -webkit-user-drag: none;
     }
     #initial-splash .splash-logo-dark {
-      display: block !important;
+      display: block;
     }
     #initial-splash .splash-logo-light {
-      display: none !important;
+      display: none;
+    }
+
+    /* Standard browser tabs in light theme: match the light UI canvas (#f5f4f0) */
+    @media not all and (display-mode: standalone) {
+      html[data-theme="light"]:not(.native-app):not(.capacitor-native) #initial-splash,
+      html.light:not(.native-app):not(.capacitor-native) #initial-splash {
+        background-color: #f5f4f0 !important;
+      }
+      html[data-theme="light"]:not(.native-app):not(.capacitor-native) #initial-splash .splash-logo-dark,
+      html.light:not(.native-app):not(.capacitor-native) #initial-splash .splash-logo-dark {
+        display: none !important;
+      }
+      html[data-theme="light"]:not(.native-app):not(.capacitor-native) #initial-splash .splash-logo-light,
+      html.light:not(.native-app):not(.capacitor-native) #initial-splash .splash-logo-light {
+        display: block !important;
+      }
+    }
+
+    /* Standalone PWA and native app cold launch: strictly locked to pure black (#000000) */
+    @media (display-mode: standalone) {
+      #initial-splash {
+        background-color: #000000 !important;
+      }
+      #initial-splash .splash-logo-dark {
+        display: block !important;
+      }
+      #initial-splash .splash-logo-light {
+        display: none !important;
+      }
+    }
+    html.native-app #initial-splash,
+    html.capacitor-native #initial-splash {
+      background-color: #000000 !important;
     }
   </style>
 
@@ -169,7 +202,6 @@
   <link rel="apple-touch-startup-image" href="/apple-splash-dark-1179x2556.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="/apple-splash-dark-1290x2796.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
   <link rel="apple-touch-startup-image" href="/apple-splash-dark-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="/apple-splash-dark.png" media="(orientation: portrait)">
   <link rel="apple-touch-startup-image" href="/apple-splash-dark.png">
 
   <!-- Preload Splash Logos -->

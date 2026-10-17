@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -42,32 +42,39 @@ describe('Cold Launch & Splash Screen Verification (Android & iOS PWA)', () => {
   });
 
   describe('iOS PWA Cold Launch & Startup Image Configuration', () => {
-    it('sets apple-mobile-web-app-status-bar-style to black-translucent in index.html to avoid white canvas', () => {
-      const indexHtmlPath = path.join(rootDir, 'index.html');
-      const content = fs.readFileSync(indexHtmlPath, 'utf8');
+    let indexHtmlContent: string;
 
-      expect(content).toContain('<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"');
+    beforeAll(() => {
+      const indexHtmlPath = path.join(rootDir, 'index.html');
+      indexHtmlContent = fs.readFileSync(indexHtmlPath, 'utf8');
+    });
+
+    it('sets apple-mobile-web-app-status-bar-style to black-translucent in index.html to avoid white canvas', () => {
+      expect(indexHtmlContent).toContain('<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"');
       // The inline theme script should also maintain black-translucent
-      expect(content).not.toMatch(/statusMeta\.setAttribute\(['"]content['"],\s*['"]default['"]\)/);
+      expect(indexHtmlContent).not.toMatch(/statusMeta\.setAttribute\(['"]content['"],\s*['"]default['"]\)/);
     });
 
     it('ensures all iOS PWA startup images use black background instead of flashing white light-mode images', () => {
-      const indexHtmlPath = path.join(rootDir, 'index.html');
-      const content = fs.readFileSync(indexHtmlPath, 'utf8');
-
       // Light splash images (apple-splash-light-*.png) have a light/cream background (#f5f4f0),
       // which causes iOS PWA cold launch in light mode to display a white screen before the dark logo splash.
-      const lightSplashMatches = content.match(/<link\s+rel="apple-touch-startup-image"[^>]+apple-splash-light[^>]+>/g);
+      const lightSplashMatches = indexHtmlContent.match(/<link\s+rel="apple-touch-startup-image"[^>]+apple-splash-light[^>]+>/g);
       expect(lightSplashMatches).toBeNull();
+
+      // Verify no duplicate fallback link tags
+      const fallbackMatches = indexHtmlContent.match(/<link\s+rel="apple-touch-startup-image"\s+href="\/apple-splash-dark\.png">/g);
+      expect(fallbackMatches?.length).toBe(1);
     });
 
-    it('ensures #initial-splash always retains pure black background (#000000) during pre-hydration boot', () => {
-      const indexHtmlPath = path.join(rootDir, 'index.html');
-      const content = fs.readFileSync(indexHtmlPath, 'utf8');
+    it('locks #initial-splash to pure black (#000000) for standalone PWA and native app cold launch', () => {
+      expect(indexHtmlContent).toContain('@media (display-mode: standalone)');
+      expect(indexHtmlContent).toMatch(/@media \(display-mode: standalone\)\s*\{\s*#initial-splash\s*\{\s*background-color:\s*#000000 !important;/);
+    });
 
-      // #initial-splash must not be overridden to light/cream (#f5f4f0) during initial boot
-      expect(content).not.toMatch(/html\[data-theme=["']light["']\]\s+#initial-splash\s*\{\s*background-color:\s*#f5f4f0/);
-      expect(content).not.toMatch(/html\.light\s+#initial-splash\s*\{\s*background-color:\s*#f5f4f0/);
+    it('allows standard browser tabs in light theme to use harmonious cream background (#f5f4f0)', () => {
+      expect(indexHtmlContent).toContain('@media not all and (display-mode: standalone)');
+      expect(indexHtmlContent).toMatch(/html\[data-theme="light"\]:not\(\.native-app\):not\(\.capacitor-native\)\s+#initial-splash/);
+      expect(indexHtmlContent).toMatch(/background-color:\s*#f5f4f0 !important;/);
     });
   });
 });

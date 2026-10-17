@@ -33,12 +33,12 @@ function App() {
         fallbackElement={<LoadingScreen />}
       />
       <InstallPrompt />
-      {!isNative && (
-        <>
-          <Analytics />
-          <SpeedInsights />
-        </>
-      )}
+      <Analytics
+        endpoint={isNative ? "https://byblosafrica.site/_vercel/insights" : undefined}
+      />
+      <SpeedInsights
+        endpoint={isNative ? "https://byblosafrica.site/_vercel/speed-insights/vitals" : undefined}
+      />
     </ErrorBoundary>
   );
 }
