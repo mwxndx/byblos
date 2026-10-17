@@ -356,6 +356,66 @@ class NotificationService {
 
         return { eligible: recipients.length, sent, pushed, failed };
     }
+
+    /**
+     * Resolves an internal user_id from an entity profile (buyer, seller, or creator).
+     * Additive, best-effort; returns null on missing profile or query error.
+     */
+    async resolveEntityUserId(entityType, entityId) {
+        if (!entityId) return null;
+        const normalizedType = String(entityType || '').toLowerCase().trim();
+        const numericId = Number(entityId);
+        if (!Number.isInteger(numericId) || numericId <= 0) return null;
+
+        const tableMap = {
+            buyer: 'buyers',
+            seller: 'sellers',
+            creator: 'creators'
+        };
+
+        const targetTable = tableMap[normalizedType];
+        if (!targetTable) return null;
+
+        try {
+            const { rows } = await pool.query(
+                `SELECT user_id FROM ${targetTable} WHERE id = $1 LIMIT 1`,
+                [numericId]
+            );
+            return rows[0]?.user_id || null;
+        } catch (error) {
+            logger.warn(`[NotificationService] ${normalizedType} userId lookup failed`, { entityId, error: error.message });
+            return null;
+        }
+    }
+
+    /**
+     * Delivers an in-app and push notification to an entity profile by resolving its user_id.
+     * Best-effort; safely resolves without throwing so asynchronous workflows aren't blocked.
+     */
+    async sendToEntity({ entityType, entityId, role = null, notification }) {
+        try {
+            const userId = await this.resolveEntityUserId(entityType, entityId);
+            if (!userId) return null;
+
+            const recipientRole = role || entityType;
+            return await this.send({
+                recipientUserId: userId,
+                recipientRole,
+                type: notification.type,
+                title: notification.title,
+                body: notification.body,
+                data: notification.data || {},
+                channels: notification.channels || ['in_app', 'push']
+            });
+        } catch (error) {
+            logger.warn(`[NotificationService] sendToEntity failed for ${entityType}:${entityId}`, {
+                type: notification?.type,
+                error: error.message
+            });
+            return null;
+        }
+    }
 }
+
 
 export default new NotificationService();

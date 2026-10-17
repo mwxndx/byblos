@@ -5,22 +5,11 @@ import PaymentReceiptService from '../../domains/payments/payments/paymentReceip
 import notificationService from '../../domains/communication/notifications/notification.service.js';
 import { pool } from '../../infrastructure/database/database.js';
 
-// --- In-app feed helpers (additive, best-effort; never throw, skip accountless) ---
-async function buyerUserIdById(buyerId) {
-    if (!buyerId) return null;
-    try { const { rows } = await pool.query('SELECT user_id FROM buyers WHERE id = $1 LIMIT 1', [Number(buyerId)]); return rows[0]?.user_id || null; }
-    catch (error) { logger.warn('[Feed] buyer userId lookup failed', { buyerId, error: error.message }); return null; }
-}
-async function sellerUserIdById(sellerId) {
-    if (!sellerId) return null;
-    try { const { rows } = await pool.query('SELECT user_id FROM sellers WHERE id = $1 LIMIT 1', [Number(sellerId)]); return rows[0]?.user_id || null; }
-    catch (error) { logger.warn('[Feed] seller userId lookup failed', { sellerId, error: error.message }); return null; }
-}
-async function creatorUserIdById(creatorId) {
-    if (!creatorId) return null;
-    try { const { rows } = await pool.query('SELECT user_id FROM creators WHERE id = $1 LIMIT 1', [Number(creatorId)]); return rows[0]?.user_id || null; }
-    catch (error) { logger.warn('[Feed] creator userId lookup failed', { creatorId, error: error.message }); return null; }
-}
+// --- In-app feed helpers (delegated to notificationService canonical resolution) ---
+const buyerUserIdById = (id) => notificationService.resolveEntityUserId('buyer', id);
+const sellerUserIdById = (id) => notificationService.resolveEntityUserId('seller', id);
+const creatorUserIdById = (id) => notificationService.resolveEntityUserId('creator', id);
+
 async function orderSellerInfoByOrderId(orderId) {
     if (!orderId) return null;
     try {
