@@ -159,3 +159,4 @@ scripts/pywin32_*.py
 
 # Test execution summaries and reports
 staging-smoke-summary.json
+.fallow/

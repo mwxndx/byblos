@@ -118,24 +118,7 @@ async function findExistingByToken(token) {
   };
 }
 
-/**
- * Initiate a product purchase (single product or a per-seller bag of 1–5 items).
- * @param {object} normalizedOrder - output of normalizeOrderInput (buyer, service|items, location, metadata, idempotencyKey)
- * @param {object} [deps] - injectable dependencies (for testing)
- * @param {object} [deps.providerClient] - Paystack client with initiatePayment()
- */
-export async function initiateProductPayment(normalizedOrder, deps = {}) {
-  const { buyer, location = {}, metadata = {}, idempotencyKey } = normalizedOrder;
-  if (!idempotencyKey) throw new AppError('Checkout idempotency token is required', 400);
-
-  const rawItems = parseItems(normalizedOrder);
-  if (rawItems.length === 0) throw new AppError('No valid items to check out', 400);
-  if (rawItems.length > MAX_BAG_ITEMS) throw new AppError(`A bag can hold at most ${MAX_BAG_ITEMS} products`, 400);
-  const items = mergeQuantities(rawItems);
-  const isMulti = items.length > 1;
-
-  // 1. Load & validate all products (must share ONE active seller).
-  const productIds = items.map((i) => i.productId);
+async function loadAndValidateCheckoutProducts(productIds) {
   const { rows: prows } = await pool.query(
     `SELECT p.*,
             s.id AS seller_id, s.status AS seller_status, s.shop_name,
@@ -160,6 +143,28 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
   for (const r of prows) {
     if (r.status !== 'available') throw new AppError('Product not available', 400);
   }
+  return { prows, productById, anyProduct };
+}
+
+/**
+ * Initiate a product purchase (single product or a per-seller bag of 1–5 items).
+ * @param {object} normalizedOrder - output of normalizeOrderInput (buyer, service|items, location, metadata, idempotencyKey)
+ * @param {object} [deps] - injectable dependencies (for testing)
+ * @param {object} [deps.providerClient] - Paystack client with initiatePayment()
+ */
+export async function initiateProductPayment(normalizedOrder, deps = {}) {
+  const { buyer, location = {}, metadata = {}, idempotencyKey } = normalizedOrder;
+  if (!idempotencyKey) throw new AppError('Checkout idempotency token is required', 400);
+
+  const rawItems = parseItems(normalizedOrder);
+  if (rawItems.length === 0) throw new AppError('No valid items to check out', 400);
+  if (rawItems.length > MAX_BAG_ITEMS) throw new AppError(`A bag can hold at most ${MAX_BAG_ITEMS} products`, 400);
+  const items = mergeQuantities(rawItems);
+  const isMulti = items.length > 1;
+
+  // 1. Load & validate all products (must share ONE active seller).
+  const productIds = items.map((i) => i.productId);
+  const { prows, productById, anyProduct } = await loadAndValidateCheckoutProducts(productIds);
 
   // 2. Build line items + secure per-line pricing.
   const lines = buildValidatedLines(items, productById, isMulti);

@@ -1,8 +1,3 @@
-import logger from './logger.js';
-
-/**
- * Fulfillment types supported by the platform.
- */
 export const FulfillmentType = {
     BUYER_TO_SELLER: 'BUYER_TO_SELLER',  // Service at the seller's location (buyer goes to seller)
     COURIER: 'COURIER',                  // Physical goods, routed via the Mzigo Ego hub (CBD)
@@ -42,27 +37,4 @@ export const resolveFulfillmentType = (_seller, productType, metadata = {}) => {
 
     // All physical goods route through the hub — never buyer <-> seller directly.
     return FulfillmentType.COURIER;
-};
-
-export const validateFulfillmentPayload = (type, location, metadata = {}) => {
-    if (type === FulfillmentType.SELLER_TO_BUYER) {
-        // Skip coordinate check if explicitly marked as Virtual/Online (Task BUG-BOOK-02)
-        if (metadata?.location_type === 'Virtual/Online' || metadata?.service_location === 'Virtual/Online') {
-            return;
-        }
-
-        if (!location?.lat || !location?.lng) {
-            const error = new Error('Home service bookings require precise map coordinates. Please select your location.');
-            error.code = 'INVALID_FULFILLMENT_FLOW';
-            throw error;
-        }
-    }
-
-    // FIX 6: Strict coordinate exclusion for In-Store/Courier
-    if (type === FulfillmentType.BUYER_TO_SELLER || type === FulfillmentType.COURIER) {
-        if (location && (location.lat || location.lng)) {
-            // Log warning but allow if it matches seller shop (though resolveFulfillment handled it)
-            logger.warn(`[FULFILLMENT] Buyer coordinates provided for ${type} flow. These will be ignored.`);
-        }
-    }
 };

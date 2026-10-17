@@ -1,0 +1,25 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": [
+    "src/main.{ts,tsx,js,jsx}",
+    "server/src/index.js",
+    "server/src/worker.js",
+    "server/scripts/*.js"
+  ],
+  "ignoreDependencies": [
+    "@capacitor/android",
+    "msw",
+    "eslint-plugin-import"
+  ],
+  "ignorePatterns": [
+    "docs/**",
+    "dist/**",
+    "android/**"
+  ],
+  "duplicates": {
+    "minOccurrences": 3
+  },
+  "rules": {
+    "unused-dependencies": "warn"
+  }
+}

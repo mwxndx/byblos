@@ -11,12 +11,6 @@ import {
   calculatePhysicalProgress
 } from './logisticsEtaMath.js';
 
-export {
-  URBAN_DETOUR_FACTOR,
-  getTrafficVelocityKmPerHour,
-  calculateEtaMinutes,
-  calculatePhysicalProgress
-};
 
 const GPS_CACHE_TTL_SECONDS = 300; // 5 minutes
 const STALE_LOCATION_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes

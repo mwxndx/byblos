@@ -20,6 +20,109 @@ export const safeJson = (val) => {
 };
 
 /**
+ * TRIPLE-SHIELD LOCATION CRAWLER (PIN-COORD-ROBUST)
+ * Scans body.buyerLocation, metadata.buyer_location, and metadata.buyerLocation
+ * Defensively handles stringified JSON and diverse naming conventions (lat/latitude).
+ */
+function crawlLocation(body, metadata = {}, user = null, loggedInBuyer = null) {
+    const candidates = [
+        body?.buyerLocation,
+        body?.buyer_location,
+        body?.delivery?.buyerLocation,
+        body?.delivery?.buyer_location,
+        body?.delivery?.location,
+        body?.bookingDetails?.buyerLocation,
+        body?.metadata?.buyer_location,
+        body?.metadata?.buyerLocation,
+        body?.metadata?.delivery?.buyerLocation,
+        body?.metadata?.delivery?.buyer_location,
+        body?.metadata?.delivery?.location,
+        metadata?.buyer_location,
+        metadata?.buyerLocation,
+        metadata?.delivery?.buyerLocation,
+        metadata?.delivery?.buyer_location,
+        metadata?.delivery?.location,
+        body?.locationData,
+        body?.customFields?.location
+    ];
+
+    const sources = [
+        'body.buyerLocation',
+        'body.buyer_location',
+        'body.delivery.buyerLocation',
+        'body.delivery.buyer_location',
+        'body.delivery.location',
+        'body.bookingDetails.buyerLocation',
+        'body.metadata.buyer_location',
+        'body.metadata.buyerLocation',
+        'body.metadata.delivery.buyerLocation',
+        'body.metadata.delivery.buyer_location',
+        'body.metadata.delivery.location',
+        'metadata.buyer_location',
+        'metadata.buyerLocation',
+        'metadata.delivery.buyerLocation',
+        'metadata.delivery.buyer_location',
+        'metadata.delivery.location',
+        'body.locationData',
+        'body.customFields.location'
+    ];
+
+    const result = { lat: null, lng: null, address: null, source: 'none' };
+
+    for (let i = 0; i < candidates.length; i++) {
+        let candidate = candidates[i];
+        if (!candidate) continue;
+
+        if (typeof candidate === 'string') {
+            try {
+                candidate = JSON.parse(candidate);
+            } catch (e) {
+                continue;
+            }
+        }
+
+        if (typeof candidate !== 'object') continue;
+
+        const rawLat = candidate.lat ?? candidate.latitude ??
+            candidate.location_lat ?? candidate.latitude_coordinate;
+        const rawLng = candidate.lng ?? candidate.longitude ??
+            candidate.location_lng ?? candidate.longitude_coordinate;
+        const addr = candidate.address || candidate.fullAddress ||
+            candidate.full_address || candidate.location_address ||
+            candidate.displayName;
+
+        const parsedLat = Number.parseFloat(rawLat);
+        const parsedLng = Number.parseFloat(rawLng);
+
+        const isValidLat = !isNaN(parsedLat) && parsedLat !== 0;
+        const isValidLng = !isNaN(parsedLng) && parsedLng !== 0;
+
+        if (isValidLat) result.lat = parsedLat;
+        if (isValidLng) result.lng = parsedLng;
+        if (addr) result.address = addr;
+
+        if (result.lat && result.lng) {
+            result.source = sources[i];
+            break;
+        }
+    }
+
+    if (result.lat === null || result.lng === null || result.lat === 0) {
+        const profileLat = user?.latitude || loggedInBuyer?.latitude;
+        const profileLng = user?.longitude || loggedInBuyer?.longitude;
+
+        if (profileLat && profileLat !== 0) {
+            result.lat = profileLat;
+            result.lng = profileLng;
+            result.address = result.address ?? (user?.location || loggedInBuyer?.fullAddress || loggedInBuyer?.location);
+            result.source = user ? 'user_profile' : 'buyer_profile';
+        }
+    }
+
+    return result;
+}
+
+/**
  * Normalizes incoming order request data into a Unified Order Object.
  * This ensures consistency between authenticated and guest buyers.
  * 
@@ -133,116 +236,7 @@ export async function normalizeOrderInput(req) {
         metadata.product_type === 'digital' ||
         body.metadata?.product_type === 'digital';
 
-    /**
-     * TRIPLE-SHIELD LOCATION CRAWLER (PIN-COORD-ROBUST)
-     * Scans body.buyerLocation, metadata.buyer_location, and metadata.buyerLocation
-     * Defensively handles stringified JSON and diverse naming conventions (lat/latitude).
-     */
-    const crawlLocation = () => {
-        // Broad scan of all potential locations where coordinates might hide
-        const candidates = [
-            body.buyerLocation,
-            body.buyer_location,
-            body.delivery?.buyerLocation,
-            body.delivery?.buyer_location,
-            body.delivery?.location,
-            body.bookingDetails?.buyerLocation,
-            body.metadata?.buyer_location,
-            body.metadata?.buyerLocation,
-            body.metadata?.delivery?.buyerLocation,
-            body.metadata?.delivery?.buyer_location,
-            body.metadata?.delivery?.location,
-            metadata.buyer_location,
-            metadata.buyerLocation,
-            metadata.delivery?.buyerLocation,
-            metadata.delivery?.buyer_location,
-            metadata.delivery?.location,
-            body.locationData, // Sometimes used by specific payment gateways
-            body.customFields?.location
-        ];
-
-        const sources = [
-            'body.buyerLocation',
-            'body.buyer_location',
-            'body.delivery.buyerLocation',
-            'body.delivery.buyer_location',
-            'body.delivery.location',
-            'body.bookingDetails.buyerLocation',
-            'body.metadata.buyer_location',
-            'body.metadata.buyerLocation',
-            'body.metadata.delivery.buyerLocation',
-            'body.metadata.delivery.buyer_location',
-            'body.metadata.delivery.location',
-            'metadata.buyer_location',
-            'metadata.buyerLocation',
-            'metadata.delivery.buyerLocation',
-            'metadata.delivery.buyer_location',
-            'metadata.delivery.location',
-            'body.locationData',
-            'body.customFields.location'
-        ];
-
-        const result = { lat: null, lng: null, address: null, source: 'none' };
-
-        for (let i = 0; i < candidates.length; i++) {
-            let candidate = candidates[i];
-            if (!candidate) continue;
-
-            // Defensive: Parse stringified JSON if it arrived as a string
-            if (typeof candidate === 'string') {
-                try {
-                    candidate = JSON.parse(candidate);
-                } catch (e) {
-                    continue; // Not JSON string, skip
-                }
-            }
-
-            if (typeof candidate !== 'object') continue;
-
-            // Property Scanning (lat/latitude/lng/longitude)
-            const rawLat = candidate.lat ?? candidate.latitude ??
-                candidate.location_lat ?? candidate.latitude_coordinate;
-            const rawLng = candidate.lng ?? candidate.longitude ??
-                candidate.location_lng ?? candidate.longitude_coordinate;
-            const addr = candidate.address || candidate.fullAddress ||
-                candidate.full_address || candidate.location_address ||
-                candidate.displayName;
-
-            const parsedLat = Number.parseFloat(rawLat);
-            const parsedLng = Number.parseFloat(rawLng);
-
-            // 0 means unset (DB numeric default). NaN means non-numeric. Both invalid.
-            const isValidLat = !isNaN(parsedLat) && parsedLat !== 0;
-            const isValidLng = !isNaN(parsedLng) && parsedLng !== 0;
-
-            if (isValidLat) result.lat = parsedLat;
-            if (isValidLng) result.lng = parsedLng;
-            if (addr) result.address = addr;
-
-            if (result.lat && result.lng) {
-                result.source = sources[i];
-                break;
-            }
-        }
-
-        // Profile Fallback (PIN-15: PROFILE-COORDS)
-        // Only if we still haven't found valid coordinates
-        if (result.lat === null || result.lng === null || result.lat === 0) {
-            const profileLat = user?.latitude || loggedInBuyer?.latitude;
-            const profileLng = user?.longitude || loggedInBuyer?.longitude;
-
-            if (profileLat && profileLat !== 0) {
-                result.lat = profileLat;
-                result.lng = profileLng;
-                result.address = result.address ?? (user?.location || loggedInBuyer?.fullAddress || loggedInBuyer?.location);
-                result.source = user ? 'user_profile' : 'buyer_profile';
-            }
-        }
-
-        return result;
-    };
-
-    const resolved = crawlLocation();
+    const resolved = crawlLocation(body, metadata, user, loggedInBuyer);
     const location = {
         address: resolved.address || null,
         lat: resolved.lat,
