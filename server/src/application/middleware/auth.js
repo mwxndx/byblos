@@ -2,7 +2,6 @@ import { AppError } from '../../shared/utils/errorHandler.js';
 import { verifyToken, getTokenFromRequest, changedPasswordAfter } from '../../shared/utils/jwt.js';
 import AuthorizationService from '../../domains/identity/auth/authorization.service.js';
 import ProductPolicy from './policies/ProductPolicy.js';
-import OrderPolicy from './policies/OrderPolicy.js';
 import CacheService from '../../shared/utils/cache.service.js';
 import logger from '../../shared/utils/logger.js';
 import { reportAlert } from '../../shared/utils/alerting.js';
@@ -12,9 +11,9 @@ import * as userRepository from '../../domains/identity/users/user.repository.js
 
 // Maps for easy lookup in req.user.can
 const policies = {
-  product: ProductPolicy,
-  order: OrderPolicy
+  product: ProductPolicy
 };
+
 
 // Short-lived in-memory cache for auth results to reduce DB load under concurrent requests.
 // Key: JWT token, Value: { user, expiresAt }
