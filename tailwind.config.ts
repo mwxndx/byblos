@@ -116,6 +116,9 @@ export default {
 				card: 'var(--r-card)',
 				sheet: 'var(--r-sheet)'
 			},
+			transitionDuration: {
+				280: '280ms'
+			},
 			transitionTimingFunction: {
 				ios: 'var(--ease-ios)'
 			},
