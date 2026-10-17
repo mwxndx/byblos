@@ -1,6 +1,9 @@
 // Pure-logic unit tests for the live-ETA math (no DB, no Redis). Covers the
 // traffic-velocity model, ETA-minutes computation, and the physical-progress
 // ratio + clamping used by the live GPS tracking layer.
+//
+// The math functions now live in logisticsEta.service.js (absorbed from
+// logisticsEtaMath.js). Imports updated accordingly; test logic is unchanged.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -8,7 +11,7 @@ import {
   getTrafficVelocityKmPerHour,
   calculateEtaMinutes,
   calculatePhysicalProgress
-} from '../src/domains/logistics/logisticsEtaMath.js';
+} from '../src/domains/logistics/logisticsEta.service.js';
 
 const utc = (h, m = 0) => new Date(Date.UTC(2026, 0, 1, h, m));
 
