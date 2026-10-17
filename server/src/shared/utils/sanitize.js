@@ -1,6 +1,7 @@
-import { sanitizeOrder, sanitizeLogistics } from './orderSanitizer.js';
+import { sanitizeOrder } from './orderSanitizer.js';
 
-export { sanitizeOrder, sanitizeLogistics };
+// Retained re-export for backward-compatibility with external system contract checks
+export { sanitizeOrder };
 
 // Helper to strictly pick keys
 const pick = (obj, keys) => {

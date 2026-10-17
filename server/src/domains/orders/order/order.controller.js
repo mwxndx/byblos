@@ -12,7 +12,7 @@
 import OrderService from './OrderService.js';
 import Order from './order.model.js';
 import logger from '../../../shared/utils/logger.js';
-import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
+import { sanitizeOrder } from '../../../shared/utils/orderSanitizer.js';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
 import LogisticsEtaService from '../../logistics/logisticsEta.service.js';

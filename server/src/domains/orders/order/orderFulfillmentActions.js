@@ -8,7 +8,7 @@ import crypto from 'node:crypto';
 import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
 import OrderService from './OrderService.js';
-import { sanitizeOrder } from '../../../shared/utils/sanitize.js';
+import { sanitizeOrder } from '../../../shared/utils/orderSanitizer.js';
 
 export function safeTokenCompare(a, b) {
     if (typeof a !== 'string' || typeof b !== 'string') return false;
