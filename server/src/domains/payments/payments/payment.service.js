@@ -324,6 +324,7 @@ export class PaymentService {
 
 const paymentService = new PaymentService();
 
-export { CorePaymentService as PaymentLifecycleService };
+export { CorePaymentService };
 export default paymentService;
+
 
