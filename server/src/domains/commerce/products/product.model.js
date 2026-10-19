@@ -46,9 +46,13 @@ class ProductModel {
 
     static async findById(id) {
         const { rows } = await pool.query(
-            `SELECT id, seller_id, name, description, price, product_type::text AS product_type,
-                    category, images, is_digital, digital_file_path, digital_file_name,
-                    track_inventory, quantity, reserved_quantity, status, service_options,
+            `SELECT id, seller_id, name, description, price, image_url, images, aesthetic,
+                    product_type::text AS product_type, service_locations, service_options,
+                    is_digital, digital_file_path, digital_file_name, digital_file_size,
+                    track_inventory, quantity, reserved_quantity, low_stock_threshold,
+                    is_custom_product, production_days, customization_prompt,
+                    is_imported_product, import_days, import_note,
+                    status, is_sold, sold_at,
                     created_at, updated_at
              FROM products 
              WHERE id = $1`,
@@ -59,9 +63,13 @@ class ProductModel {
 
     static async findBySellerId(sellerId) {
         const query = `
-          SELECT id, seller_id, name, description, price, product_type::text AS product_type,
-                 category, images, is_digital, digital_file_path, digital_file_name,
-                 track_inventory, quantity, reserved_quantity, status, service_options,
+          SELECT id, seller_id, name, description, price, image_url, images, aesthetic,
+                 product_type::text AS product_type, service_locations, service_options,
+                 is_digital, digital_file_path, digital_file_name, digital_file_size,
+                 track_inventory, quantity, reserved_quantity, low_stock_threshold,
+                 is_custom_product, production_days, customization_prompt,
+                 is_imported_product, import_days, import_note,
+                 status, is_sold, sold_at,
                  created_at, updated_at
           FROM products 
           WHERE seller_id = $1 
