@@ -56,10 +56,40 @@ const CREATOR_ANALYSIS_PERIODS = {
   yearly: { unit: 'year', interval: '5 years', labelFormat: 'YYYY' }
 };
 
+const CREATOR_BASE_COLUMNS = `
+  id, user_id, first_name, last_name, email, mpesa_number,
+  whatsapp_number, instagram_link, tiktok_link, balance, total_sales,
+  total_earnings, referral_code, total_referral_earnings, status,
+  terms_accepted, terms_accepted_at, withdrawal_reserved_balance,
+  refund_withdrawal_reserved_balance, created_at, updated_at
+`;
+
+const SELLER_CREATOR_LINK_COLUMNS = `
+  scl.id, scl.seller_id, scl.creator_id, scl.code, scl.commission_rate,
+  scl.status, scl.created_at, scl.updated_at, scl.click_count
+`;
+
+const SELLER_CREATOR_INVITE_COLUMNS = `
+  sci.id, sci.seller_id, sci.email, sci.invite_token, sci.status,
+  sci.invited_by_user_id, sci.accepted_creator_id, sci.expires_at,
+  sci.created_at, sci.updated_at
+`;
+
+const CREATOR_EARNING_COLUMNS = `
+  ce.id, ce.creator_id, ce.seller_id, ce.seller_creator_link_id,
+  ce.order_id, ce.payment_id, ce.amount, ce.rate, ce.base_amount,
+  ce.status, ce.metadata, ce.created_at
+`;
+
+const CREATOR_SHOP_REQUEST_COLUMNS = `
+  csr.id, csr.creator_id, csr.seller_id, csr.status, csr.message,
+  csr.created_at, csr.updated_at
+`;
+
 class CreatorService {
   static async findByUserId(userId, client = pool) {
     const { rows } = await client.query(
-      `SELECT * FROM creators WHERE user_id = $1 AND status = 'active' LIMIT 1`,
+      `SELECT ${CREATOR_BASE_COLUMNS} FROM creators WHERE user_id = $1 AND status = 'active' LIMIT 1`,
       [userId]
     );
     return rows[0] || null;
@@ -67,7 +97,7 @@ class CreatorService {
 
   static async findByEmail(email, client = pool) {
     const { rows } = await client.query(
-      `SELECT * FROM creators WHERE LOWER(email) = $1 LIMIT 1`,
+      `SELECT ${CREATOR_BASE_COLUMNS} FROM creators WHERE LOWER(email) = $1 LIMIT 1`,
       [normalizeEmail(email)]
     );
     return rows[0] || null;
@@ -86,7 +116,7 @@ class CreatorService {
 
     if (existingCreator) {
       const { rows: activeLinks } = await pool.query(
-        `SELECT scl.*,
+        `SELECT ${SELLER_CREATOR_LINK_COLUMNS},
                 s.shop_name,
                 c.first_name,
                 c.last_name
@@ -221,7 +251,7 @@ class CreatorService {
 
   static async listSellerInvites(sellerId) {
     const { rows } = await pool.query(
-      `SELECT sci.*,
+      `SELECT ${SELLER_CREATOR_INVITE_COLUMNS},
               s.shop_name,
               s.slug,
               c.first_name,
@@ -270,7 +300,7 @@ class CreatorService {
     try {
       await client.query('BEGIN');
       const { rows } = await client.query(
-        `SELECT sci.*, s.shop_name, s.creator_commission_rate
+        `SELECT ${SELLER_CREATOR_INVITE_COLUMNS}, s.shop_name, s.creator_commission_rate
          FROM seller_creator_invites sci
          JOIN sellers s ON s.id = sci.seller_id
          WHERE sci.id = $1
@@ -522,7 +552,7 @@ class CreatorService {
 
   static async getInviteByToken(token) {
     const { rows } = await pool.query(
-      `SELECT sci.*, s.shop_name, s.full_name AS seller_name, s.creator_commission_rate
+      `SELECT ${SELLER_CREATOR_INVITE_COLUMNS}, s.shop_name, s.full_name AS seller_name, s.creator_commission_rate
        FROM seller_creator_invites sci
        JOIN sellers s ON s.id = sci.seller_id
        WHERE sci.invite_token = $1
@@ -1501,7 +1531,7 @@ class CreatorService {
   static async getDashboard(creatorId, period = 'monthly') {
     const analysisPeriod = this.getAnalysisPeriod(period);
     const [creatorRowsResult, clearance] = await Promise.all([
-      pool.query(`SELECT * FROM creators WHERE id = $1`, [creatorId]),
+      pool.query(`SELECT ${CREATOR_BASE_COLUMNS} FROM creators WHERE id = $1`, [creatorId]),
       this.getCreatorClearance(creatorId)
     ]);
     const creator = creatorRowsResult.rows[0];
@@ -1547,7 +1577,7 @@ class CreatorService {
     );
 
     const { rows: earnings } = await pool.query(
-      `SELECT ce.*, po.order_number, s.shop_name
+      `SELECT ${CREATOR_EARNING_COLUMNS}, po.order_number, s.shop_name
        FROM creator_earnings ce
        JOIN product_orders po ON po.id = ce.order_id
        JOIN sellers s ON s.id = ce.seller_id
@@ -1905,7 +1935,7 @@ class CreatorService {
       await client.query('BEGIN');
 
       const { rows } = await client.query(
-        `SELECT csr.*, s.shop_name, s.slug, s.creator_commission_rate, c.user_id AS creator_user_id, c.first_name, c.last_name
+        `SELECT ${CREATOR_SHOP_REQUEST_COLUMNS}, s.shop_name, s.slug, s.creator_commission_rate, c.user_id AS creator_user_id, c.first_name, c.last_name
          FROM creator_shop_requests csr
          JOIN sellers s ON s.id = csr.seller_id
          JOIN creators c ON c.id = csr.creator_id
@@ -2027,7 +2057,7 @@ class CreatorService {
     }
 
     if (fields.length === 0) {
-      const { rows } = await pool.query('SELECT * FROM creators WHERE id = $1', [creatorId]);
+      const { rows } = await pool.query(`SELECT ${CREATOR_BASE_COLUMNS} FROM creators WHERE id = $1`, [creatorId]);
       return rows[0];
     }
 
