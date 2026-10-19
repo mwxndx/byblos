@@ -584,7 +584,8 @@ class LogisticsRequestService {
             await client.query('BEGIN');
 
             const { rows: paymentRows } = await client.query(
-                `SELECT *
+                `SELECT id, order_id, status, amount, currency, payment_method, provider_reference,
+                        api_ref, metadata, created_at, updated_at
                  FROM payments
                  WHERE id = $1
                  FOR UPDATE`,
@@ -593,7 +594,9 @@ class LogisticsRequestService {
             const lockedPayment = paymentRows[0];
 
             const { rows: orderRows } = await client.query(
-                `SELECT *
+                `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                        seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                        delivery_location, shipping_address, metadata, created_at, updated_at
                  FROM product_orders
                  WHERE id = $1
                  FOR UPDATE`,
@@ -730,7 +733,8 @@ class LogisticsRequestService {
             let notificationEvent = null;
 
             const { rows: paymentRows } = await client.query(
-                `SELECT *
+                `SELECT id, order_id, status, amount, currency, payment_method, provider_reference,
+                        api_ref, metadata, created_at, updated_at
                  FROM payments
                  WHERE id = $1
                  FOR UPDATE`,
@@ -739,7 +743,9 @@ class LogisticsRequestService {
             const lockedPayment = paymentRows[0];
 
             const { rows: orderRows } = await client.query(
-                `SELECT *
+                `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                        seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                        delivery_location, shipping_address, metadata, created_at, updated_at
                  FROM product_orders
                  WHERE id = $1
                  FOR UPDATE`,
@@ -915,7 +921,8 @@ class LogisticsRequestService {
             let notificationEvent = null;
 
             const { rows: paymentRows } = await client.query(
-                `SELECT *
+                `SELECT id, order_id, status, amount, currency, payment_method, provider_reference,
+                        api_ref, metadata, created_at, updated_at
                  FROM payments
                  WHERE id = $1
                  FOR UPDATE`,
@@ -924,7 +931,9 @@ class LogisticsRequestService {
             const lockedPayment = paymentRows[0];
 
             const { rows: orderRows } = await client.query(
-                `SELECT *
+                `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                        seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                        delivery_location, shipping_address, metadata, created_at, updated_at
                  FROM product_orders
                  WHERE id = $1
                  FOR UPDATE`,
