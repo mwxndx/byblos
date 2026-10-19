@@ -127,7 +127,8 @@ class User {
      */
     static async verifyPasswordResetToken(email, token) {
         const query = `
-      SELECT * FROM users
+      SELECT id, email, reset_password_token, reset_password_expires
+      FROM users
       WHERE LOWER(email) = $1
       AND reset_password_token = $2
       AND reset_password_expires > NOW()

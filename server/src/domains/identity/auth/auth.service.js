@@ -206,7 +206,13 @@ class AuthService {
                 break;
             case 'creator': {
                 const creatorResult = await pool.query(
-                    `SELECT * FROM creators WHERE user_id = $1 AND status = 'active' LIMIT 1`,
+                    `SELECT id, user_id, first_name, last_name, email, mpesa_number,
+                            whatsapp_number, instagram_link, tiktok_link, balance,
+                            total_sales, total_earnings, referral_code, status,
+                            terms_accepted, terms_accepted_at, created_at, updated_at
+                     FROM creators 
+                     WHERE user_id = $1 AND status = 'active' 
+                     LIMIT 1`,
                     [user.id]
                 );
                 profile = creatorResult.rows[0] || null;

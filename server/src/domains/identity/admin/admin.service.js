@@ -511,7 +511,15 @@ class AdminService {
 
   async getSellerById(id) {
     // Seller Info
-    const sellerRes = await pool.query('SELECT * FROM sellers WHERE id = $1', [id]);
+    const sellerRes = await pool.query(
+      `SELECT id, user_id, full_name, shop_name, slug, email, whatsapp_number,
+              city, location, physical_address, latitude, longitude, bio,
+              avatar_url, theme, total_sales, net_revenue, balance,
+              terms_accepted, status, created_at, updated_at
+       FROM sellers 
+       WHERE id = $1`,
+      [id]
+    );
     if (!sellerRes.rows[0]) return null;
 
     const seller = sellerRes.rows[0];
