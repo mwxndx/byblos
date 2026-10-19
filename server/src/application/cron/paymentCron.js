@@ -86,7 +86,7 @@ const scheduleFulfillmentRetry = (options = {}) => {
     try {
       // P1-1: Check BOTH keys for backward compat during the transition period
       const { rows } = await pool.query(
-        `SELECT p.*, (p.metadata->>'order_id')::int AS order_id
+        `SELECT p.id, (p.metadata->>'order_id')::int AS order_id
          FROM payments p
          WHERE status = 'completed'
            AND (

@@ -233,7 +233,7 @@ class ReconciliationEngine {
      */
     static async handleUnreleasedCompletedOrders() {
         const { rows: unreleasedOrders } = await pool.query(
-            `SELECT po.*
+            `SELECT po.id, po.status, po.payment_status, po.completed_at
              FROM product_orders po
              LEFT JOIN payouts p ON p.order_id = po.id
              WHERE po.status = 'COMPLETED'
@@ -252,7 +252,12 @@ class ReconciliationEngine {
             try {
                 await client.query('BEGIN');
                 const { rows: [lockedOrder] } = await client.query(
-                    'SELECT * FROM product_orders WHERE id = $1 FOR UPDATE',
+                    `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                            seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                            delivery_location, shipping_address, metadata, created_at, updated_at, completed_at
+                     FROM product_orders
+                     WHERE id = $1
+                     FOR UPDATE`,
                     [order.id]
                 );
                 if (lockedOrder && lockedOrder.status === 'COMPLETED') {
