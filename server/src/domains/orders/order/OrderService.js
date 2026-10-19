@@ -26,7 +26,15 @@ export class OrderService {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      const orderRes = await client.query('SELECT * FROM product_orders WHERE id = $1 FOR UPDATE', [orderId]);
+      const orderRes = await client.query(
+        `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                delivery_location, shipping_address, metadata, created_at, updated_at
+         FROM product_orders 
+         WHERE id = $1 
+         FOR UPDATE`,
+        [orderId]
+      );
       if (orderRes.rows.length === 0) {
         throw new Error('Order not found');
       }
@@ -62,7 +70,12 @@ export class OrderService {
     try {
       await client.query('BEGIN');
       const { rows } = await client.query(
-        'SELECT * FROM product_orders WHERE id = $1 AND seller_id = $2 FOR UPDATE',
+        `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                metadata, created_at, updated_at
+         FROM product_orders 
+         WHERE id = $1 AND seller_id = $2 
+         FOR UPDATE`,
         [orderId, sellerId]
       );
       if (rows.length === 0) throw new Error('Order not found or unauthorized seller');
@@ -91,7 +104,12 @@ export class OrderService {
     try {
       await client.query('BEGIN');
       const { rows } = await client.query(
-        'SELECT * FROM product_orders WHERE id = $1 AND buyer_id = $2 FOR UPDATE',
+        `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                delivery_location, shipping_address, metadata, created_at, updated_at
+         FROM product_orders 
+         WHERE id = $1 AND buyer_id = $2 
+         FOR UPDATE`,
         [orderId, buyerId]
       );
       if (rows.length === 0) {
@@ -151,7 +169,15 @@ export class OrderService {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
-      const { rows } = await client.query('SELECT * FROM product_orders WHERE id = $1 FOR UPDATE', [orderId]);
+      const { rows } = await client.query(
+        `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                delivery_location, shipping_address, metadata, created_at, updated_at
+         FROM product_orders 
+         WHERE id = $1 
+         FOR UPDATE`,
+        [orderId]
+      );
       if (rows.length === 0) throw new Error('Order not found');
       const order = rows[0];
       if (order.status === OrderStatus.COMPLETED) {

@@ -35,7 +35,9 @@ class FulfillmentQueueService {
         }
 
         const { rows: existingRows } = await executor.query(
-            'SELECT * FROM fulfillment_jobs WHERE order_id = $1',
+            `SELECT id, order_id, status, attempts, max_attempts, created_at, updated_at
+             FROM fulfillment_jobs 
+             WHERE order_id = $1`,
             [orderId]
         );
         logger.info(`[QUEUE] Fulfillment job for order ${orderId} already terminal or actively processing.`);
@@ -95,7 +97,7 @@ class FulfillmentQueueService {
 
             // 1. Verify this claimed job is still processing under a row lock.
             const { rows: claimedJobs } = await client.query(
-                `SELECT *
+                `SELECT id, order_id, status, attempts, max_attempts, created_at, updated_at
                  FROM fulfillment_jobs
                  WHERE id = $1
                    AND status = 'PROCESSING'
@@ -112,7 +114,12 @@ class FulfillmentQueueService {
 
             // 3. Fetch Order details
             const { rows: orders } = await client.query(
-                `SELECT * FROM product_orders WHERE id = $1 FOR UPDATE`,
+                `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                        seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                        delivery_location, shipping_address, metadata, created_at, updated_at
+                 FROM product_orders 
+                 WHERE id = $1 
+                 FOR UPDATE`,
                 [job.order_id]
             );
 
@@ -127,7 +134,11 @@ class FulfillmentQueueService {
 
             await OrderFulfillmentTransitionService.executeFulfillment(client, order);
             const { rows: [updatedOrder] } = await client.query(
-                'SELECT * FROM product_orders WHERE id = $1',
+                `SELECT id, order_number, status, payment_status, total_amount, platform_fee_amount,
+                        seller_payout_amount, seller_id, buyer_id, fulfillment_type, order_type,
+                        delivery_location, shipping_address, metadata, created_at, updated_at
+                 FROM product_orders 
+                 WHERE id = $1`,
                 [order.id]
             );
             order = updatedOrder || order;
