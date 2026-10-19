@@ -45,16 +45,28 @@ class ProductModel {
     }
 
     static async findById(id) {
-        const { rows } = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+        const { rows } = await pool.query(
+            `SELECT id, seller_id, name, description, price, product_type::text AS product_type,
+                    category, images, is_digital, digital_file_path, digital_file_name,
+                    track_inventory, quantity, reserved_quantity, status, service_options,
+                    created_at, updated_at
+             FROM products 
+             WHERE id = $1`,
+            [id]
+        );
         return rows[0];
     }
 
     static async findBySellerId(sellerId) {
         const query = `
-      SELECT * FROM products 
-      WHERE seller_id = $1 
-      ORDER BY created_at DESC
-    `;
+          SELECT id, seller_id, name, description, price, product_type::text AS product_type,
+                 category, images, is_digital, digital_file_path, digital_file_name,
+                 track_inventory, quantity, reserved_quantity, status, service_options,
+                 created_at, updated_at
+          FROM products 
+          WHERE seller_id = $1 
+          ORDER BY created_at DESC
+        `;
         const { rows } = await pool.query(query, [sellerId]);
         return rows;
     }

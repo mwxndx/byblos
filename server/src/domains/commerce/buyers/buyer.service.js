@@ -51,7 +51,10 @@ class BuyerService {
             await client.query('BEGIN');
 
             const existingUserResult = await client.query(
-                'SELECT * FROM users WHERE LOWER(email) = $1 FOR UPDATE',
+                `SELECT id, email, password_hash, role, is_active, created_at
+                 FROM users 
+                 WHERE LOWER(email) = $1 
+                 FOR UPDATE`,
                 [normalizedEmail]
             );
             const lockedUser = existingUserResult.rows[0];
