@@ -51,10 +51,15 @@ export function ThemeManager() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (typeof document !== 'undefined' && isNativeApp()) {
-      document.documentElement.classList.add('native-app', 'capacitor-native');
-      if (getDevicePlatform() === 'android') {
-        document.documentElement.classList.add('android-native');
+    if (typeof document !== 'undefined') {
+      if (isNativeApp()) {
+        document.documentElement.classList.add('native-app', 'capacitor-native');
+        if (getDevicePlatform() === 'android') {
+          document.documentElement.classList.add('android-native');
+        }
+      }
+      if ((window.navigator as unknown as { standalone?: boolean })?.standalone) {
+        document.documentElement.classList.add('pwa-standalone');
       }
     }
   }, []);

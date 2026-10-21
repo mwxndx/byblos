@@ -31,8 +31,12 @@ body,
 }
 
 :root {
-    /* ── Safe-area inset CSS variables (set by browser env or native fallback) ─────── */
-    --sat: max(env(safe-area-inset-top, 0px), 0px);
+    /* ── Safe-area inset CSS variables (set by browser env or native fallback) ───────
+       In standard webapp browser mode (Safari/Chrome), browser chrome manages the top area.
+       Default --sat to 0px so the webapp on iOS does not render an artificial blank gap
+       above headers. Top inset is only activated in standalone PWA or native app where the
+       webview extends full-screen behind the iOS status bar. */
+    --sat: 0px;
     --sab: max(env(safe-area-inset-bottom, 0px), 0px);
     --sal: max(env(safe-area-inset-left, 0px), 0px);
     --sar: max(env(safe-area-inset-right, 0px), 0px);
@@ -47,6 +51,17 @@ body,
     --r-pill: 999px;
     --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
     --dur: 0.28s;
+}
+
+/* ── Standalone PWA Safe Area Inset Override (iOS Home Screen / full-screen web app) ── */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+    :root {
+        --sat: max(env(safe-area-inset-top, 0px), 0px);
+    }
+}
+
+html.pwa-standalone {
+    --sat: max(env(safe-area-inset-top, 0px), 0px);
 }
 
 /* ── Capacitor Native Mobile (Android & iOS) Safe Area Overrides ── */

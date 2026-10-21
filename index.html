@@ -75,6 +75,9 @@
         if (metaLight) metaLight.setAttribute('content', isDark ? '#000000' : '#f5f4f0');
         var statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
         if (statusMeta) statusMeta.setAttribute('content', 'black-translucent');
+        if (window.navigator && window.navigator.standalone) {
+          doc.classList.add('pwa-standalone');
+        }
       } catch (e) {}
     })();
   </script>
