@@ -66,9 +66,10 @@ describe('MarketplaceIndex (Simplified Landing Page)', () => {
     expect(screen.queryByText(/click here to add business/i)).not.toBeInTheDocument();
   });
 
-  it('renders ambient background pattern and dot grid behind the buttons', () => {
-    const { container } = renderPage();
-    const dotGrid = container.querySelector('[data-testid="landing-dot-grid"]');
-    expect(dotGrid).toBeInTheDocument();
+  it('renders concentric architectural rings behind the content to utilize negative space', () => {
+    renderPage();
+    const ringsContainer = screen.getByTestId('landing-concentric-rings');
+    expect(ringsContainer).toBeInTheDocument();
+    expect(ringsContainer).toHaveClass('pointer-events-none');
   });
 });

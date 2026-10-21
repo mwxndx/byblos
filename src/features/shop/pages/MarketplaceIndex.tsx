@@ -11,21 +11,30 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybl
  * - Vertically stacked buttons of equal length: Creator, View Brands, Add Brand
  * - Yellow buttons with black text
  * - Spacing between buttons increased by 3 (gap-6)
- * - Ambient brand glow & masked radial dot matrix pattern in the negative space
+ * - Concentric architectural rings to activate negative space
  * - Swipe-up action deleted
  */
 const LandingHome = () => (
   <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200">
-    {/* Ambient background pattern: warm brand glow and masked radial dot grid */}
+    {/* Concentric Architectural Rings behind all buttons and content */}
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[480px] w-[360px] rounded-full bg-brand/10 blur-[110px]"
-    />
-    <div
-      aria-hidden="true"
-      data-testid="landing-dot-grid"
-      className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_30%,transparent_100%)]"
-    />
+      data-testid="landing-concentric-rings"
+      className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
+    >
+      {/* Ring 1 (innermost, warm accent hint) */}
+      <div className="absolute h-[280px] w-[280px] rounded-full border border-brand/[0.08]" />
+      {/* Ring 2 */}
+      <div className="absolute h-[440px] w-[440px] rounded-full border border-white/[0.05]" />
+      {/* Ring 3 */}
+      <div className="absolute h-[620px] w-[620px] rounded-full border border-white/[0.035]" />
+      {/* Ring 4 */}
+      <div className="absolute h-[820px] w-[820px] rounded-full border border-white/[0.02]" />
+      {/* Ring 5 (outer ambient contour) */}
+      <div className="absolute h-[1040px] w-[1040px] rounded-full border border-white/[0.015]" />
+      {/* Soft ambient center glow */}
+      <div className="absolute h-[340px] w-[340px] rounded-full bg-brand/[0.03] blur-[100px]" />
+    </div>
 
     <Link
       to="/mzigo/login"
@@ -59,19 +68,19 @@ const LandingHome = () => (
       {/* Buttons of identical length with yellow background, black text, and gap-6 spacing */}
       <div className="flex w-full flex-col items-center gap-6">
         <Link to="/creator/login" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all shadow-sm">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             Creator
           </Button>
         </Link>
 
         <Link to="/buyer/login" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all shadow-sm">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             View Brands
           </Button>
         </Link>
 
         <Link to="/seller/register" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all shadow-sm">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             Add Brand
           </Button>
         </Link>
