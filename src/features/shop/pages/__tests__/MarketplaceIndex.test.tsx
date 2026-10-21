@@ -14,35 +14,50 @@ describe('MarketplaceIndex (Simplified Landing Page)', () => {
       </HelmetProvider>
     );
 
-  it('renders the 24px by 24px logo above the creator button', () => {
+  it('renders the 144px logo (scaled 6x from 24px) above the creator button', () => {
     renderPage();
     const logos = screen.getAllByAltText('Byblos logo');
     expect(logos.length).toBeGreaterThanOrEqual(1);
     for (const logo of logos) {
-      expect(logo).toHaveClass('h-6');
-      expect(logo).toHaveClass('w-6');
+      expect(logo).toHaveClass('h-36');
+      expect(logo).toHaveClass('w-36');
     }
   });
 
-  it('renders the Creator button linking to /creator/login', () => {
+  it('renders the Creator button with yellow background and black text linking to /creator/login', () => {
     renderPage();
     const creatorLink = screen.getByRole('link', { name: /^creator$/i });
     expect(creatorLink).toBeInTheDocument();
     expect(creatorLink).toHaveAttribute('href', '/creator/login');
+    const button = creatorLink.querySelector('button');
+    expect(button).toHaveClass('bg-brand');
+    expect(button).toHaveClass('text-black');
   });
 
-  it('renders the View Brands button linking to /buyer/login', () => {
+  it('renders the View Brands button with yellow background and black text linking to /buyer/login', () => {
     renderPage();
     const viewBrandsLink = screen.getByRole('link', { name: /view brands/i });
     expect(viewBrandsLink).toBeInTheDocument();
     expect(viewBrandsLink).toHaveAttribute('href', '/buyer/login');
+    const button = viewBrandsLink.querySelector('button');
+    expect(button).toHaveClass('bg-brand');
+    expect(button).toHaveClass('text-black');
   });
 
-  it('renders the Add Brand button linking to /seller/register', () => {
+  it('renders the Add Brand button with yellow background and black text linking to /seller/register', () => {
     renderPage();
     const addBrandLink = screen.getByRole('link', { name: /add brand/i });
     expect(addBrandLink).toBeInTheDocument();
     expect(addBrandLink).toHaveAttribute('href', '/seller/register');
+    const button = addBrandLink.querySelector('button');
+    expect(button).toHaveClass('bg-brand');
+    expect(button).toHaveClass('text-black');
+  });
+
+  it('arranges buttons with gap-6 (increased by 3)', () => {
+    const { container } = renderPage();
+    const buttonGroup = container.querySelector('.gap-6');
+    expect(buttonGroup).toBeInTheDocument();
   });
 
   it('does not contain the swipe up element or text', () => {

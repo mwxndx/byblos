@@ -7,8 +7,10 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybl
 
 /**
  * Simplified Byblos landing screen:
- * - 24px x 24px centered logo
+ * - 144px x 144px centered logo (6x scale from 24px)
  * - Vertically stacked buttons of equal length: Creator, View Brands, Add Brand
+ * - Yellow buttons with black text
+ * - Spacing between buttons increased by 3 (gap-6)
  * - Swipe-up action deleted
  */
 const LandingHome = () => (
@@ -24,40 +26,40 @@ const LandingHome = () => (
     </Link>
 
     <main className="relative z-10 flex w-full max-w-xs flex-col items-center text-center">
-      {/* 24px by 24px logo above the creator button */}
-      <div className="mb-6 flex items-center justify-center">
+      {/* Logo scaled by a factor of 6 (24px * 6 = 144px -> h-36 w-36) above the creator button */}
+      <div className="mb-8 flex items-center justify-center">
         <img
           src="/byblos-mark-dark.png"
           alt="Byblos logo"
-          className="hidden dark:block h-6 w-6 object-contain"
-          width={24}
-          height={24}
+          className="hidden dark:block h-36 w-36 object-contain"
+          width={144}
+          height={144}
         />
         <img
           src="/byblos-mark-light.png"
           alt="Byblos logo"
-          className="block dark:hidden h-6 w-6 object-contain"
-          width={24}
-          height={24}
+          className="block dark:hidden h-36 w-36 object-contain"
+          width={144}
+          height={144}
         />
       </div>
 
-      {/* Buttons of identical length */}
-      <div className="flex w-full flex-col items-center gap-3">
+      {/* Buttons of identical length with yellow background, black text, and gap-6 spacing */}
+      <div className="flex w-full flex-col items-center gap-6">
         <Link to="/creator/login" className="w-full">
-          <Button className="w-full h-11 rounded-full border border-separator bg-fill text-sm font-semibold text-label hover:bg-fill-2 active:scale-[0.98] transition-all">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             Creator
           </Button>
         </Link>
 
         <Link to="/buyer/login" className="w-full">
-          <Button className="w-full h-11 rounded-full border border-separator bg-fill text-sm font-semibold text-label hover:bg-fill-2 active:scale-[0.98] transition-all">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             View Brands
           </Button>
         </Link>
 
         <Link to="/seller/register" className="w-full">
-          <Button className="w-full h-11 rounded-full border border-separator bg-fill text-sm font-semibold text-label hover:bg-fill-2 active:scale-[0.98] transition-all">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             Add Brand
           </Button>
         </Link>
