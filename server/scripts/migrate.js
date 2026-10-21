@@ -41,7 +41,7 @@ console.log(`.env exists: ${envExists}`);
 console.log('------------------------');
 
 // Load .env explicitly
-dotenv.config({ path: envPath, override: true });
+dotenv.config({ path: envPath, override: false });
 
 const { Pool } = pg;
 
