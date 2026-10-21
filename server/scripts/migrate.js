@@ -161,7 +161,8 @@ async function run() {
                 // the snapshot. Guarded on both `users` and `pgmigrations` being
                 // absent so this only ever fires on a truly empty database.
                 console.log(`[${new Date().toISOString()}] [INFO] Empty database detected — applying full schema snapshot (test/schema.sql) to bootstrap...`);
-                const snapshotSql = fs.readFileSync(SCHEMA_SNAPSHOT_FILE, 'utf8');
+                let snapshotSql = fs.readFileSync(SCHEMA_SNAPSHOT_FILE, 'utf8');
+snapshotSql = snapshotSql.replace(/SET\s+transaction_timeout\s*=\s*0\s*;/gi, '-- SET transaction_timeout = 0;');
                 await pool.query(snapshotSql);
                 console.log(`[${new Date().toISOString()}] [SUCCESS] Schema snapshot applied; incremental migrations newer than the snapshot (if any) will run next.`);
             } else if (hasUsers && !hasRefundRequests && fs.existsSync(UNIFIED_SCHEMA_FILE)) {
