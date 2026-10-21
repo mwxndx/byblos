@@ -63,7 +63,7 @@ function validateStagingTarget(targetUrl) {
   // Allowed staging patterns: staging subdomain, localhost, or explicit staging environment
   const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
   const isStagingDomain = hostname.startsWith('staging.') || hostname.includes('staging');
-  const isPreview = hostname.includes('.vercel.app') || hostname.includes('.render.com');
+  const isPreview = hostname.includes('.vercel.app');
 
   if (!isLocal && !isStagingDomain && !isPreview) {
     console.warn(`[WARN] Target host "${hostname}" is not recognized as a standard staging pattern. Proceeding with caution.`);

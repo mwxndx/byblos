@@ -92,7 +92,7 @@ async function runAudit() {
   const dbUser = env.DB_USER || 'postgres';
   const dbPassword = env.DB_PASSWORD || 'postgres';
 
-  const isDbSafe = dbName.endsWith('_test') && !dbHost.includes('render.com') && !dbHost.includes('amazonaws.com');
+  const isDbSafe = dbName.endsWith('_test') && !dbHost.includes('amazonaws.com');
   check('Safety Guard', 'Test DB name ends with _test and host is isolated', isDbSafe, `${dbHost}:${dbPort}/${dbName}`);
 
   const mockPaymentsConfigured = (

@@ -251,7 +251,7 @@ export default async (app) => {
         });
     });
 
-    // Root health check endpoints for cloud monitoring and keep-alive (UptimeRobot, Render, Kubernetes)
+    // Root health check endpoints for cloud monitoring and keep-alive (UptimeRobot, AWS, Kubernetes)
     app.get(['/health', '/api/health', '/ping'], async (req, res) => {
         try {
             res.status(200).json({

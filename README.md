@@ -17,7 +17,7 @@ This repository is a two-part project:
 | Payments | Paystack (M‑Pesa STK, card), escrow settlement, seller payouts |
 | Media | Cloudinary |
 | Tests | Vitest (frontend), Node’s built-in `node:test` (backend), Playwright (E2E) |
-| Hosting | Vercel (frontend), Render (API + worker + Postgres + Redis) |
+| Hosting | Vercel (frontend), AWS (API + worker + Postgres + Redis) |
 
 ## Prerequisites
 
@@ -97,8 +97,8 @@ The same React app runs inside the Capacitor WebView; native-only behaviour is g
 
 ## Deployment
 
-- **Frontend → Vercel.** `vercel.json` rewrites `/api/*` to the Render API, serves the SPA for all other paths, and 301-redirects the apex host to `www`. Canonical host is `https://www.byblosafrica.site`.
-- **Backend → Render.** `server/render.yaml` defines the API web service (migrations run before deploy), a background worker, PostgreSQL, and Redis. A single service can also run everything in-process — see **Process roles** in [server/README.md](server/README.md).
+- **Frontend → Vercel.** `vercel.json` rewrites `/api/*` to the AWS API (`https://api.byblosafrica.site`), serves the SPA for all other paths, and 301-redirects the apex host to `www`. Canonical host is `https://www.byblosafrica.site`.
+- **Backend → AWS.** Hosted on AWS EC2/Lightsail with Nginx reverse proxy, PostgreSQL, and Redis. A single service can also run everything in-process — see **Process roles** in [server/README.md](server/README.md).
 
 ## Project structure
 

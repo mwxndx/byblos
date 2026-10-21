@@ -44,7 +44,7 @@ if (process.env.NODE_ENV === 'test') {
   const dbHost = String(process.env.DB_HOST || '');
   const dbUrl = String(process.env.DATABASE_URL || '');
 
-  const isProdHost = dbHost.includes('render.com') || dbHost.includes('amazonaws.com') || dbUrl.includes('render.com');
+  const isProdHost = dbHost.includes('amazonaws.com') || dbUrl.includes('amazonaws.com');
   const isSafeTestDb = dbName.endsWith('_test') || dbName.includes('test');
 
   if (isProdHost) {

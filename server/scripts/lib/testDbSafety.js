@@ -49,7 +49,7 @@ export function requireSafeTestDbConfig() {
   const user = process.env.DB_USER;
   const password = process.env.DB_PASSWORD;
 
-  const isProdHost = host.includes('render.com') || host.includes('amazonaws.com') || databaseUrl.includes('render.com');
+  const isProdHost = host.includes('amazonaws.com') || databaseUrl.includes('amazonaws.com');
   const isSafeTestDb = name.toLowerCase().endsWith('_test') || name.toLowerCase().includes('test');
 
   if (isProdHost) {

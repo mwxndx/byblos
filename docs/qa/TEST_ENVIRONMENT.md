@@ -40,7 +40,7 @@ flowchart TD
 
 ### Safety Boundaries
 
-- **Database Name Guard:** `server/src/infrastructure/database/database.js` and `server/scripts/lib/testDbSafety.js` mandate that `NODE_ENV === 'test'` and `DB_NAME` ends with `_test`. Any connection attempt to hostnames containing `render.com` or `amazonaws.com` is aborted immediately.
+- **Database Name Guard:** `server/src/infrastructure/database/database.js` and `server/scripts/lib/testDbSafety.js` mandate that `NODE_ENV === 'test'` and `DB_NAME` ends with `_test`. Any connection attempt to hostnames containing `amazonaws.com` is aborted immediately.
 - **Payment Gateway Isolation:** No real M-Pesa STK push or Paystack charges occur during testing. Test configurations default to mock endpoints and synthetic responses.
 - **Disposable Volumes:** `docker-compose.test.yml` mounts PostgreSQL data on `tmpfs`, ensuring no state persists across restarts or resets.
 
