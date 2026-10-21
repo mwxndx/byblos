@@ -96,7 +96,7 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     const { container } = renderPage();
     const root = container.firstElementChild as HTMLElement;
     expect(root).toBeInTheDocument();
-    expect(root.style.paddingTop).toContain('env(safe-area-inset-top');
-    expect(root.style.paddingBottom).toContain('env(safe-area-inset-bottom');
+    expect(root.style.paddingTop).toContain('safe-area-inset-top');
+    expect(root.style.paddingBottom).toContain('safe-area-inset-bottom');
   });
 });

@@ -20,10 +20,10 @@ const LandingHome = () => (
   <div
     className="relative flex min-h-[100svh] min-h-[-webkit-fill-available] w-full flex-col items-center justify-center bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200 overflow-x-hidden overflow-y-auto"
     style={{
-      paddingTop: 'max(1.5rem, env(safe-area-inset-top, 0px))',
-      paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))',
-      paddingLeft: 'max(1.5rem, env(safe-area-inset-left, 0px))',
-      paddingRight: 'max(1.5rem, env(safe-area-inset-right, 0px))',
+      paddingTop: 'max(1rem, env(safe-area-inset-top, 0px))',
+      paddingBottom: 'max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem))',
+      paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
+      paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
     }}
   >
     {/* 90 evenly spread background doodles placed behind all buttons */}
@@ -33,8 +33,8 @@ const LandingHome = () => (
       to="/mzigo/login"
       className="absolute z-10"
       style={{
-        top: 'max(1.25rem, calc(0.75rem + env(safe-area-inset-top, 0px)))',
-        left: 'max(1.25rem, calc(0.75rem + env(safe-area-inset-left, 0px)))',
+        top: 'max(1rem, calc(0.5rem + env(safe-area-inset-top, 0px)))',
+        left: 'max(1rem, calc(0.5rem + env(safe-area-inset-left, 0px)))',
       }}
       aria-label="Mzigo Ego delivery partner login"
     >

@@ -97,10 +97,10 @@ const LANDING_DOODLES: DoodleSpec[] = Array.from({ length: COLS * ROWS }, (_, i)
   const r = Math.floor(i / COLS);
   const c = i % COLS;
 
-  // Evenly distributed staggered lattice (row offset guarantees maximal distance between neighbors)
+  // Evenly distributed staggered lattice from top (2%) to bottom (98%)
   const xOffset = r % 2 === 0 ? 0.3 : 0.7;
   const x = Number((((c + xOffset) / COLS) * 100).toFixed(1));
-  const y = Number((((r + 0.5) / ROWS) * 100).toFixed(1));
+  const y = Number((2 + (r / (ROWS - 1)) * 96).toFixed(1));
 
   const rot = Math.round((rand() - 0.5) * 50); // Balanced subtle doodle tilt (-25deg to +25deg)
   const size = 22; // Uniform balanced glyph size across all screen sizes
