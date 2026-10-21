@@ -196,41 +196,39 @@ const ShopPage = () => {
         </div>
 
         {filteredProducts.length > 0 ? (
-          <div className="shop-products-card rounded-[2rem] p-5 sm:p-10 sm:rounded-card transition-all duration-300">
-            <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
-              {filteredProducts.map((product) => {
-                // Ensure the product has the seller info from the shop
-                const productWithSeller: Product & { seller?: Seller; isSold?: boolean; } = {
-                  ...product,
-                  aesthetic: isAesthetic(product.aesthetic) ? product.aesthetic : 'all',
-                  seller: sellerInfo ? {
-                    id: sellerInfo.id,
-                    fullName: sellerInfo.fullName || '',
-                    email: sellerInfo.email || '',
-                    phone: sellerInfo.phone || '',
-                    whatsappNumber: sellerInfo.whatsappNumber || sellerInfo.phone || '',
-                    shopName: sellerInfo.shopName || '',
-                    bannerUrl: '',
-                    location: sellerInfo.location || '',
-                    // New physical shop fields
-                    hasPhysicalShop: !!sellerInfo.physicalAddress,
-                    physicalAddress: sellerInfo.physicalAddress,
-                    latitude: sellerInfo.latitude,
-                    longitude: sellerInfo.longitude,
-                    theme: sellerInfo.theme,
-                    // Add any other required fields from Seller interface with defaults
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                  } : undefined
-                };
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+            {filteredProducts.map((product) => {
+              // Ensure the product has the seller info from the shop
+              const productWithSeller: Product & { seller?: Seller; isSold?: boolean; } = {
+                ...product,
+                aesthetic: isAesthetic(product.aesthetic) ? product.aesthetic : 'all',
+                seller: sellerInfo ? {
+                  id: sellerInfo.id,
+                  fullName: sellerInfo.fullName || '',
+                  email: sellerInfo.email || '',
+                  phone: sellerInfo.phone || '',
+                  whatsappNumber: sellerInfo.whatsappNumber || sellerInfo.phone || '',
+                  shopName: sellerInfo.shopName || '',
+                  bannerUrl: '',
+                  location: sellerInfo.location || '',
+                  // New physical shop fields
+                  hasPhysicalShop: !!sellerInfo.physicalAddress,
+                  physicalAddress: sellerInfo.physicalAddress,
+                  latitude: sellerInfo.latitude,
+                  longitude: sellerInfo.longitude,
+                  theme: sellerInfo.theme,
+                  // Add any other required fields from Seller interface with defaults
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString()
+                } : undefined
+              };
 
-                return (
-                  <div key={product.id}>
-                    <ShopBagProductCard product={productWithSeller} isReadOnly={isCreatorPreview} />
-                  </div>
-                );
-              })}
-            </div>
+              return (
+                <div key={product.id}>
+                  <ShopBagProductCard product={productWithSeller} isReadOnly={isCreatorPreview} />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div className="shop-products-card text-center py-16 rounded-3xl p-8 transition-all duration-300 border border-[var(--byblos-border)]">

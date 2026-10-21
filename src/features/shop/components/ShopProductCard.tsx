@@ -108,8 +108,11 @@ export function ShopProductCard({
           borderColor: 'var(--product-card-border, var(--byblos-border, rgba(0, 0, 0, 0.1)))',
         }}
         className={cn(
-          'group relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-300 sm:rounded-2xl',
-          isSold ? 'cursor-not-allowed opacity-70' : 'cursor-pointer sm:hover:-translate-y-1',
+          'product-card-item group relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-300 sm:rounded-2xl',
+          'shadow-[0_4px_16px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.45),0_1px_2px_rgba(255,255,255,0.05)]',
+          isSold
+            ? 'cursor-not-allowed opacity-70'
+            : 'cursor-pointer hover:-translate-y-1.5 hover:shadow-[0_16px_36px_-6px_rgba(0,0,0,0.14),0_6px_16px_-4px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_42px_-8px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.12)] active:translate-y-0 active:scale-[0.99]',
           inBag && 'ring-2 ring-[var(--product-card-accent,#f5c518)]',
         )}
       >
@@ -171,9 +174,9 @@ export function ShopProductCard({
         </div>
 
         {/* Name, price, description & images buttons — theme-aware label colour (black/white by light/dark). */}
-        <div className="flex flex-1 flex-col justify-between gap-1 p-2 sm:p-2.5">
+        <div className="flex flex-1 flex-col justify-between gap-2 p-3 sm:p-3.5 min-h-[96px] sm:min-h-[108px]">
           {/* Product name on left, image icon to the right */}
-          <div className="flex items-center justify-between gap-1.5">
+          <div className="flex items-center justify-between gap-2">
             <h3
               className="min-w-0 flex-1 truncate text-xs font-normal tracking-tight text-label sm:text-sm"
               title={product.name}
@@ -185,14 +188,14 @@ export function ShopProductCard({
               type="button"
               onClick={(e) => { stop(e); setActiveImageIndex(0); setShowImages(true); }}
               aria-label={`View ${product.name} images`}
-              className="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer text-label hover:opacity-75 transition-opacity shrink-0"
+              className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0"
             >
-              <ImageIcon className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
+              <ImageIcon className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
             </button>
           </div>
 
           {/* Price on left, description icon on right */}
-          <div className="mt-auto flex items-center justify-between gap-1 pt-1">
+          <div className="mt-auto flex items-center justify-between gap-2 pt-1">
             <p className="text-sm font-normal tabular-nums text-label sm:text-base">
               {formatCurrency(product.price)}
             </p>
@@ -201,9 +204,9 @@ export function ShopProductCard({
               type="button"
               onClick={(e) => { stop(e); setShowDescription(true); }}
               aria-label={`View ${product.name} description`}
-              className="inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer text-label hover:opacity-75 transition-opacity shrink-0"
+              className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0"
             >
-              <Info className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
+              <Info className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
             </button>
           </div>
         </div>
