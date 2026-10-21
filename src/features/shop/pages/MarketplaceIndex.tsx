@@ -18,10 +18,10 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybl
  */
 const LandingHome = () => (
   <div
-    className="relative flex min-h-[100svh] min-h-[-webkit-fill-available] w-full flex-col items-center justify-center bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200 overflow-x-hidden overflow-y-auto"
+    className="relative flex min-h-[100dvh] min-h-[100svh] w-full flex-col items-center justify-center bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200 overflow-x-hidden overflow-y-auto"
     style={{
       paddingTop: 'max(1rem, env(safe-area-inset-top, 0px))',
-      paddingBottom: 'max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 4.5rem))',
+      paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))',
       paddingLeft: 'max(1rem, env(safe-area-inset-left, 0px))',
       paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
     }}
@@ -33,8 +33,8 @@ const LandingHome = () => (
       to="/mzigo/login"
       className="absolute z-10"
       style={{
-        top: 'max(1rem, calc(0.5rem + env(safe-area-inset-top, 0px)))',
-        left: 'max(1rem, calc(0.5rem + env(safe-area-inset-left, 0px)))',
+        top: 'max(1rem, env(safe-area-inset-top, 1rem))',
+        left: 'max(1rem, env(safe-area-inset-left, 1rem))',
       }}
       aria-label="Mzigo Ego delivery partner login"
     >

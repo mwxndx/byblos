@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="color-scheme" content="dark light">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" id="theme-color-dark" />
+  <meta name="theme-color" content="#f5f4f0" media="(prefers-color-scheme: light)" id="theme-color-light" />
   <meta name="theme-color" content="#000000" id="theme-color-meta" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -67,6 +69,10 @@
         }
         var meta = document.getElementById('theme-color-meta');
         if (meta) meta.setAttribute('content', isDark ? '#000000' : '#f5f4f0');
+        var metaDark = document.getElementById('theme-color-dark');
+        if (metaDark) metaDark.setAttribute('content', isDark ? '#000000' : '#f5f4f0');
+        var metaLight = document.getElementById('theme-color-light');
+        if (metaLight) metaLight.setAttribute('content', isDark ? '#000000' : '#f5f4f0');
         var statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
         if (statusMeta) statusMeta.setAttribute('content', 'black-translucent');
       } catch (e) {}
