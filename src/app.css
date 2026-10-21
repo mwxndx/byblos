@@ -87,6 +87,7 @@ body.android-native {
 nav.fixed.bottom-0 {
     bottom: 0 !important;
     margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
     background-color: var(--byblos-bg) !important;
 }
 .mt-safe-top {

@@ -25,9 +25,23 @@ export function applyResolvedTheme(resolved: 'light' | 'dark'): void {
   el.classList.toggle('dark', resolved === 'dark');
   el.classList.toggle('light', resolved === 'light');
 
+  const themeColor = resolved === 'light' ? '#f5f4f0' : '#000000';
   const metaThemeColor = document.getElementById('theme-color-meta') || document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', resolved === 'light' ? '#f5f4f0' : '#000000');
+    metaThemeColor.setAttribute('content', themeColor);
+  }
+
+  // Update all theme-color meta tags so Android and mobile browsers render the matching status bar icon tint
+  const allThemeMetas = document.querySelectorAll('meta[name="theme-color"]');
+  allThemeMetas.forEach((meta) => {
+    meta.setAttribute('content', themeColor);
+  });
+
+  // iOS status bar text style: 'default' = dark text (black time/battery for light backgrounds),
+  // 'black-translucent' = light text (white time/battery for dark backgrounds)
+  const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (statusMeta) {
+    statusMeta.setAttribute('content', resolved === 'light' ? 'default' : 'black-translucent');
   }
 
   // Keep the native (Android) keyboard accessory bar in step with the app theme,

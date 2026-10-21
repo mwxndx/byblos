@@ -2,14 +2,12 @@ import { Button } from '@/shared/ui/button';
 import { Link } from 'react-router-dom';
 import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 import { SEOHead } from '@/shared/components/SEOHead';
-import { LandingDoodles } from '@/features/shop/components/LandingDoodles';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
 
 /**
  * Simplified Byblos landing screen:
- * - 90 ambient category doodles in the background at 30% opacity, spread out evenly
- * - All buttons placed in z-10 above the doodles
+ * - Clean solid background adapted for light & dark themes
  * - Responsive safe-area layout adapted for iOS (Dynamic Island/home bar) & Android (status/nav bars)
  * - 144px x 144px centered logo
  * - Vertically stacked buttons of equal length: View Brands, Add Brand, Creator
@@ -26,9 +24,6 @@ const LandingHome = () => (
       paddingRight: 'max(1rem, env(safe-area-inset-right, 0px))',
     }}
   >
-    {/* 90 evenly spread background doodles placed behind all buttons */}
-    <LandingDoodles />
-
     <Link
       to="/mzigo/login"
       className="absolute z-10"

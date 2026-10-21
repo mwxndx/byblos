@@ -72,24 +72,9 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(screen.queryByText(/click here to add business/i)).not.toBeInTheDocument();
   });
 
-  it('renders exactly 90 background doodles with 60% opacity placed behind the buttons', () => {
-    const { container } = renderPage();
-    const doodleContainer = screen.getByTestId('landing-doodles');
-    expect(doodleContainer).toBeInTheDocument();
-    expect(doodleContainer).toHaveClass('pointer-events-none');
-    expect(doodleContainer).toHaveClass('z-0');
-
-    const doodleItems = screen.getAllByTestId('landing-doodle-item');
-    expect(doodleItems.length).toBe(90);
-
-    for (const item of doodleItems) {
-      expect(item).toHaveClass('opacity-60');
-      expect(item.style.opacity).toBe('0.6');
-    }
-
-    // Ensure the main button container has z-10 above the doodles (z-0)
-    const mainContent = container.querySelector('main');
-    expect(mainContent).toHaveClass('z-10');
+  it('does not render background doodles on the landing page', () => {
+    renderPage();
+    expect(screen.queryByTestId('landing-doodles')).not.toBeInTheDocument();
   });
 
   it('applies safe-area insets to ensure fit across iOS and Android device viewports', () => {
