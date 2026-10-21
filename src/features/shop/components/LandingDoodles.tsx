@@ -68,7 +68,7 @@ const DOODLE_ICON_POOL: Icon[] = [
   Diamond,
 ];
 
-// Seeded PRNG for reproducible, non-flashing layout across renders & SSR
+// Seeded PRNG for deterministic icon selection & rotations
 function createDeterministicRandom(seed: number) {
   let s = seed;
   return function () {
@@ -88,7 +88,7 @@ interface DoodleSpec {
   size: number;
 }
 
-// Generate exactly 90 evenly scattered doodles across a 9x10 jittered grid
+// Exactly 90 items spread out uniformly across a 9x10 staggered hexagonal grid
 const rand = createDeterministicRandom(20261021);
 const COLS = 9;
 const ROWS = 10; // 9 * 10 = 90 items
@@ -97,17 +97,13 @@ const LANDING_DOODLES: DoodleSpec[] = Array.from({ length: COLS * ROWS }, (_, i)
   const r = Math.floor(i / COLS);
   const c = i % COLS;
 
-  const baseX = (c + 0.5) * (100 / COLS);
-  const baseY = (r + 0.5) * (100 / ROWS);
+  // Evenly distributed staggered lattice (row offset guarantees maximal distance between neighbors)
+  const xOffset = r % 2 === 0 ? 0.3 : 0.7;
+  const x = Number((((c + xOffset) / COLS) * 100).toFixed(1));
+  const y = Number((((r + 0.5) / ROWS) * 100).toFixed(1));
 
-  // Organic jitter within each grid cell (+/- 4%)
-  const jitterX = (rand() - 0.5) * 8;
-  const jitterY = (rand() - 0.5) * 8;
-
-  const x = Math.max(3, Math.min(97, Number((baseX + jitterX).toFixed(1))));
-  const y = Math.max(3, Math.min(97, Number((baseY + jitterY).toFixed(1))));
-  const rot = Math.round((rand() - 0.5) * 70);
-  const size = Math.round(18 + rand() * 14); // 18px to 32px
+  const rot = Math.round((rand() - 0.5) * 50); // Balanced subtle doodle tilt (-25deg to +25deg)
+  const size = 22; // Uniform balanced glyph size across all screen sizes
 
   const iconIndex = Math.floor(rand() * DOODLE_ICON_POOL.length);
   const IconComponent = DOODLE_ICON_POOL[iconIndex];
@@ -123,8 +119,8 @@ const LANDING_DOODLES: DoodleSpec[] = Array.from({ length: COLS * ROWS }, (_, i)
 });
 
 /**
- * 90 ambient doodles peppered across the landing page background.
- * Opacity is strictly 60% per specification.
+ * 90 ambient doodles spread out evenly across the landing page background.
+ * Opacity is 30% (reduced by 30% from 60%).
  * Pointer-events-none and z-0 ensure all buttons and controls remain interactable above.
  */
 export const LandingDoodles: React.FC = () => {
@@ -132,7 +128,7 @@ export const LandingDoodles: React.FC = () => {
     <div
       aria-hidden="true"
       data-testid="landing-doodles"
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden select-none"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
     >
       {LANDING_DOODLES.map((doodle) => {
         const { id, IconComponent, x, y, rot, size } = doodle;
@@ -140,12 +136,12 @@ export const LandingDoodles: React.FC = () => {
           <div
             key={id}
             data-testid="landing-doodle-item"
-            className="absolute text-[var(--byblos-text,#f5f5f5)] opacity-60"
+            className="absolute text-[var(--byblos-text,#f5f5f5)] opacity-30"
             style={{
               top: `${y}%`,
               left: `${x}%`,
               transform: `translate(-50%, -50%) rotate(${rot}deg)`,
-              opacity: 0.6,
+              opacity: 0.3,
             }}
           >
             <IconComponent size={size} weight="regular" />

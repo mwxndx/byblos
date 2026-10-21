@@ -14,7 +14,7 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
       </HelmetProvider>
     );
 
-  it('renders the 144px logo (scaled 6x from 24px) above the creator button', () => {
+  it('renders the 144px logo (scaled 6x from 24px)', () => {
     renderPage();
     const logos = screen.getAllByAltText('Byblos logo');
     expect(logos.length).toBeGreaterThanOrEqual(1);
@@ -72,7 +72,7 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(screen.queryByText(/click here to add business/i)).not.toBeInTheDocument();
   });
 
-  it('renders exactly 90 background doodles with 60% opacity placed behind the buttons', () => {
+  it('renders exactly 90 background doodles with 30% opacity placed behind the buttons', () => {
     const { container } = renderPage();
     const doodleContainer = screen.getByTestId('landing-doodles');
     expect(doodleContainer).toBeInTheDocument();
@@ -83,12 +83,20 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(doodleItems.length).toBe(90);
 
     for (const item of doodleItems) {
-      expect(item).toHaveClass('opacity-60');
-      expect(item.style.opacity).toBe('0.6');
+      expect(item).toHaveClass('opacity-30');
+      expect(item.style.opacity).toBe('0.3');
     }
 
     // Ensure the main button container has z-10 above the doodles (z-0)
     const mainContent = container.querySelector('main');
     expect(mainContent).toHaveClass('z-10');
+  });
+
+  it('applies safe-area insets to ensure fit across iOS and Android device viewports', () => {
+    const { container } = renderPage();
+    const root = container.firstElementChild as HTMLElement;
+    expect(root).toBeInTheDocument();
+    expect(root.style.paddingTop).toContain('env(safe-area-inset-top');
+    expect(root.style.paddingBottom).toContain('env(safe-area-inset-bottom');
   });
 });

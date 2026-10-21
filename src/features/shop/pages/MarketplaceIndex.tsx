@@ -8,21 +8,34 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybl
 
 /**
  * Simplified Byblos landing screen:
- * - 90 ambient category doodles in the background at 60% opacity
+ * - 90 ambient category doodles in the background at 30% opacity, spread out evenly
  * - All buttons placed in z-10 above the doodles
+ * - Responsive safe-area layout adapted for iOS (Dynamic Island/home bar) & Android (status/nav bars)
  * - 144px x 144px centered logo
- * - Vertically stacked buttons of equal length: Creator, View Brands, Add Brand
+ * - Vertically stacked buttons of equal length: View Brands, Add Brand, Creator
  * - Yellow buttons with black text
  * - Spacing between buttons increased by 3 (gap-6)
  */
 const LandingHome = () => (
-  <div className="relative flex min-h-[100svh] items-center justify-center bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200 overflow-hidden">
-    {/* 90 random category doodles placed behind all buttons */}
+  <div
+    className="relative flex min-h-[100svh] min-h-[-webkit-fill-available] w-full flex-col items-center justify-center bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200 overflow-x-hidden overflow-y-auto"
+    style={{
+      paddingTop: 'max(1.5rem, env(safe-area-inset-top, 0px))',
+      paddingBottom: 'max(2rem, env(safe-area-inset-bottom, 0px))',
+      paddingLeft: 'max(1.5rem, env(safe-area-inset-left, 0px))',
+      paddingRight: 'max(1.5rem, env(safe-area-inset-right, 0px))',
+    }}
+  >
+    {/* 90 evenly spread background doodles placed behind all buttons */}
     <LandingDoodles />
 
     <Link
       to="/mzigo/login"
-      className="absolute left-5 top-[calc(1.25rem+env(safe-area-inset-top,0px))] z-10"
+      className="absolute z-10"
+      style={{
+        top: 'max(1.25rem, calc(0.75rem + env(safe-area-inset-top, 0px)))',
+        left: 'max(1.25rem, calc(0.75rem + env(safe-area-inset-left, 0px)))',
+      }}
       aria-label="Mzigo Ego delivery partner login"
     >
       <Button className="flex h-10 w-10 items-center justify-center rounded-full border border-separator bg-fill p-0 hover:bg-fill-2">
@@ -30,8 +43,8 @@ const LandingHome = () => (
       </Button>
     </Link>
 
-    <main className="relative z-10 flex w-full max-w-xs flex-col items-center text-center">
-      {/* Logo scaled by a factor of 6 (24px * 6 = 144px -> h-36 w-36) above the creator button */}
+    <main className="relative z-10 my-auto flex w-full max-w-xs flex-col items-center text-center">
+      {/* Logo scaled by a factor of 6 (24px * 6 = 144px -> h-36 w-36) */}
       <div className="mb-8 flex items-center justify-center">
         <img
           src="/byblos-mark-dark.png"
