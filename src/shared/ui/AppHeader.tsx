@@ -20,7 +20,7 @@ interface AppHeaderProps {
  *
  *  - sticky at the top of its scroll container (`top-0 z-50`)
  *  - safe-area / notch handling (`pt-safe-top`)
- *  - one fixed height (`min-h-14 sm:min-h-16` → 56/64px)
+ *  - compact mobile height (`min-h-11 sm:min-h-14 lg:min-h-16` → 44/56/64px)
  *  - one themed background token (`--bg`, which every theme scope aliases to
  *    `--byblos-bg`, so it resolves correctly in all role scopes)
  *
@@ -37,13 +37,13 @@ export function AppHeader({ left, center, right, className }: AppHeaderProps) {
     >
       <div className="w-full px-4 sm:px-6 lg:px-8">
         {center !== undefined ? (
-          <div className="grid min-h-14 grid-cols-[auto_1fr_auto] items-center gap-3 sm:min-h-16">
+          <div className="grid min-h-11 sm:min-h-14 lg:min-h-16 grid-cols-[auto_1fr_auto] items-center gap-3">
             <div className="flex min-w-0 items-center gap-2 justify-self-start">{left}</div>
             <div className="min-w-0 justify-self-center text-center">{center}</div>
             <div className="flex shrink-0 items-center gap-2 justify-self-end">{right}</div>
           </div>
         ) : (
-          <div className="flex min-h-14 items-center justify-between gap-3 sm:min-h-16">
+          <div className="flex min-h-11 sm:min-h-14 lg:min-h-16 items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2">{left}</div>
             <div className="flex shrink-0 items-center gap-2">{right}</div>
           </div>
