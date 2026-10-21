@@ -11,10 +11,22 @@ const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybl
  * - Vertically stacked buttons of equal length: Creator, View Brands, Add Brand
  * - Yellow buttons with black text
  * - Spacing between buttons increased by 3 (gap-6)
+ * - Ambient brand glow & masked radial dot matrix pattern in the negative space
  * - Swipe-up action deleted
  */
 const LandingHome = () => (
-  <div className="relative flex min-h-[100svh] items-center justify-center bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200">
+  <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200">
+    {/* Ambient background pattern: warm brand glow and masked radial dot grid */}
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[480px] w-[360px] rounded-full bg-brand/10 blur-[110px]"
+    />
+    <div
+      aria-hidden="true"
+      data-testid="landing-dot-grid"
+      className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_30%,transparent_100%)]"
+    />
+
     <Link
       to="/mzigo/login"
       className="absolute left-5 top-[calc(1.25rem+env(safe-area-inset-top,0px))] z-10"
@@ -47,19 +59,19 @@ const LandingHome = () => (
       {/* Buttons of identical length with yellow background, black text, and gap-6 spacing */}
       <div className="flex w-full flex-col items-center gap-6">
         <Link to="/creator/login" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all shadow-sm">
             Creator
           </Button>
         </Link>
 
         <Link to="/buyer/login" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all shadow-sm">
             View Brands
           </Button>
         </Link>
 
         <Link to="/seller/register" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all shadow-sm">
             Add Brand
           </Button>
         </Link>

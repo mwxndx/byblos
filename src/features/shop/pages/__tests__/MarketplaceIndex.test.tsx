@@ -65,4 +65,10 @@ describe('MarketplaceIndex (Simplified Landing Page)', () => {
     expect(screen.queryByText(/swipe up to add business/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/click here to add business/i)).not.toBeInTheDocument();
   });
+
+  it('renders ambient background pattern and dot grid behind the buttons', () => {
+    const { container } = renderPage();
+    const dotGrid = container.querySelector('[data-testid="landing-dot-grid"]');
+    expect(dotGrid).toBeInTheDocument();
+  });
 });
