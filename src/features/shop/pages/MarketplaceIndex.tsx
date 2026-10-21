@@ -51,12 +51,6 @@ const LandingHome = () => (
 
       {/* Buttons of identical length with yellow background, black text, and gap-6 spacing */}
       <div className="flex w-full flex-col items-center gap-6">
-        <Link to="/creator/login" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
-            Creator
-          </Button>
-        </Link>
-
         <Link to="/buyer/login" className="w-full">
           <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             View Brands
@@ -66,6 +60,12 @@ const LandingHome = () => (
         <Link to="/seller/register" className="w-full">
           <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
             Add Brand
+          </Button>
+        </Link>
+
+        <Link to="/creator/login" className="w-full">
+          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold hover:bg-brand-press active:scale-[0.98] transition-all">
+            Creator
           </Button>
         </Link>
       </div>

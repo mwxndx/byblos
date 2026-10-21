@@ -54,10 +54,16 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(button).toHaveClass('text-black');
   });
 
-  it('arranges buttons with gap-6 (increased by 3)', () => {
+  it('arranges buttons with gap-6 and in order: View Brands, Add Brand, Creator', () => {
     const { container } = renderPage();
     const buttonGroup = container.querySelector('.gap-6');
     expect(buttonGroup).toBeInTheDocument();
+
+    const links = buttonGroup ? Array.from(buttonGroup.querySelectorAll('a')) : [];
+    expect(links.length).toBe(3);
+    expect(links[0]).toHaveAttribute('href', '/buyer/login');
+    expect(links[1]).toHaveAttribute('href', '/seller/register');
+    expect(links[2]).toHaveAttribute('href', '/creator/login');
   });
 
   it('does not contain the swipe up element or text', () => {
