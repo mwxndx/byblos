@@ -72,7 +72,7 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(screen.queryByText(/click here to add business/i)).not.toBeInTheDocument();
   });
 
-  it('renders exactly 90 background doodles with 30% opacity placed behind the buttons', () => {
+  it('renders exactly 90 background doodles with 60% opacity placed behind the buttons', () => {
     const { container } = renderPage();
     const doodleContainer = screen.getByTestId('landing-doodles');
     expect(doodleContainer).toBeInTheDocument();
@@ -83,8 +83,8 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(doodleItems.length).toBe(90);
 
     for (const item of doodleItems) {
-      expect(item).toHaveClass('opacity-30');
-      expect(item.style.opacity).toBe('0.3');
+      expect(item).toHaveClass('opacity-60');
+      expect(item.style.opacity).toBe('0.6');
     }
 
     // Ensure the main button container has z-10 above the doodles (z-0)

@@ -31,12 +31,8 @@ body,
 }
 
 :root {
-    /* ── Safe-area inset CSS variables (set by browser env or native fallback) ───────
-       In standard webapp browser mode (Safari/Chrome), browser chrome manages the top area.
-       Default --sat to 0px so the webapp on iOS does not render an artificial blank gap
-       above headers. Top inset is only activated in standalone PWA or native app where the
-       webview extends full-screen behind the iOS status bar. */
-    --sat: 0px;
+    /* ── Safe-area inset CSS variables (set by browser env or native fallback) ─────── */
+    --sat: max(env(safe-area-inset-top, 0px), 0px);
     --sab: max(env(safe-area-inset-bottom, 0px), 0px);
     --sal: max(env(safe-area-inset-left, 0px), 0px);
     --sar: max(env(safe-area-inset-right, 0px), 0px);

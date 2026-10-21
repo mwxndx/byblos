@@ -35,7 +35,7 @@ export function AppHeader({ left, center, right, className }: AppHeaderProps) {
         className
       )}
     >
-      <div className="w-full px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 pt-2.5 pb-2 sm:pt-1 sm:pb-1 sm:px-6 lg:px-8">
         {center !== undefined ? (
           <div className="grid min-h-11 sm:min-h-14 lg:min-h-16 grid-cols-[auto_1fr_auto] items-center gap-3">
             <div className="flex min-w-0 items-center gap-2 justify-self-start">{left}</div>

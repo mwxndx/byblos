@@ -120,7 +120,7 @@ const LANDING_DOODLES: DoodleSpec[] = Array.from({ length: COLS * ROWS }, (_, i)
 
 /**
  * 90 ambient doodles spread out evenly across the landing page background.
- * Opacity is 30% (reduced by 30% from 60%).
+ * Opacity is 60%.
  * Pointer-events-none and z-0 ensure all buttons and controls remain interactable above.
  */
 export const LandingDoodles: React.FC = () => {
@@ -136,12 +136,12 @@ export const LandingDoodles: React.FC = () => {
           <div
             key={id}
             data-testid="landing-doodle-item"
-            className="absolute text-[var(--byblos-text,#f5f5f5)] opacity-30"
+            className="absolute text-[var(--byblos-text,#f5f5f5)] opacity-60"
             style={{
               top: `${y}%`,
               left: `${x}%`,
               transform: `translate(-50%, -50%) rotate(${rot}deg)`,
-              opacity: 0.3,
+              opacity: 0.6,
             }}
           >
             <IconComponent size={size} weight="regular" />
