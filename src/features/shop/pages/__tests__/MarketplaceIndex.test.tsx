@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import IndexPage from '../MarketplaceIndex';
 
-describe('MarketplaceIndex (Simplified Landing Page)', () => {
+describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
   const renderPage = () =>
     render(
       <HelmetProvider>
@@ -66,10 +66,23 @@ describe('MarketplaceIndex (Simplified Landing Page)', () => {
     expect(screen.queryByText(/click here to add business/i)).not.toBeInTheDocument();
   });
 
-  it('renders concentric architectural rings behind the content to utilize negative space', () => {
-    renderPage();
-    const ringsContainer = screen.getByTestId('landing-concentric-rings');
-    expect(ringsContainer).toBeInTheDocument();
-    expect(ringsContainer).toHaveClass('pointer-events-none');
+  it('renders exactly 90 background doodles with 60% opacity placed behind the buttons', () => {
+    const { container } = renderPage();
+    const doodleContainer = screen.getByTestId('landing-doodles');
+    expect(doodleContainer).toBeInTheDocument();
+    expect(doodleContainer).toHaveClass('pointer-events-none');
+    expect(doodleContainer).toHaveClass('z-0');
+
+    const doodleItems = screen.getAllByTestId('landing-doodle-item');
+    expect(doodleItems.length).toBe(90);
+
+    for (const item of doodleItems) {
+      expect(item).toHaveClass('opacity-60');
+      expect(item.style.opacity).toBe('0.6');
+    }
+
+    // Ensure the main button container has z-10 above the doodles (z-0)
+    const mainContent = container.querySelector('main');
+    expect(mainContent).toHaveClass('z-10');
   });
 });

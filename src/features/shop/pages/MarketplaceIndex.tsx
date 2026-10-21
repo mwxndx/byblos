@@ -2,39 +2,23 @@ import { Button } from '@/shared/ui/button';
 import { Link } from 'react-router-dom';
 import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 import { SEOHead } from '@/shared/components/SEOHead';
+import { LandingDoodles } from '@/features/shop/components/LandingDoodles';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
 
 /**
  * Simplified Byblos landing screen:
- * - 144px x 144px centered logo (6x scale from 24px)
+ * - 90 ambient category doodles in the background at 60% opacity
+ * - All buttons placed in z-10 above the doodles
+ * - 144px x 144px centered logo
  * - Vertically stacked buttons of equal length: Creator, View Brands, Add Brand
  * - Yellow buttons with black text
  * - Spacing between buttons increased by 3 (gap-6)
- * - Concentric architectural rings to activate negative space
- * - Swipe-up action deleted
  */
 const LandingHome = () => (
-  <div className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200">
-    {/* Concentric Architectural Rings behind all buttons and content */}
-    <div
-      aria-hidden="true"
-      data-testid="landing-concentric-rings"
-      className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
-    >
-      {/* Ring 1 (innermost, warm accent hint) */}
-      <div className="absolute h-[280px] w-[280px] rounded-full border border-brand/[0.08]" />
-      {/* Ring 2 */}
-      <div className="absolute h-[440px] w-[440px] rounded-full border border-white/[0.05]" />
-      {/* Ring 3 */}
-      <div className="absolute h-[620px] w-[620px] rounded-full border border-white/[0.035]" />
-      {/* Ring 4 */}
-      <div className="absolute h-[820px] w-[820px] rounded-full border border-white/[0.02]" />
-      {/* Ring 5 (outer ambient contour) */}
-      <div className="absolute h-[1040px] w-[1040px] rounded-full border border-white/[0.015]" />
-      {/* Soft ambient center glow */}
-      <div className="absolute h-[340px] w-[340px] rounded-full bg-brand/[0.03] blur-[100px]" />
-    </div>
+  <div className="relative flex min-h-[100svh] items-center justify-center bg-[var(--byblos-bg,#000000)] px-6 py-10 text-[var(--byblos-text,#f5f5f5)] selection:bg-yellow-300 selection:text-black transition-colors duration-200 overflow-hidden">
+    {/* 90 random category doodles placed behind all buttons */}
+    <LandingDoodles />
 
     <Link
       to="/mzigo/login"
