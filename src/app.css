@@ -82,6 +82,13 @@ body.android-native {
 .pb-safe-bottom {
     padding-bottom: var(--sab) !important;
 }
+
+/* Fixed bottom navigation bars: solid themed background, zero bottom gap */
+nav.fixed.bottom-0 {
+    bottom: 0 !important;
+    margin-bottom: 0 !important;
+    background-color: var(--byblos-bg) !important;
+}
 .mt-safe-top {
     margin-top: var(--sat) !important;
 }
@@ -161,12 +168,10 @@ body.android-native {
 @keyframes pageIn {
     from {
         opacity: 0;
-        transform: translateY(8px);
     }
 
     to {
         opacity: 1;
-        transform: none;
     }
 }
 

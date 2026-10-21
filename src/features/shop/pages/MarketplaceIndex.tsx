@@ -33,8 +33,8 @@ const LandingHome = () => (
       to="/mzigo/login"
       className="absolute z-10"
       style={{
-        top: 'max(1rem, env(safe-area-inset-top, 1rem))',
-        left: 'max(1rem, env(safe-area-inset-left, 1rem))',
+        top: 'max(2.5rem, calc(env(safe-area-inset-top, 0px) + 0.85rem))',
+        left: 'max(1rem, calc(env(safe-area-inset-left, 0px) + 0.5rem))',
       }}
       aria-label="Mzigo Ego delivery partner login"
     >

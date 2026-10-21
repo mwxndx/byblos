@@ -318,7 +318,12 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
       <Sheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
         <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-md">
           <div className="seller-surface min-h-full">
-            <SheetHeader className="px-4 pb-2 pt-6 text-left">
+            <SheetHeader
+              className="px-4 pb-2 text-left"
+              style={{
+                paddingTop: 'max(2rem, calc(env(safe-area-inset-top, 0px) + 1.25rem))',
+              }}
+            >
               <SheetTitle>Profile</SheetTitle>
             </SheetHeader>
             <div className="px-4 pb-8">

@@ -128,7 +128,10 @@ export const LandingDoodles: React.FC = () => {
     <div
       aria-hidden="true"
       data-testid="landing-doodles"
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-0 overflow-hidden select-none"
+      style={{
+        top: 'max(3.5rem, calc(env(safe-area-inset-top, 0px) + 2rem))',
+      }}
     >
       {LANDING_DOODLES.map((doodle) => {
         const { id, IconComponent, x, y, rot, size } = doodle;

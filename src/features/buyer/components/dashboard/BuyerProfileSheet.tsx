@@ -230,7 +230,12 @@ export function BuyerProfileSheet({ open, onOpenChange, ...content }: BuyerProfi
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full overflow-y-auto bg-surface-1 p-0 text-label sm:max-w-md">
-        <SheetHeader className="px-4 pb-2 pt-6 text-left">
+        <SheetHeader
+          className="px-4 pb-2 text-left"
+          style={{
+            paddingTop: 'max(2rem, calc(env(safe-area-inset-top, 0px) + 1.25rem))',
+          }}
+        >
           <SheetTitle className="text-label">Profile</SheetTitle>
         </SheetHeader>
         <div className="px-4 pb-8">
