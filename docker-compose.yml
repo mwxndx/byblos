@@ -110,6 +110,7 @@ services:
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      CARTO_API_KEY: ${CARTO_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy
@@ -188,6 +189,7 @@ services:
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      CARTO_API_KEY: ${CARTO_API_KEY}
     command: ["npm", "run", "start:worker"]
     depends_on:
       postgres:

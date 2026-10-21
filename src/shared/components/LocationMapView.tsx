@@ -1,13 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { LocationMarker, MapSizeInvalidator, MapFlyTo } from './locationPickerParts';
-
-const MAP_TILE_URLS = [
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    'https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-];
+import { getMapTileUrls } from './location/mapTileUrls';
+import { getLocationConfig } from '@/infrastructure/location/locationApi';
 
 interface LocationMapViewProps {
     center: [number, number];
@@ -23,8 +19,23 @@ interface LocationMapViewProps {
 // this via React.lazy + Suspense; its own search UI stays immediately
 // available while the map loads in behind it.
 export default function LocationMapView({ center, markerPosition, watchKey, onMapClick }: LocationMapViewProps) {
+    const [tileUrls, setTileUrls] = useState<string[]>(() => getMapTileUrls());
     const [tileUrlIndex, setTileUrlIndex] = useState(0);
-    const tileUrl = MAP_TILE_URLS[tileUrlIndex] || MAP_TILE_URLS[0];
+
+    useEffect(() => {
+        let isMounted = true;
+        getLocationConfig().then((config) => {
+            if (isMounted && config.cartoApiKey) {
+                setTileUrls(getMapTileUrls(config.cartoApiKey));
+                setTileUrlIndex(0);
+            }
+        });
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
+    const tileUrl = tileUrls[tileUrlIndex] || tileUrls[0];
 
     return (
         <MapContainer
@@ -39,7 +50,7 @@ export default function LocationMapView({ center, markerPosition, watchKey, onMa
                 url={tileUrl}
                 eventHandlers={{
                     tileerror: () => {
-                        setTileUrlIndex((currentIndex) => Math.min(currentIndex + 1, MAP_TILE_URLS.length - 1));
+                        setTileUrlIndex((currentIndex) => Math.min(currentIndex + 1, tileUrls.length - 1));
                     },
                 }}
             />

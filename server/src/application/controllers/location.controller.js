@@ -1,5 +1,15 @@
 import { searchLocations } from '../../domains/logistics/locationSearch.service.js';
 
+export async function getConfig(req, res) {
+  const cartoApiKey = (process.env.CARTO_API_KEY || '').trim();
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      cartoApiKey,
+    },
+  });
+}
+
 export async function search(req, res, next) {
   try {
     const query = String(req.query.q || '').trim();
