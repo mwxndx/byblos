@@ -115,28 +115,6 @@ export function formatDate(dateInput: string | Date, format: 'full' | 'date' | '
   }
 }
 
-export function decodeJwt(token: string): unknown {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-
-    return JSON.parse(jsonPayload);
-  } catch (error) {
-    return null;
-  }
-}
-
-export function isTokenExpired(token: string): boolean {
-  const decoded = decodeJwt(token) as { exp?: number } | null;
-  if (!decoded || !decoded.exp) return true;
-
-  const currentTime = Date.now() / 1000;
-  return decoded.exp < currentTime;
-}
-
 /**
  * Normalizes an image path or URL to a full URL
  * Handles base64, absolute URLs, relative paths, and Capacitor Native environment paths
@@ -204,18 +182,6 @@ export function isSellerShopless(input: unknown): boolean {
   return true;
 }
 
-/**
- * Formats bytes into a human-readable string (KB, MB, etc.)
- */
-export function formatFileSize(bytes: number | string | null | undefined): string {
-  if (bytes === null || bytes === undefined || bytes === '') return '0 KB';
 
-  const numBytes = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
-  if (isNaN(numBytes) || numBytes <= 0) return '0 KB';
-
-  if (numBytes < 1024) return `${numBytes} B`;
-  if (numBytes < 1024 * 1024) return `${(numBytes / 1024).toFixed(1)} KB`;
-  return `${(numBytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 

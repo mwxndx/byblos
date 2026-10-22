@@ -1,7 +1,7 @@
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Loader2, Search } from '@/shared/ui/icons';
-import { cn } from '@/shared/utils/formatting';
+import { cn } from '@/shared/utils/cn';
 import type { LocationSearchResult } from '@/infrastructure/location/locationApi';
 
 interface LocationSearchComboboxProps {
@@ -40,7 +40,7 @@ export function LocationSearchCombobox({
 }: LocationSearchComboboxProps) {
   return (
     <div>
-      <Label htmlFor="location-search" className="text-sm font-semibold text-slate-700 block mb-2">
+      <Label htmlFor="location-search" className="text-sm font-semibold text-slate-700 dark:text-label block mb-2">
         {label}
       </Label>
       <div className="relative">

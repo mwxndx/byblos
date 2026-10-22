@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { cn } from '@/shared/utils/formatting';
+import { cn } from '@/shared/utils/cn';
 
 interface AppHeaderProps {
   /** Left slot — branding, title, or a leading control. */

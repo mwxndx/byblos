@@ -10,6 +10,5 @@ export { getWithdrawalStatusLabel } from '@/shared/utils/withdrawalStatus';
 
 export {
   formatSettlementDate,
-  formatSettlementTimeOnly,
-  formatSettlementTime
+  formatSettlementTimeOnly
 } from '@/shared/utils/settlementFormatting';

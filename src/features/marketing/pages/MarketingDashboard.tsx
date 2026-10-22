@@ -6,7 +6,7 @@ import { AreaChart, Area,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { marketingApi, type MarketingOverview, type MarketingRecord } from '../api/marketingApi';
-import { StatCard } from '../components/StatCard';
+import { StatCard } from '@/shared/ui/stat-card';
 import { ChartCard } from '../components/ChartCard';
 import { SectionTitle } from '../components/SectionTitle';
 import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';

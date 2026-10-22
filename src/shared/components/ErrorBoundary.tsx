@@ -76,7 +76,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <RefreshCw className="w-4 h-4" />
                 Refresh Now
               </Button>
-              {process.env.NODE_ENV === 'development' && (
+              {import.meta.env.DEV && (
                 <div className="mt-6 p-4 bg-red-950/30 rounded-lg text-left overflow-auto max-h-40 border border-red-900/50">
                   <p className="text-red-400 font-mono text-xs break-all">
                     {this.state.error?.toString()}
@@ -112,7 +112,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 We hit an unexpected error. Your data is safe — try refreshing or go home.
               </p>
 
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {import.meta.env.DEV && this.state.error && (
                 <div className="mb-8 text-left">
                   <details className="bg-black/40 rounded-xl p-4 border border-white/10">
                     <summary className="text-yellow-400 font-semibold cursor-pointer mb-2">

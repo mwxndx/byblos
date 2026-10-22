@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
 import { Loader2, X } from '@/shared/ui/icons';
-import { cn } from '@/shared/utils/formatting';
+import { cn } from '@/shared/utils/cn';
 import type { LocationCoordinates } from '@/infrastructure/location/location';
 import { useLocationSearch } from './location/useLocationSearch';
 import { useLocationMapState } from './location/useLocationMapState';
@@ -67,7 +67,7 @@ export default function LocationPicker({
 
       <div>
         <div className="flex items-center justify-between mb-2">
-          <Label htmlFor="address-detailed" className="text-sm font-semibold text-slate-700 block">
+          <Label htmlFor="address-detailed" className="text-sm font-semibold text-slate-700 dark:text-label block">
             {detailedLabel}
           </Label>
           {mapState.address && (

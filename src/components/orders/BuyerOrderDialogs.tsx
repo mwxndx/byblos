@@ -178,6 +178,10 @@ export function BuyerOrderDialogs({
 
       <Dialog open={!!viewingImage} onOpenChange={(open) => !open && onViewingImageChange(null)}>
         <DialogContent className="sm:max-w-3xl bg-transparent border-0 shadow-none p-0 flex items-center justify-center pointer-events-none">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Order Item Image Preview</DialogTitle>
+            <DialogDescription>Enlarged view of the ordered product image</DialogDescription>
+          </DialogHeader>
           <div className="relative w-full h-full flex items-center justify-center pointer-events-auto">
             <button
               onClick={() => onViewingImageChange(null)}

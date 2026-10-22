@@ -1,6 +1,6 @@
 import { type ChangeEvent } from 'react';
 import { Moon, Sun } from '@/shared/ui/icons';
-import { cn } from '@/shared/utils/formatting';
+import { cn } from '@/shared/utils/cn';
 import type { AppTheme } from '@/shared/hooks/useAppTheme';
 
 interface ThemeSegmentedPillProps {

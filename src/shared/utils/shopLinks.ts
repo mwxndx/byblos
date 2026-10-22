@@ -27,15 +27,6 @@ export const resolveShareOrigin = (origin?: string) => {
   return current;
 };
 
-const escapeHtml = (value: string) => {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-};
-
 export const getShopUrl = (slug?: string | null, origin?: string) => {
   const cleanSlug = String(slug || '').trim();
   if (!cleanSlug) return '';

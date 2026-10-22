@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/shared/utils/formatting"
+import { cn } from "@/shared/utils/cn"
 import { Button, type ButtonProps } from "./button"
 
 export interface IconButtonProps extends Omit<ButtonProps, 'aria-label'> {

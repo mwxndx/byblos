@@ -1,5 +1,5 @@
 import React from 'react';
-import { DialogHeader, DialogTitle } from '@/shared/ui/dialog';
+import { DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
@@ -51,9 +51,9 @@ export function BuyerInfoForm({
         </div>
         <div className="space-y-2">
           <DialogTitle className="text-2xl font-semibold text-center text-slate-950 dark:text-white">PAYMENT DETAILS</DialogTitle>
-          <p className="text-[11px] text-center font-bold text-slate-600 dark:text-white uppercase tracking-wider opacity-80 leading-relaxed px-4">
+          <DialogDescription className="text-[11px] text-center font-bold text-slate-600 dark:text-white uppercase tracking-wider opacity-80 leading-relaxed px-4">
             Your payment details are safe and are only collected once
-          </p>
+          </DialogDescription>
         </div>
       </DialogHeader>
 

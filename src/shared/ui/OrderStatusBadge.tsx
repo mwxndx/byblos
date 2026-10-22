@@ -1,4 +1,4 @@
-import { cn } from '@/shared/utils/formatting';
+import { cn } from '@/shared/utils/cn';
 import { CheckCircle, Clock, Package, Truck, XCircle } from '@/shared/ui/icons';
 
 interface OrderStatusBadgeProps {

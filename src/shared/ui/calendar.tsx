@@ -2,7 +2,7 @@ import * as React from "react";
 import { ChevronLeft, ChevronRight } from '@/shared/ui/icons';
 import { DayPicker } from "react-day-picker";
 
-import { cn } from "@/shared/utils/formatting";
+import { cn } from "@/shared/utils/cn";
 import { buttonVariants } from "@/shared/ui/buttonVariants";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;

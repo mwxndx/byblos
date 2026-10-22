@@ -1,4 +1,4 @@
-import { cn } from '@/shared/utils/formatting';
+import { cn } from '@/shared/utils/cn';
 
 interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;

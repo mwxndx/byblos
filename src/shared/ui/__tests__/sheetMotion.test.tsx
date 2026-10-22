@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render } from '@testing-library/react';
-import { Sheet, SheetContent } from '../sheet';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../sheet';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -18,6 +18,10 @@ describe('Profile Sheet Slide Motion & Animation Configuration', () => {
     const { container } = render(
       <Sheet open={true}>
         <SheetContent side="right">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Profile Settings</SheetTitle>
+            <SheetDescription>View and manage profile settings</SheetDescription>
+          </SheetHeader>
           <div>Profile content</div>
         </SheetContent>
       </Sheet>
