@@ -7,6 +7,7 @@ import payoutService from '../../payments/payouts/payout.service.js';
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
 import CacheService from '../../../shared/utils/cache.service.js';
 import { buildSearchClause } from '../../../shared/utils/pagination.utils.js';
+import { invalidateUserSessions } from '../../../shared/utils/sessionRevocation.js';
 
 class AdminService {
   async getDashboardStats() {
@@ -463,6 +464,7 @@ class AdminService {
       );
 
       if (userId) {
+        await invalidateUserSessions(userId);
         const profileRes = await client.query(
           `SELECT
              EXISTS(SELECT 1 FROM sellers WHERE user_id = $1) AS has_seller,
@@ -580,10 +582,15 @@ class AdminService {
       'UPDATE sellers SET status = $1 WHERE id = $2 RETURNING *',
       [status, id]
     );
-    return res.rows[0];
+    const updated = res.rows[0];
+    if (updated?.user_id && (status === 'suspended' || status === 'inactive')) {
+      await invalidateUserSessions(updated.user_id);
+    }
+    return updated;
   }
 
   async deleteUser(userId) {
+    await invalidateUserSessions(userId);
     const client = await pool.connect();
     try {
       await client.query('BEGIN');

@@ -69,7 +69,7 @@ export const signAutoLoginToken = (id, role = 'buyer', purpose = 'payment_succes
 };
 
 /**
- * Verify a JWT token
+ * Verify a JWT token with zero-downtime secret rotation support
  * @param {string} token - JWT token to verify
  * @returns {Object} Decoded token payload
  */
@@ -78,40 +78,59 @@ export const verifyToken = (token) => {
     throw new Error('JWT_SECRET is not defined in environment variables');
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
-      algorithms: ['HS256']
-    });
+  const previousSecrets = (process.env.JWT_PREVIOUS_SECRETS || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
 
-    if (decoded.iss && decoded.iss !== JWT_ISSUER) {
-      const err = new AppError('Token issuer mismatch', 401);
-      err.code = 'INVALID_TOKEN_ISSUER';
-      throw err;
-    }
-    if (decoded.aud && decoded.aud !== JWT_AUDIENCE) {
-      const err = new AppError('Token audience mismatch', 401);
-      err.code = 'INVALID_TOKEN_AUDIENCE';
-      throw err;
-    }
+  const secretsToTry = [process.env.JWT_SECRET, ...previousSecrets];
+  let decoded = null;
+  let lastError = null;
 
-    // Handle both 'role' and 'type' fields for backward compatibility
-    if (decoded.type && !decoded.role) {
-      decoded.role = decoded.type;
+  for (const secret of secretsToTry) {
+    try {
+      decoded = jwt.verify(token, secret, {
+        algorithms: ['HS256']
+      });
+      break;
+    } catch (error) {
+      lastError = error;
+      if (error.name === 'TokenExpiredError') {
+        const err = new AppError('Your token has expired! Please log in again.', 401);
+        err.code = 'TOKEN_EXPIRED';
+        throw err;
+      }
+      if (error.name === 'JsonWebTokenError') {
+        continue;
+      }
+      throw error;
     }
+  }
 
-    return decoded;
-  } catch (error) {
-    if (error instanceof AppError) throw error;
-    if (error.name === 'TokenExpiredError') {
-      const err = new AppError('Your token has expired! Please log in again.', 401);
-      err.code = 'TOKEN_EXPIRED';
-      throw err;
-    }
-    logger.error('JWT Verification Error:', error.message);
+  if (!decoded) {
+    logger.error('JWT Verification Error:', lastError?.message);
     const err = new AppError('Invalid token. Please log in again!', 401);
     err.code = 'INVALID_TOKEN';
     throw err;
   }
+
+  if (decoded.iss && decoded.iss !== JWT_ISSUER) {
+    const err = new AppError('Token issuer mismatch', 401);
+    err.code = 'INVALID_TOKEN_ISSUER';
+    throw err;
+  }
+  if (decoded.aud && decoded.aud !== JWT_AUDIENCE) {
+    const err = new AppError('Token audience mismatch', 401);
+    err.code = 'INVALID_TOKEN_AUDIENCE';
+    throw err;
+  }
+
+  // Handle both 'role' and 'type' fields for backward compatibility
+  if (decoded.type && !decoded.role) {
+    decoded.role = decoded.type;
+  }
+
+  return decoded;
 };
 
 /**

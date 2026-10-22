@@ -157,9 +157,10 @@ export const resolveCrossRoleAccess = async ({ user, type, signToken, pool, Buye
         }
     }
 
-    // CASE 4: Marketing / Admin cross-role access
-    if ((type === 'admin' && user.role === 'marketing') || (type === 'marketing' && user.role === 'admin')) {
-        const issuedRole = type;
+    // CASE 4: Admin accessing Marketing portal (allowed for administrative oversight)
+    // NOTE: Marketing accounts are strictly NEVER granted cross-role access to the Admin portal (privilege escalation prevention).
+    if (type === 'marketing' && user.role === 'admin') {
+        const issuedRole = 'marketing';
         const token = signToken(user.id, issuedRole);
         return {
             user,

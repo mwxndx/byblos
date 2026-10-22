@@ -9,6 +9,8 @@
 import tokenBlacklist from '../../domains/identity/tokens/tokenBlacklist.service.js';
 import { getTokenFromRequest, verifyToken } from './jwt.js';
 import { verifyRefreshToken } from './refreshToken.js';
+import { invalidateAuthCacheForUser } from './authCache.js';
+import CacheService from './cache.service.js';
 import logger from './logger.js';
 
 /**
@@ -59,4 +61,44 @@ export function clearAuthCookies(res) {
   res.cookie('refreshToken', '', { ...base, path: '/api/auth/refresh-token' });
 }
 
-export default { revokeSessionTokens, clearAuthCookies };
+/**
+ * Invalidate all sessions, caches, and permissions for a user immediately (ban/suspension/deletion/password reset).
+ * 1. Purges user tokens from the in-memory _authCache.
+ * 2. Clears Redis permissions and cross-role caches.
+ * 3. Updates users.password_changed_at = NOW() (if user row exists) to invalidate all existing JWTs and refresh tokens.
+ * @param {string|number} userId
+ */
+export async function invalidateUserSessions(userId) {
+  if (!userId) return;
+
+  // 1) Invalidate in-memory authCache
+  try {
+    invalidateAuthCacheForUser(userId);
+  } catch (err) {
+    logger.warn(`[SESSION_REVOCATION] Failed to clear authCache for user ${userId}:`, err.message);
+  }
+
+  // 2) Invalidate Redis caches
+  try {
+    await Promise.all([
+      CacheService.delete(`user:${userId}:cross-roles`),
+      CacheService.delete(`user:permissions:${userId}`),
+      CacheService.delete(`user:${userId}:permissions`),
+    ]);
+  } catch (err) {
+    logger.warn(`[SESSION_REVOCATION] Failed to clear Redis keys for user ${userId}:`, err.message);
+  }
+
+  // 3) Bump password_changed_at in database to instantly invalidate all in-flight JWTs and refresh tokens
+  try {
+    const { pool } = await import('../../infrastructure/database/database.js');
+    await pool.query(
+      'UPDATE users SET password_changed_at = NOW(), updated_at = NOW() WHERE id = $1',
+      [userId]
+    );
+  } catch (err) {
+    logger.warn(`[SESSION_REVOCATION] Failed to bump password_changed_at for user ${userId}:`, err.message);
+  }
+}
+
+export default { revokeSessionTokens, clearAuthCookies, invalidateUserSessions };

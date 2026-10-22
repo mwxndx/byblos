@@ -23,11 +23,11 @@ router.get('/sitemap.xml', async (req, res) => {
             { url: '/terms', changefreq: 'yearly', priority: '0.3' },
         ];
 
-        // Fetch active approved sellers
+        // Fetch active approved sellers from sellers table
         let sellerRows = [];
         try {
             const sellerRes = await pool.query(
-                `SELECT shop_slug, updated_at FROM seller_profiles WHERE is_active = true AND status = 'approved' AND shop_slug IS NOT NULL`
+                `SELECT shop_name, updated_at FROM sellers WHERE status = 'active' AND shop_name IS NOT NULL`
             );
             sellerRows = sellerRes.rows;
         } catch {
@@ -47,10 +47,10 @@ router.get('/sitemap.xml', async (req, res) => {
         }
 
         for (const seller of sellerRows) {
-            if (!seller.shop_slug) continue;
+            if (!seller.shop_name) continue;
             const lastMod = seller.updated_at ? new Date(seller.updated_at).toISOString() : new Date().toISOString();
             xml += `  <url>\n`;
-            xml += `    <loc>${baseUrl}/shop/${encodeURIComponent(seller.shop_slug)}</loc>\n`;
+            xml += `    <loc>${baseUrl}/shop/${encodeURIComponent(seller.shop_name)}</loc>\n`;
             xml += `    <lastmod>${lastMod}</lastmod>\n`;
             xml += `    <changefreq>daily</changefreq>\n`;
             xml += `    <priority>0.8</priority>\n`;
