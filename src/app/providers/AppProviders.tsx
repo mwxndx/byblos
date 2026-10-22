@@ -20,9 +20,9 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
         <TooltipProvider>
             <SonnerToaster />
-            <ForegroundNotificationListener />
             {/* Unified auth provider - provides all role-specific hooks */}
             <GlobalAuthProvider>
+                <ForegroundNotificationListener />
                 {children}
             </GlobalAuthProvider>
         </TooltipProvider>

@@ -55,7 +55,7 @@ function BuyerDashboard() {
     isSavingProfile, handleSaveProfile,
   } = useBuyerProfileForm();
   const { hasUnreadOrders, markOrdersViewed } = useBuyerOrdersNotification(!!user);
-  const { unreadCount: unreadNotificationsCount } = useNotifications('default', !!user);
+  const { unreadCount: unreadNotificationsCount } = useNotifications('default', !!user, 'buyer');
 
   const handleLogout = () => {
     logout();
@@ -166,6 +166,7 @@ function BuyerDashboard() {
             <div className="mx-auto w-full max-w-[760px]">
               <NotificationList
                 variant="default"
+                role="buyer"
                 scrollClassName=""
                 className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
               />

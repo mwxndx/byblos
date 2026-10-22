@@ -8,10 +8,11 @@ import { NotificationList } from './NotificationList';
 export interface NotificationBellProps {
   variant?: NotificationVariant;
   triggerClassName?: string;
+  role?: string;
 }
 
-export function NotificationBell({ variant = 'default', triggerClassName }: NotificationBellProps) {
-  const { unreadCount } = useNotifications(variant);
+export function NotificationBell({ variant = 'default', triggerClassName, role }: NotificationBellProps) {
+  const { unreadCount } = useNotifications(variant, true, role);
 
   return (
     <Popover>
@@ -40,7 +41,7 @@ export function NotificationBell({ variant = 'default', triggerClassName }: Noti
         sideOffset={8}
         className="w-[calc(100vw-2rem)] sm:w-[440px] md:w-[480px] max-w-[480px] p-0 overflow-hidden bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 text-slate-950 dark:text-white shadow-2xl rounded-2xl transition-colors duration-200"
       >
-        <NotificationList variant={variant} scrollClassName="max-h-[390px]" />
+        <NotificationList variant={variant} role={role} scrollClassName="max-h-[390px]" />
       </PopoverContent>
     </Popover>
   );

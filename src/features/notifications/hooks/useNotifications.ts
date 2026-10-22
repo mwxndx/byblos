@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/infrastructure/http/apiClient';
+import { useGlobalAuth } from '@/features/auth/contexts';
 
 export interface AppNotification {
   id: number | string;
@@ -18,6 +19,14 @@ export type NotificationVariant = 'default' | 'logistics';
 const basePath = (variant: NotificationVariant) =>
   variant === 'logistics' ? '/notifications/logistics' : '/notifications';
 
+function useSafeAuth() {
+  try {
+    return useGlobalAuth();
+  } catch {
+    return { user: null, role: null, isAuthenticated: false };
+  }
+}
+
 /**
  * Notification feed for the bell / notification screen. Works for any logged-in
  * role on web or app (plain API, no push permission needed). Pass
@@ -25,17 +34,20 @@ const basePath = (variant: NotificationVariant) =>
  */
 export function useNotifications(variant: NotificationVariant = 'default', enabled = true, role?: string) {
   const queryClient = useQueryClient();
-  const queryKey = ['notifications', variant, role ?? 'auto'] as const;
+  const { user, role: authRole } = useSafeAuth();
+  const activeRole = role || authRole || undefined;
+  const isEnabled = Boolean(enabled && user);
+  const queryKey = ['notifications', variant, activeRole ?? 'auto'] as const;
   const base = basePath(variant);
 
   const query = useQuery({
     queryKey,
     queryFn: async (): Promise<AppNotification[]> => {
-      const url = role ? `${base}?limit=30&role=${encodeURIComponent(role)}` : `${base}?limit=30`;
+      const url = activeRole ? `${base}?limit=30&role=${encodeURIComponent(activeRole)}` : `${base}?limit=30`;
       const res = await apiClient.get(url);
       return (res.data?.data ?? []) as AppNotification[];
     },
-    enabled,
+    enabled: isEnabled,
     refetchInterval: 45000,
     refetchOnWindowFocus: true,
     staleTime: 15000,
@@ -61,7 +73,7 @@ export function useNotifications(variant: NotificationVariant = 'default', enabl
 
   const markAllReadMutation = useMutation({
     mutationFn: async () => {
-      const url = role ? `${base}/read-all?role=${encodeURIComponent(role)}` : `${base}/read-all`;
+      const url = activeRole ? `${base}/read-all?role=${encodeURIComponent(activeRole)}` : `${base}/read-all`;
       await apiClient.patch(url);
     },
     onSuccess: () => {

@@ -38,6 +38,7 @@ interface NotificationListProps {
   /** Height class for the scroll region — popover uses a capped height, the full page section can grow. */
   scrollClassName?: string;
   className?: string;
+  role?: string;
 }
 
 /**
@@ -50,8 +51,9 @@ export function NotificationList({
   variant = 'default',
   scrollClassName = 'max-h-[390px]',
   className,
+  role,
 }: NotificationListProps) {
-  const { notifications, unreadCount, isLoading, markAllRead } = useNotifications(variant);
+  const { notifications, unreadCount, isLoading, markAllRead } = useNotifications(variant, true, role);
 
   return (
     <div className={className}>
@@ -75,7 +77,7 @@ export function NotificationList({
         )}
       </div>
 
-      <IosNotificationBanner />
+      <IosNotificationBanner role={role as any} />
 
       <div className={cn('overflow-y-auto divide-y divide-slate-100 dark:divide-white/5', scrollClassName)}>
         {isLoading ? (

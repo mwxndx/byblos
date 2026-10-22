@@ -10,7 +10,7 @@ interface SellerDashboardHeaderProps {
 export function SellerDashboardHeader({ sellerFirstName, onOpenProfile }: SellerDashboardHeaderProps) {
   return (
     <AppHeader
-      left={<NotificationBell />}
+      left={<NotificationBell role="seller" />}
       center={
         <h1 className="text-sm sm:text-lg font-semibold text-slate-900 dark:text-white tracking-tight truncate">
           Welcome, {sellerFirstName}

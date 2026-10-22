@@ -172,21 +172,31 @@ export async function unregisterNativePushNotifications(
   role?: AppNotificationRole,
   requestConfig?: AxiosRequestConfig
 ) {
-  if (!isNativeApp()) return;
-
   try {
     const token = localStorage.getItem(TOKEN_STORAGE_KEY);
     const registration = localStorage.getItem(REGISTRATION_STORAGE_KEY);
     const registeredRole = role || (registration ? JSON.parse(registration).role : undefined);
 
-    if (token && registeredRole) {
-      await apiClient.delete(notificationEndpoint(registeredRole), {
+    if (token) {
+      const endpoint = registeredRole ? notificationEndpoint(registeredRole) : '/notifications/devices';
+      await apiClient.delete(endpoint, {
         ...requestConfig,
         data: { token },
-      });
+      }).catch((e) => console.warn('[MobileNotifications] Unregister request error ignored', e));
+    }
+
+    if (isNativeApp()) {
+      try {
+        await PushNotifications.removeAllListeners();
+      } catch (e) {
+        console.warn('[MobileNotifications] Failed to remove push listeners', e);
+      }
+      listenersReady = false;
+      pendingRole = null;
+      pendingRequestConfig = undefined;
     }
   } catch (e) {
-    console.warn('[MobileNotifications] Unregister request error ignored', e);
+    console.warn('[MobileNotifications] Unregister exception ignored', e);
   } finally {
     try {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
