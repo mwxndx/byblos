@@ -83,9 +83,9 @@ async function startServer() {
   // synchronously its graceful-close callback never ran — so it was removed to
   // avoid a double-fire and dead code.
 
-  // Handle SIGTERM
-  process.on('SIGTERM', () => {
-    logger.info('👋 SIGTERM RECEIVED. Shutting down gracefully');
+  // Handle graceful shutdown on SIGTERM and SIGINT
+  const gracefulShutdown = (signal) => {
+    logger.info(`👋 ${signal} RECEIVED. Shutting down gracefully`);
     const forceExit = setTimeout(() => {
       logger.error('❌ Forced shutdown triggered after 10s connection drain timeout');
       process.exit(1);
@@ -100,12 +100,26 @@ async function startServer() {
         logger.info('📦 Database pool closed');
       } catch (poolErr) {
         logger.error('❌ Error closing pool:', poolErr);
+      }
+
+      try {
+        const { default: getRedisClient } = await import('./shared/config/redis.js');
+        const redisClient = getRedisClient();
+        if (redisClient && typeof redisClient.quit === 'function') {
+          await redisClient.quit();
+          logger.info('📦 Redis client disconnected');
+        }
+      } catch (redisErr) {
+        logger.error('❌ Error disconnecting Redis:', redisErr);
       } finally {
         logger.info('Graceful shutdown complete');
         process.exit(0);
       }
     });
-  });
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 startServer().catch(err => {

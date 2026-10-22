@@ -57,6 +57,17 @@ const shutdown = async (signal) => {
     } catch (error) {
         logger.error('[Worker] Error closing pool:', error);
     }
+
+    try {
+        const { default: getRedisClient } = await import('./shared/config/redis.js');
+        const redisClient = getRedisClient();
+        if (redisClient && typeof redisClient.quit === 'function') {
+            await redisClient.quit();
+            logger.info('[Worker] Redis client disconnected');
+        }
+    } catch (error) {
+        logger.error('[Worker] Error disconnecting Redis:', error);
+    }
     process.exit(0);
 };
 

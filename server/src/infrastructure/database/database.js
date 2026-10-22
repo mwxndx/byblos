@@ -8,36 +8,45 @@ const { Pool } = pg;
 /** @type {import('pg').Pool} */
 let pool;
 
-// Required environment variables for database
-const requiredEnvVars = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+// Required environment variables for database:
+// Either individual DB_* variables or a valid DATABASE_URL must be provided.
+const hasIndividualVars = !!(process.env.DB_HOST && process.env.DB_NAME && process.env.DB_USER && process.env.DB_PASSWORD);
+const hasDatabaseUrl = !!process.env.DATABASE_URL;
 
-if (missingVars.length > 0) {
-  const errorMsg = `❌ FATAL: Missing required environment variables: ${missingVars.join(', ')}`;
+if (!hasIndividualVars && !hasDatabaseUrl) {
+  const errorMsg = '❌ FATAL: Missing database configuration. Provide either individual DB_* variables (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD) or DATABASE_URL.';
   logger.error(errorMsg);
-  logger.error('In production, you must use individual DB_* variables.');
   throw new Error(errorMsg);
 }
 
-const dbConfig = {
-  host: process.env.DB_HOST,
-  port: Number.parseInt(process.env.DB_PORT, 10) || 5432,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  // SSL is required in production and for Render/Heroku/AWS Postgres.
-  // Supports DB_SSL_REJECT_UNAUTHORIZED and DB_SSL_CA overrides for certificate trust verification.
-  ssl: process.env.DB_SSL === 'false' ? false : (process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true',
-    ca: process.env.DB_SSL_CA ? process.env.DB_SSL_CA.replace(/\\n/g, '\n') : undefined,
-  } : false),
+const configuredPoolMax = Number.parseInt(process.env.DB_POOL_MAX, 10);
+const defaultPoolMax = process.env.NODE_ENV === 'production' ? 25 : 10;
 
+const dbConfig = {
   connectionTimeoutMillis: 10000,
   idleTimeoutMillis: 30000,
-  max: process.env.NODE_ENV === 'production' ? 100 : 25,
+  max: Number.isFinite(configuredPoolMax) && configuredPoolMax > 0 ? configuredPoolMax : defaultPoolMax,
   query_timeout: 30000,
   allowExitOnIdle: false,
 };
+
+if (hasIndividualVars) {
+  dbConfig.host = process.env.DB_HOST;
+  dbConfig.port = Number.parseInt(process.env.DB_PORT, 10) || 5432;
+  dbConfig.database = process.env.DB_NAME;
+  dbConfig.user = process.env.DB_USER;
+  dbConfig.password = process.env.DB_PASSWORD;
+} else {
+  dbConfig.connectionString = process.env.DATABASE_URL;
+}
+
+// SSL is required in production and for Render/Heroku/AWS Postgres.
+// Supports DB_SSL_REJECT_UNAUTHORIZED and DB_SSL_CA overrides for certificate trust verification.
+dbConfig.ssl = process.env.DB_SSL === 'false' ? false : (process.env.NODE_ENV === 'production' ? {
+  rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true',
+  ca: process.env.DB_SSL_CA ? process.env.DB_SSL_CA.replace(/\\n/g, '\n') : undefined,
+} : false);
+
 // Fail-fast safety guard when running in test mode
 if (process.env.NODE_ENV === 'test') {
   const dbName = String(process.env.DB_NAME || '');
@@ -45,10 +54,10 @@ if (process.env.NODE_ENV === 'test') {
   const dbUrl = String(process.env.DATABASE_URL || '');
 
   const isProdHost = dbHost.includes('amazonaws.com') || dbUrl.includes('amazonaws.com');
-  const isSafeTestDb = dbName.endsWith('_test') || dbName.includes('test');
+  const isSafeTestDb = dbName.endsWith('_test') || dbName.includes('test') || dbUrl.includes('_test');
 
   if (isProdHost) {
-    const errMsg = `FATAL SAFETY GUARD: Production DB host detected ("${dbHost}"). Refusing to connect in test mode!`;
+    const errMsg = `FATAL SAFETY GUARD: Production DB host detected ("${dbHost || dbUrl}"). Refusing to connect in test mode!`;
     logger.error(errMsg);
     throw new Error(errMsg);
   }
@@ -61,7 +70,10 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 // Log connection attempt details (masking password)
-logger.info(`Initializing database pool: ${dbConfig.user}@${dbConfig.host}:${dbConfig.port}/${dbConfig.database} (SSL: ${!!dbConfig.ssl})`);
+const logTarget = hasIndividualVars
+  ? `${dbConfig.user}@${dbConfig.host}:${dbConfig.port}/${dbConfig.database}`
+  : (process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:([^:@]+)@/, ':***@') : 'DATABASE_URL');
+logger.info(`Initializing database pool: ${logTarget} (SSL: ${!!dbConfig.ssl}, Pool Max: ${dbConfig.max})`);
 
 pool = new Pool(dbConfig);
 
@@ -109,6 +121,46 @@ export const query = async (text, params) => {
       params: (typeof text === 'object' ? text?.values : params)
     });
     throw error;
+  }
+};
+
+/**
+ * Execute work with a leased client, guaranteeing release back to the pool.
+ * @template T
+ * @param {(client: import('pg').PoolClient) => Promise<T>} callback
+ * @returns {Promise<T>}
+ */
+export const withClient = async (callback) => {
+  const client = await pool.connect();
+  try {
+    return await callback(client);
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Execute work inside a database transaction, automatically managing BEGIN, COMMIT, ROLLBACK, and client release.
+ * @template T
+ * @param {(client: import('pg').PoolClient) => Promise<T>} callback
+ * @returns {Promise<T>}
+ */
+export const withTransaction = async (callback) => {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const result = await callback(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    try {
+      await client.query('ROLLBACK');
+    } catch (rollbackErr) {
+      logger.error('Database transaction rollback error:', rollbackErr);
+    }
+    throw err;
+  } finally {
+    client.release();
   }
 };
 

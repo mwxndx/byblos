@@ -11,6 +11,7 @@ import { mkdir } from 'fs/promises';
 
 import logger from '../../shared/utils/logger.js';
 import routes from '../routes/index.js';
+import healthRoutes from '../routes/health.routes.js';
 import seoRoutes from '../routes/seo.routes.js';
 import { handleSocialCrawlerSeo } from '../middleware/socialCrawlerSeo.js';
 import { globalErrorHandler, notFoundHandler } from '../../shared/utils/errorHandler.js';
@@ -251,28 +252,9 @@ export default async (app) => {
         });
     });
 
-    // Root health check endpoints for cloud monitoring and keep-alive (UptimeRobot, AWS, Kubernetes)
-    app.get(['/health', '/api/health', '/ping'], async (req, res) => {
-        try {
-            res.status(200).json({
-                status: 'ok',
-                timestamp: new Date().toISOString(),
-                uptime: process.uptime()
-            });
-        } catch {
-            res.status(200).send('OK');
-        }
-    });
-
-    app.get(['/health/readiness', '/api/health/readiness'], async (req, res) => {
-        try {
-            const { pool } = await import('../../infrastructure/database/database.js');
-            await pool.query('SELECT 1');
-            res.status(200).json({ status: 'ready', database: 'connected', timestamp: new Date().toISOString() });
-        } catch (error) {
-            res.status(503).json({ status: 'unhealthy', database: 'disconnected', error: error.message });
-        }
-    });
+    // Root liveness & readiness check endpoints (cloud monitoring, AWS, Kubernetes, UptimeRobot)
+    app.get('/ping', (req, res) => res.status(200).send('OK'));
+    app.use('/health', healthRoutes);
 
     app.get('/', (req, res) => {
         res.status(200).json({ status: 'ok', message: 'Byblos API is operational' });

@@ -61,7 +61,16 @@ async function checkPaystack() {
 }
 
 /**
- * @route GET /health
+ * @route GET /ping
+ * @description Fast liveness endpoint for container orchestrators
+ * @access Public
+ */
+router.get('/ping', (req, res) => {
+  res.status(200).send('OK');
+});
+
+/**
+ * @route GET /health (or /api/health)
  * @description Health check endpoint for monitoring services
  * @access Public
  */
@@ -88,11 +97,11 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route GET /health/ready
+ * @route GET /health/ready, /health/readiness (or /api/health/ready, /api/health/readiness)
  * @description Readiness probe endpoint for cloud load balancers and orchestrators
  * @access Public
  */
-router.get('/ready', async (req, res) => {
+router.get(['/ready', '/readiness'], async (req, res) => {
   try {
     // Postgres is the hard gate — the app cannot serve requests without it.
     await pool.query('SELECT 1');
@@ -121,4 +130,3 @@ router.get('/ready', async (req, res) => {
 });
 
 export default router;
-
