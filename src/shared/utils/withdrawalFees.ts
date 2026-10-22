@@ -2,7 +2,7 @@ export const MIN_WITHDRAWAL_AMOUNT = 50;
 export const MAX_WITHDRAWAL_AMOUNT = 250_000;
 export const WITHDRAWAL_FEE_TIERS = [
   { min: 50, max: 1500, fee: 21, label: 'KSh 50 - KSh 1,500' },
-  { min: 1501, max: 19999.99, fee: 45, label: 'KSh 1,501 - KSh 19,999' },
+  { min: 1500.01, max: 19999.99, fee: 45, label: 'KSh 1,501 - KSh 19,999' },
   { min: 20000, max: Number.POSITIVE_INFINITY, fee: 63, label: 'KSh 20,000 and above' }
 ] as const;
 
