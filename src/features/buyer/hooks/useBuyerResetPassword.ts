@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { useToast } from '@/shared/hooks/use-toast';
+import {
+  checkPasswordStrength,
+  validatePasswordRequirements,
+} from '@/features/auth/utils/authValidation';
 
 export function useBuyerResetPassword() {
     const [searchParams] = useSearchParams();
@@ -20,16 +24,7 @@ export function useBuyerResetPassword() {
     const [passwordError, setPasswordError] = useState('');
     const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
 
-    // Password strength checker function
-    const checkPasswordStrength = (password: string) => {
-        return {
-            minLength: password.length >= 8,
-            hasNumber: /\d/.test(password),
-            hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-            hasUpper: /[A-Z]/.test(password),
-            hasLower: /[a-z]/.test(password),
-        };
-    };
+
 
     // Verify token on component mount
     useEffect(() => {
@@ -57,34 +52,13 @@ export function useBuyerResetPassword() {
     }, [token, toast]);
 
     const validatePasswords = (password: string, confirmPassword: string, showToast = true): boolean => {
-        if (password !== confirmPassword) {
-            if (showToast) {
-                setPasswordError('Passwords do not match');
+        const result = validatePasswordRequirements(password, confirmPassword);
+        if (!result.isValid) {
+            if (showToast && result.error) {
+                setPasswordError(result.error);
                 toast({
-                    title: "Validation Error",
-                    description: "Passwords do not match",
-                    variant: 'destructive',
-                });
-            }
-            return false;
-        }
-
-        const strength = checkPasswordStrength(password);
-        const unmetRequirements: string[] = [];
-
-        if (!strength.minLength) unmetRequirements.push("at least 8 characters");
-        if (!strength.hasNumber) unmetRequirements.push("a number");
-        if (!strength.hasSpecial) unmetRequirements.push("a special character");
-        if (!strength.hasUpper) unmetRequirements.push("an uppercase letter");
-        if (!strength.hasLower) unmetRequirements.push("a lowercase letter");
-
-        if (unmetRequirements.length > 0) {
-            const errorMsg = `Password needs ${unmetRequirements.join(', ')}`;
-            setPasswordError(errorMsg);
-            if (showToast) {
-                toast({
-                    title: "Weak Password",
-                    description: errorMsg,
+                    title: result.error === 'Passwords do not match' ? 'Validation Error' : 'Weak Password',
+                    description: result.error,
                     variant: 'destructive',
                 });
             }

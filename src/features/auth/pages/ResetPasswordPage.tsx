@@ -7,6 +7,10 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { useResetPasswordMutation } from '@/features/seller/hooks/mutations/useSellerAuthMutations';
 import { Loader2, ArrowLeft, Eye, EyeOff, Lock, Check, X, ShieldCheck } from '@/shared/ui/icons';
 import { LoadingScreen as RouteFallback } from '@/shared/components/LoadingScreen';
+import {
+  checkPasswordStrength,
+  validatePasswordRequirements,
+} from '@/features/auth/utils/authValidation';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -24,46 +28,14 @@ export function ResetPasswordPage() {
   const [isValidToken, setIsValidToken] = useState<boolean | null>(null);
   const [passwordError, setPasswordError] = useState('');
 
-  // Password strength checker function
-  const checkPasswordStrength = (password: string) => {
-    return {
-      minLength: password.length >= 8,
-      hasNumber: /\d/.test(password),
-      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      hasUpper: /[A-Z]/.test(password),
-      hasLower: /[a-z]/.test(password),
-    };
-  };
-
   const validatePasswords = (password: string, confirmPassword: string, showToast = true): boolean => {
-    if (password !== confirmPassword) {
-      if (showToast) {
-        setPasswordError('Passwords do not match');
+    const result = validatePasswordRequirements(password, confirmPassword);
+    if (!result.isValid) {
+      if (showToast && result.error) {
+        setPasswordError(result.error);
         toast({
-          title: "Validation Error",
-          description: "Passwords do not match",
-          variant: 'destructive',
-        });
-      }
-      return false;
-    }
-
-    const strength = checkPasswordStrength(password);
-    const unmetRequirements: string[] = [];
-
-    if (!strength.minLength) unmetRequirements.push("at least 8 characters");
-    if (!strength.hasNumber) unmetRequirements.push("a number");
-    if (!strength.hasSpecial) unmetRequirements.push("a special character");
-    if (!strength.hasUpper) unmetRequirements.push("an uppercase letter");
-    if (!strength.hasLower) unmetRequirements.push("a lowercase letter");
-
-    if (unmetRequirements.length > 0) {
-      const errorMsg = `Password needs ${unmetRequirements.join(', ')}`;
-      setPasswordError(errorMsg);
-      if (showToast) {
-        toast({
-          title: "Weak Password",
-          description: errorMsg,
+          title: result.error === 'Passwords do not match' ? 'Validation Error' : 'Weak Password',
+          description: result.error,
           variant: 'destructive',
         });
       }

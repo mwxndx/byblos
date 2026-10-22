@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/shared/hooks/use-toast';
+import {
+  checkPasswordStrength,
+  isValidEmail,
+  validatePasswordRequirements,
+} from '@/features/auth/utils/authValidation';
 import type { BuyerInfo, BuyerInfoModalProps } from './BuyerInfoModal';
 
 export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false, theme = 'default', phoneNumber, initialData }: BuyerInfoModalProps) {
@@ -43,16 +48,7 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
     }
   }, [isOpen]);
 
-  // Password strength checker function
-  const checkPasswordStrength = (password: string) => {
-    return {
-      minLength: password.length >= 8,
-      hasNumber: /\d/.test(password),
-      hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-      hasUpper: /[A-Z]/.test(password),
-      hasLower: /[a-z]/.test(password),
-    };
-  };
+
 
   const validateForm = (): boolean => {
     const newErrors: Partial<BuyerInfo & { termsAccepted?: string }> = {};
@@ -67,26 +63,18 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
 
     if (!buyerInfo.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!/^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(buyerInfo.email)) {
+    } else if (!isValidEmail(buyerInfo.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
 
     // Strict Password validation matching BuyerRegister
-    const strength = checkPasswordStrength(buyerInfo.password || '');
-    const unmetRequirements: string[] = [];
-
-    if (!strength.minLength) unmetRequirements.push("at least 8 characters");
-    if (!strength.hasNumber) unmetRequirements.push("a number");
-    if (!strength.hasSpecial) unmetRequirements.push("a special character");
-    if (!strength.hasUpper) unmetRequirements.push("an uppercase letter");
-    if (!strength.hasLower) unmetRequirements.push("a lowercase letter");
-
-    if (unmetRequirements.length > 0) {
-      newErrors.password = `Password needs ${unmetRequirements.join(', ')}`;
-    }
-
-    if (buyerInfo.password !== buyerInfo.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
+    const pwdResult = validatePasswordRequirements(buyerInfo.password || '', buyerInfo.confirmPassword);
+    if (!pwdResult.isValid) {
+      if (pwdResult.error === 'Passwords do not match') {
+        newErrors.confirmPassword = 'Passwords do not match';
+      } else if (pwdResult.error) {
+        newErrors.password = pwdResult.error;
+      }
     }
 
     if (!buyerInfo.whatsappNumber?.trim()) {

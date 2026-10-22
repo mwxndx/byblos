@@ -161,22 +161,23 @@ export function useAuthActions({
 
   const logout = useCallback(async () => {
     const role = user?.role;
-    setUser(null);
-    navigate('/', { replace: true });
-    toast('Logged out', { description: 'You have been successfully logged out.' });
 
+    if (role) {
+      try {
+        await unregisterNativePushNotifications(role);
+        const logoutUrl = getLogoutEndpointForRole(role);
+        await apiClient.post(logoutUrl);
+      } catch {
+        // Fail silently — proceed with local session clearance.
+      }
+    }
+
+    setUser(null);
     try { await clearRoleSessionMarkers(); } catch { /* ignore */ }
     queryClient.clear();
 
-    if (!role) return;
-
-    try {
-      await unregisterNativePushNotifications(role);
-      const logoutUrl = getLogoutEndpointForRole(role);
-      await apiClient.post(logoutUrl);
-    } catch {
-      // Fail silently — already logged out locally.
-    }
+    navigate('/', { replace: true });
+    toast('Logged out', { description: 'You have been successfully logged out.' });
   }, [navigate, setUser, user, queryClient]);
 
   return {

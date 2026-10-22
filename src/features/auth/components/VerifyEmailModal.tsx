@@ -3,7 +3,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { useBuyerResendVerificationMutation } from '@/features/buyer/hooks/mutations/useBuyerAuthMutations';
 import { useSellerResendVerificationMutation } from '@/features/seller/hooks/mutations/useSellerAuthMutations';
 import { useCreatorResendVerificationMutation } from '@/features/creator/hooks/mutations/useCreatorAuthMutations';
-import { VerifyEmailModalView } from '@/components/auth/VerifyEmailModalView';
+import { VerifyEmailModalView } from './VerifyEmailModalView';
 
 export interface VerifyEmailModalProps {
   isOpen: boolean;

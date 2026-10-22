@@ -1,3 +1,5 @@
+import { checkPasswordStrength } from '@/features/auth/utils/authValidation';
+
 export interface SellerRegistrationFormData {
   firstName: string;
   lastName: string;
@@ -18,13 +20,5 @@ export const locationData: Record<string, string[]> = {
   'Nairobi': ['CBD', 'Westlands', 'Karen', 'Runda', 'Kileleshwa', 'Kilimani', 'Lavington', 'Parklands', 'Eastleigh', 'South B', 'South C', 'Langata', 'Kasarani', 'Embakasi', 'Ruaraka']
 };
 
-// Password strength checker function
-export const checkPasswordStrength = (password: string) => {
-  return {
-    minLength: password.length >= 8,
-    hasNumber: /\d/.test(password),
-    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    hasUpper: /[A-Z]/.test(password),
-    hasLower: /[a-z]/.test(password),
-  };
-};
+// Password strength checker function re-exported from canonical authValidation
+export { checkPasswordStrength };

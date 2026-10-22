@@ -33,7 +33,7 @@ export function useAccountSwitching({
 
       queryClient.clear();
       await enforceSingleActiveRole(role);
-      if (isNativeApp() && token) {
+      if (token) {
         await storage.set(`${role}Token`, token);
         if (refreshToken) await storage.set(`${role}RefreshToken`, refreshToken);
       }
