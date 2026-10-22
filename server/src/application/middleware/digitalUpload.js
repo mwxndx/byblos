@@ -28,7 +28,10 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Disk storage — streams directly to OS temp directory without loading 500 MB into V8 RAM
+export const MAX_DIGITAL_FILE_SIZE_MB = 90;
+export const MAX_DIGITAL_FILE_SIZE_BYTES = MAX_DIGITAL_FILE_SIZE_MB * 1024 * 1024;
+
+// Disk storage — streams directly to OS temp directory without loading 90 MB into V8 RAM
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, os.tmpdir());
@@ -43,7 +46,7 @@ const multerInstance = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: 500 * 1024 * 1024, // 500 MB
+        fileSize: MAX_DIGITAL_FILE_SIZE_BYTES, // 90 MB
     },
 });
 

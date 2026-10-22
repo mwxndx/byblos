@@ -207,11 +207,18 @@ export const AddProductFormSteps = ({
             accept=".pdf,.png,.jpg,.jpeg,.webp,.svg,.gif,.bmp,.tiff,.heic,.zip,.rar,.7z,.epub,.mobi,.doc,.docx,.txt,.mp3,.wav,.mp4"
             onChange={e => {
               const file = e.target.files?.[0];
-              if (file) setFormData(p => ({ ...p, digital_file: file }));
+              if (file) {
+                if (file.size > 90 * 1024 * 1024) {
+                  alert('File is too large. Maximum size for digital products is 90MB.');
+                  e.target.value = '';
+                  return;
+                }
+                setFormData(p => ({ ...p, digital_file: file }));
+              }
             }}
             className="h-11 cursor-pointer pt-2.5"
           />
-          <p className="text-[13px] text-label-3">Images, PDFs, archives (ZIP, RAR), audio, and eBooks are supported.</p>
+          <p className="text-[13px] text-label-3">Images, PDFs, archives (ZIP, RAR), audio, and eBooks are supported (max 90MB).</p>
           {uploadProgress > 0 && (
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-fill">
               <div className="h-full bg-brand transition-all duration-300" style={{ width: `${uploadProgress}%` }} />

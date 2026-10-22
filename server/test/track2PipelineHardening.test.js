@@ -8,6 +8,11 @@ import domainEventDispatcher, {
 } from '../src/shared/core/domainEventDispatcher.js';
 import { DomainEvents as AliasedEvents } from '../src/shared/core/domainEvents.js';
 import rawEventBus from '../src/application/events/eventBus.js';
+import {
+    MAX_DIGITAL_FILE_SIZE_MB,
+    MAX_DIGITAL_FILE_SIZE_BYTES,
+    cloudinaryDigitalUpload
+} from '../src/application/middleware/digitalUpload.js';
 
 describe('Track 2: Pipeline, Middleware & Security Hardening', () => {
     describe('requestId middleware', () => {
@@ -75,6 +80,14 @@ describe('Track 2: Pipeline, Middleware & Security Hardening', () => {
             assert.equal(AliasedEvents, AppEvents);
             assert.equal(AppEvents.ORDER.PAID, 'order.paid');
             assert.equal(AppEvents.WITHDRAWAL.CREATED, 'withdrawal.created');
+        });
+    });
+
+    describe('digitalUpload streaming & size limits', () => {
+        test('configures digital upload limit at 90MB', () => {
+            assert.equal(MAX_DIGITAL_FILE_SIZE_MB, 90);
+            assert.equal(MAX_DIGITAL_FILE_SIZE_BYTES, 90 * 1024 * 1024);
+            assert.equal(typeof cloudinaryDigitalUpload, 'function');
         });
     });
 });
