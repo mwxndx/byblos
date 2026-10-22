@@ -1,4 +1,5 @@
 import LogisticsDashboardService from './logisticsDashboard.service.js';
+import LogisticsEtaService from './logisticsEta.service.js';
 import { setAuthCookie, setRefreshTokenCookie } from '../../shared/utils/cookie.utils.js';
 import { revokeSessionTokens, clearAuthCookies } from '../../shared/utils/sessionRevocation.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
@@ -33,7 +34,6 @@ export const logoutLogisticsPartner = async (req, res, next) => {
         next(error);
     }
 };
-
 
 export const getLogisticsMe = async (req, res, next) => {
     try {
@@ -78,8 +78,6 @@ export const getLogisticsDashboardRequests = async (req, res, next) => {
     }
 };
 
-import LogisticsEtaService from './logisticsEta.service.js';
-
 export const updateLogisticsLegStatus = async (req, res, next) => {
     try {
         const partnerId = req.logisticsPartner?.id || req.user?.profile_id || req.user?.id;
@@ -87,12 +85,18 @@ export const updateLogisticsLegStatus = async (req, res, next) => {
             return next(new AppError('Logistics partner identity not found', 400));
         }
 
+        const verificationCode = req.body?.verificationCode
+            || req.body?.packageCode
+            || req.body?.code
+            || null;
+
         const result = await LogisticsDashboardService.updateLegStatus({
             partner: req.logisticsPartner || { id: partnerId, email: req.user?.email },
             partnerId,
             requestId: req.params.requestId,
             legType: req.params.legType,
-            status: req.body?.status
+            status: req.body?.status,
+            verificationCode
         });
 
         res.status(200).json({
@@ -130,3 +134,13 @@ export const updateRiderLocation = async (req, res, next) => {
     }
 };
 
+export class LogisticsController {
+    static loginLogisticsPartner = loginLogisticsPartner;
+    static logoutLogisticsPartner = logoutLogisticsPartner;
+    static getLogisticsMe = getLogisticsMe;
+    static getLogisticsDashboardRequests = getLogisticsDashboardRequests;
+    static updateLogisticsLegStatus = updateLogisticsLegStatus;
+    static updateRiderLocation = updateRiderLocation;
+}
+
+export default LogisticsController;

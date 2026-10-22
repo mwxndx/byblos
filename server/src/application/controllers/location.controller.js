@@ -40,3 +40,9 @@ export async function search(req, res, next) {
     });
   }
 }
+
+export default {
+  getConfig,
+  search
+};
+

@@ -12,3 +12,7 @@ export const getPublicTrackingByToken = async (req, res, next) => {
         next(error);
     }
 };
+
+export default {
+    getPublicTrackingByToken
+};

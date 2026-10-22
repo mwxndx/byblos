@@ -144,7 +144,8 @@ class LogisticsQuoteService {
 
         const a = Math.sin(dLat / 2) ** 2
             + Math.cos(originLat) * Math.cos(destinationLat) * Math.sin(dLng / 2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const safeA = Math.min(1, Math.max(0, a));
+        const c = 2 * Math.atan2(Math.sqrt(safeA), Math.sqrt(1 - safeA));
 
         return Math.round(EARTH_RADIUS_KM * c * 1000) / 1000;
     }
@@ -171,7 +172,8 @@ class LogisticsQuoteService {
         const destination = normalizeLocation(buyerLocation, 'buyerLocation');
         const rateKesPerKm = options.rateKesPerKm ?? this.getConfiguredRate(options.env);
         const distanceKm = this.calculateDistanceKm(hub, destination);
-        const feeAmount = this.calculateFeeForDistance(distanceKm, rateKesPerKm);
+        const chargeableDistanceKm = Math.max(1, Math.ceil(distanceKm));
+        const feeAmount = this.calculateFeeForDistance(chargeableDistanceKm, rateKesPerKm);
 
         return {
             legType: 'delivery',
@@ -179,7 +181,7 @@ class LogisticsQuoteService {
             currency: 'KES',
             rateKesPerKm,
             distanceKm,
-            chargeableDistanceKm: Math.ceil(distanceKm),
+            chargeableDistanceKm,
             feeAmount,
             origin: hub,
             destination

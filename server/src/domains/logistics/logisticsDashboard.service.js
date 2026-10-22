@@ -375,7 +375,8 @@ class LogisticsDashboardService {
         partnerId,
         requestId,
         legType,
-        status
+        status,
+        verificationCode = null
     }) {
         const normalizedLegType = normalizeLegType(legType);
         const { externalStatus, internalStatus } = normalizeRequestedLogisticsStatus(
@@ -397,6 +398,7 @@ class LogisticsDashboardService {
                     lr.id AS request_id,
                     lr.order_id,
                     lr.status AS request_status,
+                    lr.package_code,
                     ll.id AS leg_id,
                     ll.leg_type,
                     ll.status AS leg_status,
@@ -440,6 +442,32 @@ class LogisticsDashboardService {
                 );
                 if (deliveryLeg.length > 0) {
                     throw new AppError('Cannot mark collected: this order uses door delivery, not hub collection.', 409);
+                }
+            }
+
+            // Prevent premature delivery leg progression if sibling pickup leg has not completed collection from seller
+            if (normalizedLegType === 'delivery' && ['out_for_delivery', 'delivered'].includes(internalStatus)) {
+                const { rows: pickupLegs } = await client.query(
+                    `SELECT status FROM logistics_legs WHERE logistics_request_id = $1 AND leg_type = 'pickup' LIMIT 1`,
+                    [record.request_id]
+                );
+                if (pickupLegs.length > 0) {
+                    const pickupStatus = pickupLegs[0].status;
+                    if (!['picked_up', 'dropped_at_hub', 'collected'].includes(pickupStatus)) {
+                        throw new AppError(
+                            `Cannot dispatch or deliver package before pickup from seller is completed (pickup status: ${pickupStatus})`,
+                            409
+                        );
+                    }
+                }
+            }
+
+            if (verificationCode) {
+                const normInput = String(verificationCode).trim().toUpperCase();
+                const expectedCode = String(record.package_code || '').trim().toUpperCase();
+                const orderNum = String(record.order_id || '');
+                if (normInput !== expectedCode && normInput !== orderNum && !normInput.endsWith(orderNum)) {
+                    throw new AppError('Invalid verification code for package handover', 400);
                 }
             }
 

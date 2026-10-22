@@ -22,20 +22,30 @@ const TIMING_DUMMY_HASH = '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uhe
 const LOGISTICS_STATUS_MAP = {
     pickup: {
         pickup_pending: 'pending',
+        pending: 'pending',
         pickup_assigned: 'assigned',
+        assigned: 'assigned',
         pickup_started: 'started',
+        started: 'started',
         picked_up_from_seller: 'picked_up',
+        picked_up: 'picked_up',
         dropped_at_hub: 'dropped_at_hub',
         buyer_collected: 'collected',
-        pickup_failed: 'failed'
+        collected: 'collected',
+        pickup_failed: 'failed',
+        failed: 'failed'
     },
     delivery: {
         delivery_pending: 'delivery_pending',
+        pending: 'delivery_pending',
         courier_assigned: 'assigned',
+        assigned: 'assigned',
         out_for_delivery: 'out_for_delivery',
         delivered: 'delivered',
         delivery_failed: 'failed',
-        delivery_delayed: 'delayed'
+        failed: 'failed',
+        delivery_delayed: 'delayed',
+        delayed: 'delayed'
     }
 };
 
@@ -52,7 +62,13 @@ const LOGISTICS_STATUS_MESSAGES = {
     out_for_delivery: 'Package is out for delivery.',
     delivered: 'Package was delivered.',
     delivery_failed: 'Delivery failed.',
-    delivery_delayed: 'Delivery was delayed.'
+    delivery_delayed: 'Delivery was delayed.',
+    picked_up: 'Package was picked up from the seller.',
+    assigned: 'Courier was assigned.',
+    pending: 'Logistics request is pending.',
+    collected: 'Buyer collected the package from the hub.',
+    failed: 'Logistics leg failed.',
+    delayed: 'Delivery was delayed.'
 };
 
 const ALLOWED_LOGISTICS_TRANSITIONS = {
