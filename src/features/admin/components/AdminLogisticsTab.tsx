@@ -13,11 +13,15 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { STATUS_FILTERS, SORT_OPTIONS, formatCurrency } from '../utils/adminLogisticsTab.utils';
 import { LogisticsAdminCard } from './adminLogisticsTab.components';
+import { AdminPaginationControls } from './AdminPaginationControls';
+import type { PaginationMeta } from '../types/dashboard';
 
 export function AdminLogisticsTab() {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<AdminLogisticsStatusFilter>('all');
   const [sort, setSort] = useState<LogisticsSort>('priority');
+  const PAGE_SIZE = 15;
+  const [page, setPage] = useState(1);
   const [draftStatuses, setDraftStatuses] = useState<Record<string, LogisticsStatusUpdate>>({});
   const [updatingKey, setUpdatingKey] = useState<string | null>(null);
   const [resolvingId, setResolvingId] = useState<number | null>(null);
@@ -61,6 +65,24 @@ export function AdminLogisticsTab() {
 
   const dashboard = logisticsQuery.data;
   const requests = useMemo(() => dashboard?.requests || [], [dashboard]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [status, sort]);
+
+  const total = requests.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginatedRequests = useMemo(() => {
+    return requests.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  }, [requests, safePage]);
+
+  const pagination: PaginationMeta = useMemo(() => ({
+    page: safePage,
+    pageSize: PAGE_SIZE,
+    total,
+    hasMore: safePage * PAGE_SIZE < total,
+  }), [safePage, total]);
 
   // Reconciliation totals: what Byblos owes Mzigo across the requests in view.
   const feeTotals = useMemo(
@@ -187,7 +209,7 @@ export function AdminLogisticsTab() {
             </div>
           ) : (
             <div className="grid gap-5">
-              {requests.map((request) => (
+              {paginatedRequests.map((request) => (
                 <LogisticsAdminCard
                   key={request.id}
                   request={request}
@@ -199,6 +221,11 @@ export function AdminLogisticsTab() {
                   resolvingId={resolvingId}
                 />
               ))}
+            </div>
+          )}
+          {total > PAGE_SIZE && (
+            <div className="pt-4 border-t border-separator">
+              <AdminPaginationControls pagination={pagination} onPageChange={setPage} />
             </div>
           )}
         </CardContent>

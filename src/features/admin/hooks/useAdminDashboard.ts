@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useGlobalAuth } from '@/features/auth/contexts';
+import { useGlobalAuth, type UserRole } from '@/features/auth/contexts';
+import { getDashboardPath } from '@/features/auth/utils/authRouting';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { useGetBuyerByIdMutation, useDeleteUserMutation, useDeleteCreatorMutation, useGetSellerByIdMutation, useUpdateWithdrawalRequestStatusMutation } from '@/features/admin/hooks/mutations/useAdminMutations';
@@ -24,7 +25,8 @@ import { EMPTY_PAGINATION } from '../types/dashboard';
 
 export function useAdminDashboard() {
   // All hooks must be called unconditionally at the top level
-  const { isAuthenticated, isLoading: authLoading } = useGlobalAuth();
+  const { user, role, isAuthenticated, isLoading: authLoading } = useGlobalAuth();
+  const isAdmin = Boolean(isAuthenticated && (role === 'admin' || user?.role === 'admin'));
   const navigate = useNavigate();
 
   const getBuyerByIdMutation = useGetBuyerByIdMutation();
@@ -108,7 +110,7 @@ export function useAdminDashboard() {
     providerHealth: null
   });
 
-  const isEnabled = isAuthenticated && !authLoading;
+  const isEnabled = isAdmin && !authLoading;
   const analyticsQuery = useAdminAnalyticsQuery(isEnabled);
   const sellersQuery = useAdminSellersQuery({ page: sellersList.page, search: sellersList.debouncedSearch }, isEnabled);
   const creatorsQuery = useAdminCreatorsQuery({ page: creatorsList.page, search: creatorsList.debouncedSearch }, isEnabled);
@@ -366,10 +368,17 @@ export function useAdminDashboard() {
   ]);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (authLoading) return;
+    if (!isAuthenticated) {
       navigate('/admin/login', { replace: true });
+      return;
     }
-  }, [isAuthenticated, authLoading, navigate]);
+    if (!isAdmin) {
+      const targetRole = (role || user?.role) as UserRole | undefined;
+      const targetPath = targetRole ? getDashboardPath(targetRole) : '/buyer/dashboard';
+      navigate(targetPath, { replace: true });
+    }
+  }, [isAuthenticated, authLoading, isAdmin, role, user?.role, navigate]);
 
   const safeFormatDate = (dateString: string | null | undefined, formatStr: string = 'MMM d, yyyy') => {
     if (!dateString) return 'N/A';
@@ -600,6 +609,7 @@ export function useAdminDashboard() {
   return {
     authLoading,
     isAuthenticated,
+    isAdmin,
     isInitialized,
     error,
     retryDashboard,

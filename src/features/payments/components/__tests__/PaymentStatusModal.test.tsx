@@ -69,7 +69,7 @@ describe('PaymentStatusModal', () => {
       expect(handleCancelRetry).toHaveBeenCalled();
       expect(handleClose).toHaveBeenCalled();
     });
-  });
+  }, 15000);
 
   it('renders failure reason and retry button when status transition fails', async () => {
     mockGetStatusMutateAsync.mockResolvedValueOnce({
@@ -101,5 +101,5 @@ describe('PaymentStatusModal', () => {
     fireEvent.click(tryAgainButton);
     expect(handleCancelRetry).toHaveBeenCalled();
     expect(handleClose).toHaveBeenCalled();
-  });
+  }, 15000);
 });

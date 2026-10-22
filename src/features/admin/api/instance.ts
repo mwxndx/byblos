@@ -1,5 +1,4 @@
 import { defaultUniversalClient } from '@/infrastructure/http/UniversalHttpClient';
-import { getCachedCsrfToken, setCachedCsrfToken } from '@/infrastructure/auth/WebAuthStrategy';
 
 type AxiosInstance = import('axios').AxiosInstance;
 
@@ -49,4 +48,3 @@ export interface AdminLogisticsResponse {
   };
 }
 
-export { getCachedCsrfToken as csrfTokenCache, setCachedCsrfToken as setCsrfTokenCache, setCachedCsrfToken };

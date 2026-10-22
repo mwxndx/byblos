@@ -44,7 +44,3 @@ export const adminRoutes: RouteObject[] = [
   },
 ];
 
-// Deprecated router alias for backwards compatibility
-export const adminRouter = {
-  routes: adminRoutes,
-};

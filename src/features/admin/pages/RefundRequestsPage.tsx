@@ -9,6 +9,9 @@ import { CheckCircle, XCircle, Clock, DollarSign, Loader2, AlertTriangle } from 
 import { RefundRequestCard } from '../components/RefundRequestCard';
 import { useRefundRequests } from '../hooks/useRefundRequests';
 import type { RefundRequest } from '../types/refunds';
+import { AdminPaginationControls } from '../components/AdminPaginationControls';
+import type { PaginationMeta } from '../types/dashboard';
+import { useState, useMemo, useEffect } from 'react';
 
 
 export default function RefundRequestsPage() {
@@ -36,6 +39,27 @@ export default function RefundRequestsPage() {
     handleConfirmRefund,
     handleRejectRefund,
   } = useRefundRequests();
+
+  const PAGE_SIZE = 12;
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter, isOverdueOnly, sortBy]);
+
+  const total = requests.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const paginatedRequests = useMemo(() => {
+    return requests.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  }, [requests, safePage]);
+
+  const pagination: PaginationMeta = useMemo(() => ({
+    page: safePage,
+    pageSize: PAGE_SIZE,
+    total,
+    hasMore: safePage * PAGE_SIZE < total,
+  }), [safePage, total]);
 
   const overdueCount = requests.filter((r) => {
     const isPendingOrReview = r.status === 'pending' || r.status === 'manual_review';
@@ -197,22 +221,29 @@ export default function RefundRequestsPage() {
           description="There are currently no refund requests in this view."
         />
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {requests.map((request) => (
-          <RefundRequestCard
-            key={request.id}
-            request={request}
-            getStatusBadge={getStatusBadge}
-            formatCurrency={formatCurrency}
-            onApprove={() => {
-              setAdminNotes('');
-              setApprovedAmount(request.amount);
-              setSelectedRequest(request);
-              setIsConfirmDialogOpen(true);
-            }}
-            onReject={() => { setAdminNotes(''); setSelectedRequest(request); setIsRejectDialogOpen(true); }}
-          />
-        ))}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {paginatedRequests.map((request) => (
+              <RefundRequestCard
+                key={request.id}
+                request={request}
+                getStatusBadge={getStatusBadge}
+                formatCurrency={formatCurrency}
+                onApprove={() => {
+                  setAdminNotes('');
+                  setApprovedAmount(request.amount);
+                  setSelectedRequest(request);
+                  setIsConfirmDialogOpen(true);
+                }}
+                onReject={() => { setAdminNotes(''); setSelectedRequest(request); setIsRejectDialogOpen(true); }}
+              />
+            ))}
+          </div>
+          {total > PAGE_SIZE && (
+            <div className="pt-4 border-t border-separator">
+              <AdminPaginationControls pagination={pagination} onPageChange={setPage} />
+            </div>
+          )}
         </div>
       )}
 

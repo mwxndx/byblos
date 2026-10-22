@@ -27,6 +27,7 @@ const NewAdminDashboard = () => {
   const {
     authLoading,
     isAuthenticated,
+    isAdmin,
     isInitialized,
     error,
     retryDashboard,
@@ -71,7 +72,7 @@ const NewAdminDashboard = () => {
   const logisticsQuery = useQuery({
     queryKey: adminQueryKeys.logistics('all', 'priority'),
     queryFn: () => adminApi.getLogisticsRequests({ status: 'all', sort: 'priority' }),
-    enabled: isAuthenticated && !authLoading,
+    enabled: Boolean(isAdmin && !authLoading),
     staleTime: 20_000,
   });
   const logisticsSummary = logisticsQuery.data?.summary;
