@@ -10,6 +10,7 @@ export function useRefundRequestMutation() {
     mutationFn: (data: { amount: number; mpesaNumber?: string; mpesaName?: string }) => buyerApi.requestRefund(data),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: buyerQueryKeys.refunds() });
+      queryClient.invalidateQueries({ queryKey: buyerQueryKeys.refundHistory() });
       queryClient.invalidateQueries({ queryKey: buyerQueryKeys.profile() });
       toast.success(res.message || 'Refund requested successfully');
     },

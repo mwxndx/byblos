@@ -4,7 +4,7 @@ import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound } from '@/
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
 import { BuyerMembershipCard } from './BuyerMembershipCard';
-import { DeleteAccountButton } from '@/components/account/DeleteAccountButton';
+import { DeleteAccountButton } from '@/shared/components/DeleteAccountButton';
 import { deleteBuyerAccount } from '@/features/buyer/api/profile';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';

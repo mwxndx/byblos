@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Edit, Loader2, LogOut } from '@/shared/ui/icons';
-import { DeleteAccountButton } from '@/components/account/DeleteAccountButton';
+import { DeleteAccountButton } from '@/shared/components/DeleteAccountButton';
 import { deleteSellerAccount } from '@/features/seller/api/profileApi';
 import type { Theme } from '@/features/seller/api';
 import { Button } from '@/shared/ui/button';

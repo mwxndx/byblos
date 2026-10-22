@@ -9,7 +9,7 @@ import { useBuyerOrdersQuery } from '@/features/buyer/hooks/queries/useBuyerOrde
 import { useCancelOrderMutation } from '@/features/buyer/hooks/mutations/useCancelOrderMutation';
 import { useConfirmOrderReceiptMutation } from '@/features/buyer/hooks/mutations/useConfirmOrderReceiptMutation';
 import { useDownloadProductMutation } from '@/features/buyer/hooks/mutations/useDownloadProductMutation';
-import { OrdersSectionView } from '@/components/orders/OrdersSectionView';
+import { OrdersSectionView } from './OrdersSectionView';
 
 export function OrdersSectionContainer() {
   const { user: globalUser } = useGlobalAuth();

@@ -66,10 +66,8 @@ export async function cancelOrder(orderId: string): Promise<{ success: boolean; 
     return { success: true };
   } catch (error) {
     const err = error as ApiError;
-    return {
-      success: false,
-      message: err.response?.data?.message || 'Failed to cancel order'
-    };
+    const errorMessage = err.response?.data?.message || err.message || 'Failed to cancel order';
+    throw new Error(errorMessage);
   }
 }
 

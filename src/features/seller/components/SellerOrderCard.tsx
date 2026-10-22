@@ -6,7 +6,7 @@ import { cn } from '@/shared/utils/formatting';
 import type { ApiOrder } from '@/shared/types';
 import { SellerOrderActions } from './SellerOrderActions';
 import { getOrderInstruction } from '@/features/orders/utils/orderInstructions';
-import { OrderLogisticsTracking } from '@/components/orders/OrderLogisticsTracking';
+import { OrderLogisticsTracking } from '@/features/orders/components/OrderLogisticsTracking';
 import { OrderStatusBadge } from '@/shared/ui/OrderStatusBadge';
 import { isDigitalOrder, isServiceOrder, OrderMetaPills } from '@/features/orders/utils/ordersSectionUtils';
 import { formatCurrency, formatDate, getEffectiveFulfillmentType } from '../utils/sellerOrders.utils';
