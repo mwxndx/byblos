@@ -114,6 +114,13 @@ class NotificationService {
             results.in_app = await this.createInAppNotification({
                 ...notification,
                 channels
+            }).catch(error => {
+                logger.error('[NotificationService] In-app notification creation failed', {
+                    recipientUserId: notification.recipientUserId,
+                    type: notification.type,
+                    error: error.message
+                });
+                return { delivered: false, error: error.message };
             });
         }
 
@@ -199,6 +206,12 @@ class NotificationService {
                         invalidTokens.push(device.token);
                     }
                 }
+            } else {
+                logger.error('[NotificationService] Push delivery promise rejected', {
+                    recipientUserId,
+                    error: item.reason?.message || String(item.reason)
+                });
+                responses.push({ ok: false, error: item.reason?.message || 'push_delivery_rejected' });
             }
         }
 

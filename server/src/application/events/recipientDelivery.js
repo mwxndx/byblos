@@ -6,7 +6,7 @@ class RecipientDelivery {
         if (!eventId || !recipientKey) {
             throw new Error('Recipient delivery requires eventId and recipientKey');
         }
-        const channel = options.channel || 'whatsapp';
+        const channel = options.channel || 'feed';
         const key = String(recipientKey).slice(0, 255);
         const client = await pool.connect();
         try {

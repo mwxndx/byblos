@@ -66,87 +66,103 @@ export const unregisterDevice = async (req, res) => {
     }
 };
 
-export const listNotifications = async (req, res) => {
-    const userId = currentUserId(req);
-    if (!userId || !Number.isInteger(userId) || userId <= 0) {
-        return res.status(401).json({ status: 'error', message: 'Authentication required' });
-    }
+export const listNotifications = async (req, res, next) => {
+    try {
+        const userId = currentUserId(req);
+        if (!userId || !Number.isInteger(userId) || userId <= 0) {
+            return res.status(401).json({ status: 'error', message: 'Authentication required' });
+        }
 
-    const allRoles = req.query.allRoles === 'true' || req.query.all_roles === 'true';
-    const role = allRoles ? null : (req.query.role || currentRole(req));
+        const allRoles = req.query.allRoles === 'true' || req.query.all_roles === 'true';
+        const role = allRoles ? null : (req.query.role || currentRole(req));
 
-    const notifications = await NotificationService.listForUser({
-        userId,
-        role,
-        limit: req.query.limit,
-        unreadOnly: req.query.unreadOnly === 'true' || req.query.unread_only === 'true'
-    });
-
-    res.status(200).json({
-        status: 'success',
-        data: notifications
-    });
-};
-
-export const markNotificationRead = async (req, res) => {
-    const userId = currentUserId(req);
-    if (!userId || !Number.isInteger(userId) || userId <= 0) {
-        return res.status(401).json({ status: 'error', message: 'Authentication required' });
-    }
-
-    const notification = await NotificationService.markRead({
-        userId,
-        notificationId: req.params.notificationId
-    });
-
-    if (!notification) {
-        return res.status(404).json({
-            status: 'error',
-            message: 'Notification not found'
+        const notifications = await NotificationService.listForUser({
+            userId,
+            role,
+            limit: req.query.limit,
+            unreadOnly: req.query.unreadOnly === 'true' || req.query.unread_only === 'true'
         });
-    }
 
-    return res.status(200).json({
-        status: 'success',
-        data: notification
-    });
+        res.status(200).json({
+            status: 'success',
+            data: notifications
+        });
+    } catch (err) {
+        next(err);
+    }
 };
 
-export const markAllNotificationsRead = async (req, res) => {
-    const userId = currentUserId(req);
-    if (!userId || !Number.isInteger(userId) || userId <= 0) {
-        return res.status(401).json({ status: 'error', message: 'Authentication required' });
+export const markNotificationRead = async (req, res, next) => {
+    try {
+        const userId = currentUserId(req);
+        if (!userId || !Number.isInteger(userId) || userId <= 0) {
+            return res.status(401).json({ status: 'error', message: 'Authentication required' });
+        }
+
+        const notification = await NotificationService.markRead({
+            userId,
+            notificationId: req.params.notificationId
+        });
+
+        if (!notification) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'Notification not found'
+            });
+        }
+
+        return res.status(200).json({
+            status: 'success',
+            data: notification
+        });
+    } catch (err) {
+        next(err);
     }
-
-    const allRoles = req.body?.allRoles === true || req.query.allRoles === 'true' || req.query.all_roles === 'true';
-    const role = allRoles ? null : (req.body?.role || req.query.role || currentRole(req));
-
-    const updated = await NotificationService.markAllRead({
-        userId,
-        role
-    });
-
-    res.status(200).json({
-        status: 'success',
-        data: { updated }
-    });
 };
 
-export const getUnreadNotificationCount = async (req, res) => {
-    const userId = currentUserId(req);
-    if (!userId || !Number.isInteger(userId) || userId <= 0) {
-        return res.status(401).json({ status: 'error', message: 'Authentication required' });
+export const markAllNotificationsRead = async (req, res, next) => {
+    try {
+        const userId = currentUserId(req);
+        if (!userId || !Number.isInteger(userId) || userId <= 0) {
+            return res.status(401).json({ status: 'error', message: 'Authentication required' });
+        }
+
+        const allRoles = req.body?.allRoles === true || req.query.allRoles === 'true' || req.query.all_roles === 'true';
+        const role = allRoles ? null : (req.body?.role || req.query.role || currentRole(req));
+
+        const updated = await NotificationService.markAllRead({
+            userId,
+            role
+        });
+
+        res.status(200).json({
+            status: 'success',
+            data: { updated }
+        });
+    } catch (err) {
+        next(err);
     }
+};
 
-    const allRoles = req.query.allRoles === 'true' || req.query.all_roles === 'true';
-    const role = allRoles ? null : (req.query.role || currentRole(req));
-    const unreadCount = await NotificationService.getUnreadCount({
-        userId,
-        role
-    });
+export const getUnreadNotificationCount = async (req, res, next) => {
+    try {
+        const userId = currentUserId(req);
+        if (!userId || !Number.isInteger(userId) || userId <= 0) {
+            return res.status(401).json({ status: 'error', message: 'Authentication required' });
+        }
 
-    res.status(200).json({
-        status: 'success',
-        data: { unreadCount }
-    });
+        const allRoles = req.query.allRoles === 'true' || req.query.all_roles === 'true';
+        const role = allRoles ? null : (req.query.role || currentRole(req));
+        const unreadCount = await NotificationService.getUnreadCount({
+            userId,
+            role
+        });
+
+        res.status(200).json({
+            status: 'success',
+            data: { unreadCount }
+        });
+    } catch (err) {
+        next(err);
+    }
 };

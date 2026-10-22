@@ -89,6 +89,7 @@ async function getAccessToken() {
             grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
             assertion,
         }),
+        signal: AbortSignal.timeout(10000),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.access_token) {
@@ -157,6 +158,7 @@ export async function sendFcmV1({ token, title, body, data = {}, platform }) {
         body: JSON.stringify({
             message: buildFcmMessage({ token, title, body, data, platform }),
         }),
+        signal: AbortSignal.timeout(10000),
     });
 
     if (res.ok) return { ok: true };

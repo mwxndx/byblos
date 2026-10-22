@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import cron from 'node-cron';
 import { pool } from '../../infrastructure/database/database.js';
 import logger from '../../shared/utils/logger.js';
@@ -60,6 +62,61 @@ export async function deleteExpiredPendingRegistrations() {
     return result.rowCount;
 }
 
+/**
+ * Prunes orphaned files in temporary upload/processing directories that are older than maxAgeMs.
+ * Defaults to 1 hour (3,600,000 ms).
+ *
+ * @param {number} [maxAgeMs=3600000]
+ * @param {string[]} [customDirs]
+ * @returns {Promise<{ scannedDirs: string[], deletedFiles: number, freedBytes: number }>}
+ */
+export async function cleanOrphanedTempFiles(maxAgeMs = 60 * 60 * 1000, customDirs = null) {
+    const rawDirs = customDirs || [
+        path.join(process.cwd(), 'temp'),
+        path.join(process.cwd(), 'uploads', 'temp'),
+        path.join(process.cwd(), 'server', 'temp'),
+        path.join(process.cwd(), 'server', 'uploads', 'temp')
+    ];
+
+    // Deduplicate existing directories
+    const uniqueDirs = Array.from(new Set(rawDirs.map(d => path.resolve(d))));
+    const existingDirs = uniqueDirs.filter(d => fs.existsSync(d) && fs.statSync(d).isDirectory());
+
+    let deletedFiles = 0;
+    let freedBytes = 0;
+    const now = Date.now();
+
+    for (const dir of existingDirs) {
+        try {
+            const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+            for (const entry of entries) {
+                if (!entry.isFile()) continue;
+                const filePath = path.join(dir, entry.name);
+                try {
+                    const stats = await fs.promises.stat(filePath);
+                    const ageMs = now - stats.mtimeMs;
+                    if (ageMs > maxAgeMs) {
+                        await fs.promises.unlink(filePath);
+                        deletedFiles += 1;
+                        freedBytes += stats.size;
+                    }
+                } catch (fileErr) {
+                    // File might have been concurrently deleted or locked
+                    logger.warn(`[CLEANUP] Could not stat/unlink temp file ${filePath}:`, fileErr.message);
+                }
+            }
+        } catch (dirErr) {
+            logger.warn(`[CLEANUP] Failed to read temp directory ${dir}:`, dirErr.message);
+        }
+    }
+
+    if (deletedFiles > 0) {
+        logger.info(`[CLEANUP] Pruned ${deletedFiles} orphaned temp files (${freedBytes} bytes freed)`);
+    }
+
+    return { scannedDirs: existingDirs, deletedFiles, freedBytes };
+}
+
 export const scheduleCleanupJobs = () => {
     // Every 5 minutes: release expired unpaid inventory reservations.
     cron.schedule('*/5 * * * *', async () => {
@@ -70,6 +127,15 @@ export const scheduleCleanupJobs = () => {
             logger.error('[INVENTORY_TTL_CRON] Error running inventory release cron:', err.message);
         } finally {
             client.release();
+        }
+    });
+
+    // Hourly: prune orphaned temporary files older than 1 hour.
+    cron.schedule('0 * * * *', async () => {
+        try {
+            await cleanOrphanedTempFiles();
+        } catch (err) {
+            logger.error('[CLEANUP] Failed to prune orphaned temp files:', err.message);
         }
     });
 

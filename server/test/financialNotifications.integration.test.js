@@ -111,14 +111,7 @@ describe('Financial Push & Feed Notifications Integration', () => {
       reason: 'The M-Pesa prompt expired before PIN entry'
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
-    const { rows: buyerNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'payment_failed' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [buyerUser.id]
-    );
+    const buyerNotifs = await waitForNotification(buyerUser.id, 'payment_failed');
     assert.equal(buyerNotifs.length, 1, 'Buyer received payment_failed notification');
     assert.equal(buyerNotifs[0].title, 'Payment Failed');
     assert.ok(buyerNotifs[0].body.includes(`TEST-ORD-${id}`));
@@ -141,14 +134,7 @@ describe('Financial Push & Feed Notifications Integration', () => {
       buyer: { id: buyer.id }
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
-    const { rows: refundNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'refund_completed' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [buyerUser.id]
-    );
+    const refundNotifs = await waitForNotification(buyerUser.id, 'refund_completed');
     assert.equal(refundNotifs.length, 1, 'Buyer received refund_completed notification');
     assert.equal(refundNotifs[0].title, 'Refund Credited');
     assert.ok(refundNotifs[0].body.includes('1,200'));
@@ -170,14 +156,7 @@ describe('Financial Push & Feed Notifications Integration', () => {
       withdrawal
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
-    const { rows: createdNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'withdrawal_created' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [creatorUser.id]
-    );
+    const createdNotifs = await waitForNotification(creatorUser.id, 'withdrawal_created');
     assert.equal(createdNotifs.length, 1, 'Creator received withdrawal_created notification');
     assert.ok(createdNotifs[0].body.includes('4,500'));
 
@@ -188,14 +167,7 @@ describe('Financial Push & Feed Notifications Integration', () => {
       newBalance: 500
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
-    const { rows: completedNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'withdrawal_updated' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [creatorUser.id]
-    );
+    const completedNotifs = await waitForNotification(creatorUser.id, 'withdrawal_updated');
     assert.equal(completedNotifs.length, 1, 'Creator received withdrawal_updated notification');
     assert.equal(completedNotifs[0].title, 'Payout sent');
     assert.ok(completedNotifs[0].body.includes('4,500'));
@@ -216,14 +188,7 @@ describe('Financial Push & Feed Notifications Integration', () => {
       withdrawal
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
-    const { rows: createdNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'withdrawal_created' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [buyerUser.id]
-    );
+    const createdNotifs = await waitForNotification(buyerUser.id, 'withdrawal_created');
     assert.equal(createdNotifs.length, 1, 'Buyer received withdrawal_created notification');
     assert.ok(createdNotifs[0].body.includes('1,800'));
 
@@ -233,14 +198,7 @@ describe('Financial Push & Feed Notifications Integration', () => {
       withdrawal
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
-    const { rows: completedNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'withdrawal_updated' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [buyerUser.id]
-    );
+    const completedNotifs = await waitForNotification(buyerUser.id, 'withdrawal_updated');
     assert.equal(completedNotifs.length, 1, 'Buyer received withdrawal_updated notification');
     assert.equal(completedNotifs[0].title, 'Refund payout complete');
     assert.ok(completedNotifs[0].body.includes('1,800'));
@@ -262,26 +220,14 @@ describe('Financial Push & Feed Notifications Integration', () => {
       items: [{ product_id: 1, is_digital: false }]
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
     // Buyer received order_fulfilled, not duplicate order_payment_success
-    const { rows: buyerNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'order_fulfilled' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [buyerUser.id]
-    );
+    const buyerNotifs = await waitForNotification(buyerUser.id, 'order_fulfilled');
     assert.equal(buyerNotifs.length, 1, 'Buyer received order_fulfilled notification');
     assert.equal(buyerNotifs[0].title, 'Order fulfilled');
     assert.ok(buyerNotifs[0].body.includes(`TEST-ORD-${id}`));
 
     // Seller received order_fulfilled
-    const { rows: sellerNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'order_fulfilled' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [sellerUser.id]
-    );
+    const sellerNotifs = await waitForNotification(sellerUser.id, 'order_fulfilled');
     assert.equal(sellerNotifs.length, 1, 'Seller received order_fulfilled notification');
     assert.equal(sellerNotifs[0].title, 'Order fulfilled');
   });
@@ -302,25 +248,13 @@ describe('Financial Push & Feed Notifications Integration', () => {
       items: [{ product_id: 1, quantity: 1 }]
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
     // Buyer received cancellation notice
-    const { rows: buyerNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'order_cancelled' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [buyerUser.id]
-    );
+    const buyerNotifs = await waitForNotification(buyerUser.id, 'order_cancelled');
     assert.equal(buyerNotifs.length, 1, 'Buyer received order_cancelled notification');
     assert.ok(buyerNotifs[0].body.includes('cancelled'));
 
     // Seller received cancellation notice
-    const { rows: sellerNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'order_cancelled' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [sellerUser.id]
-    );
+    const sellerNotifs = await waitForNotification(sellerUser.id, 'order_cancelled');
     assert.equal(sellerNotifs.length, 1, 'Seller received order_cancelled notification');
     assert.ok(sellerNotifs[0].body.includes(`TEST-ORD-${id}`));
   });
@@ -348,15 +282,8 @@ describe('Financial Push & Feed Notifications Integration', () => {
       buyer: { id: buyer.id }
     });
 
-    await new Promise(r => setTimeout(r, 200));
-
     // Seller received refund notification
-    const { rows: sellerNotifs } = await pool.query(
-      `SELECT * FROM app_notifications 
-       WHERE recipient_user_id = $1 AND type = 'order_refunded' 
-       ORDER BY created_at DESC LIMIT 1`,
-      [sellerUser.id]
-    );
+    const sellerNotifs = await waitForNotification(sellerUser.id, 'order_refunded');
     assert.equal(sellerNotifs.length, 1, 'Seller received order_refunded notification');
     assert.equal(sellerNotifs[0].title, 'Order Refunded');
     assert.ok(sellerNotifs[0].body.includes(testOrder.order_number));
