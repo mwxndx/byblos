@@ -28,6 +28,7 @@ export function useShopPage() {
   const [sellerTheme, setSellerTheme] = useState<Theme>('default');
   const themeClasses = useShopAccentOnly(sellerTheme);
 
+  const [creatorModeNotice, setCreatorModeNotice] = useState<string | null>(null);
   const trackCreatorLink = useTrackCreatorLinkMutation();
 
   useEffect(() => {
@@ -35,9 +36,19 @@ export function useShopPage() {
     if (!creatorCode) return;
 
     const storageKey = `creator-click:${creatorCode}`;
-    if (sessionStorage.getItem(storageKey)) return;
-    sessionStorage.setItem(storageKey, '1');
-    trackCreatorLink.mutate(creatorCode);
+    const alreadyClicked = sessionStorage.getItem(storageKey);
+    if (!alreadyClicked) {
+      sessionStorage.setItem(storageKey, '1');
+    }
+
+    trackCreatorLink.mutate(creatorCode, {
+      onSuccess: (data: unknown) => {
+        const resp = data as { status?: string; code?: string; message?: string; data?: { sellerCreatorModeOff?: boolean; message?: string } };
+        if (resp?.data?.sellerCreatorModeOff || resp?.code === 'SELLER_CREATOR_MODE_OFF' || resp?.status === 'fail') {
+          setCreatorModeNotice(resp?.message || resp?.data?.message || 'This seller has switched off creator mode.');
+        }
+      }
+    });
   }, [location.search, trackCreatorLink]);
 
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
@@ -96,6 +107,10 @@ export function useShopPage() {
 
     setSellerInfo(sellerData);
     setAvatarLoadFailed(false);
+
+    if (!sellerData.isCreatorMarketplaceEnabled && new URLSearchParams(location.search).get('creator')) {
+      setCreatorModeNotice(`${sellerData.shopName || 'This seller'} has switched off creator mode.`);
+    }
 
     // Store seller's saved theme for accent/button colouring
     setSellerTheme((sellerData.theme as Theme) || 'default');
@@ -156,6 +171,7 @@ export function useShopPage() {
 
   return {
     sellerInfo,
+    creatorModeNotice,
     themeClasses,
     shopPageTheme,
     setShopPageTheme,

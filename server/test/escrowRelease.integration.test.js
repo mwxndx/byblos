@@ -131,13 +131,13 @@ describe('EscrowManager.releaseFunds (integration)', () => {
     );
     assert.equal(referralRows.length, 1);
     assert.equal(referralRows[0].units_sold, 5);
-    // This is the actual regression assertion: NOT 15, capped at 10.
-    assert.equal(Number(referralRows[0].amount), 10);
+    // Creator referral reward is flat KES 3.
+    assert.equal(Number(referralRows[0].amount), 3);
 
     const { rows: creatorRows } = await pool.query(
       'SELECT total_referral_earnings FROM creators WHERE id = $1',
       [referrerCreator.id]
     );
-    assert.equal(Number(creatorRows[0].total_referral_earnings), 10);
+    assert.equal(Number(creatorRows[0].total_referral_earnings), 3);
   });
 });

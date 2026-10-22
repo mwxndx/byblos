@@ -24,6 +24,7 @@ const Fees = {
     CREATOR_MIN_COMMISSION_RATE: 0.01,  // Minimum allowed creator commission rate (1%)
     CREATOR_MAX_COMMISSION_RATE: 0.30,  // Maximum allowed creator commission rate (30%)
     CREATOR_COMMISSION_RATE: 0.01,     // Default creator cut from seller payout base
+    CREATOR_REFERRAL_REWARD: 3,        // Flat KES 3 referral reward for creator who invited the seller
     REFERRAL_REWARD_PER_PRODUCT: 3,    // Flat KES 3 referral reward per product sold by a referred seller
     DEFAULT_CURRENCY: 'KES',
     MIN_WITHDRAWAL_AMOUNT: 50,         // Minimum seller withdrawal amount in KES

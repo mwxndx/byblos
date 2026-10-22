@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
-import { Loader2, Store, Package, ExternalLink, Sparkles } from '@/shared/ui/icons';
+import { Loader2, Store, Package, ExternalLink, Sparkles, AlertCircle } from '@/shared/ui/icons';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
 import { BagProvider } from '@/features/shop/bag/BagContext';
 import { BagSheet } from '@/features/shop/components/BagSheet';
@@ -18,6 +18,7 @@ const ShopPage = () => {
   const { shopName: routeShopName } = useParams<{ shopName: string }>();
   const {
     sellerInfo,
+    creatorModeNotice,
     themeClasses,
     shopPageTheme,
     setShopPageTheme,
@@ -105,6 +106,16 @@ const ShopPage = () => {
         url={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
         canonical={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
       />
+      {creatorModeNotice && (
+        <div className="sticky top-0 z-50 border-b border-amber-500/40 bg-amber-500/10 text-amber-900 dark:text-amber-200 px-4 py-2.5 backdrop-blur-md shadow-sm">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs sm:text-sm font-medium">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+              <span>{creatorModeNotice}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {isCreatorPreview && (
         <div className="sticky top-0 z-50 border-b border-yellow-400/30 bg-black/90 px-4 py-2.5 backdrop-blur-md shadow-lg">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">

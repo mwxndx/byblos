@@ -255,7 +255,7 @@ describe('CreatorService post-hoc self-dealing review hold (integration)', () =>
 
     const { rows: referralBefore } = await pool.query('SELECT amount FROM creator_referral_earnings WHERE order_id = $1', [order.id]);
     assert.equal(referralBefore.length, 1, 'sanity check: the unrelated referral reward was created');
-    assert.equal(Number(referralBefore[0].amount), 10, 'sanity check: capped at the platform fee, same as the dedicated P2-1 test');
+    assert.equal(Number(referralBefore[0].amount), 3, 'creator earns flat KES 3 referral reward');
 
     const result = await CreatorService.resolveFlaggedEarning({
       earningType: 'sales',
@@ -277,8 +277,8 @@ describe('CreatorService post-hoc self-dealing review hold (integration)', () =>
     // exists to guarantee instead of reusing the whole-order reversal helper.
     const { rows: referralAfter } = await pool.query('SELECT status, amount FROM creator_referral_earnings WHERE order_id = $1', [order.id]);
     assert.equal(referralAfter[0].status, 'credited');
-    assert.equal(Number(referralAfter[0].amount), 10);
+    assert.equal(Number(referralAfter[0].amount), 3);
     const { rows: referrerRows } = await pool.query('SELECT total_referral_earnings FROM creators WHERE id = $1', [referrerCreator.id]);
-    assert.equal(Number(referrerRows[0].total_referral_earnings), 10);
+    assert.equal(Number(referrerRows[0].total_referral_earnings), 3);
   });
 });

@@ -326,12 +326,20 @@ export const generateReferralCode = async (req, res, next) => {
 
 export const trackLinkClick = async (req, res, next) => {
   try {
-    await CreatorService.recordLinkClick({
+    const result = await CreatorService.recordLinkClick({
       code: req.params.code,
       ipAddress: req.ip,
       userAgent: req.get('user-agent')
     });
-    res.status(200).json({ status: 'success' });
+    if (result?.sellerCreatorModeOff) {
+      return res.status(200).json({
+        status: 'fail',
+        code: 'SELLER_CREATOR_MODE_OFF',
+        message: result.message,
+        data: result
+      });
+    }
+    res.status(200).json({ status: 'success', data: result });
   } catch (error) {
     next(error);
   }

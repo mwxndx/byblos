@@ -841,10 +841,12 @@ class CreatorService {
               c.email AS creator_email,
               c.mpesa_number AS creator_mpesa
        FROM seller_creator_links scl
+       JOIN sellers s ON s.id = scl.seller_id
        JOIN creators c ON c.id = scl.creator_id
        WHERE scl.code = $1
          AND scl.seller_id = $2
          AND scl.status = 'active'
+         AND s.is_creator_marketplace_enabled = TRUE
        LIMIT 1`,
       [String(code).trim().toUpperCase(), sellerId]
     );
@@ -1128,8 +1130,7 @@ class CreatorService {
 
     const units = Math.max(Number(order.total_quantity || 1), 1);
     const { amount, amountCents, uncappedAmount, capped } = computeCreatorReferralReward({
-      units,
-      rewardRatePerUnit: Fees.REFERRAL_REWARD_PER_PRODUCT || 3,
+      rewardFlatAmount: Fees.CREATOR_REFERRAL_REWARD || 3,
       platformFeeAmount: Fees.PLATFORM_COMMISSION_AMOUNT || 10
     });
 
@@ -1196,30 +1197,54 @@ class CreatorService {
     const normalizedCode = String(code || '').trim().toUpperCase();
     if (!normalizedCode) return null;
 
+    const { rows: linkRows } = await pool.query(
+      `SELECT scl.id, scl.creator_id, scl.seller_id, scl.status, s.is_creator_marketplace_enabled, s.shop_name
+       FROM seller_creator_links scl
+       JOIN sellers s ON s.id = scl.seller_id
+       WHERE scl.code = $1
+       LIMIT 1`,
+      [normalizedCode]
+    );
+
+    const link = linkRows[0];
+    if (!link) return null;
+
+    if (!link.is_creator_marketplace_enabled || link.status !== 'active') {
+      return {
+        active: false,
+        sellerCreatorModeOff: true,
+        sellerId: link.seller_id,
+        creatorId: link.creator_id,
+        shopName: link.shop_name,
+        message: `${link.shop_name || 'This seller'} has switched off creator mode.`
+      };
+    }
+
     const { rows } = await pool.query(
-      `WITH target AS (
-         SELECT id, creator_id, seller_id
-         FROM seller_creator_links
-         WHERE code = $1 AND status = 'active'
-         LIMIT 1
-       ),
-       updated AS (
+      `WITH updated AS (
          UPDATE seller_creator_links
          SET click_count = click_count + 1,
              updated_at = NOW()
-         WHERE id = (SELECT id FROM target)
+         WHERE id = $1
          RETURNING id
        ),
        inserted AS (
          INSERT INTO creator_link_clicks (seller_creator_link_id, creator_id, seller_id, ip_address, user_agent)
-         SELECT id, creator_id, seller_id, $2, $3 FROM target
+         VALUES ($1, $2, $3, $4, $5)
          RETURNING id
        )
-       SELECT target.id, target.creator_id, target.seller_id FROM target`,
-      [normalizedCode, ipAddress || null, userAgent || null]
+       SELECT $1::int AS id, $2::int AS creator_id, $3::int AS seller_id`,
+      [link.id, link.creator_id, link.seller_id, ipAddress || null, userAgent || null]
     );
 
-    return rows[0] || null;
+    return {
+      active: true,
+      sellerCreatorModeOff: false,
+      id: link.id,
+      creatorId: link.creator_id,
+      sellerId: link.seller_id,
+      shopName: link.shop_name
+    };
   }
 
   static getAnalysisPeriod(period) {
@@ -1537,7 +1562,7 @@ class CreatorService {
     const creator = creatorRowsResult.rows[0];
     if (!creator) throw new Error('Creator profile not found.');
 
-    const { rows: shops } = await pool.query(
+    const { rows: rawShops } = await pool.query(
       `SELECT scl.id,
               scl.seller_id,
               scl.code,
@@ -1548,17 +1573,31 @@ class CreatorService {
               s.slug,
               s.avatar_url,
               s.full_name AS seller_name,
+              s.is_creator_marketplace_enabled,
               COUNT(ce.id) AS sales_count,
               COALESCE(SUM(ce.amount), 0) AS earnings
        FROM seller_creator_links scl
        JOIN sellers s ON s.id = scl.seller_id
        LEFT JOIN creator_earnings ce ON ce.seller_creator_link_id = scl.id
        WHERE scl.creator_id = $1
-         AND scl.status = 'active'
-       GROUP BY scl.id, scl.seller_id, s.shop_name, s.slug, s.avatar_url, s.full_name
+         AND scl.status IN ('active', 'paused')
+       GROUP BY scl.id, scl.seller_id, s.shop_name, s.slug, s.avatar_url, s.full_name, s.is_creator_marketplace_enabled
        ORDER BY scl.created_at DESC`,
       [creatorId]
     );
+
+    const baseUrl = process.env.FRONTEND_URL || '';
+    const shops = rawShops.map((s) => {
+      const isPaused = !s.is_creator_marketplace_enabled || s.status === 'paused';
+      const slug = s.slug || s.shop_name;
+      return {
+        ...s,
+        status: isPaused ? 'paused' : s.status,
+        code: isPaused ? null : s.code,
+        shopUrl: isPaused ? null : `${baseUrl}/${slug}?creator=${s.code}`,
+        sellerCreatorModeOff: !s.is_creator_marketplace_enabled
+      };
+    });
 
     const { rows: shopRequests } = await pool.query(
       `SELECT sci.id,
@@ -1865,44 +1904,66 @@ class CreatorService {
         createdAt: r.created_at,
         status: r.status
       })),
-      activeCreators: activeCreators.map((a) => ({
-        id: a.id,
-        creatorId: a.creator_id,
-        creatorName: `${a.first_name} ${a.last_name || ''}`.trim(),
-        email: a.email,
-        whatsappNumber: a.whatsapp_number,
-        instagramLink: a.instagram_link || null,
-        tiktokLink: a.tiktok_link || null,
-        code: a.code,
-        commissionRate: Number(a.commission_rate),
-        clickCount: Number(a.click_count || 0),
-        salesCount: Number(a.sales_count || 0),
-        revenueGenerated: Number(a.revenue_generated || 0),
-        earningsPaid: Number(a.earnings_paid || 0),
-        createdAt: a.created_at,
-        shopUrl: `${baseUrl}/${slug}?creator=${a.code}`
-      })),
+      activeCreators: activeCreators.map((a) => {
+        const isPaused = !seller.is_creator_marketplace_enabled || a.status === 'paused';
+        return {
+          id: a.id,
+          creatorId: a.creator_id,
+          creatorName: `${a.first_name} ${a.last_name || ''}`.trim(),
+          email: a.email,
+          whatsappNumber: a.whatsapp_number,
+          instagramLink: a.instagram_link || null,
+          tiktokLink: a.tiktok_link || null,
+          code: isPaused ? null : a.code,
+          commissionRate: Number(a.commission_rate),
+          clickCount: Number(a.click_count || 0),
+          salesCount: Number(a.sales_count || 0),
+          revenueGenerated: Number(a.revenue_generated || 0),
+          earningsPaid: Number(a.earnings_paid || 0),
+          createdAt: a.created_at,
+          status: isPaused ? 'paused' : a.status,
+          shopUrl: isPaused ? null : `${baseUrl}/${slug}?creator=${a.code}`
+        };
+      }),
       manualInvites
     };
   }
 
   static async updateSellerCreatorListing(sellerId, { isCreatorMarketplaceEnabled, creatorCommissionRate }) {
-    const updates = [];
-    const values = [sellerId];
-    let paramIndex = 2;
-
-    if (isCreatorMarketplaceEnabled !== undefined) {
-      updates.push(`is_creator_marketplace_enabled = $${paramIndex++}`);
-      values.push(Boolean(isCreatorMarketplaceEnabled));
-    }
-
     if (creatorCommissionRate !== undefined) {
       const numericRate = Number(creatorCommissionRate);
       if (!Number.isFinite(numericRate) || numericRate < MIN_CREATOR_COMMISSION_RATE || numericRate > MAX_CREATOR_COMMISSION_RATE) {
         throw new Error('Creator commission must be between 1% and 30%');
       }
+    }
+
+    const { rows: currentSellerRows } = await pool.query(
+      `SELECT id, shop_name, is_creator_marketplace_enabled FROM sellers WHERE id = $1`,
+      [sellerId]
+    );
+    const currentSeller = currentSellerRows[0];
+    if (!currentSeller) throw new AppError('Seller not found', 404);
+
+    const updates = [];
+    const values = [sellerId];
+    let paramIndex = 2;
+
+    const turningOff = isCreatorMarketplaceEnabled !== undefined &&
+      currentSeller.is_creator_marketplace_enabled &&
+      Boolean(isCreatorMarketplaceEnabled) === false;
+
+    const turningOn = isCreatorMarketplaceEnabled !== undefined &&
+      !currentSeller.is_creator_marketplace_enabled &&
+      Boolean(isCreatorMarketplaceEnabled) === true;
+
+    if (isCreatorMarketplaceEnabled !== undefined) {
+      updates.push('is_creator_marketplace_enabled = $' + (paramIndex++));
+      values.push(Boolean(isCreatorMarketplaceEnabled));
+    }
+
+    if (creatorCommissionRate !== undefined) {
       const normalizedRate = normalizeCommissionRate(creatorCommissionRate);
-      updates.push(`creator_commission_rate = $${paramIndex++}`);
+      updates.push('creator_commission_rate = $' + (paramIndex++));
       values.push(normalizedRate);
     }
 
@@ -1910,18 +1971,94 @@ class CreatorService {
 
     updates.push(`updated_at = NOW()`);
 
-    const { rows } = await pool.query(
-      `UPDATE sellers
-       SET ${updates.join(', ')}
-       WHERE id = $1
-       RETURNING id, shop_name, is_creator_marketplace_enabled, creator_commission_rate`,
-      values
-    );
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    return {
-      isCreatorMarketplaceEnabled: Boolean(rows[0].is_creator_marketplace_enabled),
-      creatorCommissionRate: Number(rows[0].creator_commission_rate)
-    };
+      const { rows } = await client.query(
+        `UPDATE sellers
+         SET ${updates.join(', ')}
+         WHERE id = $1
+         RETURNING id, shop_name, is_creator_marketplace_enabled, creator_commission_rate`,
+        values
+      );
+
+      if (turningOff) {
+        const { rows: activeLinks } = await client.query(
+          `SELECT scl.id, scl.creator_id, c.user_id AS creator_user_id
+           FROM seller_creator_links scl
+           JOIN creators c ON c.id = scl.creator_id
+           WHERE scl.seller_id = $1 AND scl.status = 'active'`,
+          [sellerId]
+        );
+
+        if (activeLinks.length > 0) {
+          await client.query(
+            `UPDATE seller_creator_links
+             SET status = 'paused', updated_at = NOW()
+             WHERE seller_id = $1 AND status = 'active'`,
+            [sellerId]
+          );
+
+          for (const link of activeLinks) {
+            if (link.creator_user_id) {
+              notificationService.send({
+                recipientUserId: link.creator_user_id,
+                recipientRole: 'creator',
+                type: 'creator_mode_disabled',
+                title: `${currentSeller.shop_name} switched off Creator Mode`,
+                body: `${currentSeller.shop_name} has switched off creator mode. Your collaboration link is temporarily paused until the seller re-enables creator mode.`,
+                data: { path: '/creator/dashboard', sellerId },
+                channels: ['in_app', 'push']
+              }).catch((error) => logger.warn('[CreatorService] Notification failed', { creatorId: link.creator_id, error: error.message }));
+            }
+          }
+        }
+      } else if (turningOn) {
+        const { rows: pausedLinks } = await client.query(
+          `SELECT scl.id, scl.creator_id, c.user_id AS creator_user_id
+           FROM seller_creator_links scl
+           JOIN creators c ON c.id = scl.creator_id
+           WHERE scl.seller_id = $1 AND scl.status = 'paused'`,
+          [sellerId]
+        );
+
+        if (pausedLinks.length > 0) {
+          await client.query(
+            `UPDATE seller_creator_links
+             SET status = 'active', updated_at = NOW()
+             WHERE seller_id = $1 AND status = 'paused'`,
+            [sellerId]
+          );
+
+          for (const link of pausedLinks) {
+            if (link.creator_user_id) {
+              notificationService.send({
+                recipientUserId: link.creator_user_id,
+                recipientRole: 'creator',
+                type: 'creator_mode_enabled',
+                title: `${currentSeller.shop_name} re-enabled Creator Mode`,
+                body: `${currentSeller.shop_name} has re-enabled creator mode. Your collaboration link is active again!`,
+                data: { path: '/creator/dashboard', sellerId },
+                channels: ['in_app', 'push']
+              }).catch((error) => logger.warn('[CreatorService] Notification failed', { creatorId: link.creator_id, error: error.message }));
+            }
+          }
+        }
+      }
+
+      await client.query('COMMIT');
+
+      return {
+        isCreatorMarketplaceEnabled: Boolean(rows[0].is_creator_marketplace_enabled),
+        creatorCommissionRate: Number(rows[0].creator_commission_rate)
+      };
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   static async respondToCreatorCollaborationRequest(sellerId, requestId, action) {

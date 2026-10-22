@@ -40,12 +40,12 @@ export async function createBuyer({ userId = null, email, mobilePayment, fullNam
   return rows[0];
 }
 
-export async function createSeller({ userId = null, shopName, email, creatorCommissionRate = 0.01 } = {}) {
+export async function createSeller({ userId = null, shopName, email, creatorCommissionRate = 0.01, isCreatorMarketplaceEnabled = true } = {}) {
   const { rows } = await pool.query(
-    `INSERT INTO sellers (user_id, full_name, shop_name, email, creator_commission_rate)
-     VALUES ($1, 'Test Seller', $2, $3, $4)
+    `INSERT INTO sellers (user_id, full_name, shop_name, email, creator_commission_rate, is_creator_marketplace_enabled)
+     VALUES ($1, 'Test Seller', $2, $3, $4, $5)
      RETURNING *`,
-    [userId, shopName || unique('Test Shop '), email || `${unique('seller')}@test.byblos.local`, creatorCommissionRate]
+    [userId, shopName || unique('Test Shop '), email || `${unique('seller')}@test.byblos.local`, creatorCommissionRate, isCreatorMarketplaceEnabled]
   );
   return rows[0];
 }

@@ -74,8 +74,8 @@ export default async () => {
             logger.error('❌ Failed to start cleanup cron:', err.message);
         }
     }
-    // 7. Monthly referral reward payout
-    if (process.env.ENABLE_REFERRAL_CRON !== 'false') {
+    // 7. Monthly referral reward payout (Retired: seller-to-seller referrals discontinued)
+    if (process.env.ENABLE_REFERRAL_CRON === 'true') {
         try {
             scheduleReferralRewards();
             logger.info('Referral rewards cron started');

@@ -41,13 +41,21 @@ export function roundMoney(amount) {
  * @param {number} params.platformFeeAmount - flat KES platform fee collected on the order (Fees.PLATFORM_COMMISSION_AMOUNT)
  * @returns {{ amount: number, amountCents: number, uncappedAmount: number, capped: boolean }}
  */
-export function computeCreatorReferralReward({ units, rewardRatePerUnit, platformFeeAmount }) {
-  const safeUnits = Math.max(Number(units) || 1, 1);
-  const safeRate = Number(rewardRatePerUnit) || 0;
-  const safeFee = Number(platformFeeAmount) || 0;
-
-  const uncappedAmountCents = Math.round(safeUnits * safeRate * 100);
+export function computeCreatorReferralReward({ units, rewardRatePerUnit, rewardFlatAmount, platformFeeAmount = 10 } = {}) {
+  const safeFee = Number(platformFeeAmount) || 10;
   const platformFeeCents = Math.round(safeFee * 100);
+
+  let uncappedAmountCents;
+  if (rewardFlatAmount !== undefined) {
+    uncappedAmountCents = Math.round(Number(rewardFlatAmount) * 100);
+  } else if (units !== undefined || rewardRatePerUnit !== undefined) {
+    const safeUnits = Math.max(Number(units) || 1, 1);
+    const safeRate = Number(rewardRatePerUnit) || 0;
+    uncappedAmountCents = Math.round(safeUnits * safeRate * 100);
+  } else {
+    uncappedAmountCents = 300;
+  }
+
   const amountCents = Math.min(uncappedAmountCents, platformFeeCents);
 
   return {

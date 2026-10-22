@@ -19,69 +19,13 @@ class ReferralService {
     // ─── Code Generation ────────────────────────────────────────────────────────
 
     /**
-     * Generate & persist a unique BY+6-char alphanumeric referral code.
+     * Generate & persist a unique referral code.
+     * (Retired: Seller-to-seller referrals are discontinued)
      * @param {number} sellerId
-     * @returns {Promise<string>} the generated code
+     * @returns {Promise<string>}
      */
     static async generateReferralCode(sellerId) {
-        // BUG 1: Enforce sales lock
-        const sellerCheck = await pool.query(
-            'SELECT total_sales FROM sellers WHERE id = $1',
-            [sellerId]
-        );
-
-        if (sellerCheck.rowCount === 0) {
-            throw new AppError('Seller not found', 404);
-        }
-
-        const totalSales = Number.parseFloat(sellerCheck.rows[0].total_sales || 0);
-
-        if (totalSales <= 0) {
-            // Fallback: check if there's at least one paid order (even if not yet in total_sales/escrow release)
-            const orderCheck = await pool.query(
-                `SELECT 1 FROM product_orders 
-                 WHERE seller_id = $1 AND payment_status IN ('completed', 'paid')
-                 LIMIT 1`,
-                [sellerId]
-            );
-
-            if (orderCheck.rowCount === 0) {
-                throw new AppError('Complete your first sale to unlock referrals', 403);
-            }
-        }
-
-        const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-        let code;
-        let attempts = 0;
-        const MAX_ATTEMPTS = 10;
-
-        while (attempts < MAX_ATTEMPTS) {
-            let suffix = '';
-            for (let i = 0; i < 6; i++) {
-                // Use crypto.randomInt for secure randomness (SonarQube compliance)
-                suffix += CHARS.charAt(crypto.randomInt(0, CHARS.length));
-            }
-            code = `BY${suffix}`;
-
-            // Check uniqueness before saving
-            const existing = await pool.query(
-                'SELECT id FROM sellers WHERE referral_code = $1',
-                [code]
-            );
-            if (existing.rowCount === 0) break; // unique!
-            attempts++;
-        }
-
-        if (!code) throw new AppError('Failed to generate unique referral code', 500);
-
-        await pool.query(
-            'UPDATE sellers SET referral_code = $1 WHERE id = $2',
-            [code, sellerId]
-        );
-
-        logger.info(`[REFERRAL] Generated referral code ${code} for seller ${sellerId}`);
-        return code;
+        throw new AppError('Seller referral program is discontinued. Only creators can refer businesses.', 410);
     }
 
     // ─── Link Generation ────────────────────────────────────────────────────────
@@ -100,126 +44,73 @@ class ReferralService {
 
     /**
      * Called during seller registration when a ?ref=CODE is present.
-     * Links the new seller to the referrer. Does NOT set referral_active_until.
+     * Links the new seller to the referring creator.
+     * Only creator referral codes (CR...) are supported; seller referral codes are discontinued.
      * @param {number} newSellerId
      * @param {string} referralCode
      */
     static async applyReferral(newSellerId, referralCode, dbClient = pool) {
         const normalizedCode = String(referralCode || '').trim().toUpperCase();
-        if (!newSellerId || !/^(BY[A-Z0-9]{6}|CR[A-Z0-9]+)$/.test(normalizedCode)) {
-            logger.warn(`[ReferralService] Invalid referral code format used: ${referralCode}`);
+        if (!newSellerId || !normalizedCode.startsWith('CR')) {
+            logger.info(`[ReferralService] Seller-to-seller referrals are discontinued. Only creator codes (CR...) are supported: ${referralCode}`);
             return null;
         }
 
-        if (normalizedCode.startsWith('CR')) {
-            let creatorResult;
-            try {
-                creatorResult = await dbClient.query(
-                    'SELECT id FROM creators WHERE referral_code = $1 AND status = $2',
-                    [normalizedCode, 'active']
-                );
-            } catch (err) {
-                const errorMsg = err instanceof Error ? err.message : String(err);
-                logger.error(`[ReferralService] Error looking up creator referral code: ${errorMsg}`);
-                return null;
-            }
-
-            if (creatorResult.rowCount === 0) {
-                logger.warn(`[ReferralService] Invalid creator referral code used: ${referralCode}`);
-                return null;
-            }
-
-            const creatorId = creatorResult.rows[0].id;
-
-            // Cap invited businesses: a creator earns the referral reward from at
-            // most MAX_ACTIVE_INVITES sellers. Beyond that, the seller still
-            // registers normally — the referral is simply not attributed, so no
-            // KSh reward is created. Counts only currently-attributed sellers, so
-            // leaving one (referred_by_creator_id -> NULL) frees a slot.
-            const inviteCount = await dbClient.query(
-                'SELECT COUNT(*)::int AS n FROM sellers WHERE referred_by_creator_id = $1',
-                [creatorId]
-            );
-            if (inviteCount.rows[0].n >= MAX_ACTIVE_INVITES) {
-                logger.info(`[REFERRAL] Creator ${creatorId} at invite cap (${MAX_ACTIVE_INVITES}); seller ${newSellerId} not attributed for code ${normalizedCode}`);
-                return null;
-            }
-
-            const updateResult = await dbClient.query(
-                'UPDATE sellers SET referred_by_creator_id = $1 WHERE id = $2 AND referred_by_creator_id IS NULL RETURNING id',
-                [creatorId, newSellerId]
-            );
-
-            if (updateResult.rowCount === 0) {
-                logger.info(`[REFERRAL] Seller ${newSellerId} already has a creator referrer; skipped code ${normalizedCode}`);
-                return null;
-            }
-
-            logger.info(`[REFERRAL] Seller ${newSellerId} referred by creator ${creatorId} (code: ${normalizedCode})`);
-            return { referredSellerId: newSellerId, referrerCreatorId: creatorId };
-        }
-
-        let referrerResult;
+        let creatorResult;
         try {
-            referrerResult = await dbClient.query(
-                'SELECT id FROM sellers WHERE referral_code = $1',
-                [normalizedCode]
+            creatorResult = await dbClient.query(
+                'SELECT id FROM creators WHERE referral_code = $1 AND status = $2',
+                [normalizedCode, 'active']
             );
         } catch (err) {
             const errorMsg = err instanceof Error ? err.message : String(err);
-            logger.error(`[ReferralService] Error looking up referral code: ${errorMsg}`);
+            logger.error(`[ReferralService] Error looking up creator referral code: ${errorMsg}`);
             return null;
         }
 
-        if (referrerResult.rowCount === 0) {
-            logger.warn(`[ReferralService] Invalid referral code used: ${referralCode}`);
+        if (creatorResult.rowCount === 0) {
+            logger.warn(`[ReferralService] Invalid creator referral code used: ${referralCode}`);
             return null;
         }
 
-        const referrerId = referrerResult.rows[0].id;
+        const creatorId = creatorResult.rows[0].id;
 
-        // Guard: prevent self-referral
-        if (referrerId === newSellerId) {
-            logger.warn(`[REFERRAL] Seller ${newSellerId} tried to use their own referral code`);
-            return;
+        // Cap invited businesses: a creator earns the referral reward from at
+        // most MAX_ACTIVE_INVITES sellers. Beyond that, the seller still
+        // registers normally — the referral is simply not attributed, so no
+        // KSh reward is created. Counts only currently-attributed sellers, so
+        // leaving one (referred_by_creator_id -> NULL) frees a slot.
+        const inviteCount = await dbClient.query(
+            'SELECT COUNT(*)::int AS n FROM sellers WHERE referred_by_creator_id = $1',
+            [creatorId]
+        );
+        if (inviteCount.rows[0].n >= MAX_ACTIVE_INVITES) {
+            logger.info(`[REFERRAL] Creator ${creatorId} at invite cap (${MAX_ACTIVE_INVITES}); seller ${newSellerId} not attributed for code ${normalizedCode}`);
+            return null;
         }
 
         const updateResult = await dbClient.query(
-            'UPDATE sellers SET referred_by_seller_id = $1 WHERE id = $2 AND referred_by_seller_id IS NULL RETURNING id',
-            [referrerId, newSellerId]
+            'UPDATE sellers SET referred_by_creator_id = $1 WHERE id = $2 AND referred_by_creator_id IS NULL RETURNING id',
+            [creatorId, newSellerId]
         );
 
         if (updateResult.rowCount === 0) {
-            logger.info(`[REFERRAL] Seller ${newSellerId} already has a referrer; skipped code ${normalizedCode}`);
+            logger.info(`[REFERRAL] Seller ${newSellerId} already has a creator referrer; skipped code ${normalizedCode}`);
             return null;
         }
 
-        logger.info(`[REFERRAL] Seller ${newSellerId} referred by seller ${referrerId} (code: ${normalizedCode})`);
-        return { referredSellerId: newSellerId, referrerSellerId: referrerId };
+        logger.info(`[REFERRAL] Seller ${newSellerId} referred by creator ${creatorId} (code: ${normalizedCode})`);
+        return { referredSellerId: newSellerId, referrerCreatorId: creatorId };
     }
 
     // ─── First-Sale Activation Hook ─────────────────────────────────────────────
 
     /**
      * Called after a referred seller completes their FIRST paid order.
-     * Sets referral_active_until = NOW() + 3 months.
-     * @param {number} referredSellerId
+     * (Retired: seller-to-seller referrals are discontinued).
+     * @param {number} _referredSellerId
      */
-    static async activateReferral(referredSellerId) {
-        const result = await pool.query(
-            `UPDATE sellers
-       SET referral_active_until = NOW() + INTERVAL '3 months'
-       WHERE id = $1
-         AND referred_by_seller_id IS NOT NULL
-         AND referral_active_until IS NULL
-       RETURNING *`,
-            [referredSellerId]
-        );
-
-        if (result.rowCount > 0) {
-            logger.info(`[REFERRAL] Activated referral for seller ${referredSellerId} — expires ${result.rows[0].referral_active_until}`);
-            return result.rows[0];
-        }
+    static async activateReferral(_referredSellerId) {
         return null;
     }
 
