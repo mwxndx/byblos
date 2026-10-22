@@ -4,7 +4,8 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
-import { releaseOrderReservations } from '../../../shared/utils/reservationRelease.js';
+import { releaseOrderReservations } from '../utils/reservationRelease.js';
+import settlementService from '../escrow/settlement.service.js';
 
 class OrderDeadlineService {
     /**
@@ -606,6 +607,10 @@ class OrderDeadlineService {
                     [lockedOrder.id]
                 );
             }
+
+            // Reverse any escrow settlement hold or creator earnings attached to this cancelled order
+            await settlementService.reverseOrderSettlementForRefund(client, lockedOrder.id, 'deadline_timeout_cancellation');
+            await settlementService.reverseCreatorEarningsForRefund(client, lockedOrder.id, 'deadline_timeout_cancellation');
 
             await client.query('COMMIT');
 

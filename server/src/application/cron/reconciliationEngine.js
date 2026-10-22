@@ -135,8 +135,8 @@ class ReconciliationEngine {
                     logger.info(`[RECON] Released ${released} product reservation(s) for expired order ${order.id}`);
                 }
 
-                await Order.updateStatusWithSideEffects(client, order.id, OrderStatus.CANCELLED, PaymentStatus.CANCELLED);
-                await this.markCancellationReason(client, order.id, 'system_timeout');
+                await Order.updateStatusWithSideEffects(client, order.id, OrderStatus.EXPIRED, PaymentStatus.CANCELLED);
+                await this.markCancellationReason(client, order.id, 'reservation_expired');
 
                 await client.query('COMMIT');
                 logger.info(`[RECON] Expired order ${order.id} (${lockedOrder.order_type}) cancelled successfully.`);

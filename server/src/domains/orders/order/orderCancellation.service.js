@@ -5,7 +5,7 @@ import Order from './order.model.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import InventoryReservationService from '../../commerce/products/inventoryReservation.service.js';
 import settlementService from '../escrow/settlement.service.js';
-
+import { assertValidTransition } from '../utils/OrderStatusGuard.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 
 class OrderCancellationService {
@@ -39,6 +39,8 @@ class OrderCancellationService {
       if (order.status === OrderStatus.REFUNDED) {
         throw new AppError('Order is already refunded', 400, 'ORDER_ALREADY_REFUNDED');
       }
+
+      assertValidTransition(order.status, OrderStatus.CANCELLED, orderId);
 
       const updatedOrder = await Order.updateStatusWithReason(client, orderId, OrderStatus.CANCELLED, reason);
 
