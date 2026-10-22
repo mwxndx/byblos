@@ -45,11 +45,38 @@ const BagContext = createContext<BagContextValue | null>(null);
  * naturally isolated to the current shop — leaving one shop and opening another
  * remounts a fresh, empty bag (spec §29: bags never mix between sellers).
  * Holds up to MAX_BAG_PRODUCTS distinct products (quantities can grow beyond that).
+ * Session-scoped per shopSlug so page refreshes and login redirects preserve the cart.
  */
-export function BagProvider({ seedProduct, children }: { seedProduct?: Product | null; children: ReactNode }) {
-  const [items, setItems] = useState<BagLine[]>([]);
+export function BagProvider({ seedProduct, shopSlug, children }: { seedProduct?: Product | null; shopSlug?: string; children: ReactNode }) {
+  const [items, setItems] = useState<BagLine[]>(() => {
+    if (typeof window === 'undefined' || !shopSlug) return [];
+    try {
+      const stored = sessionStorage.getItem(`byblos_bag_${shopSlug}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.debug('Failed to load stored bag:', e);
+    }
+    return [];
+  });
   const [isOpen, setIsOpen] = useState(false);
   const seededRef = useRef(false);
+
+  // Sync cart items to sessionStorage scoped by seller shop
+  useEffect(() => {
+    if (typeof window === 'undefined' || !shopSlug) return;
+    try {
+      if (items.length > 0) {
+        sessionStorage.setItem(`byblos_bag_${shopSlug}`, JSON.stringify(items));
+      } else {
+        sessionStorage.removeItem(`byblos_bag_${shopSlug}`);
+      }
+    } catch (e) {
+      console.debug('Failed to save bag to sessionStorage:', e);
+    }
+  }, [items, shopSlug]);
 
   // Pre-add a product carried over from another surface (e.g. a wishlist tap that
   // opens this shop with the item already in the bag — spec: wishlist → shop + bag).
@@ -67,8 +94,25 @@ export function BagProvider({ seedProduct, children }: { seedProduct?: Product |
   );
 
   const addProduct = useCallback((product: Product): AddResult => {
-    const already = items.some((l) => sameId(l.product.id, product.id));
+    const trackInventory = Boolean((product as unknown as ProductWithApiFields).track_inventory ?? (product as unknown as ProductWithApiFields).trackInventory);
+    const availableStock = typeof (product as unknown as ProductWithApiFields).quantity === 'number'
+      ? (product as unknown as ProductWithApiFields).quantity!
+      : Infinity;
+
+    if (trackInventory && availableStock <= 0) {
+      return { ok: false, reason: 'This product is out of stock.' };
+    }
+
+    const already = items.find((l) => sameId(l.product.id, product.id));
     if (already) {
+      if (trackInventory && already.quantity + 1 > availableStock) {
+        return {
+          ok: false,
+          reason: availableStock <= 0
+            ? 'This product is out of stock.'
+            : `Only ${availableStock} item${availableStock === 1 ? '' : 's'} available in stock.`
+        };
+      }
       setItems((prev) => prev.map((l) => (sameId(l.product.id, product.id) ? { ...l, quantity: l.quantity + 1 } : l)));
       return { ok: true };
     }
@@ -93,11 +137,32 @@ export function BagProvider({ seedProduct, children }: { seedProduct?: Product |
   const setQuantity = useCallback((productId: string | number, quantity: number) => {
     setItems((prev) => {
       if (quantity <= 0) return prev.filter((l) => !sameId(l.product.id, productId));
-      return prev.map((l) => (sameId(l.product.id, productId) ? { ...l, quantity } : l));
+      return prev.map((l) => {
+        if (!sameId(l.product.id, productId)) return l;
+        const trackInventory = Boolean((l.product as unknown as ProductWithApiFields).track_inventory ?? (l.product as unknown as ProductWithApiFields).trackInventory);
+        const availableStock = typeof (l.product as unknown as ProductWithApiFields).quantity === 'number'
+          ? (l.product as unknown as ProductWithApiFields).quantity!
+          : Infinity;
+        if (trackInventory && quantity > availableStock) {
+          toast.error(`Only ${availableStock} available in stock.`);
+          return { ...l, quantity: availableStock };
+        }
+        return { ...l, quantity };
+      });
     });
   }, []);
 
-  const clear = useCallback(() => setItems([]), []);
+  const clear = useCallback(() => {
+    setItems([]);
+    if (typeof window !== 'undefined' && shopSlug) {
+      try {
+        sessionStorage.removeItem(`byblos_bag_${shopSlug}`);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [shopSlug]);
+
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
 
@@ -133,4 +198,3 @@ export function useBag(): BagContextValue {
   if (!ctx) throw new Error('useBag must be used within a BagProvider');
   return ctx;
 }
-

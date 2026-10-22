@@ -91,7 +91,7 @@ const ShopPage = () => {
   }
 
   return (
-    <BagProvider seedProduct={bagAdd}>
+    <BagProvider seedProduct={bagAdd} shopSlug={routeShopName || sellerInfo?.slug || sellerInfo?.shopName}>
     <div
       className="shop-page-root min-h-screen transition-colors duration-300"
       data-shop-theme={resolvedShopTheme}

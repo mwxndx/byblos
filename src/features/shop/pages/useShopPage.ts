@@ -35,6 +35,19 @@ export function useShopPage() {
     const creatorCode = new URLSearchParams(location.search).get('creator');
     if (!creatorCode) return;
 
+    if (shopName) {
+      try {
+        sessionStorage.setItem(`byblos_creator_${shopName}`, creatorCode);
+      } catch (e) {
+        // ignore
+      }
+    }
+    try {
+      sessionStorage.setItem('byblos_last_creator', creatorCode);
+    } catch (e) {
+      // ignore
+    }
+
     const storageKey = `creator-click:${creatorCode}`;
     const alreadyClicked = sessionStorage.getItem(storageKey);
     if (!alreadyClicked) {

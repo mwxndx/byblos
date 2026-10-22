@@ -259,6 +259,23 @@ export const PaymentStatusModal = ({
               <div className="mt-2 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.04] p-2.5">
                 <p className="text-[11px] leading-relaxed text-slate-600 dark:text-white/60">Protected checkout, instant receipts, and live order tracking.</p>
               </div>
+              <div className="mt-4 w-full">
+                <button
+                  type="button"
+                  onClick={handleCancelAndRetry}
+                  disabled={isCancelling}
+                  className="flex h-10 w-full items-center justify-center rounded-xl border border-slate-300 dark:border-white/20 bg-transparent text-xs font-semibold text-slate-700 dark:text-white/80 transition-all hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
+                >
+                  {isCancelling ? (
+                    <>
+                      <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                      Cancelling prompt...
+                    </>
+                  ) : (
+                    "Didn't get prompt? Cancel & Try Again"
+                  )}
+                </button>
+              </div>
             </>
           )}
 

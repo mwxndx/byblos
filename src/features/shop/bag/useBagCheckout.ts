@@ -122,8 +122,12 @@ export function useBagCheckout(bag: BagContextValue) {
     setIsProcessingPurchase(true);
     try {
       const checkoutToken = getToken();
-      const creatorCode = new URLSearchParams(window.location.search).get('creator') || undefined;
-      const representative = bag.items[0].product;
+      const representative = bag.items[0]?.product;
+      const sellerSlug = representative?.seller?.slug || representative?.seller?.shopName;
+      const urlCreatorCode = new URLSearchParams(window.location.search).get('creator');
+      const sessionCreatorCode = (sellerSlug ? sessionStorage.getItem(`byblos_creator_${sellerSlug}`) : null)
+        || sessionStorage.getItem('byblos_last_creator');
+      const creatorCode = urlCreatorCode || sessionCreatorCode || undefined;
       const sellerId = (representative.sellerId as string | number | undefined) || representative.seller?.id;
       const deliveryBlock = wantsDoorDelivery
         ? { doorDelivery: true, door_delivery: true, deliveryMode: 'DOOR_DELIVERY', delivery_mode: 'DOOR_DELIVERY', address: doorDeliveryLocation?.address, latitude: doorDeliveryLocation?.lat, longitude: doorDeliveryLocation?.lng, buyerDeliveryLocation: doorDeliveryLocation, frontendQuote: door?.quote }
@@ -307,7 +311,7 @@ export function useBagCheckout(bag: BagContextValue) {
       if (!skipSave) {
         const saveResult = await saveBuyerInfoMutation.mutateAsync(buyerInfo as unknown as Parameters<typeof saveBuyerInfoMutation.mutateAsync>[0]);
         if (saveResult.requiresLogin) {
-          sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+          sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
           navigate('/buyer/login', { replace: true });
           return;
         }
