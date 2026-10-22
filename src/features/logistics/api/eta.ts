@@ -13,7 +13,7 @@ export interface ApiLiveEtaResponse {
 
 
 export async function fetchOrderLiveEta(orderId: string): Promise<ApiLiveEtaResponse> {
-  const response = await apiClient.get<{ status: string; data: ApiLiveEtaResponse }>(`/orders/${orderId}/live-eta`);
-  return response.data;
+  const response = await apiClient.get<{ status?: string; data?: ApiLiveEtaResponse }>(`/orders/${orderId}/live-eta`);
+  return (response.data?.data || response.data) as ApiLiveEtaResponse;
 }
 

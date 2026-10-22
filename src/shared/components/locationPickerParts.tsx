@@ -54,6 +54,9 @@ export function MapFlyTo({ position }: { position: [number, number] | null }) {
                 duration: 0.6
             });
         }
+        return () => {
+            map.stop();
+        };
     }, [position, map]);
     return null;
 }

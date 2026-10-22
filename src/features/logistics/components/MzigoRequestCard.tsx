@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, Truck, UserRound } from '@/shared/ui/icons';
 import { LogisticsLegType, LogisticsRequestCard, LogisticsStatusUpdate } from '@/features/logistics/api';
 import { getImageUrl } from '@/shared/utils/formatting';
-import { deadlineText, formatCurrency, formatDate, statusLabel } from '../utils/mzigoDashboard.utils';
+import { deadlineText, formatCurrency, formatDate, statusLabel, validateHandoverCode } from '../utils/mzigoDashboard.utils';
 import { courierActions, deriveJourney, requestHasDoorDelivery, requestNextStop, routeLink } from '../utils/mzigoJourney';
 import { MzigoJourneyStepper } from './MzigoJourneyStepper';
 
@@ -37,11 +37,12 @@ export function RequestCard({
   request: LogisticsRequestCard;
   tone: string;
   now: number;
-  onStatusUpdate: (requestId: number, legType: LogisticsLegType, status: LogisticsStatusUpdate) => void;
+  onStatusUpdate: (requestId: number, legType: LogisticsLegType, status: LogisticsStatusUpdate, verificationCode?: string | null) => void;
   updatingStatusKey?: string | null;
   readOnly?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
 
   const primaryProduct = request.product.items[0];
   const productSummary = request.product.summary || primaryProduct?.name || 'Package';
@@ -61,6 +62,11 @@ export function RequestCard({
   const buyerAddress = request.deliveryLeg?.destination.address
     || request.deliveryLeg?.destination.label
     || 'No door delivery — buyer collects.';
+
+  const isHandoverAction = actions?.primary?.status === 'delivered' || actions?.primary?.status === 'buyer_collected';
+  const trimmedCode = verificationCode.trim();
+  const validation = trimmedCode ? validateHandoverCode(trimmedCode) : null;
+  const isCodeInvalid = Boolean(trimmedCode && validation && !validation.isValid);
 
   const bannerTone = journey.state === 'attention'
     ? 'border-red-400/40 bg-red-400/10 text-red-200'
@@ -141,12 +147,40 @@ export function RequestCard({
         </div>
       )}
 
+      {/* Optional Handover verification code input for terminal handover */}
+      {isHandoverAction && (
+        <div className="mt-3 rounded-xl border border-yellow-400/30 bg-black/45 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <label htmlFor={`handover-code-${request.id}`} className="text-xs font-semibold text-yellow-300">
+              Package Handover Code / OTP
+            </label>
+            <span className="text-[10px] text-label-2">Optional or 4-digit PIN</span>
+          </div>
+          <input
+            id={`handover-code-${request.id}`}
+            type="text"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+            placeholder="e.g. 1042 or BYB-LOG-..."
+            maxLength={24}
+            className="mt-1.5 w-full rounded-xl border border-separator bg-black/60 px-3 py-2 text-xs font-mono tracking-wider text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none"
+          />
+          {isCodeInvalid && validation?.error && (
+            <p className="mt-1.5 text-[11px] font-medium text-red-400">{validation.error}</p>
+          )}
+        </div>
+      )}
+
       {/* Primary next action — one clear thing to do. */}
       {actions?.primary && (
         <button
           type="button"
-          disabled={Boolean(updatingStatusKey)}
-          onClick={() => onStatusUpdate(request.id, actions.primary!.legType, actions.primary!.status)}
+          disabled={Boolean(updatingStatusKey) || isCodeInvalid}
+          onClick={() => {
+            if (isCodeInvalid) return;
+            const codeToSend = trimmedCode && validation?.isValid ? validation.sanitized : null;
+            onStatusUpdate(request.id, actions.primary!.legType, actions.primary!.status, codeToSend);
+          }}
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-yellow-400 px-4 py-2.5 text-sm font-bold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-55"
         >
           {updatingStatusKey === `${request.id}:${actions.primary.legType}:${actions.primary.status}` && (

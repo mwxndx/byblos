@@ -111,16 +111,15 @@ export function useMzigoDashboard() {
     navigate('/mzigo/login', { replace: true });
   };
 
-
   const handleStatusUpdate = (
     requestId: number,
     legType: LogisticsLegType,
-    status: LogisticsStatusUpdate
+    status: LogisticsStatusUpdate,
+    verificationCode?: string | null
   ) => {
     setUpdatingStatusKey(`${requestId}:${legType}:${status}`);
-    statusMutation.mutate({ requestId, legType, status });
+    statusMutation.mutate({ requestId, legType, status, verificationCode });
   };
-
 
   return {
     sort,

@@ -1,4 +1,3 @@
-
 export function formatCurrency(value: number | string | null | undefined) {
   const amount = Number(value || 0);
   return `KSh ${amount.toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
@@ -28,4 +27,25 @@ export function statusLabel(status?: string | null) {
   return String(status || 'not requested').replace(/_/g, ' ');
 }
 
+export interface HandoverCodeValidationResult {
+  isValid: boolean;
+  sanitized: string;
+  error?: string;
+}
 
+export function validateHandoverCode(code?: string | null): HandoverCodeValidationResult {
+  const sanitized = String(code || '').trim().toUpperCase();
+  if (!sanitized) {
+    return { isValid: false, sanitized: '', error: 'Verification code cannot be empty.' };
+  }
+  if (sanitized.length < 4) {
+    return { isValid: false, sanitized, error: 'Verification code must be at least 4 characters.' };
+  }
+  if (sanitized.length > 24) {
+    return { isValid: false, sanitized, error: 'Verification code cannot exceed 24 characters.' };
+  }
+  if (!/^[A-Z0-9-]+$/.test(sanitized)) {
+    return { isValid: false, sanitized, error: 'Verification code may only contain letters, numbers, and hyphens.' };
+  }
+  return { isValid: true, sanitized };
+}

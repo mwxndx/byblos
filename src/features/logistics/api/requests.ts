@@ -146,14 +146,21 @@ export async function updateLogisticsLegStatus({
   requestId,
   legType,
   status,
+  verificationCode,
 }: {
   requestId: number;
   legType: LogisticsLegType;
   status: LogisticsStatusUpdate;
+  verificationCode?: string | null;
 }) {
+  const payload: { status: LogisticsStatusUpdate; verificationCode?: string } = { status };
+  if (verificationCode && verificationCode.trim()) {
+    payload.verificationCode = verificationCode.trim().toUpperCase();
+  }
+
   const response = await apiClient.patch(
     `/logistics/requests/${requestId}/legs/${legType}/status`,
-    { status },
+    payload,
     { headers: logisticsHeaders() }
   );
   return response.data?.data as {
@@ -168,5 +175,3 @@ export async function updateLogisticsLegStatus({
     updatedAt?: string;
   };
 }
-
-
