@@ -1,23 +1,10 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sellerApi } from '@/features/seller/api';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
 import { toast } from 'sonner';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { ApiSellerProduct } from '@/shared/types';
 
-// Products Queries
-import { useQuery } from '@tanstack/react-query';
-
-export function useSellerProductsQuery() {
-  return useQuery({
-    queryKey: sellerQueryKeys.products(),
-    queryFn: sellerApi.getProducts,
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-    retry: 1,
-    refetchOnWindowFocus: false,
-  });
-}
 
 export const sellerProductQuery = (id: string) => ({
   queryKey: sellerQueryKeys.product(id),

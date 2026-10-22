@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Button } from '@/shared/ui/button';
 import { IconButton } from '@/shared/ui/icon-button';
 import { Badge } from '@/shared/ui/badge';
@@ -18,7 +19,7 @@ interface SellerProductsTableProps {
   onInventoryEdit: (product: ProductWithApiFields) => void;
 }
 
-export function SellerProductsTable({
+export const SellerProductsTable = memo(function SellerProductsTable({
   products,
   deletingId,
   updatingId,
@@ -169,6 +170,4 @@ export function SellerProductsTable({
       </Table>
     </div>
   );
-}
-
-
+});

@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useCallback, useMemo, useState, type ChangeEvent } from 'react';
 import { useToast } from '@/shared/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUpdateProductMutation, useUpdateInventoryMutation, sellerProductQuery } from '@/features/seller/hooks/useSellerProducts';
@@ -45,13 +45,13 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     );
   }, [products, searchQuery]);
 
-  const handleInventoryEdit = (product: Product) => {
+  const handleInventoryEdit = useCallback((product: Product) => {
     setSelectedProduct(product);
     setStockQuantity((product as ApiSellerProduct).quantity ?? 0);
     setLowStockThreshold((product as ApiSellerProduct).low_stock_threshold ?? 5);
     setTrackInventory((product as ApiSellerProduct).track_inventory ?? false);
     setShowStockModal(true);
-  };
+  }, []);
 
   const handleEditImageChange = async (event: ChangeEvent<HTMLInputElement>, slot: number) => {
     const file = event.target.files?.[0];
@@ -118,7 +118,7 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
   const updateProductMutation = useUpdateProductMutation();
   const updateInventoryMutation = useUpdateInventoryMutation();
 
-  const handleEditClick = async (id: string) => {
+  const handleEditClick = useCallback(async (id: string) => {
     setIsLoadingEdit(true);
 
     try {
@@ -152,7 +152,7 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     } finally {
       setIsLoadingEdit(false);
     }
-  };
+  }, [queryClient, toast]);
 
   const handleSaveEdit = async () => {
     if (!editingProduct) return;
@@ -271,12 +271,12 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     }
   };
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = useCallback((id: string) => {
     setProductToDelete(id);
     setShowDeleteDialog(true);
-  };
+  }, []);
 
-  const confirmDelete = async () => {
+  const confirmDelete = useCallback(async () => {
     if (!productToDelete) return;
 
     try {
@@ -297,9 +297,9 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     } finally {
       setDeletingId(null);
     }
-  };
+  }, [productToDelete, onDelete, toast]);
 
-  const handleStatusUpdate = async (productId: string, newStatus: 'available' | 'sold') => {
+  const handleStatusUpdate = useCallback(async (productId: string, newStatus: 'available' | 'sold') => {
     if (!onStatusUpdate) return;
 
     try {
@@ -316,7 +316,7 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     } finally {
       setUpdatingId(null);
     }
-  };
+  }, [onStatusUpdate, onRefresh, toast]);
 
   const handleSaveInventory = async () => {
     if (!selectedProduct) return;

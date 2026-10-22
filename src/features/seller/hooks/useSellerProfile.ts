@@ -13,17 +13,6 @@ export function useSellerProfileQuery(enabled = true) {
   });
 }
 
-// Analytics Query
-export function useSellerAnalyticsQuery(enabled = true) {
-  return useQuery({
-    queryKey: sellerQueryKeys.analytics(),
-    queryFn: sellerApi.getAnalytics,
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-    enabled,
-  });
-}
-
 // Profile Mutations
 export function useUpdateProfileMutation() {
   const queryClient = useQueryClient();
@@ -58,41 +47,9 @@ export function useUploadBusinessPhotoMutation() {
   });
 }
 
-// Referral & Invites
-export function useSellerReferralDashboardQuery(enabled = true) {
-  return useQuery({
-    queryKey: ['seller-referrals'],
-    queryFn: sellerApi.getReferralDashboard,
-    staleTime: 60_000,
-    gcTime: 5 * 60_000,
-    enabled,
-  });
-}
-
-export function useGenerateReferralCodeMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: sellerApi.generateReferralCode,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['seller-referrals'] });
-    },
-  });
-}
-
+// Creator Invites
 export function useInviteCreatorMutation() {
   return useMutation({
     mutationFn: (email: string) => sellerApi.inviteCreator(email),
   });
 }
-
-export function useGetCreatorInvitesQuery(enabled = true) {
-  return useQuery({
-    queryKey: ['seller-creator-invites'],
-    queryFn: sellerApi.getCreatorInvites,
-    staleTime: 30_000,
-    gcTime: 5 * 60_000,
-    enabled,
-  });
-}
-
-

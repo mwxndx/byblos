@@ -2,7 +2,6 @@
 import type { ApiSeller } from '@/shared/types/api/seller';
 import apiClient, { getFreshCsrfToken } from '@/infrastructure/http/apiClient';
 import type {
-  ReferralDashboard,
   RegisterSellerInput,
   SellerAnalytics,
   Theme,
@@ -97,16 +96,6 @@ interface ResetPasswordResponse {
   message: string;
 }
 
-interface ReferralDashboardResponse {
-  data: ReferralDashboard;
-}
-
-interface ReferralCodeResponse {
-  data: {
-    referralCode: string;
-    referralLink: string;
-  };
-}
 
 export const checkShopNameAvailability = async (shopName: string): Promise<{ available: boolean }> => {
   try {
@@ -381,25 +370,12 @@ export const sellerProfileApi = {
     return response.data.data;
   },
 
-  async getReferralDashboard(): Promise<ReferralDashboard> {
-    const response = await sellerApiInstance.get<ReferralDashboardResponse>('/sellers/referral/dashboard');
-    return response.data.data;
-  },
-
-  async generateReferralCode(): Promise<{ referralCode: string; referralLink: string }> {
-    const response = await sellerApiInstance.post<ReferralCodeResponse>('/sellers/referral/generate-code');
-    return response.data.data;
-  },
 
   async inviteCreator(email: string) {
     const response = await sellerApiInstance.post('/sellers/creator-invites', { email });
     return response.data?.data?.invite;
   },
 
-  async getCreatorInvites() {
-    const response = await sellerApiInstance.get('/sellers/creator-invites');
-    return response.data?.data?.invites || [];
-  },
 
   verifyEmail: async (email: string, token: string): Promise<{ success: boolean; message: string }> => {
     try {

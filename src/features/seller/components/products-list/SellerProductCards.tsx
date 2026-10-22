@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Button } from '@/shared/ui/button';
 import { IconButton } from '@/shared/ui/icon-button';
 import { Badge } from '@/shared/ui/badge';
@@ -61,7 +62,7 @@ interface SellerProductCardsProps {
   onInventoryEdit: (product: ProductWithApiFields) => void;
 }
 
-export function SellerProductCards({
+export const SellerProductCards = memo(function SellerProductCards({
   products,
   deletingId,
   updatingId,
@@ -207,6 +208,4 @@ export function SellerProductCards({
       ))}
     </div>
   );
-}
-
-
+});
