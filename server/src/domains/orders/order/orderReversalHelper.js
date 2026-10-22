@@ -1,9 +1,7 @@
 import logger from '../../../shared/utils/logger.js';
 import { OrderStatus, OrderType } from '../../../shared/constants/enums.js';
-import domainEventDispatcher, { AppEvents } from '../../../shared/core/domainEventDispatcher.js';
+import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import InventoryReservationService from '../../commerce/products/inventoryReservation.service.js';
-
-const eventBus = domainEventDispatcher;
 
 export const executeExceptionalReversalHelper = async ({
   pool,

@@ -2,7 +2,7 @@ import multer from 'multer';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
-import { writeFile, unlink } from 'node:fs/promises';
+import { unlink } from 'node:fs/promises';
 import os from 'node:os';
 import { uploadToCloudinary } from '../../shared/utils/cloudinary.js';
 
@@ -28,9 +28,19 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Memory storage — no local disk writes; buffer goes straight to Cloudinary
+// Disk storage — streams directly to OS temp directory without loading 500 MB into V8 RAM
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, os.tmpdir());
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `digital-${crypto.randomBytes(8).toString('hex')}${ext}`);
+    }
+});
+
 const multerInstance = multer({
-    storage: multer.memoryStorage(),
+    storage,
     fileFilter,
     limits: {
         fileSize: 500 * 1024 * 1024, // 500 MB
@@ -39,11 +49,10 @@ const multerInstance = multer({
 
 /**
  * Express middleware that:
- * 1. Accepts a single 'digital_file' multipart field (memory storage).
- * 2. Writes the buffer to a temp file in os.tmpdir().
- * 3. Uploads the temp file to Cloudinary as resource_type 'raw'.
- * 4. Attaches the Cloudinary result to req.cloudinaryFile.
- * 5. Cleans up the temp file regardless of success or failure.
+ * 1. Accepts a single 'digital_file' multipart field streamed to a temp file in os.tmpdir().
+ * 2. Uploads the temp file to Cloudinary as resource_type 'raw'.
+ * 3. Attaches the Cloudinary result to req.cloudinaryFile.
+ * 4. Cleans up the temp file regardless of success or failure.
  *
  * On success, req.cloudinaryFile will contain:
  *   - public_id          {string}  Cloudinary asset ID — stored in products.digital_file_path
@@ -65,13 +74,9 @@ export const cloudinaryDigitalUpload = (req, res, next) => {
             return next();
         }
 
-        const ext = path.extname(req.file.originalname).toLowerCase();
-        const tempFileName = `digital-${crypto.randomBytes(8).toString('hex')}${ext}`;
-        const tempFilePath = path.join(os.tmpdir(), tempFileName);
+        const tempFilePath = req.file.path;
 
         try {
-            await writeFile(tempFilePath, req.file.buffer);
-
             // uploadToCloudinary deletes the temp file on completion (success or error)
             const cloudinaryResult = await uploadToCloudinary(
                 tempFilePath,

@@ -2,8 +2,7 @@ import bcrypt from 'bcrypt';
 import { pool } from '../../infrastructure/database/database.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
 import logger from '../../shared/utils/logger.js';
-import domainEventDispatcher, { AppEvents, DomainEvents } from '../../shared/core/domainEventDispatcher.js';
-const eventBus = domainEventDispatcher;
+import eventBus, { AppEvents } from '../../application/events/eventBus.js';
 import LogisticsTrackingLinkService from './logisticsTrackingLink.service.js';
 import { generateRefreshToken } from '../../shared/utils/refreshToken.js';
 import {

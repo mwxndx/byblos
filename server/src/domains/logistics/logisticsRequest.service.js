@@ -1,6 +1,5 @@
 import { pool } from '../../infrastructure/database/database.js';
-import domainEventDispatcher, { AppEvents, DomainEvents } from '../../shared/core/domainEventDispatcher.js';
-const eventBus = domainEventDispatcher;
+import eventBus, { AppEvents } from '../../application/events/eventBus.js';
 import LogisticsTrackingLinkService from './logisticsTrackingLink.service.js';
 
 const MZIGO_EGO_SLUG = 'mzigo-ego';

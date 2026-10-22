@@ -1,4 +1,1 @@
-import { AppEvents } from '../../application/events/eventTypes.js';
-
-export const DomainEvents = AppEvents;
-export { AppEvents };
+export { AppEvents, AppEvents as DomainEvents } from '../../application/events/eventTypes.js';

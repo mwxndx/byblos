@@ -8,9 +8,8 @@ import { pool } from '../../../infrastructure/database/database.js';
 import Fees from '../../../shared/config/fees.js';
 import logger from '../../../shared/utils/logger.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
-import domainEventDispatcher, { AppEvents, DomainEvents } from '../../../shared/core/domainEventDispatcher.js';
+import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import { MAX_ACTIVE_INVITES } from '../creators/creatorLimits.js';
-const eventBus = domainEventDispatcher;
 
 /**
  * ReferralService — all referral business logic.

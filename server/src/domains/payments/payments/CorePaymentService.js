@@ -22,8 +22,7 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import crypto from 'node:crypto';
 import logger from '../../../shared/utils/logger.js';
-import domainEventDispatcher, { AppEvents, DomainEvents } from '../../../shared/core/domainEventDispatcher.js';
-const eventBus = domainEventDispatcher;
+import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import FulfillmentQueueService from '../../orders/fulfillment/fulfillmentQueue.service.js';
 import { getProviderPayloadData, normalizeProviderReference } from '../../../shared/utils/providerReference.js';
 import { normalizeProviderAmount, normalizeProviderPaymentStatus } from '../../../shared/utils/paymentStatusNormalizer.js';

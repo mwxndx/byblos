@@ -14,12 +14,21 @@ import { enforceIdempotency } from '../src/application/middleware/idempotency.mi
 // Minimal express-style response double: records the last status/body sent and
 // preserves the middleware's ability to wrap res.json.
 function makeRes() {
+    const listeners = {};
     return {
         statusCode: 200,
         sentStatus: null,
         sentBody: null,
         status(code) { this.statusCode = code; return this; },
         json(body) { this.sentStatus = this.statusCode; this.sentBody = body; return this; },
+        once(event, fn) {
+            listeners[event] = listeners[event] || [];
+            listeners[event].push(fn);
+            return this;
+        },
+        emit(event, ...args) {
+            (listeners[event] || []).forEach(fn => fn(...args));
+        }
     };
 }
 
@@ -30,7 +39,17 @@ function makeReadyClient(seed = {}) {
     return {
         status: 'ready',
         _setexCalls: setexCalls,
+        _store: store,
         async get(key) { return store.get(key) ?? null; },
+        async set(key, value, ...args) {
+            const nx = args.some(arg => String(arg).toUpperCase() === 'NX');
+            if (nx && store.has(key)) return null;
+            store.set(key, value);
+            return 'OK';
+        },
+        async del(key) {
+            return store.delete(key) ? 1 : 0;
+        },
         async setex(key, ttl, value) { setexCalls.push({ key, ttl, value }); store.set(key, value); return 'OK'; },
     };
 }
@@ -140,5 +159,27 @@ describe('enforceIdempotency', () => {
         await mw({ headers: { 'idempotency-key': 'slow' } }, res, () => { nextCalled = true; });
         assert.equal(nextCalled, true, 'a stalled Redis must not hang the request');
         assert.ok(Date.now() - t0 < 2000, 'should fall through shortly after the read timeout');
+    });
+
+    test('concurrent requests with same idempotency key: second request returns 409 Conflict', async () => {
+        const client = makeReadyClient();
+        const mw = enforceIdempotency(60, { getClient: () => client });
+
+        const res1 = makeRes();
+        let next1Called = false;
+        await mw({ headers: { 'idempotency-key': 'concurrent-key-1' } }, res1, () => { next1Called = true; });
+        assert.equal(next1Called, true, 'first request should proceed to handler');
+
+        // Second request arrives while first is still in-flight
+        const res2 = makeRes();
+        let next2Called = false;
+        await mw({ headers: { 'idempotency-key': 'concurrent-key-1' } }, res2, () => { next2Called = true; });
+        assert.equal(next2Called, false, 'second request must not reach handler');
+        assert.equal(res2.sentStatus, 409);
+        assert.match(res2.sentBody.message, /currently being processed/i);
+
+        // First request finishes and emits finish event, clearing in-flight lock
+        res1.emit('finish');
+        assert.equal(client._store.has('idempotency:lock:concurrent-key-1'), false, 'lock should be cleared on finish');
     });
 });

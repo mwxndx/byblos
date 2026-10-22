@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import logger from '../../shared/utils/logger.js';
-import { pool } from '../../infrastructure/database/database.js';
+import { pool, withTransaction } from '../../infrastructure/database/database.js';
 
 class EventOutboxRepository {
     static buildDurablePayload(event, payload = {}) {
@@ -16,42 +16,41 @@ class EventOutboxRepository {
     }
 
     static async claimEvent(event, eventId, payload = {}) {
-        const client = await pool.connect();
         try {
-            await client.query('BEGIN');
-            const result = await client.query(
-                `INSERT INTO event_dedupe (event_id, event_name, expires_at)
-                 VALUES ($1, $2, NOW() + INTERVAL '24 hours')
-                 ON CONFLICT (event_id) DO NOTHING`,
-                [eventId, event]
-            );
-            if (result.rowCount === 0) {
-                await client.query('ROLLBACK');
+            const claimResult = await withTransaction(async (client) => {
+                const result = await client.query(
+                    `INSERT INTO event_dedupe (event_id, event_name, expires_at)
+                     VALUES ($1, $2, NOW() + INTERVAL '24 hours')
+                     ON CONFLICT (event_id) DO NOTHING`,
+                    [eventId, event]
+                );
+                if (result.rowCount === 0) {
+                    return { claimed: false, retryable: false, reason: 'duplicate' };
+                }
+
+                await client.query(
+                    `INSERT INTO event_outbox (event_id, event_name, payload, status, attempts, delivery_attempts, next_attempt_at)
+                     VALUES ($1, $2, $3, 'processing', 1, 1, NOW())
+                     ON CONFLICT (event_id) DO NOTHING`,
+                    [eventId, event, JSON.stringify(payload || {})]
+                );
+                return { claimed: true };
+            });
+
+            if (claimResult.claimed) {
+                pool.query('DELETE FROM event_dedupe WHERE expires_at < NOW()')
+                    .catch(error => logger.warn('[EventBus] Event dedupe cleanup failed:', error.message));
+            } else if (claimResult.reason === 'duplicate') {
                 logger.warn('[EventBus] Duplicate event suppressed by DB dedupe', { event, eventId });
-                return { claimed: false, retryable: false, reason: 'duplicate' };
             }
-
-            await client.query(
-                `INSERT INTO event_outbox (event_id, event_name, payload, status, attempts, delivery_attempts, next_attempt_at)
-                 VALUES ($1, $2, $3, 'processing', 1, 1, NOW())
-                 ON CONFLICT (event_id) DO NOTHING`,
-                [eventId, event, JSON.stringify(payload || {})]
-            );
-
-            await client.query('COMMIT');
-            pool.query('DELETE FROM event_dedupe WHERE expires_at < NOW()')
-                .catch(error => logger.warn('[EventBus] Event dedupe cleanup failed:', error.message));
-            return { claimed: true };
+            return claimResult;
         } catch (error) {
-            await client.query('ROLLBACK').catch(() => {});
             logger.error('[EventBus] DB event dedupe unavailable; deferring side-effect event until outbox claim succeeds', {
                 event,
                 eventId,
                 error: error.message
             });
             return { claimed: false, retryable: true, reason: 'db_unavailable', error };
-        } finally {
-            client.release();
         }
     }
 
@@ -80,88 +79,73 @@ class EventOutboxRepository {
     }
 
     static async enqueue(event, payload = {}) {
-        const client = await pool.connect();
         try {
-            await client.query('BEGIN');
-            const durableEvent = await this.enqueueInTransaction(client, event, payload);
-            await client.query('COMMIT');
-            return durableEvent;
+            return await withTransaction((client) => this.enqueueInTransaction(client, event, payload));
         } catch (error) {
-            await client.query('ROLLBACK').catch(() => {});
             logger.error('[EventBus] Failed to enqueue durable event', {
                 event,
                 error: error.message
             });
             throw error;
-        } finally {
-            client.release();
         }
     }
 
     static async claimOutboxEvent(eventId) {
-        const client = await pool.connect();
         try {
-            await client.query('BEGIN');
-            const { rows } = await client.query(
-                `UPDATE event_outbox
-                 SET status = 'processing',
-                     attempts = attempts + 1,
-                     delivery_attempts = delivery_attempts + 1,
-                     updated_at = NOW()
-                 WHERE event_id = $1
-                   AND (
-                       status IN ('pending', 'failed')
-                       OR (status = 'processing' AND updated_at < NOW() - INTERVAL '5 minutes')
-                   )
-                 RETURNING *`,
-                [eventId]
-            );
-            await client.query('COMMIT');
-            return rows[0] || null;
+            return await withTransaction(async (client) => {
+                const { rows } = await client.query(
+                    `UPDATE event_outbox
+                     SET status = 'processing',
+                         attempts = attempts + 1,
+                         delivery_attempts = delivery_attempts + 1,
+                         updated_at = NOW()
+                     WHERE event_id = $1
+                       AND (
+                           status IN ('pending', 'failed')
+                           OR (status = 'processing' AND updated_at < NOW() - INTERVAL '5 minutes')
+                       )
+                     RETURNING *`,
+                    [eventId]
+                );
+                return rows[0] || null;
+            });
         } catch (error) {
-            await client.query('ROLLBACK').catch(() => {});
             logger.error('[EventBus] Failed to claim specific outbox event', { eventId, error: error.message });
             throw error;
-        } finally {
-            client.release();
         }
     }
 
     static async claimReplayBatch(limit = 50) {
-        const client = await pool.connect();
         try {
-            await client.query('BEGIN');
-            const result = await client.query(
-                `WITH claimed AS (
-                    SELECT id
-                    FROM event_outbox
-                    WHERE (
-                        (status IN ('pending', 'failed') AND next_attempt_at <= NOW())
-                        OR (status = 'processing' AND updated_at < NOW() - INTERVAL '5 minutes')
-                      )
-                      AND attempts < 10
-                    ORDER BY created_at ASC
-                    LIMIT $1
-                    FOR UPDATE SKIP LOCKED
-                 )
-                 UPDATE event_outbox eo
-                 SET status = 'processing',
-                     attempts = attempts + 1,
-                     delivery_attempts = delivery_attempts + 1,
-                     updated_at = NOW()
-                 FROM claimed
-                 WHERE eo.id = claimed.id
-                 RETURNING eo.*`,
-                [limit]
-            );
-            await client.query('COMMIT');
-            return result.rows;
+            return await withTransaction(async (client) => {
+                const result = await client.query(
+                    `WITH claimed AS (
+                        SELECT id
+                        FROM event_outbox
+                        WHERE (
+                            (status IN ('pending', 'failed') AND next_attempt_at <= NOW())
+                            OR (status = 'processing' AND updated_at < NOW() - INTERVAL '5 minutes')
+                          )
+                          AND attempts < 10
+                        ORDER BY created_at ASC
+                        LIMIT $1
+                        FOR UPDATE SKIP LOCKED
+                     )
+                     UPDATE event_outbox eo
+                     SET status = 'processing',
+                         attempts = attempts + 1,
+                         delivery_attempts = delivery_attempts + 1,
+                         updated_at = NOW()
+                     FROM claimed
+                     WHERE eo.id = claimed.id
+                     RETURNING eo.*`,
+                    [limit]
+                );
+                return result.rows;
+            });
         } catch (error) {
-            await client.query('ROLLBACK').catch(() => {});
             logger.error('[EventBus] Failed to claim pending outbox events', { error: error.message });
             throw error;
-        } finally {
-            client.release();
         }
     }
 

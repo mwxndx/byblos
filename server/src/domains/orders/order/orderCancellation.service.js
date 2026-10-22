@@ -2,8 +2,7 @@ import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
 import { OrderStatus, OrderType } from '../../../shared/constants/enums.js';
 import Order from './order.model.js';
-import domainEventDispatcher, { AppEvents, DomainEvents } from '../../../shared/core/domainEventDispatcher.js';
-const eventBus = domainEventDispatcher;
+import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import InventoryReservationService from '../../commerce/products/inventoryReservation.service.js';
 import settlementService from '../escrow/settlement.service.js';
 

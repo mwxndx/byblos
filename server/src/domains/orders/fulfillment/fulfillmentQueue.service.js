@@ -1,7 +1,6 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
-import domainEventDispatcher, { AppEvents, DomainEvents } from '../../../shared/core/domainEventDispatcher.js';
-const eventBus = domainEventDispatcher;
+import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import OrderFulfillmentTransitionService from '../order/orderFulfillmentTransition.service.js';
 
 class FulfillmentQueueService {
