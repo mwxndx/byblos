@@ -3,7 +3,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
-import { promisify } from 'util';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,22 +11,13 @@ const __dirname = dirname(__filename);
 const uploadsDir = path.join(process.cwd(), 'uploads');
 const tempDir = path.join(process.cwd(), 'temp');
 
-const mkdir = promisify(fs.mkdir);
-
-// Create directories if they don't exist
-const ensureDirsExist = async () => {
-  try {
-    await mkdir(uploadsDir, { recursive: true });
-    await mkdir(tempDir, { recursive: true });
-    console.log(`Uploads directory ready at: ${uploadsDir}`);
-    console.log(`Temp directory ready at: ${tempDir}`);
-  } catch (error) {
-    console.error('Error creating directories:', error);
-  }
-};
-
-// Run this on server start
-ensureDirsExist();
+// Create directories if they don't exist silently
+try {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  fs.mkdirSync(tempDir, { recursive: true });
+} catch {
+  // directory exists or permission handled
+}
 
 // Configure memory storage to handle file buffers
 const storage = multer.memoryStorage();

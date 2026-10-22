@@ -1,6 +1,6 @@
 // Seller profile/settings handlers (profile read/update, theme, image uploads).
 // Split from seller.controller.js in Phase 15.7b; re-exported via that barrel.
-import { query } from '../../../infrastructure/database/database.js';
+import { updateSellerTheme, updateSellerBusinessPhoto } from './seller.repository.js';
 import { invalidateAuthCache } from '../../../shared/utils/authCache.js';
 import logger from '../../../shared/utils/logger.js';
 import ImageService from '../../../infrastructure/storage/image.service.js';
@@ -166,26 +166,23 @@ export const updateTheme = async (req, res) => {
     }
 
     // Update the seller's theme
-    const result = await query(
-      'UPDATE sellers SET theme = $1 WHERE id = $2 RETURNING theme, shop_name',
-      [theme, req.user.sellerId]
-    );
+    const updated = await updateSellerTheme(req.user.sellerId, theme);
 
-    if (!result.rows[0]) {
+    if (!updated) {
       return res.status(404).json({
         status: 'error',
         message: 'Seller not found'
       });
     }
 
-    if (result.rows[0].shop_name) {
-      await cacheService.delete(`seller:shop:${String(result.rows[0].shop_name).toLowerCase().trim()}`);
+    if (updated.shop_name) {
+      await cacheService.delete(`seller:shop:${String(updated.shop_name).toLowerCase().trim()}`);
     }
 
     res.status(200).json({
       status: 'success',
       data: {
-        theme: result.rows[0].theme
+        theme: updated.theme
       }
     });
   } catch (error) {
@@ -223,15 +220,9 @@ export const uploadBusinessPhoto = async (req, res) => {
 
     const businessPhotoValue = businessPhoto === '' ? null : businessPhoto;
 
-    const result = await query(
-      `UPDATE sellers
-       SET avatar_url = $1
-       WHERE id = $2
-       RETURNING id, avatar_url AS "avatarUrl"`,
-      [businessPhotoValue, sellerId]
-    );
+    const updated = await updateSellerBusinessPhoto(sellerId, businessPhotoValue);
 
-    if (!result.rows[0]) {
+    if (!updated) {
       return res.status(404).json({
         status: 'error',
         message: 'Seller not found'
@@ -241,8 +232,8 @@ export const uploadBusinessPhoto = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: {
-        businessPhotoUrl: result.rows[0].avatarUrl || '',
-        avatarUrl: result.rows[0].avatarUrl || ''
+        businessPhotoUrl: updated.avatarUrl || '',
+        avatarUrl: updated.avatarUrl || ''
       }
     });
   } catch (error) {

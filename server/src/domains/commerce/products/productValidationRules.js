@@ -53,15 +53,31 @@ export const validateProductImage = (imageData) => {
 export const sanitizeDigitalPath = (filePath) => {
     if (!filePath) return null;
 
-    if (filePath.includes('\0') || filePath.startsWith('uploads/')) {
+    if (typeof filePath !== 'string') {
+        throw new Error('Invalid digital file path: expected a string');
+    }
+
+    const trimmed = filePath.trim();
+
+    if (
+        trimmed.includes('\0') ||
+        trimmed.startsWith('uploads/') ||
+        trimmed.includes('..') ||
+        trimmed.startsWith('/') ||
+        trimmed.startsWith('\\')
+    ) {
         throw new Error('Invalid digital file path: expected a Cloudinary public_id');
     }
 
-    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(filePath) || filePath.startsWith('//')) {
+    if (/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed) || trimmed.startsWith('//')) {
         throw new Error('Invalid digital file path: expected a Cloudinary public_id, not a URL');
     }
 
-    return filePath;
+    if (!/^[a-zA-Z0-9_\-\.\/]+$/.test(trimmed)) {
+        throw new Error('Invalid digital file path: invalid characters in public_id');
+    }
+
+    return trimmed;
 };
 
 /**

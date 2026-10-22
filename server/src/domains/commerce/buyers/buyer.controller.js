@@ -10,7 +10,7 @@ import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cook
 import { signToken, verifyToken } from '../../../shared/utils/jwt.js';
 import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import tokenBlacklist from '../../identity/tokens/tokenBlacklist.service.js';
-import { revokeSessionTokens, clearAuthCookies } from '../../../shared/utils/sessionRevocation.js';
+import { revokeSessionTokens, clearAuthCookies, invalidateUserSessions } from '../../../shared/utils/sessionRevocation.js';
 import OrderModel from "../../orders/order/order.model.js";
 import { OrderStatus } from "../../../shared/constants/enums.js";
 import WithdrawalService from '../../payments/withdrawals/withdrawal.service.js';
@@ -508,6 +508,10 @@ export const deleteAccount = async (req, res, next) => {
       return next(new AppError('Buyer account not found.', 404));
     }
     await Buyer.softDeleteAccount(buyerId, userId);
+    if (userId) {
+      await invalidateUserSessions(userId);
+    }
+    clearAuthCookies(res);
     res.clearCookie('token');
     res.status(200).json({ status: 'success', message: 'Your account has been deleted.' });
   } catch (error) {

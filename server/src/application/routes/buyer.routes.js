@@ -52,8 +52,6 @@ router.get('/refund-requests/history', buyerController.getRefundHistory);
 // Mark order as collected
 router.post('/orders/:orderId/collected', validate(V.orderCollected), buyerController.markOrderAsCollected);
 
-import * as sellerController from '../../domains/commerce/sellers/seller.controller.js';
-
 // Wishlist routes
 router.use('/wishlist', wishlistRoutes);
 

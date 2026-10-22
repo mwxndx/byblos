@@ -2,12 +2,21 @@ import { v2 as cloudinary } from 'cloudinary';
 import { query } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
 
-export async function generateSecureDownloadUrl(digitalFilePath, userId) {
+export async function generateSecureDownloadUrl(digitalFilePath, userId, digitalFileName = null) {
   if (!digitalFilePath) return null;
   const expiresAt = Math.floor(Date.now() / 1000) + 900; // 15 minutes
 
   try {
-    const signedUrl = cloudinary.utils.private_download_url(digitalFilePath, 'pdf', {
+    let format = '';
+    const source = digitalFileName || digitalFilePath;
+    if (typeof source === 'string') {
+      const match = source.match(/\.([a-zA-Z0-9]+)(?:[\?#]|$)/);
+      if (match) {
+        format = match[1].toLowerCase();
+      }
+    }
+
+    const signedUrl = cloudinary.utils.private_download_url(digitalFilePath, format, {
       resource_type: 'raw',
       type: 'authenticated',
       expires_at: expiresAt
@@ -65,7 +74,11 @@ export async function findVerifiedDigitalItem({ orderId, buyerId, clientCheckout
   if (!item) return undefined;
 
   if (item.digital_file_path) {
-    item.download_url = await generateSecureDownloadUrl(item.digital_file_path, buyerId || item.order_id);
+    item.download_url = await generateSecureDownloadUrl(
+      item.digital_file_path,
+      buyerId || item.order_id,
+      item.digital_file_name
+    );
   }
   return item;
 }

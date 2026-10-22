@@ -20,6 +20,7 @@ import referralRoutes from './referral.routes.js';
 import { createWithdrawal, getWithdrawals, getWithdrawalById } from '../../domains/payments/withdrawals/withdrawal.controller.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
 import { softDeleteSeller } from '../../domains/commerce/sellers/seller.model.js';
+import { invalidateUserSessions, clearAuthCookies } from '../../shared/utils/sessionRevocation.js';
 
 import { authLimiter } from '../middleware/authRateLimiter.js';
 import { uploadRateLimiter, withdrawalRateLimiter } from '../middleware/rateLimiting.js';
@@ -170,7 +171,12 @@ router.use('/referral', referralRoutes);
 // Delete account (Play data-deletion requirement)
 router.delete('/account', requireSellerProfile, async (req, res, next) => {
   try {
-    await softDeleteSeller(req.user.sellerId, req.user.userId || req.user.id);
+    const userId = req.user.userId || req.user.id;
+    await softDeleteSeller(req.user.sellerId, userId);
+    if (userId) {
+      await invalidateUserSessions(userId);
+    }
+    clearAuthCookies(res);
     res.clearCookie('token');
     res.status(200).json({ status: 'success', message: 'Your account has been deleted.' });
   } catch (error) {

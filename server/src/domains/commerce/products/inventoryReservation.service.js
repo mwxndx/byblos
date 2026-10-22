@@ -31,8 +31,21 @@ function isPhysicalItem(item) {
     return !isDigitalItem(item) && !isServiceItem(item);
 }
 
+function consolidateAndSortItems(items) {
+    const map = new Map();
+    for (const item of items) {
+        if (map.has(item.productId)) {
+            const existing = map.get(item.productId);
+            existing.quantity += item.quantity;
+        } else {
+            map.set(item.productId, { ...item });
+        }
+    }
+    return Array.from(map.values()).sort((a, b) => a.productId - b.productId);
+}
+
 function trackableItems(items) {
-    return items
+    const mapped = items
         .filter(item => isTrackableInventoryItem(item) && !isDigitalItem(item))
         .map(item => ({
             ...item,
@@ -40,10 +53,12 @@ function trackableItems(items) {
             quantity: itemQuantity(item)
         }))
         .filter(item => Number.isInteger(item.productId) && item.productId > 0 && item.quantity > 0);
+
+    return consolidateAndSortItems(mapped);
 }
 
 function singlePurchasePhysicalItems(items) {
-    return items
+    const mapped = items
         .filter(item => !isTrackableInventoryItem(item) && isPhysicalItem(item))
         .map(item => ({
             ...item,
@@ -51,6 +66,8 @@ function singlePurchasePhysicalItems(items) {
             quantity: itemQuantity(item)
         }))
         .filter(item => Number.isInteger(item.productId) && item.productId > 0 && item.quantity > 0);
+
+    return consolidateAndSortItems(mapped);
 }
 
 class InventoryReservationService {

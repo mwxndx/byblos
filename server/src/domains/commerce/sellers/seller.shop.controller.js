@@ -1,6 +1,6 @@
 // Seller shop/discovery handlers (public shop lookup, search, product listing).
 // Split from seller.controller.js in Phase 15.7b; re-exported via that barrel.
-import { query } from '../../../infrastructure/database/database.js';
+import { findSellersByLocation, findSellerProducts } from './seller.repository.js';
 import { findSellerByShopName, isShopNameAvailable, findSellerById } from './seller.model.js';
 import { sanitizeSeller, sanitizePublicSeller } from '../../../shared/utils/sanitize.js';
 import cacheService from '../../../shared/utils/cache.service.js';
@@ -115,7 +115,9 @@ export const searchSellers = async (req, res) => {
     }
 
     const searchLimit = boundedLimit(req.query.limit, SELLER_SEARCH_MAX);
-    const sellers = await searchSellersInDB(city, location, {
+    const sellers = await findSellersByLocation({
+      city,
+      location,
       limit: searchLimit,
       offset: boundedOffset(req.query.page, searchLimit),
     });
@@ -155,35 +157,7 @@ function boundedOffset(rawPage, limit) {
   return (page - 1) * limit;
 }
 
-// Internal function to search sellers in database
-async function searchSellersInDB(city, location = null, { limit = SELLER_SEARCH_MAX, offset = 0 } = {}) {
-  let queryText = `
-    SELECT 
-      id, 
-      full_name AS "fullName", 
-      shop_name AS "shopName", 
-      city, 
-      location,
-      theme,
-      created_at AS "createdAt"
-    FROM sellers 
-    WHERE LOWER(city) = LOWER($1)
-  `;
 
-  const queryParams = [city];
-
-  if (location) {
-    queryText += ' AND LOWER(location) LIKE LOWER($2)';
-    queryParams.push(`%${location}%`);
-  }
-
-  queryText += ' ORDER BY created_at DESC';
-  queryParams.push(limit, offset);
-  queryText += ` LIMIT $${queryParams.length - 1} OFFSET $${queryParams.length}`;
-
-  const result = await query(queryText, queryParams);
-  return result.rows;
-}
 
 // @desc    Get products for a specific seller
 // @route   GET /api/sellers/:sellerId/products
@@ -212,7 +186,7 @@ export const getSellerProducts = async (req, res) => {
       });
     }
 
-    const products = await getSellerProductsFromDB(sellerId, {
+    const products = await findSellerProducts(sellerId, {
       limit: productsLimit,
       offset,
     });
@@ -234,42 +208,7 @@ export const getSellerProducts = async (req, res) => {
   }
 };
 
-// Internal function to get products for a specific seller
-async function getSellerProductsFromDB(sellerId, { limit = SELLER_PRODUCTS_MAX, offset = 0 } = {}) {
-  const result = await query(
-    `SELECT 
-      p.id,
-      p.name,
-      p.description,
-      p.price,
-      p.image_url AS "imageUrl",
-      p.images,
-      p.aesthetic,
-      p.seller_id AS "sellerId",
-      p.status = 'sold' AS "isSold",
-      p.status,
-      p.created_at AS "createdAt",
-      p.updated_at AS "updatedAt",
-      p.is_digital AS "isDigital",
-      p.product_type AS "productType",
-      p.is_custom_product,
-      p.production_days,
-      p.customization_prompt,
-      p.is_imported_product,
-      p.import_days,
-      p.import_note,
-      p.service_locations AS "serviceLocations",
-      p.service_options AS "serviceOptions",
-      s.shop_name AS "sellerName"
-    FROM products p
-    JOIN sellers s ON p.seller_id = s.id
-    WHERE p.seller_id = $1 AND p.status = 'available'
-    ORDER BY p.created_at DESC
-    LIMIT $2 OFFSET $3`,
-    [sellerId, limit, offset]
-  );
-  return result.rows;
-}
+
 
 export const getSellerById = async (req, res) => {
   try {

@@ -124,3 +124,120 @@ export async function lockById(sellerId, executor = DEFAULT_EXECUTOR) {
   const sql = `SELECT id FROM sellers WHERE id = $1 FOR UPDATE`;
   await executor.query(sql, [sellerId]);
 }
+
+/**
+ * Updates seller theme configuration.
+ *
+ * @param {number|string} sellerId
+ * @param {string} theme
+ * @returns {Promise<{theme: string, shop_name: string}|undefined>}
+ */
+export async function updateSellerTheme(sellerId, theme) {
+  const sql = `UPDATE sellers SET theme = $1 WHERE id = $2 RETURNING theme, shop_name`;
+  const { rows } = await query(sql, [theme, sellerId]);
+  return rows[0];
+}
+
+/**
+ * Updates seller business avatar / photo.
+ *
+ * @param {number|string} sellerId
+ * @param {string|null} avatarUrl
+ * @returns {Promise<{id: number, avatarUrl: string|null}|undefined>}
+ */
+export async function updateSellerBusinessPhoto(sellerId, avatarUrl) {
+  const sql = `
+    UPDATE sellers
+    SET avatar_url = $1
+    WHERE id = $2
+    RETURNING id, avatar_url AS "avatarUrl"
+  `;
+  const { rows } = await query(sql, [avatarUrl, sellerId]);
+  return rows[0];
+}
+
+/**
+ * Searches sellers by city and optional location filter.
+ *
+ * @param {object} input
+ * @param {string} input.city
+ * @param {string|null} [input.location]
+ * @param {number} [input.limit]
+ * @param {number} [input.offset]
+ * @returns {Promise<Array<object>>}
+ */
+export async function findSellersByLocation({ city, location = null, limit = 50, offset = 0 } = {}) {
+  let queryText = `
+    SELECT 
+      id, 
+      full_name AS "fullName", 
+      shop_name AS "shopName", 
+      city, 
+      location,
+      theme,
+      created_at AS "createdAt"
+    FROM sellers 
+    WHERE LOWER(city) = LOWER($1)
+  `;
+
+  const queryParams = [city];
+
+  if (location) {
+    queryText += ' AND LOWER(location) LIKE LOWER($2)';
+    queryParams.push(`%${location}%`);
+  }
+
+  queryText += ' ORDER BY created_at DESC';
+  queryParams.push(limit, offset);
+  const limitIdx = queryParams.length - 1;
+  const offsetIdx = queryParams.length;
+  queryText += " LIMIT $" + limitIdx + " OFFSET $" + offsetIdx;
+
+  const { rows } = await query(queryText, queryParams);
+  return rows;
+}
+
+/**
+ * Retrieves public product catalog for a specific seller.
+ *
+ * @param {number|string} sellerId
+ * @param {object} [options]
+ * @param {number} [options.limit]
+ * @param {number} [options.offset]
+ * @returns {Promise<Array<object>>}
+ */
+export async function findSellerProducts(sellerId, { limit = 50, offset = 0 } = {}) {
+  const sql = `
+    SELECT 
+      p.id,
+      p.name,
+      p.description,
+      p.price,
+      p.image_url AS "imageUrl",
+      p.images,
+      p.aesthetic,
+      p.seller_id AS "sellerId",
+      p.status = 'sold' AS "isSold",
+      p.status,
+      p.created_at AS "createdAt",
+      p.updated_at AS "updatedAt",
+      p.is_digital AS "isDigital",
+      p.product_type AS "productType",
+      p.is_custom_product,
+      p.production_days,
+      p.customization_prompt,
+      p.is_imported_product,
+      p.import_days,
+      p.import_note,
+      p.service_locations AS "serviceLocations",
+      p.service_options AS "serviceOptions",
+      s.shop_name AS "sellerName"
+    FROM products p
+    JOIN sellers s ON p.seller_id = s.id
+    WHERE p.seller_id = $1 AND p.status = 'available'
+    ORDER BY p.created_at DESC
+    LIMIT $2 OFFSET $3
+  `;
+  const { rows } = await query(sql, [sellerId, limit, offset]);
+  return rows;
+}
