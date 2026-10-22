@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import IndexPage from '../MarketplaceIndex';
+import { GlobalAuthContext } from '@/features/auth/contexts/authContextObjects';
+import type { GlobalAuthContextType } from '@/features/auth/types/authTypes';
 
 describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
   const renderPage = () =>
@@ -83,5 +85,50 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(root).toBeInTheDocument();
     expect(root.style.paddingTop).toContain('safe-area-inset-top');
     expect(root.style.paddingBottom).toContain('safe-area-inset-bottom');
+  });
+
+  it('renders seamless boot splash and hides action buttons on standalone PWA while auth session revalidation is loading', () => {
+    Object.defineProperty(window.navigator, 'standalone', {
+      value: true,
+      configurable: true,
+    });
+
+    const mockAuthContext: GlobalAuthContextType = {
+      user: null,
+      isAuthenticated: false,
+      isLoading: true,
+      role: null,
+      login: async () => {},
+      loginWithToken: async () => {},
+      loginAdmin: async () => {},
+      register: async () => {},
+      logout: () => {},
+      switchAccount: async () => {},
+      refreshRole: async () => {},
+      forgotPassword: async () => false,
+      resetPassword: async () => {},
+      getProfile: async () => {},
+      updateProfile: async () => {},
+    };
+
+    render(
+      <HelmetProvider>
+        <MemoryRouter>
+          <GlobalAuthContext.Provider value={mockAuthContext}>
+            <IndexPage />
+          </GlobalAuthContext.Provider>
+        </MemoryRouter>
+      </HelmetProvider>
+    );
+
+    // Boot splash should be present
+    expect(screen.getByTestId('seamless-boot-splash')).toBeInTheDocument();
+    // Action buttons must NOT be rendered (preventing the landing page flash!)
+    expect(screen.queryByRole('link', { name: /view brands/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /add brand/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^creator$/i })).not.toBeInTheDocument();
+
+    // Clean up
+    delete (window.navigator as unknown as { standalone?: unknown }).standalone;
   });
 });

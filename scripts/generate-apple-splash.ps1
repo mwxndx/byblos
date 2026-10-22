@@ -23,7 +23,7 @@ function Create-SplashImage {
     $logoPath = Join-Path $publicDir $LogoFile
     $logo = [System.Drawing.Bitmap]::FromFile($logoPath)
 
-    # Logo width: ~50% of screen width, max 480px
+    # Logo width: ~48% of screen width, bounded
     $targetWidth = [int]($Width * 0.48)
     if ($targetWidth -gt 500) { $targetWidth = 500 }
     if ($targetWidth -lt 220) { $targetWidth = 220 }
@@ -45,12 +45,16 @@ function Create-SplashImage {
 }
 
 $sizes = @(
-    @{ Name = "1179x2556"; Width = 1179; Height = 2556 }, # iPhone 15/15 Pro, 16
-    @{ Name = "1290x2796"; Width = 1290; Height = 2796 }, # iPhone 15 Plus/Pro Max
-    @{ Name = "1170x2532"; Width = 1170; Height = 2532 }, # iPhone 12/13/14
-    @{ Name = "1242x2688"; Width = 1242; Height = 2688 }, # iPhone XS Max / 11 Pro Max
-    @{ Name = "828x1792";  Width = 828;  Height = 1792 }, # iPhone 11 / XR
-    @{ Name = "750x1334";  Width = 750;  Height = 1334 }  # iPhone SE / 8
+    @{ Name = "1320x2868"; Width = 1320; Height = 2868 }, # iPhone 16 Pro Max (440x956 @3x)
+    @{ Name = "1290x2796"; Width = 1290; Height = 2796 }, # iPhone 15/16 Plus, 14/15 Pro Max (430x932 @3x)
+    @{ Name = "1284x2778"; Width = 1284; Height = 2778 }, # iPhone 14 Plus, 12/13 Pro Max (428x926 @3x)
+    @{ Name = "1206x2622"; Width = 1206; Height = 2622 }, # iPhone 16 Pro (402x874 @3x)
+    @{ Name = "1179x2556"; Width = 1179; Height = 2556 }, # iPhone 14/15/16 Pro, 15/16 (393x852 @3x)
+    @{ Name = "1170x2532"; Width = 1170; Height = 2532 }, # iPhone 12/13/14 (390x844 @3x)
+    @{ Name = "1242x2688"; Width = 1242; Height = 2688 }, # iPhone XS Max, 11 Pro Max (414x896 @3x)
+    @{ Name = "828x1792";  Width = 828;  Height = 1792 }, # iPhone 11, XR (414x896 @2x)
+    @{ Name = "1125x2436"; Width = 1125; Height = 2436 }, # iPhone X, XS, 11 Pro (375x812 @3x)
+    @{ Name = "750x1334";  Width = 750;  Height = 1334 }  # iPhone SE 2/3, 7/8 (375x667 @2x)
 )
 
 foreach ($s in $sizes) {

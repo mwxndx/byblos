@@ -1,9 +1,19 @@
+import { useContext } from 'react';
 import { Button } from '@/shared/ui/button';
 import { Link } from 'react-router-dom';
 import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 import { SEOHead } from '@/shared/components/SEOHead';
+import { GlobalAuthContext } from '@/features/auth/contexts/authContextObjects';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
+
+export const isPwaStandalone = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return Boolean(
+    (window.navigator as unknown as { standalone?: boolean })?.standalone ||
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+  );
+};
 
 /**
  * Simplified Byblos landing screen:
@@ -102,6 +112,30 @@ const LandingHome = () => (
 );
 
 const IndexPage = () => {
+  const auth = useContext(GlobalAuthContext);
+  // When opening on Android native or iOS standalone PWA:
+  // If auth is actively restoring a session (isLoading) or user is already known (isAuthenticated),
+  // render the seamless dark splash mark rather than flashing the public action buttons.
+  const isMobileAppShell = isNativeApp() || isPwaStandalone();
+  const isSessionPending = auth ? (auth.isLoading || auth.isAuthenticated) : false;
+
+  if (isMobileAppShell && isSessionPending) {
+    return (
+      <div
+        data-testid="seamless-boot-splash"
+        className="flex min-h-[100dvh] min-h-[100svh] w-full items-center justify-center bg-[var(--byblos-bg,#000000)]"
+      >
+        <img
+          src="/byblos-mark-dark.png"
+          alt="Byblos"
+          className="h-36 w-36 object-contain"
+          width={144}
+          height={144}
+        />
+      </div>
+    );
+  }
+
   return (
     <>
       <SEOHead
