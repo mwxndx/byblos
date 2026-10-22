@@ -45,6 +45,8 @@ export type LinkedShop = {
   sales_count?: number | string;
   click_count?: number | string;
   earnings?: number | string;
+  sellerCreatorModeOff?: boolean;
+  status?: string;
 };
 export type InvitedBusiness = {
   id: number;

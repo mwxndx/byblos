@@ -199,7 +199,7 @@ export function CreatorEarningsHero({
                   </div>
                   <ul className="space-y-1 leading-relaxed text-label-2">
                     <li>Audience: shoppers and your social followers.</li>
-                    <li>You earn: a percentage commission (5%–20% per sale).</li>
+                    <li>You earn: a commission rate set by the seller (1%–30% per sale).</li>
                     <li>Duration: per approved shop collaboration.</li>
                     <li>Effort: share tracking links and earn on completed orders.</li>
                   </ul>

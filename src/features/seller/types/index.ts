@@ -31,20 +31,7 @@ export interface SellerAnalytics {
 
 
 
-export interface ReferredSeller {
-  id: number;
-  shopName: string;
-  referralActiveUntil: string | null;
-  isActive: boolean;
-  totalEarned: number;
-}
-
-export interface ReferralDashboard {
-  referralCode: string | null;
-  referralLink: string | null;
-  totalReferralEarnings: number;
-  referred: ReferredSeller[];
-}
+// Note: Seller-to-seller referrals were retired in favor of creator referrals.
 
 export interface RegisterSellerInput {
   fullName: string;

@@ -6,8 +6,6 @@ import { sellerWithdrawalsApi, withdrawalService } from './withdrawalsApi';
 export type {
   OrderQueryParams,
   OrdersAnalytics,
-  ReferralDashboard,
-  ReferredSeller,
   RegisterSellerInput,
   SellerAnalytics,
   Theme,
