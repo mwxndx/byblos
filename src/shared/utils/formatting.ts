@@ -1,11 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { isNativeApp } from "@/infrastructure/navigation/mobileApp"
-import { DEFAULT_MAP_CENTER } from "@/infrastructure/location/location"
+import { cn } from "./cn";
+import { isNativeApp } from "@/infrastructure/navigation/mobileApp";
+import { DEFAULT_MAP_CENTER } from "@/infrastructure/location/location";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+export { cn };
 
 // Module-level static cache for Intl.NumberFormat instance (10x faster execution)
 const currencyFormatter = new Intl.NumberFormat('en-KE', {

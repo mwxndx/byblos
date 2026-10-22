@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 import { useLocation } from 'react-router-dom';
 import {
   applyResolvedTheme,
@@ -45,7 +46,6 @@ function applyForPath(pathname: string): void {
  * and applies that scope's preference, so every surface, its modals, and the
  * global toasts follow the right per-scope theme. Mounted once, inside the router.
  */
-import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 
 export function ThemeManager() {
   const { pathname } = useLocation();

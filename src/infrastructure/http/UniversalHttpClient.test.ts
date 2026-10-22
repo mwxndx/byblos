@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import type { InternalAxiosRequestConfig } from 'axios';
 import { UniversalHttpClient } from './UniversalHttpClient';
+import { registerAppNavigator, clearAppNavigator, SESSION_EXPIRED_EVENT } from '../navigation/navigationService';
 import type { AuthStrategy, AppRole, AuthPlatform } from '../auth/types';
 
 const tick = () => new Promise((r) => setTimeout(r, 5));
@@ -156,5 +157,48 @@ describe('UniversalHttpClient — keyed token refresh (Android role race)', () =
       'creator',
       'buyer'
     ]);
+  });
+  test('throttles duplicate session-expired events when concurrent requests 401 and refresh fails', async () => {
+    const expiredEvents: unknown[] = [];
+    const mockNav = () => {};
+    registerAppNavigator(mockNav);
+    const listener = (e: Event) => {
+      expiredEvents.push(e);
+    };
+    globalThis.addEventListener(SESSION_EXPIRED_EVENT, listener);
+
+    try {
+      const strategy: AuthStrategy = {
+        platform: 'web' as AuthPlatform,
+        async getAuthHeaders() { return {}; },
+        async getCsrfHeader() { return {}; },
+        async handleUnauthorized() {
+          await tick();
+          return false; // Refresh fails
+        },
+        async clearSession() {},
+      };
+
+      const client = new UniversalHttpClient({ authStrategy: strategy });
+      client.getAxiosInstance().defaults.adapter = async (config) => {
+        return unauthorized(config);
+      };
+
+      // 5 concurrent requests all receiving 401
+      const results = await Promise.allSettled([
+        client.get('/seller/orders'),
+        client.get('/seller/products'),
+        client.get('/seller/metrics'),
+        client.get('/seller/settings'),
+        client.get('/seller/analytics'),
+      ]);
+
+      expect(results.every((r) => r.status === 'rejected')).toBe(true);
+      // All 5 requests failed with 401, but emitSessionExpired should only fire once
+      expect(expiredEvents).toHaveLength(1);
+    } finally {
+      globalThis.removeEventListener(SESSION_EXPIRED_EVENT, listener);
+      clearAppNavigator(mockNav);
+    }
   });
 });

@@ -19,7 +19,6 @@ export class AndroidAuthStrategy implements AuthStrategy {
 
     // 2. Fall back to the persisted active role (not a hardcoded list), so we
     //    never accidentally attach a stale token from a different account.
-    // 2. Fall back to active role token or unified BYBLOS_AUTH_KEYS.TOKEN
     if (!token) {
       const activeRole = await this.storageAdapter.getItem(BYBLOS_AUTH_KEYS.ACTIVE_ROLE);
       if (activeRole) {

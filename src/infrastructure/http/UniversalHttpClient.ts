@@ -26,6 +26,17 @@ export class UniversalHttpClient {
   // refresh-token rotation with concurrent /auth/refresh-token calls — so web
   // keeps one key.
   private refreshPromises = new Map<string, Promise<boolean>>();
+  private lastSessionExpiredTimes = new Map<string, number>();
+
+  private notifySessionExpired(key: string, route: string): void {
+    const now = Date.now();
+    const last = this.lastSessionExpiredTimes.get(key) || 0;
+    // 2-second throttle prevents dispatch storm from concurrent failing 401s
+    if (now - last > 2000) {
+      this.lastSessionExpiredTimes.set(key, now);
+      emitSessionExpired(route);
+    }
+  }
 
   constructor(options: UniversalHttpClientOptions = {}) {
     const baseURL = buildApiBaseUrl();
@@ -116,7 +127,7 @@ export class UniversalHttpClient {
 
             if (role === 'marketing') {
               await this.authStrategy.clearSession('marketing');
-              emitSessionExpired('/admin/marketing/login');
+              this.notifySessionExpired('marketing', '/admin/marketing/login');
               throw error;
             }
 
@@ -135,6 +146,7 @@ export class UniversalHttpClient {
 
             const refreshed = await refreshPromise;
             if (refreshed) {
+              this.lastSessionExpiredTimes.delete(refreshKey);
               const updatedAuthHeaders = await this.authStrategy.getAuthHeaders(role);
               Object.assign(config.headers, updatedAuthHeaders);
               return this.instance(config);
@@ -147,7 +159,7 @@ export class UniversalHttpClient {
                 logistics: '/logistics/login',
                 buyer: '/buyer/login',
               };
-              emitSessionExpired(ROLE_LOGIN_ROUTES[role]);
+              this.notifySessionExpired(refreshKey, ROLE_LOGIN_ROUTES[role]);
             }
           }
         }

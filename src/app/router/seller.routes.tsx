@@ -4,7 +4,7 @@ import { SellerProtectedRoute } from '@/app/router/AppProtectedRoute';
 import { SellerLayout } from '@/app/layouts/SellerLayout';
 import { safeLazy } from '@/shared/utils/safeLazy';
 import { RouteFallback } from '@/app/router/RouteFallback';
-import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
+const ResetPasswordPage = safeLazy(() => import('@/features/auth/pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 
 const SellerDashboard = safeLazy(() => import('@/features/seller/pages/SellerDashboard'));
 const SellerRegistration = safeLazy(() => import('@/features/seller/pages/SellerRegistration'));
