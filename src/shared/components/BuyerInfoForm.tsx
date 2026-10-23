@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { Loader2, User, Mail, MapPin, Phone, CheckCircle2, Lock, Eye, EyeOff } from '@/shared/ui/icons';
+import { Loader2, User, Mail, Phone } from '@/shared/ui/icons';
 import { locationData } from '@/shared/utils/constants';
 import type { BuyerInfo } from './BuyerInfoModal';
 
@@ -14,14 +14,14 @@ interface BuyerInfoFormProps {
   buyerInfo: BuyerInfo;
   setBuyerInfo: React.Dispatch<React.SetStateAction<BuyerInfo>>;
   errors: Partial<BuyerInfo & { termsAccepted?: string }>;
-  showPassword: boolean;
-  setShowPassword: React.Dispatch<React.SetStateAction<boolean>>;
-  showConfirmPassword: boolean;
-  setShowConfirmPassword: React.Dispatch<React.SetStateAction<boolean>>;
+  showPassword?: boolean;
+  setShowPassword?: React.Dispatch<React.SetStateAction<boolean>>;
+  showConfirmPassword?: boolean;
+  setShowConfirmPassword?: React.Dispatch<React.SetStateAction<boolean>>;
   termsAccepted: boolean;
   setTermsAccepted: React.Dispatch<React.SetStateAction<boolean>>;
   setIsTermsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  checkPasswordStrength: (password: string) => { minLength: boolean; hasNumber: boolean; hasSpecial: boolean; hasUpper: boolean; hasLower: boolean };
+  checkPasswordStrength?: (password: string) => { minLength: boolean; hasNumber: boolean; hasSpecial: boolean; hasUpper: boolean; hasLower: boolean };
   themeClasses: Record<string, string>;
   isLoading: boolean;
 }
@@ -32,14 +32,9 @@ export function BuyerInfoForm({
   buyerInfo,
   setBuyerInfo,
   errors,
-  showPassword,
-  setShowPassword,
-  showConfirmPassword,
-  setShowConfirmPassword,
   termsAccepted,
   setTermsAccepted,
   setIsTermsModalOpen,
-  checkPasswordStrength,
   themeClasses,
   isLoading,
 }: BuyerInfoFormProps) {
@@ -50,9 +45,9 @@ export function BuyerInfoForm({
           <User className="h-7 w-7 text-yellow-400" />
         </div>
         <div className="space-y-2">
-          <DialogTitle className="text-2xl font-semibold text-center text-slate-950 dark:text-white">PAYMENT DETAILS</DialogTitle>
+          <DialogTitle className="text-2xl font-semibold text-center text-slate-950 dark:text-white">DELIVERY & CONTACT</DialogTitle>
           <DialogDescription className="text-[11px] text-center font-bold text-slate-600 dark:text-white uppercase tracking-wider opacity-80 leading-relaxed px-4">
-            Your payment details are safe and are only collected once
+            Used for your digital receipt, M-Pesa prompt, and delivery
           </DialogDescription>
         </div>
       </DialogHeader>
@@ -70,46 +65,39 @@ export function BuyerInfoForm({
             <Label htmlFor="firstName" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               First Name *
             </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <User className="h-4 w-4 text-slate-400" />
-              </div>
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="First Name"
-                value={buyerInfo.firstName}
-                onChange={(e) => setBuyerInfo(prev => ({ ...prev, firstName: e.target.value }))}
-                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.firstName ? 'border-red-500' : ''}`}
-                disabled={isLoading}
-                aria-invalid={!!errors.firstName}
-                aria-describedby={errors.firstName ? 'firstName-error' : undefined}
-              />
-            </div>
+            <Input
+              id="firstName"
+              name="firstName"
+              autoComplete="given-name"
+              placeholder="e.g. John"
+              value={buyerInfo.firstName}
+              onChange={(e) => setBuyerInfo(prev => ({ ...prev, firstName: e.target.value }))}
+              className={`h-11 text-sm rounded-xl ${themeClasses.input} ${errors.firstName ? 'border-red-500' : ''}`}
+              disabled={isLoading}
+              aria-invalid={!!errors.firstName}
+              aria-describedby={errors.firstName ? 'firstName-error' : undefined}
+            />
             {errors.firstName && (
               <p id="firstName-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.firstName}</p>
             )}
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="lastName" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
               Last Name *
             </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <User className="h-4 w-4 text-slate-400" />
-              </div>
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Last Name"
-                value={buyerInfo.lastName}
-                onChange={(e) => setBuyerInfo(prev => ({ ...prev, lastName: e.target.value }))}
-                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.lastName ? 'border-red-500' : ''}`}
-                disabled={isLoading}
-                aria-invalid={!!errors.lastName}
-                aria-describedby={errors.lastName ? 'lastName-error' : undefined}
-              />
-            </div>
+            <Input
+              id="lastName"
+              name="lastName"
+              autoComplete="family-name"
+              placeholder="e.g. Doe"
+              value={buyerInfo.lastName}
+              onChange={(e) => setBuyerInfo(prev => ({ ...prev, lastName: e.target.value }))}
+              className={`h-11 text-sm rounded-xl ${themeClasses.input} ${errors.lastName ? 'border-red-500' : ''}`}
+              disabled={isLoading}
+              aria-invalid={!!errors.lastName}
+              aria-describedby={errors.lastName ? 'lastName-error' : undefined}
+            />
             {errors.lastName && (
               <p id="lastName-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.lastName}</p>
             )}
@@ -130,7 +118,7 @@ export function BuyerInfoForm({
               name="email"
               type="email"
               autoComplete="email"
-              placeholder="Enter your email address"
+              placeholder="name@example.com"
               value={buyerInfo.email}
               onChange={(e) => setBuyerInfo(prev => ({ ...prev, email: e.target.value }))}
               className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.email ? 'border-red-500' : ''}`}
@@ -148,7 +136,7 @@ export function BuyerInfoForm({
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <Label htmlFor="mobilePayment" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-              M-Pesa *
+              M-Pesa Number *
             </Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
@@ -156,19 +144,21 @@ export function BuyerInfoForm({
               </div>
               <Input
                 id="mobilePayment"
+                name="mobilePayment"
                 type="tel"
+                autoComplete="tel"
                 placeholder="07..."
                 value={buyerInfo.mobilePayment}
                 onChange={(e) => setBuyerInfo(prev => ({ ...prev, mobilePayment: e.target.value }))}
-                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}
+                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.mobilePayment ? 'border-red-500' : ''}`}
                 disabled={isLoading}
-                required
               />
             </div>
           </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="whatsappNumber" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-              WhatsApp *
+              WhatsApp (Optional)
             </Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
@@ -176,198 +166,74 @@ export function BuyerInfoForm({
               </div>
               <Input
                 id="whatsappNumber"
+                name="whatsappNumber"
                 type="tel"
-                placeholder="07..."
+                autoComplete="tel"
+                placeholder="Same as M-Pesa"
                 value={buyerInfo.whatsappNumber}
                 onChange={(e) => setBuyerInfo(prev => ({ ...prev, whatsappNumber: e.target.value }))}
-                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.whatsappNumber ? 'border-red-500' : ''}`}
+                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}
                 disabled={isLoading}
-                required
-                aria-invalid={!!errors.whatsappNumber}
               />
             </div>
           </div>
         </div>
 
-        {/* City & Area in a grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="city" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-              City *
-            </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <MapPin className="h-4 w-4 text-slate-400" />
-              </div>
+        {/* City and Area Selection */}
+        <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* City Selection */}
+            <div className="space-y-1.5">
+              <Label className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
+                City
+              </Label>
               <Select
-                value={buyerInfo.city}
+                value={buyerInfo.city || 'Nairobi'}
                 onValueChange={(value) => {
                   setBuyerInfo(prev => ({
                     ...prev,
                     city: value,
-                    location: '' // Reset location when city changes
+                    location: ''
                   }));
                 }}
                 disabled={isLoading}
               >
-                <SelectTrigger id="city" className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}>
-                  <SelectValue placeholder="Select city" />
+                <SelectTrigger className={`h-11 text-sm rounded-xl ${themeClasses.input}`}>
+                  <SelectValue placeholder="Select City" />
                 </SelectTrigger>
-                <SelectContent className="bg-black border-white/15 text-white">
-                  <SelectItem value="Nairobi" className="text-white hover:bg-white/10 focus:bg-white/10">
-                    Nairobi
-                  </SelectItem>
-                  <SelectItem value="Mombasa" className="text-white hover:bg-white/10 focus:bg-white/10">
-                    Mombasa
-                  </SelectItem>
-                  <SelectItem value="Kisumu" className="text-white hover:bg-white/10 focus:bg-white/10">
-                    Kisumu
-                  </SelectItem>
+                <SelectContent className={`${themeClasses.bg} ${themeClasses.text} border-slate-200 dark:border-white/15`}>
+                  {Object.keys(locationData).map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="location" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-              Area *
-            </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <MapPin className="h-4 w-4 text-slate-400" />
-              </div>
+
+            {/* Area Selection */}
+            <div className="space-y-1.5">
+              <Label className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
+                Area / Neighborhood
+              </Label>
               <Select
                 value={buyerInfo.location}
-                onValueChange={(value) => {
-                  setBuyerInfo(prev => ({
-                    ...prev,
-                    location: value
-                  }));
-                }}
-                disabled={isLoading || !buyerInfo.city}
+                onValueChange={(value) => setBuyerInfo(prev => ({ ...prev, location: value }))}
+                disabled={isLoading}
               >
-                <SelectTrigger id="location" className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}>
-                  <SelectValue placeholder={buyerInfo.city ? "Select area" : "City first"} />
+                <SelectTrigger className={`h-11 text-sm rounded-xl ${themeClasses.input}`}>
+                  <SelectValue placeholder="Select Area" />
                 </SelectTrigger>
-                <SelectContent className="bg-black border-white/15 text-white">
-                  {buyerInfo.city && [...(locationData[buyerInfo.city] || [])]
-                    .sort((a, b) => a.localeCompare(b))
-                    .map((area) => (
-                      <SelectItem key={area} value={area} className="text-white hover:bg-white/10 focus:bg-white/10">
-                        {area}
-                      </SelectItem>
-                    ))}
+                <SelectContent className={`${themeClasses.bg} ${themeClasses.text} border-slate-200 dark:border-white/15`}>
+                  {(locationData[buyerInfo.city || 'Nairobi'] || locationData['Nairobi']).map((area) => (
+                    <SelectItem key={area} value={area}>
+                      {area}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-        </div>
-
-        {/* Password */}
-        <div className="space-y-2 pt-2">
-          <Label htmlFor="password" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-            Set Password *
-          </Label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-              <Lock className="h-4 w-4 text-slate-400" />
-            </div>
-            <Input
-              id="password"
-              name="password"
-              autoComplete="new-password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Min 8 characters"
-              value={buyerInfo.password}
-              onChange={(e) => setBuyerInfo(prev => ({ ...prev, password: e.target.value }))}
-              className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.password ? 'border-red-500' : ''}`}
-              disabled={isLoading}
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? 'password-error' : undefined}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              aria-pressed={showPassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-2 hover:text-white transition-colors"
-            >
-              {showPassword ? (
-                <EyeOff className="w-5 h-5" />
-              ) : (
-                <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-
-          {/* Password Strength Checklist -- aria-live so each met/unmet
-              requirement is announced as the user types, without them having
-              to navigate back to it. WCAG 4.1.3. */}
-          {buyerInfo.password && (
-            <div aria-live="polite" className="p-3 bg-white/5 rounded-xl border border-white/15">
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: "8+ chars", met: checkPasswordStrength(buyerInfo.password).minLength },
-                  { label: "Number", met: checkPasswordStrength(buyerInfo.password).hasNumber },
-                  { label: "Special", met: checkPasswordStrength(buyerInfo.password).hasSpecial },
-                  { label: "Case Mix", met: checkPasswordStrength(buyerInfo.password).hasUpper && checkPasswordStrength(buyerInfo.password).hasLower },
-                ].map((req, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <div className={`p-0.5 rounded-full ${req.met ? 'bg-green-500/20 text-green-400' : 'bg-slate-50 text-slate-400'}`}>
-                      <CheckCircle2 className="h-3 w-3" />
-                    </div>
-                    <span className={`text-[10px] uppercase font-semibold ${req.met ? 'text-green-400' : 'text-slate-400'}`}>
-                      {req.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {errors.password && (
-            <p id="password-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.password}</p>
-          )}
-        </div>
-
-        {/* Confirm Password */}
-        <div className="space-y-1.5 pb-2">
-          <Label htmlFor="confirmPassword" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-            Verify Password *
-          </Label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-              <Lock className="h-4 w-4 text-slate-400" />
-            </div>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              autoComplete="new-password"
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Repeat password"
-              value={buyerInfo.confirmPassword}
-              onChange={(e) => setBuyerInfo(prev => ({ ...prev, confirmPassword: e.target.value }))}
-              className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.confirmPassword ? 'border-red-500' : ''}`}
-              disabled={isLoading}
-              aria-invalid={!!errors.confirmPassword}
-              aria-describedby={errors.confirmPassword ? 'confirmPassword-error' : undefined}
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              aria-pressed={showConfirmPassword}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-label-2 hover:text-white transition-colors"
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="w-5 h-5" />
-              ) : (
-                <Eye className="w-5 h-5" />
-              )}
-            </button>
-          </div>
-          {errors.confirmPassword && (
-            <p id="confirmPassword-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.confirmPassword}</p>
-          )}
         </div>
 
         {/* Terms and Conditions Checkout */}
@@ -407,10 +273,10 @@ export function BuyerInfoForm({
           {isLoading ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin mr-2" />
-              Saving Profile...
+              Initiating Payment...
             </>
           ) : (
-            'Save & Continue to Payment'
+            'Continue to Payment'
           )}
         </Button>
         <Button

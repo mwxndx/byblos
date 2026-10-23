@@ -518,3 +518,23 @@ export const deleteAccount = async (req, res, next) => {
     next(error);
   }
 };
+/**
+ * POST /api/buyer/claim-guest-order
+ * Public: Convert a completed guest checkout into a registered account
+ * and link the order to the buyer. Returns a JWT so the client can log in.
+ */
+export const claimGuestOrder = async (req, res, next) => {
+  try {
+    const { email, password, checkoutToken } = req.body;
+    if (!email || !password || !checkoutToken) {
+      return next(new AppError('email, password, and checkoutToken are required.', 400));
+    }
+    const result = await BuyerService.claimGuestOrder({ email, password, checkoutToken });
+    return res.status(200).json({ status: 'success', token: result.token });
+  } catch (error) {
+    if (error.statusCode === 401) {
+      return next(new AppError(error.message, 401));
+    }
+    next(error);
+  }
+};

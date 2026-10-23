@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 import { useToast } from '@/shared/hooks/use-toast';
+import { Button } from '@/shared/ui/button';
 
 // Lazy load the OrdersSection component
 const OrdersSection = lazy(() => import('@/features/orders/components/OrdersSectionContainer'));
@@ -67,8 +68,6 @@ function BuyerDashboard() {
     ? parseFloat((user as unknown as { refunds: string }).refunds)
     : ((user as unknown as { refunds?: number })?.refunds || 0);
 
-
-
   useEffect(() => {
     const originalBodyStyle = document.body.style.cssText;
     const originalHtmlStyle = document.documentElement.style.cssText;
@@ -121,7 +120,6 @@ function BuyerDashboard() {
     disabled: activeSection === 'profile',
   });
 
-
   return (
     <div className="page-enter dashboard-layout min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
       display: 'flex', flexDirection: 'column',
@@ -164,12 +162,25 @@ function BuyerDashboard() {
 
           {activeSection === 'notifications' && (
             <div className="mx-auto w-full max-w-[760px]">
-              <NotificationList
-                variant="default"
-                role="buyer"
-                scrollClassName=""
-                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
-              />
+              {user ? (
+                <NotificationList
+                  variant="default"
+                  role="buyer"
+                  scrollClassName=""
+                  className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+                />
+              ) : (
+                <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-6 text-center space-y-3">
+                  <Bell className="mx-auto h-8 w-8 text-yellow-400" />
+                  <h3 className="text-base font-bold text-slate-950 dark:text-white">Alerts & Notifications</h3>
+                  <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
+                    Sign in to your Byblos account to receive instant order tracking updates, delivery notifications, and messages.
+                  </p>
+                  <Button onClick={() => navigate('/buyer/login')} className="h-10 px-6 rounded-full bg-[#F5C518] text-black font-bold hover:bg-yellow-300">
+                    Sign In
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -191,7 +202,22 @@ function BuyerDashboard() {
             </div>
           )}
 
-          {activeSection === 'refunds' && <BuyerRefundsTab refundAmount={refundAmount} />}
+          {activeSection === 'refunds' && (
+            user ? (
+              <BuyerRefundsTab refundAmount={refundAmount} />
+            ) : (
+              <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-6 text-center space-y-3">
+                <WalletCards className="mx-auto h-8 w-8 text-yellow-400" />
+                <h3 className="text-base font-bold text-slate-950 dark:text-white">Refunds</h3>
+                <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
+                  Sign in to view your refund balance and withdrawal history.
+                </p>
+                <Button onClick={() => navigate('/buyer/login')} className="h-10 px-6 rounded-full bg-[#F5C518] text-black font-bold hover:bg-yellow-300">
+                  Sign In
+                </Button>
+              </div>
+            )
+          )}
 
         </div>
       </div>
@@ -222,5 +248,3 @@ function BuyerDashboard() {
 }
 
 export default BuyerDashboard;
-
-

@@ -27,3 +27,8 @@ export const refundRequest = z.object({
   mpesaName: s
 }).passthrough();
 export const orderCollected = z.object({ orderId: id }).passthrough();
+export const claimGuestOrder = z.object({
+  email: z.string().email('Valid email required'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  checkoutToken: z.string().min(1, 'Checkout token required'),
+}).passthrough();

@@ -663,6 +663,18 @@ class Order {
     const { rows } = await executor.query(updateOrderQuery, [status, JSON.stringify(reason), orderId]);
     return rows[0];
   }
+
+  /**
+   * Link all guest orders (identified by client_checkout_token) to a buyer after
+   * they claim their order post-payment. Runs inside the provided transaction client.
+   */
+  static async linkGuestOrderToBuyer(client, buyerId, clientCheckoutToken) {
+    const { rows } = await client.query(
+      `UPDATE product_orders SET buyer_id = $1, updated_at = NOW() WHERE client_checkout_token = $2 AND (buyer_id IS NULL OR buyer_id = $1) RETURNING id`,
+      [buyerId, clientCheckoutToken]
+    );
+    return rows;
+  }
 }
 
 export default Order;

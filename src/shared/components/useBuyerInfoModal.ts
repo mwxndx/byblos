@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/shared/hooks/use-toast';
-import {
-  checkPasswordStrength,
-  isValidEmail,
-  validatePasswordRequirements,
-} from '@/features/auth/utils/authValidation';
+import { isValidEmail } from '@/features/auth/utils/authValidation';
 import type { BuyerInfo, BuyerInfoModalProps } from './BuyerInfoModal';
 
 export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false, theme = 'default', phoneNumber, initialData }: BuyerInfoModalProps) {
@@ -17,13 +13,11 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
     email: initialData?.email || '',
     mobilePayment: initialData?.mobilePayment || phoneNumber || '',
     whatsappNumber: initialData?.whatsappNumber || phoneNumber || '',
-    city: initialData?.city || '',
+    city: initialData?.city || 'Nairobi',
     location: initialData?.location || '',
-    password: '',
-    confirmPassword: ''
   });
 
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
   const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
   const [errors, setErrors] = useState<Partial<BuyerInfo & { termsAccepted?: string }>>({});
 
@@ -35,20 +29,20 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
         ...initialData,
         firstName: initialData.fullName?.split(' ')[0] || prev.firstName,
         lastName: initialData.fullName?.split(' ').slice(1).join(' ') || prev.lastName,
-        city: initialData.city || prev.city
+        city: initialData.city || prev.city || 'Nairobi',
+        mobilePayment: initialData.mobilePayment || phoneNumber || prev.mobilePayment,
+        whatsappNumber: initialData.whatsappNumber || initialData.mobilePayment || phoneNumber || prev.whatsappNumber,
       }) as BuyerInfo);
     }
-  }, [initialData]);
+  }, [initialData, phoneNumber]);
 
-  // FIX: Reset state when modal opens
+  // Reset errors when modal opens
   useEffect(() => {
     if (isOpen) {
-      setTermsAccepted(false);
+      setTermsAccepted(true);
       setErrors({});
     }
   }, [isOpen]);
-
-
 
   const validateForm = (): boolean => {
     const newErrors: Partial<BuyerInfo & { termsAccepted?: string }> = {};
@@ -67,20 +61,6 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
       newErrors.email = 'Please enter a valid email address';
     }
 
-    // Strict Password validation matching BuyerRegister
-    const pwdResult = validatePasswordRequirements(buyerInfo.password || '', buyerInfo.confirmPassword);
-    if (!pwdResult.isValid) {
-      if (pwdResult.error === 'Passwords do not match') {
-        newErrors.confirmPassword = 'Passwords do not match';
-      } else if (pwdResult.error) {
-        newErrors.password = pwdResult.error;
-      }
-    }
-
-    if (!buyerInfo.whatsappNumber?.trim()) {
-      newErrors.whatsappNumber = 'WhatsApp number is required';
-    }
-
     if (!termsAccepted) {
       newErrors.termsAccepted = 'You must accept the Terms and Conditions to continue.';
     }
@@ -97,8 +77,10 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
     }
 
     try {
+      const effectiveWhatsapp = buyerInfo.whatsappNumber?.trim() || buyerInfo.mobilePayment?.trim() || phoneNumber;
       await onSubmit({
         ...buyerInfo,
+        whatsappNumber: effectiveWhatsapp,
         fullName: `${buyerInfo.firstName} ${buyerInfo.lastName}`.trim(),
         termsAccepted: true
       } as unknown as Parameters<typeof onSubmit>[0]);
@@ -109,17 +91,15 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
         email: '',
         mobilePayment: '',
         whatsappNumber: '',
-        city: '',
+        city: 'Nairobi',
         location: '',
-        password: '',
-        confirmPassword: ''
       });
       setErrors({});
       onClose();
     } catch (error) {
       toast({
         title: 'Error',
-        description: (error as Error).message || 'Failed to save buyer information',
+        description: (error as Error).message || 'Failed to submit contact information',
         variant: 'destructive',
         duration: 5000,
       });
@@ -128,7 +108,6 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
 
   const handleClose = () => {
     if (!isLoading) {
-      setTermsAccepted(false);
       setErrors({});
       onClose();
     }
@@ -157,7 +136,6 @@ export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false
     setIsTermsModalOpen,
     handleSubmit,
     handleClose,
-    checkPasswordStrength,
     themeClasses,
   };
 }

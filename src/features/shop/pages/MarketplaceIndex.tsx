@@ -69,7 +69,7 @@ const LandingHome = () => (
 
       {/* Buttons of identical length with yellow background, black text, gap-6 spacing, and elevated lift effect */}
       <div className="flex w-full flex-col items-center gap-6">
-        <Link to="/buyer/login" className="w-full">
+        <Link to="/buyer/dashboard" className="w-full">
           <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold shadow-[0_8px_20px_-4px_rgba(245,197,24,0.38),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-4px_rgba(245,197,24,0.5),0_6px_12px_-2px_rgba(0,0,0,0.25)] hover:bg-brand-press active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
             View Brands
           </Button>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { useGetOrderStatusMutation, useCancelPublicOrderMutation } from '@/features/buyer/hooks/queries/useOrderStatusQuery';
 import { useGlobalAuth } from '@/features/auth/contexts';
@@ -6,6 +7,20 @@ import { isNativeApp, APP_DOWNLOAD_URL, getDevicePlatform, getAndroidDeepLink } 
 import { Loader2 } from '@/shared/ui/icons';
 import { useToast } from '@/shared/hooks/use-toast';
 import { useScreenSecurity } from '@/shared/utils/screenSecurity';
+import { checkPasswordStrength } from '@/features/auth/utils/authValidation';
+
+const GUEST_ORDERS_KEY = 'byblos_guest_orders';
+
+function saveGuestOrderToStorage(orderNumber: string, checkoutToken: string | null | undefined, email: string | undefined) {
+  try {
+    const existing = JSON.parse(localStorage.getItem(GUEST_ORDERS_KEY) || '[]') as Array<{ orderNumber: string; checkoutToken?: string; email?: string; date: string }>;
+    const entry = { orderNumber, checkoutToken: checkoutToken ?? undefined, email, date: new Date().toISOString() };
+    const deduped = existing.filter((o) => o.orderNumber !== orderNumber);
+    localStorage.setItem(GUEST_ORDERS_KEY, JSON.stringify([entry, ...deduped].slice(0, 20)));
+  } catch {
+    // localStorage may be unavailable in some browsers
+  }
+}
 
 type ModalState = 'POLLING' | 'SUCCESS' | 'FAILED' | 'TIMEOUT';
 
@@ -45,6 +60,10 @@ export const PaymentStatusModal = ({
   const [attempts, setAttempts] = useState(0);
   const [failureReason, setFailureReason] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const navigate = useNavigate();
+  const [guestPassword, setGuestPassword] = useState('');
+  const [guestClaimStatus, setGuestClaimStatus] = useState<'idle' | 'loading' | 'done' | 'skipped'>('idle');
+  const [showGuestPassword, setShowGuestPassword] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const { loginWithToken } = useGlobalAuth();
   const getOrderStatusMutation = useGetOrderStatusMutation();
@@ -114,6 +133,11 @@ export const PaymentStatusModal = ({
           setState('SUCCESS');
           if (intervalRef.current) clearInterval(intervalRef.current);
 
+          // Persist guest orders to localStorage so the Orders tab can show them without login
+          if (isGuest && invoiceId) {
+            saveGuestOrderToStorage(invoiceId, checkoutToken, email);
+          }
+
           if (isGuest && res.autoLoginToken) {
             await handleAutoLogin(res.autoLoginToken);
           }
@@ -154,7 +178,7 @@ export const PaymentStatusModal = ({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [isOpen, invoiceId, state, isGuest, checkoutToken, handleAutoLogin]);
+  }, [isOpen, invoiceId, state, isGuest, checkoutToken, handleAutoLogin, email]);
 
 
 
@@ -297,12 +321,93 @@ export const PaymentStatusModal = ({
               </div>
               {!isNativeApp() && (
                 <div className="mb-3 w-full rounded-xl border border-yellow-200 dark:border-yellow-400/20 bg-yellow-50 dark:bg-yellow-400/10 p-3 text-left">
-                  {isGuest && (
+                  {isGuest && guestClaimStatus !== 'done' && (
                     <>
-                      <p className="text-xs font-bold text-slate-950 dark:text-white">Your Byblos account is ready</p>
-                      <p className="mt-1 text-[11px] leading-relaxed text-slate-700 dark:text-white/70">
-                        Log in anytime with{email ? <> <span className="font-semibold text-slate-900 dark:text-white">{email}</span></> : ' your email'} to track this order.
-                      </p>
+                      <p className="text-xs font-bold text-slate-950 dark:text-white">Track or save this order</p>
+                      {guestClaimStatus === 'skipped' ? (
+                        <p className="mt-1 text-[11px] leading-relaxed text-slate-700 dark:text-white/70">
+                          Updates sent to {email || 'your email'}. Use the link in your confirmation email to track anytime.
+                        </p>
+                      ) : (
+                        <>
+                          <p className="mt-1 text-[11px] leading-relaxed text-slate-700 dark:text-white/70">
+                            Set a password to track your order and save your details for next time.
+                          </p>
+                          <div className="relative mt-2">
+                            <input
+                              type={showGuestPassword ? 'text' : 'password'}
+                              value={guestPassword}
+                              onChange={(e) => setGuestPassword(e.target.value)}
+                              placeholder="Set a password..."
+                              className="w-full rounded-lg border border-slate-200 dark:border-white/20 bg-white dark:bg-white/5 px-3 py-2 pr-9 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-yellow-400"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowGuestPassword((v) => !v)}
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                            >
+                              {showGuestPassword ? 'Hide' : 'Show'}
+                            </button>
+                          </div>
+                          {guestPassword && (() => {
+                            const s = checkPasswordStrength(guestPassword);
+                            const pills = [
+                              { label: '8+ chars', ok: s.minLength },
+                              { label: 'Number', ok: s.hasNumber },
+                              { label: 'Special', ok: s.hasSpecial },
+                              { label: 'Upper+Lower', ok: s.hasUpper && s.hasLower },
+                            ];
+                            return (
+                              <div className="mt-1.5 flex flex-wrap gap-1">
+                                {pills.map(({ label, ok }) => (
+                                  <span
+                                    key={label}
+                                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ok ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : 'bg-slate-100 dark:bg-white/10 text-slate-400 dark:text-white/40'}`}
+                                  >
+                                    {ok ? '✓' : '·'} {label}
+                                  </span>
+                                ))}
+                              </div>
+                            );
+                          })()}
+                          <button
+                            type="button"
+                            disabled={guestClaimStatus === 'loading' || !Object.values(checkPasswordStrength(guestPassword)).every(Boolean)}
+                            onClick={async () => {
+                              setGuestClaimStatus('loading');
+                              try {
+                                const res = await fetch('/api/buyer/claim-guest-order', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ email, password: guestPassword, checkoutToken }),
+                                });
+                                if (res.ok) {
+                                  const data = await res.json() as { token?: string; emailExists?: boolean };
+                                  if (data.emailExists) {
+                                    navigate('/buyer/login', { state: { email, checkoutToken } });
+                                  } else {
+                                    setGuestClaimStatus('done');
+                                  }
+                                } else {
+                                  setGuestClaimStatus('idle');
+                                }
+                              } catch {
+                                setGuestClaimStatus('idle');
+                              }
+                            }}
+                            className="mt-2 flex h-9 w-full items-center justify-center rounded-xl bg-yellow-400 text-xs font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98] disabled:opacity-50"
+                          >
+                            {guestClaimStatus === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Save Account & Track Order'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setGuestClaimStatus('skipped')}
+                            className="mt-1 w-full text-center text-[11px] text-slate-500 dark:text-white/40 hover:text-slate-700 dark:hover:text-white/70 underline underline-offset-2"
+                          >
+                            I'll track via my email link
+                          </button>
+                        </>
+                      )}
                     </>
                   )}
 

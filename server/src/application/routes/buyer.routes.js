@@ -24,6 +24,7 @@ router.post('/resend-verification', authLimiter, validate(V.resendVerification),
 router.post('/check-phone', publicApiRateLimiter, validate(V.checkPhone), buyerController.checkBuyerByPhone);
 router.post('/save-info', authLimiter, validate(V.saveInfo), buyerController.saveBuyerInfo);
 router.post('/auto-login', publicApiRateLimiter, validate(V.autoLogin), buyerController.autoLogin);
+router.post('/claim-guest-order', publicApiRateLimiter, validate(V.claimGuestOrder), buyerController.claimGuestOrder);
 router.post('/logout', buyerController.logout);
 
 // Protected routes - require buyer authentication

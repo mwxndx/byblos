@@ -1,7 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- route config module exports a route array, not a fast-refreshable component */
 import { Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
-import { BuyerProtectedRoute } from '@/app/router/AppProtectedRoute';
 import { safeLazy } from '@/shared/utils/safeLazy';
 import { RouteFallback } from '@/app/router/RouteFallback';
 import BuyerLayout from '@/app/layouts/BuyerLayout';
@@ -49,14 +48,10 @@ export const buyerRoutes = [
     ),
   },
 
-  // ─── Protected routes ────────────────────────────────────────────────────────
+  // ─── Marketplace / Buyer routes (Public dashboard & catalog browsing) ───────
   {
     path: '/buyer',
-    element: (
-      <BuyerProtectedRoute>
-        <BuyerLayout />
-      </BuyerProtectedRoute>
-    ),
+    element: <BuyerLayout />,
     children: [
       {
         index: true,
@@ -116,15 +111,13 @@ export const buyerRoutes = [
     ],
   },
 
-  // ─── Buyer shop page (protected — buyer-only with wishlist + back button) ────
+  // ─── Buyer shop page (Public browsing with wishlist + back button) ───────────
   {
     path: '/buyer/shop/:shopName',
     element: (
-      <BuyerProtectedRoute>
-        <Suspense fallback={<RouteFallback />}>
-          <ShopPage />
-        </Suspense>
-      </BuyerProtectedRoute>
+      <Suspense fallback={<RouteFallback />}>
+        <ShopPage />
+      </Suspense>
     ),
   },
 ];

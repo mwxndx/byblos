@@ -5,6 +5,7 @@ import User from '../../identity/users/user.model.js';
 import { pool } from '../../../infrastructure/database/database.js';
 import ProfileProvisioningService from '../../identity/users/profileProvisioning.service.js';
 import CacheService from '../../../shared/utils/cache.service.js';
+import Order from '../../orders/order/order.model.js';
 
 class BuyerService {
     static async register(data) {
@@ -143,6 +144,105 @@ class BuyerService {
         if (!isValid) return null;
 
         return Buyer.findByUserId(userFound.id);
+    }
+
+    /**
+     * Claim a guest order post-payment:
+     * - If email belongs to an existing user, verify password then link order + provision buyer profile.
+     * - If email is new, create user + buyer profile then link order.
+     * Returns { token, buyer } on success, or throws AppError on invalid credentials.
+     */
+    static async claimGuestOrder({ email, password, checkoutToken }) {
+        const normalizedEmail = (email || '').trim().toLowerCase();
+        const existingUser = await User.findByEmail(normalizedEmail);
+
+        if (existingUser) {
+            // Existing account -- verify password before linking
+            const passwordValid = await User.verifyPassword(password, existingUser.password_hash);
+            if (!passwordValid) {
+                const err = new Error('Incorrect password. Please try again, or use the email link to claim this order.');
+                err.statusCode = 401;
+                throw err;
+            }
+
+            let buyer = await Buyer.findByUserId(existingUser.id);
+            if (!buyer) {
+                const nameRes = await pool.query(
+                    `SELECT full_name, whatsapp_number AS phone FROM sellers WHERE user_id = $1
+                     UNION ALL
+                     SELECT CONCAT(first_name, ' ', last_name) AS full_name, COALESCE(whatsapp_number, mpesa_number) AS phone FROM creators WHERE user_id = $1
+                     LIMIT 1`,
+                    [existingUser.id]
+                );
+                const existingName = nameRes.rows[0]?.full_name || normalizedEmail.split('@')[0];
+                const existingPhone = nameRes.rows[0]?.phone || '';
+
+                buyer = await Buyer.create({
+                    fullName: existingName,
+                    email: normalizedEmail,
+                    mobilePayment: existingPhone,
+                    whatsappNumber: existingPhone || null,
+                    city: 'Nairobi',
+                    location: 'Nairobi',
+                    userId: existingUser.id,
+                    termsAccepted: true
+                });
+
+                await pool.query(
+                    `INSERT INTO user_roles (user_id, role_id)
+                     SELECT $1, id FROM roles WHERE slug = 'buyer'
+                     ON CONFLICT DO NOTHING`,
+                    [existingUser.id]
+                );
+            }
+
+            const client = await pool.connect();
+            try {
+                await client.query('BEGIN');
+                await Order.linkGuestOrderToBuyer(client, buyer.id, checkoutToken);
+                await client.query('COMMIT');
+                const token = signToken(existingUser.id, 'buyer');
+                return { token, buyer };
+            } catch (err) {
+                await client.query('ROLLBACK');
+                throw err;
+            } finally {
+                client.release();
+            }
+        } else {
+            const client = await pool.connect();
+            try {
+                await client.query('BEGIN');
+                const newUser = await User.create({
+                    email: normalizedEmail,
+                    password,
+                    role: 'buyer',
+                    is_verified: true
+                }, client);
+
+                const buyer = await Buyer.create({
+                    fullName: normalizedEmail.split('@')[0],
+                    email: normalizedEmail,
+                    mobilePayment: '',
+                    whatsappNumber: null,
+                    city: 'Nairobi',
+                    location: 'Nairobi',
+                    userId: newUser.id,
+                    termsAccepted: true
+                }, client);
+
+                await Order.linkGuestOrderToBuyer(client, buyer.id, checkoutToken);
+                await client.query('COMMIT');
+
+                const token = signToken(newUser.id, 'buyer');
+                return { token, buyer };
+            } catch (err) {
+                await client.query('ROLLBACK');
+                throw err;
+            } finally {
+                client.release();
+            }
+        }
     }
 
     static signToken(buyer) {

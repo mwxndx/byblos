@@ -5,7 +5,6 @@ import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import { useToast } from '@/shared/hooks/use-toast';
 import { useCheckBuyerByPhoneMutation } from '@/features/buyer/hooks/mutations/useBuyerAuthMutations';
-import { useSaveBuyerInfoMutation } from '@/features/buyer/hooks/mutations/useSaveBuyerInfoMutation';
 import { useInitiateProductMutation } from '@/features/buyer/hooks/useBuyerPayments';
 import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
 import { calculateBuyerPayableTotal, calculateProductServiceCharge, createCheckoutAttemptToken, getProductFlags, normalizePhone, normalizePhoneForPaystack, type ProductWithApiFields } from '@/features/shop/utils/productCardUtils';
@@ -47,7 +46,6 @@ export function useBagCheckout(bag: BagContextValue) {
   const hasRegisteredPaymentNumber = Boolean(registeredPaystackPhone && registeredPaystackPhone.length >= 10);
 
   const checkBuyerByPhoneMutation = useCheckBuyerByPhoneMutation();
-  const saveBuyerInfoMutation = useSaveBuyerInfoMutation();
   const initiateProductMutation = useInitiateProductMutation();
   const { runWithLock } = useAsyncLock();
 
@@ -305,17 +303,9 @@ export function useBagCheckout(bag: BagContextValue) {
     }
   };
 
-  const handleBuyerInfoSubmit = async (buyerInfo: BuyerInfo, skipSave: boolean) => {
+  const handleBuyerInfoSubmit = async (buyerInfo: BuyerInfo) => {
     try {
       const info = buyerInfo as unknown as BuyerDetails;
-      if (!skipSave) {
-        const saveResult = await saveBuyerInfoMutation.mutateAsync(buyerInfo as unknown as Parameters<typeof saveBuyerInfoMutation.mutateAsync>[0]);
-        if (saveResult.requiresLogin) {
-          sessionStorage.setItem('redirectAfterLogin', window.location.pathname + window.location.search);
-          navigate('/buyer/login', { replace: true });
-          return;
-        }
-      }
       setIsBuyerModalOpen(false);
       await runWithLock(async () => { await executePayment(info); });
     } catch (error) {

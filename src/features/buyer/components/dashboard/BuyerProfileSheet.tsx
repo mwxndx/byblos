@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound } from '@/shared/ui/icons';
@@ -116,7 +117,82 @@ export function BuyerProfileContent({
   onToggleEdit,
   onWhatsappNumberChange
 }: BuyerProfileContentProps) {
+  const navigate = useNavigate();
+  const { theme, setTheme } = useThemeScope('buyer');
   const buyerUser = user as import("@/features/auth/types/authTypes").BuyerProfile | null;
+
+  // Unauthenticated Guest View: prompt sign-in / registration with existing flows
+  if (!user) {
+    return (
+      <div className="w-full space-y-4">
+        {/* Welcome & Sign-In Card */}
+        <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-5 shadow-sm text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20 text-yellow-600 dark:text-yellow-400">
+            <UserRound className="h-6 w-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-950 dark:text-white">Welcome to Byblos</h3>
+          <p className="text-xs text-slate-600 dark:text-white/70 leading-relaxed max-w-xs mx-auto">
+            Sign in or create an account to manage your delivery address, track orders, and view notifications.
+          </p>
+          <div className="pt-2 space-y-2">
+            <Button
+              onClick={() => {
+                sessionStorage.setItem('redirectAfterLogin', window.location.pathname);
+                navigate('/buyer/login');
+              }}
+              className="h-10 w-full rounded-xl bg-[#F5C518] font-bold text-black hover:bg-yellow-300"
+            >
+              Sign In
+            </Button>
+            <Button
+              onClick={() => navigate('/buyer/register')}
+              variant="outline"
+              className="h-10 w-full rounded-xl border-slate-300 dark:border-separator font-semibold text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+            >
+              Create Account
+            </Button>
+          </div>
+        </section>
+
+        {/* Theme Preference */}
+        <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+          <div className="space-y-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
+              Theme
+            </span>
+            <ThemeSegmentedPill value={theme} onChange={setTheme} className="w-full justify-center" />
+          </div>
+        </section>
+
+        {/* Portals: Become a Seller or Creator */}
+        <section className="space-y-2 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">Partner with Byblos</h4>
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/seller/register')}
+              className="h-9 text-xs font-semibold border-slate-300 dark:border-separator"
+            >
+              Become a Seller
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate('/creator/register')}
+              className="h-9 text-xs font-semibold border-slate-300 dark:border-separator"
+            >
+              Add Creator
+            </Button>
+          </div>
+        </section>
+
+        {/* Legal Links */}
+        <section className="space-y-3">
+          <h3 className="text-sm font-bold text-slate-950 dark:text-white">Legal</h3>
+          <LegalLinks />
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-4">

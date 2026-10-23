@@ -50,7 +50,6 @@ export function BuyerInfoModal({
     setIsTermsModalOpen,
     handleSubmit,
     handleClose,
-    checkPasswordStrength,
     themeClasses,
   } = useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading, theme, phoneNumber, initialData });
   useScreenSecurity(isOpen, 'checkout-buyer-info');
@@ -70,7 +69,6 @@ export function BuyerInfoModal({
           termsAccepted={termsAccepted}
           setTermsAccepted={setTermsAccepted}
           setIsTermsModalOpen={setIsTermsModalOpen}
-          checkPasswordStrength={checkPasswordStrength}
           themeClasses={themeClasses}
           isLoading={isLoading}
           handleClose={handleClose}
