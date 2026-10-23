@@ -25,10 +25,18 @@ export const getRoleFromRoute = (pathname: string): UserRole | null => {
 export const isPublicRoute = (pathname: string): boolean => {
   if (!pathname || pathname === '/') return true;
 
-  // These routes intentionally support guest marketplace discovery. Keep
-  // account-specific buyer routes (orders, wishlist, refunds) protected so a
-  // session-expiry signal cannot be suppressed where user data is rendered.
-  if (pathname === '/buyer/dashboard' || pathname.startsWith('/buyer/shop/')) return true;
+  // The buyer dashboard deliberately supports guest browsing. Its account
+  // sections render guest-safe views and keep their authenticated queries
+  // disabled, so revalidating a missing buyer session here would turn normal
+  // marketplace navigation into a spurious login redirect.
+  if (
+    pathname === '/buyer/dashboard'
+    || pathname === '/buyer/orders'
+    || pathname === '/buyer/wishlist'
+    || pathname === '/buyer/refunds'
+    || pathname === '/buyer/notifications'
+    || pathname.startsWith('/buyer/shop/')
+  ) return true;
 
   if (pathname === '/marketing/login' || pathname === '/admin/marketing/login') return true;
   if (pathname === '/verify-email' || pathname.startsWith('/verify-email?') || pathname.startsWith('/verify-email/')) return true;

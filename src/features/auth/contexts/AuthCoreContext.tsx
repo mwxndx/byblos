@@ -28,35 +28,20 @@ export type {
     UserRole,
 } from '../types/authTypes';
 
-const CACHED_SESSION_KEY = 'byblos.auth.session';
-
-function getInitialUser(): import('../types/authTypes').GlobalUser | null {
-    if (typeof window === 'undefined') return null;
-    try {
-        const raw = localStorage.getItem(CACHED_SESSION_KEY);
-        if (!raw) return null;
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object' && parsed.role && parsed.isAuthenticated) {
-            return parsed as import('../types/authTypes').GlobalUser;
-        }
-    } catch {
-        /* ignore parsing errors */
-    }
-    return null;
-}
-
 // ============================================================================
 // PROVIDER COMPONENT
 // ============================================================================
 
 export function AuthCoreProvider({ children }: { children: ReactNode }) {
-    const [user, setUserState] = useState<import('../types/authTypes').GlobalUser | null>(() => getInitialUser());
-    const [isLoading, setIsLoading] = useState<boolean>(() => !getInitialUser());
+    // Session credentials are kept by the platform auth strategy. Do not cache
+    // the full profile in web localStorage: it includes contact details and is
+    // readable by any injected script. Revalidation restores it when needed.
+    const [user, setUserState] = useState<import('../types/authTypes').GlobalUser | null>(null);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     // Only true when on an unauthenticated protected route waiting for storage/network probe.
     // If a user was already hydrated or path is public, immediately false to prevent loading flash.
     const [initializing, setInitializing] = useState<boolean>(() => {
         if (typeof window === 'undefined') return false;
-        if (getInitialUser()) return false;
         const currentPath = window.location.pathname || '/';
         return currentPath !== '/' && !isPublicRoute(currentPath);
     });
@@ -66,15 +51,6 @@ export function AuthCoreProvider({ children }: { children: ReactNode }) {
     const setUser = useCallback<Dispatch<SetStateAction<import('../types/authTypes').GlobalUser | null>>>((action) => {
         setUserState((prev) => {
             const next = typeof action === 'function' ? action(prev) : action;
-            try {
-                if (next && next.isAuthenticated) {
-                    localStorage.setItem(CACHED_SESSION_KEY, JSON.stringify(next));
-                } else {
-                    localStorage.removeItem(CACHED_SESSION_KEY);
-                }
-            } catch {
-                /* ignore storage error */
-            }
             return next;
         });
     }, []);
@@ -111,7 +87,7 @@ export function AuthCoreProvider({ children }: { children: ReactNode }) {
             clearAppNavigator(navigateFn);
             window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
         };
-    }, [navigate]);
+    }, [navigate, setUser]);
 
     const {
         login,

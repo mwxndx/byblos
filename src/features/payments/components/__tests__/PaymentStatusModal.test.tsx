@@ -1,7 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { PaymentStatusModal } from '../PaymentStatusModal';
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => vi.fn(),
+}));
 
 // Mock mutations
 const mockCancelMutateAsync = vi.fn().mockResolvedValue({ success: true });
@@ -34,6 +38,30 @@ vi.mock('@/shared/hooks/use-toast', () => ({
 describe('PaymentStatusModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('does not start a second status request until the previous poll settles', async () => {
+    vi.useFakeTimers();
+    mockGetStatusMutateAsync.mockImplementationOnce(() => new Promise<never>(() => undefined));
+
+    render(
+      <PaymentStatusModal
+        isOpen={true}
+        orderNumber="ORD-SLOW"
+        invoiceId="ORD-SLOW"
+        onClose={vi.fn()}
+      />,
+    );
+
+    await act(async () => {
+      await Promise.resolve();
+      await vi.advanceTimersByTimeAsync(15_000);
+    });
+    expect(mockGetStatusMutateAsync).toHaveBeenCalledTimes(1);
   });
 
   it('renders a cancel and retry button during POLLING state so user is not trapped', async () => {

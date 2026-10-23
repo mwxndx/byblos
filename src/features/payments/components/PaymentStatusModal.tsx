@@ -64,7 +64,8 @@ export const PaymentStatusModal = ({
   const [guestPassword, setGuestPassword] = useState('');
   const [guestClaimStatus, setGuestClaimStatus] = useState<'idle' | 'loading' | 'done' | 'skipped'>('idle');
   const [showGuestPassword, setShowGuestPassword] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const attemptsRef = useRef(0);
   const { loginWithToken } = useGlobalAuth();
   const getOrderStatusMutation = useGetOrderStatusMutation();
   const cancelPublicOrderMutation = useCancelPublicOrderMutation();
@@ -83,6 +84,7 @@ export const PaymentStatusModal = ({
     if (isOpen && invoiceId) {
       setState('POLLING');
       setAttempts(0);
+      attemptsRef.current = 0;
       setFailureReason(null);
     }
   }, [isOpen, invoiceId]);
@@ -97,9 +99,20 @@ export const PaymentStatusModal = ({
 
   useEffect(() => {
     if (!isOpen || !invoiceId || state !== 'POLLING') {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
       return;
     }
+
+    let cancelled = false;
+    const recordAttempt = (): boolean => {
+      attemptsRef.current += 1;
+      setAttempts(attemptsRef.current);
+      if (attemptsRef.current >= MAX_ATTEMPTS) {
+        setState('TIMEOUT');
+        return false;
+      }
+      return true;
+    };
 
     const poll = async () => {
       try {
@@ -131,7 +144,6 @@ export const PaymentStatusModal = ({
 
         if (isPaymentSuccess || isOrderPaid) {
           setState('SUCCESS');
-          if (intervalRef.current) clearInterval(intervalRef.current);
 
           // Persist guest orders to localStorage so the Orders tab can show them without login
           if (isGuest && invoiceId) {
@@ -149,40 +161,36 @@ export const PaymentStatusModal = ({
         if (isPaymentFailure) {
           setFailureReason(res.failureReason || null);
           setState('FAILED');
-          if (intervalRef.current) clearInterval(intervalRef.current);
           return;
         }
 
-        setAttempts(prev => {
-          if (prev + 1 >= MAX_ATTEMPTS) {
-            setState('TIMEOUT');
-            if (intervalRef.current) clearInterval(intervalRef.current);
-          }
-          return prev + 1;
-        });
+        if (!recordAttempt()) return;
       } catch (err) {
         console.error('Poll error:', err);
-        setAttempts(prev => {
-          if (prev + 1 >= MAX_ATTEMPTS) {
-            setState('TIMEOUT');
-            if (intervalRef.current) clearInterval(intervalRef.current);
-          }
-          return prev + 1;
-        });
+        if (!recordAttempt()) return;
+      }
+
+      // Schedule only after the current request settles. setInterval would
+      // start another request while Axios can still be waiting up to 30s.
+      if (!cancelled) {
+        pollTimerRef.current = setTimeout(() => {
+          void poll();
+        }, 5000);
       }
     };
 
-    poll();
-    intervalRef.current = setInterval(poll, 5000);
+    void poll();
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      cancelled = true;
+      if (pollTimerRef.current) clearTimeout(pollTimerRef.current);
     };
   }, [isOpen, invoiceId, state, isGuest, checkoutToken, handleAutoLogin, email]);
 
 
 
   const handleRecheck = () => {
+    attemptsRef.current = 0;
     setAttempts(0);
     setState('POLLING');
   };

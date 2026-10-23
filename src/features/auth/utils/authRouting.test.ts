@@ -103,11 +103,13 @@ describe('authRouting utility unit tests', () => {
     test('identifies public buyer marketplace browsing routes', () => {
       expect(isPublicRoute('/buyer/dashboard')).toBe(true);
       expect(isPublicRoute('/buyer/shop/cool-shop')).toBe(true);
+      expect(isPublicRoute('/buyer/orders')).toBe(true);
+      expect(isPublicRoute('/buyer/wishlist')).toBe(true);
+      expect(isPublicRoute('/buyer/refunds')).toBe(true);
+      expect(isPublicRoute('/buyer/notifications')).toBe(true);
     });
 
     test('identifies account and staff routes as non-public', () => {
-      expect(isPublicRoute('/buyer/orders')).toBe(false);
-      expect(isPublicRoute('/buyer/wishlist')).toBe(false);
       expect(isPublicRoute('/seller/dashboard')).toBe(false);
       expect(isPublicRoute('/admin/dashboard')).toBe(false);
       expect(isPublicRoute('/creator/dashboard')).toBe(false);

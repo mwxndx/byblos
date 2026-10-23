@@ -22,7 +22,7 @@ describe('DashboardProfilePanel', () => {
     expect(panelHost.parentElement).toBe(container.firstElementChild);
     expect(panelHost).toHaveClass('absolute');
     expect(panelHost).toHaveStyle({ bottom: '56px' });
-    expect(screen.getByRole('dialog', { name: 'Profile' })).toHaveClass('overflow-y-auto', 'overscroll-contain');
+    expect(screen.getByRole('complementary', { name: 'Profile' })).toHaveClass('overflow-y-auto', 'overscroll-contain');
   });
 
   it('dismisses through its backdrop and Escape key', () => {
@@ -40,5 +40,25 @@ describe('DashboardProfilePanel', () => {
 
     expect(onOpenChange).toHaveBeenNthCalledWith(1, false);
     expect(onOpenChange).toHaveBeenNthCalledWith(2, false);
+  });
+
+  it('restores focus to the control that opened the non-modal panel', () => {
+    const onOpenChange = vi.fn();
+    const trigger = document.createElement('button');
+    document.body.appendChild(trigger);
+    trigger.focus();
+
+    const { rerender } = render(
+      <div className="relative h-[600px]">
+        <DashboardProfilePanel open onOpenChange={onOpenChange} title="Profile">
+          <div>Profile content</div>
+        </DashboardProfilePanel>
+      </div>,
+    );
+
+    expect(screen.getByRole('complementary', { name: 'Profile' })).toHaveFocus();
+    rerender(<div className="relative h-[600px]" />);
+    expect(trigger).toHaveFocus();
+    trigger.remove();
   });
 });

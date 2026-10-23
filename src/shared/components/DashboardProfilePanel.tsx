@@ -28,6 +28,7 @@ export function DashboardProfilePanel({
 }: DashboardProfilePanelProps) {
   const titleId = useId();
   const panelRef = useRef<HTMLElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -36,9 +37,15 @@ export function DashboardProfilePanel({
       if (event.key === 'Escape') onOpenChange(false);
     };
 
+    previousFocusRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
     window.addEventListener('keydown', dismissOnEscape);
     panelRef.current?.focus();
-    return () => window.removeEventListener('keydown', dismissOnEscape);
+    return () => {
+      window.removeEventListener('keydown', dismissOnEscape);
+      previousFocusRef.current?.focus();
+    };
   }, [onOpenChange, open]);
 
   if (!open) return null;
@@ -57,7 +64,7 @@ export function DashboardProfilePanel({
       />
       <aside
         ref={panelRef}
-        role="dialog"
+        role="complementary"
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
