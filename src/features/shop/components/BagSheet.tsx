@@ -264,7 +264,7 @@ export function BagSheet() {
         isOpen={checkout.isBuyerModalOpen}
         onClose={() => checkout.setIsBuyerModalOpen(false)}
         onSubmit={async (buyerInfo) => {
-          await checkout.handleBuyerInfoSubmit({ ...buyerInfo, fullName: buyerInfo.fullName || `${buyerInfo.firstName} ${buyerInfo.lastName}`.trim() }, checkout.shouldSkipSave);
+          await checkout.handleBuyerInfoSubmit({ ...buyerInfo, fullName: buyerInfo.fullName || `${buyerInfo.firstName} ${buyerInfo.lastName}`.trim() });
         }}
         isLoading={checkout.isProcessingPurchase}
         theme={theme}

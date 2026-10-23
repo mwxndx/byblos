@@ -40,7 +40,7 @@ export function useOrderTrackingState(
   const deliveryLeg = logistics?.deliveryLeg || null;
   const pickupLeg = logistics?.pickupLeg || null;
 
-  const fulfillmentType = String(order.fulfillment_type || order.fulfillmentType || '').toUpperCase();
+  const fulfillmentType = String(order.fulfillment_type || '').toUpperCase();
   const orderType = String(order.order_type || order.orderType || '').toUpperCase();
 
   const isDoorDelivery = hasBuyerPaidDoorDelivery(order) || Boolean(order.shippingAddress?.address);

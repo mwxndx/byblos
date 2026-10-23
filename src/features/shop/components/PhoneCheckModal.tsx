@@ -9,6 +9,7 @@ import { formatCurrency } from '@/shared/utils/formatting';
 import { createOptionalBuyerLocation, type BuyerLocationPayload } from '@/infrastructure/location/location';
 import { usePhoneCheck } from './usePhoneCheck';
 import { useScreenSecurity } from '@/shared/utils/screenSecurity';
+import LocationPicker from '@/shared/components/LocationPicker';
 
 
 export interface DoorDeliverySelection {

@@ -37,6 +37,7 @@ export interface ShopProduct extends Omit<BaseProduct, 'seller'> {
 
 // Shop-specific seller type that extends the base Seller type
 export interface ShopSeller extends Omit<Seller, 'bannerUrl'> {
+  slug?: string;
   theme?: Theme;
   city?: string;
   instagramLink?: string;

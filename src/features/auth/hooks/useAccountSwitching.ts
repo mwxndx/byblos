@@ -3,7 +3,6 @@ import type { NavigateFunction } from 'react-router-dom';
 import type { QueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { storage } from '@/infrastructure/storage/storage';
-import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { registerNativePushNotifications } from '@/features/notifications/utils/mobileNotifications';
 import { switchAccountRequest, type SwitchableRole } from '@/features/auth/api/account';
 import { enforceSingleActiveRole, markRoleSessionActive, setActiveRole } from '../services/authSession';
@@ -39,7 +38,7 @@ export function useAccountSwitching({
       }
 
       const queryOpts = getProfileQueryOptionsForRole(role);
-      const profileData = await queryClient.fetchQuery(queryOpts);
+      const profileData = await queryClient.fetchQuery(queryOpts as never);
 
       setUser({
         role,
@@ -73,7 +72,7 @@ export function useAccountSwitching({
     setIsLoading(true);
     try {
       const queryOpts = getProfileQueryOptionsForRole(newRole);
-      const profileData = await queryClient.fetchQuery(queryOpts);
+      const profileData = await queryClient.fetchQuery(queryOpts as never);
 
       if (!profileData) throw new Error('Failed to fetch profile');
 

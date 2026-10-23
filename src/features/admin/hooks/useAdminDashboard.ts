@@ -277,10 +277,10 @@ export function useAdminDashboard() {
 
         setDashboardState({
           analytics: safeAnalytics,
-          sellers: Array.isArray(sellers) ? sellers : [],
-          creators: Array.isArray(creators) ? creators : [],
+          sellers: Array.isArray(sellers) ? (sellers as unknown as DashboardState['sellers']) : [],
+          creators: Array.isArray(creators) ? (creators as unknown as DashboardState['creators']) : [],
           buyers: Array.isArray(buyers) ? (buyers as DashboardState['buyers']) : [],
-          withdrawalRequests: Array.isArray(withdrawalRequests) ? (withdrawalRequests as WithdrawalRequest[]) : [],
+          withdrawalRequests: Array.isArray(withdrawalRequests) ? (withdrawalRequests as unknown as WithdrawalRequest[]) : [],
           monthlyMetrics: metricsData,
           financialMetrics: financialMetrics || {
             totalSales: 0,

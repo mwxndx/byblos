@@ -67,16 +67,17 @@ export function ShopProductCard({
   if (product.image_url) {
     productImages.push(getImageUrl(product.image_url));
   }
-  if (Array.isArray(product.images)) {
-    product.images.forEach((img) => {
+  const images = (product as unknown as { images?: unknown }).images;
+  if (Array.isArray(images)) {
+    images.forEach((img) => {
       if (typeof img === 'string' && img.trim()) {
         const fullUrl = getImageUrl(img);
         if (!productImages.includes(fullUrl)) productImages.push(fullUrl);
       }
     });
-  } else if (typeof product.images === 'string' && product.images.trim()) {
+  } else if (typeof images === 'string' && images.trim()) {
     try {
-      const parsed = JSON.parse(product.images);
+      const parsed = JSON.parse(images);
       if (Array.isArray(parsed)) {
         parsed.forEach((img) => {
           if (typeof img === 'string' && img.trim()) {

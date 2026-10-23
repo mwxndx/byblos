@@ -36,6 +36,7 @@ import {
   getProfileQueryOptionsForRole,
 } from './authRoleDispatcher';
 import { useAccountSwitching } from './useAccountSwitching';
+import { classifyApiError } from '@/shared/utils/errorClassification';
 
 interface UseAuthActionsOptions {
   navigate: NavigateFunction;
@@ -102,8 +103,9 @@ export function useAuthActions({
         isAuthenticated: true,
       });
 
-      if (response.token) {
-        await storage.set(`${role}Token`, response.token);
+      const token = (response as { token?: string }).token;
+      if (token) {
+        await storage.set(`${role}Token`, token);
         const refreshToken = (response as { refreshToken?: string }).refreshToken;
         if (refreshToken) await storage.set(`${role}RefreshToken`, refreshToken);
       }
@@ -120,6 +122,7 @@ export function useAuthActions({
       handlePostLoginRedirect(navigate, role);
     } catch (error) {
       await handleLoginFailure(role);
+      const classified = classifyApiError(error, 'Login failed. Please check your credentials and try again.');
       if (
         classified.code !== 'PENDING_VERIFICATION' &&
         classified.code !== 'EMAIL_NOT_VERIFIED' &&
@@ -138,7 +141,7 @@ export function useAuthActions({
     setIsLoading(true);
     try {
       const queryOpts = getProfileQueryOptionsForRole(role);
-      const profileData = await queryClient.fetchQuery(queryOpts);
+      const profileData = await queryClient.fetchQuery(queryOpts as never);
 
       setUser({
         role,

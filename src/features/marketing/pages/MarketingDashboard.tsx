@@ -193,7 +193,7 @@ export default function MarketingDashboard() {
                     <StatCard
                         title="Gross Merchandise Value"
                         value={`KSh ${Number((overview.totalGmvCents || 0) / 100).toLocaleString()}`}
-                        trend={overview.gmvGrowthMoM}
+                        trend={typeof overview.gmvGrowthMoM === 'number' || typeof overview.gmvGrowthMoM === 'string' ? overview.gmvGrowthMoM : undefined}
                         label="MoM growth"
                         color="yellow"
                     />

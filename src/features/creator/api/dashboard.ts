@@ -1,4 +1,5 @@
 import apiClient from '@/infrastructure/http/apiClient';
+import type { DashboardData } from '../utils/creatorDashboardUtils';
 
 // The backend's CREATOR_ANALYSIS_PERIODS (creator.service.js) has always
 // supported 'yearly' alongside daily/weekly/monthly; this signature just
@@ -12,12 +13,12 @@ import apiClient from '@/infrastructure/http/apiClient';
 // validation of the dashboard payload's shape (shops/shopRequests/
 // clearance/etc.) -- that's a larger, separate change; this narrows the
 // unwrap boundary only.
-export const getDashboard = async (period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'): Promise<unknown> => {
+export const getDashboard = async (period: 'daily' | 'weekly' | 'monthly' | 'yearly' = 'monthly'): Promise<DashboardData> => {
   const response = await apiClient.get<unknown>('/creators/dashboard', {
     params: { period }
   });
   const body = (response.data && typeof response.data === 'object' ? response.data : {}) as Record<string, unknown>;
-  return body.data;
+  return (body.data && typeof body.data === 'object' ? body.data : {}) as DashboardData;
 };
 
 

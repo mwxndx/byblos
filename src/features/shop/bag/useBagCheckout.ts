@@ -121,7 +121,7 @@ export function useBagCheckout(bag: BagContextValue) {
     try {
       const checkoutToken = getToken();
       const representative = bag.items[0]?.product;
-      const sellerSlug = representative?.seller?.slug || representative?.seller?.shopName;
+      const sellerSlug = (representative?.seller as { slug?: string; shopName?: string } | undefined)?.slug || representative?.seller?.shopName;
       const urlCreatorCode = new URLSearchParams(window.location.search).get('creator');
       const sessionCreatorCode = (sellerSlug ? sessionStorage.getItem(`byblos_creator_${sellerSlug}`) : null)
         || sessionStorage.getItem('byblos_last_creator');
@@ -235,8 +235,9 @@ export function useBagCheckout(bag: BagContextValue) {
     const paystackPhone = normalizePhoneForPaystack(targetPhone);
     setCurrentPhone(paystackPhone);
 
-    const buyerEmail = buyerProfile?.email || globalUser?.email;
-    const buyerName = buyerProfile?.fullName || globalUser?.email?.split('@')[0] || 'Buyer';
+    const globalBuyer = globalUser?.role === 'buyer' ? globalUser.profile as BuyerProfile : undefined;
+    const buyerEmail = buyerProfile?.email || globalBuyer?.email;
+    const buyerName = buyerProfile?.fullName || globalBuyer?.fullName || globalBuyer?.email?.split('@')[0] || 'Buyer';
 
     if (buyerEmail && buyerEmail.trim() !== '') {
       await runWithLock(async () => {

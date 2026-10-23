@@ -1,6 +1,6 @@
 import { getInvite } from './invites';
 import { register, login, logout, verifyEmail, resendVerification, forgotPassword, resetPassword } from './auth';
-import { getProfile } from './profile';
+import { getProfile, updateProfile } from './profile';
 import { getDashboard } from './dashboard';
 import { getReferralDashboard, generateReferralCode, trackLinkClick } from './referrals';
 import { requestWithdrawal } from './withdrawals';
@@ -24,6 +24,7 @@ export const creatorApi = {
   forgotPassword,
   resetPassword,
   getProfile,
+  updateProfile,
   getDashboard,
   getReferralDashboard,
   generateReferralCode,

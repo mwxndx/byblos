@@ -1,11 +1,12 @@
 import apiClient from '@/infrastructure/http/apiClient';
+import type { ReferralData } from '../utils/creatorDashboardUtils';
 
 // <unknown> instead of no type parameter (defaults to axios's own `any`) --
 // see the matching comment in profile.ts.
-export const getReferralDashboard = async () => {
+export const getReferralDashboard = async (): Promise<ReferralData> => {
   const response = await apiClient.get<unknown>('/creators/referral/dashboard');
   const body = (response.data && typeof response.data === 'object' ? response.data : {}) as Record<string, unknown>;
-  return body.data;
+  return (body.data && typeof body.data === 'object' ? body.data : {}) as ReferralData;
 };
 
 export const generateReferralCode = async () => {

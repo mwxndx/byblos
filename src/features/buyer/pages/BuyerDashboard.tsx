@@ -115,9 +115,9 @@ function BuyerDashboard() {
     onTouchCancel: handleDashboardTouchCancel,
   } = useSwipeTabs({
     tabs: SWIPE_SECTIONS,
-    activeTab: activeSection,
+    activeTab: activeSection === 'refunds' || activeSection === 'profile' ? 'shop' : activeSection,
     onChange: setActiveTab,
-    disabled: activeSection === 'profile',
+    disabled: activeSection === 'profile' || activeSection === 'refunds',
   });
 
   return (
@@ -134,7 +134,7 @@ function BuyerDashboard() {
         className="relative flex-1 min-h-0 flex flex-col overflow-hidden"
       >
         <BuyerDashboardSearch
-          activeSection={activeSection}
+          activeSection={activeSection === 'refunds' ? 'shop' : activeSection}
           productSearchQuery={searchQuery}
           onProductSearchChange={setSearchQuery}
         />

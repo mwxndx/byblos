@@ -91,7 +91,7 @@ function getHeadlineText(params: {
   const { isSeller, isDoorDelivery, isPickup, isDigital, journey, order, deliveryLeg, logistics, liveEta, etaSource, riderMoving } = params;
 
   if (journey.isDelivered || order.status === 'COMPLETED') {
-    const timeStr = formatDateTime(deliveryLeg?.completedAt || logistics?.completedAt || order.updatedAt);
+    const timeStr = formatDateTime(String(deliveryLeg?.completedAt || logistics?.completedAt || order.updatedAt || ''));
     return isSeller
       ? `Delivered on ${timeStr} — Escrow released`
       : `${isPickup ? 'Collected' : 'Delivered'} on ${timeStr}`;
@@ -102,7 +102,7 @@ function getHeadlineText(params: {
   }
 
   if (liveEta && typeof liveEta.etaMinutes === 'number') {
-    const formattedEta = formatDateTime(liveEta.estimatedArrival || etaSource);
+    const formattedEta = formatDateTime(String(liveEta.estimatedArrival || etaSource || ''));
     return isSeller
       ? `Rider en route to buyer • ETA ~${liveEta.etaMinutes} min (by ${formattedEta})`
       : `Arriving in ${liveEta.etaMinutes} min (by ${formattedEta})`;

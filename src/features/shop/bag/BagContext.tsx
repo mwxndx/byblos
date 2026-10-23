@@ -20,7 +20,7 @@ interface AddResult {
   reason?: string;
 }
 
-interface BagContextValue {
+export interface BagContextValue {
   items: BagLine[];
   count: number;          // distinct products in the bag
   totalQuantity: number;
@@ -94,7 +94,7 @@ export function BagProvider({ seedProduct, shopSlug, children }: { seedProduct?:
   );
 
   const addProduct = useCallback((product: Product): AddResult => {
-    const trackInventory = Boolean((product as unknown as ProductWithApiFields).track_inventory ?? (product as unknown as ProductWithApiFields).trackInventory);
+    const trackInventory = Boolean((product as unknown as ProductWithApiFields).track_inventory);
     const availableStock = typeof (product as unknown as ProductWithApiFields).quantity === 'number'
       ? (product as unknown as ProductWithApiFields).quantity!
       : Infinity;
@@ -139,7 +139,7 @@ export function BagProvider({ seedProduct, shopSlug, children }: { seedProduct?:
       if (quantity <= 0) return prev.filter((l) => !sameId(l.product.id, productId));
       return prev.map((l) => {
         if (!sameId(l.product.id, productId)) return l;
-        const trackInventory = Boolean((l.product as unknown as ProductWithApiFields).track_inventory ?? (l.product as unknown as ProductWithApiFields).trackInventory);
+        const trackInventory = Boolean((l.product as unknown as ProductWithApiFields).track_inventory);
         const availableStock = typeof (l.product as unknown as ProductWithApiFields).quantity === 'number'
           ? (l.product as unknown as ProductWithApiFields).quantity!
           : Infinity;
