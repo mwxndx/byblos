@@ -35,7 +35,8 @@
     "db:test:reset": "node scripts/reset-test-db.js && npm run db:test:schema",
     "db:migrate:test": "cross-env DOTENV_CONFIG_PATH=.env.test node scripts/migrate.js",
     "lint": "eslint .",
-    "format": "prettier --write \"**/*.{js,ts,json,md}\""
+    "format": "prettier --write \"**/*.{js,ts,json,md}\"",
+    "migrate:up": "npm run migrate"
   },
   "repository": {
     "type": "git",
