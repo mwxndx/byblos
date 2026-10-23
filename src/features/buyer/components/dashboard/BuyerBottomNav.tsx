@@ -21,7 +21,6 @@ export function BuyerBottomNav({ activeNav, navItems, onSelect }: BuyerBottomNav
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"
-      style={{ paddingBottom: 'max(var(--sab, 0px), env(safe-area-inset-bottom, 0px))' }}
       aria-label="Buyer navigation"
     >
       <div className="flex items-center justify-around h-14 px-1">
