@@ -22,7 +22,7 @@ import { SellerDashboardHeader } from '../components/dashboard/widgets/SellerDas
 import { SellerDashboardErrorState } from '../components/dashboard/widgets/SellerDashboardState';
 import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
 import { SellerDashboardTabs } from '../components/dashboard/widgets/SellerDashboardTabs';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
+import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
 import { copyLinkedTextToClipboard, getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { useShopAccentOnly } from '@/shared/hooks/useShopTheme';
@@ -89,6 +89,15 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
       return true;
     });
   }, [isAddProductModalOpen]);
+
+  useEffect(() => {
+    if (!isNativeApp() || !isProfileOpen) return;
+
+    return registerModalDismiss(() => {
+      setIsProfileOpen(false);
+      return true;
+    });
+  }, [isProfileOpen]);
 
   const sellerFirstName = useMemo(
     () => sellerProfile?.fullName?.trim().split(/\s+/)[0] || sellerProfile?.shopName?.trim().split(/\s+/)[0] || 'Seller',
@@ -244,21 +253,22 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
       <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       {/* Main Content Area */}
-      <div
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchCancel}
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden"
-        style={{
-          WebkitOverflowScrolling: 'touch',
-          scrollBehavior: 'smooth',
-          overscrollBehavior: 'none',
-        }}
-      >
+      <div className="relative flex-1 min-h-0 overflow-hidden">
         <div
-          className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
-          style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
+          className="h-full overflow-y-auto overflow-x-hidden"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth',
+            overscrollBehavior: 'none',
+          }}
         >
+          <div
+            className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
+            style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+          >
           <div className="mb-5 mt-1 sm:mb-6">
             <SellerProfileHero
               sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
@@ -302,7 +312,24 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
               setIsAddProductModalOpen={setIsAddProductModalOpen}
             />
           )}
+          </div>
         </div>
+
+        <DashboardProfilePanel
+          open={isProfileOpen}
+          onOpenChange={setIsProfileOpen}
+          title="Profile"
+          bottomInset="calc(3.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))"
+          className="seller-surface"
+        >
+          <div className="px-4 py-4 pb-8">
+            <SettingsTab
+              sellerProfile={sellerProfile}
+              onLogout={handleLogout}
+              {...settingsForm}
+            />
+          </div>
+        </DashboardProfilePanel>
       </div>
 
       <SellerDashboardTabs
@@ -311,31 +338,6 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
         pendingCreatorsCount={pendingCreatorsCount}
         onSelectTab={handleSelectTab}
       />
-
-      {/* Profile / settings as a right-side slide-over — same UX as the creator
-          profile, opened from the header profile icon. The .seller-surface
-          wrapper carries the seller-scoped styling into the portal. */}
-      <Sheet open={isProfileOpen} onOpenChange={setIsProfileOpen}>
-        <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-md">
-          <div className="seller-surface min-h-full">
-            <SheetHeader
-              className="px-4 pb-2 text-left"
-              style={{
-                paddingTop: 'max(2rem, calc(env(safe-area-inset-top, 0px) + 1.25rem))',
-              }}
-            >
-              <SheetTitle>Profile</SheetTitle>
-            </SheetHeader>
-            <div className="px-4 pb-8">
-              <SettingsTab
-                sellerProfile={sellerProfile}
-                onLogout={handleLogout}
-                {...settingsForm}
-              />
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }

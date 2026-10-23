@@ -66,6 +66,14 @@ export default function CreatorDashboard() {
     });
   }, [respondingRequestId]);
 
+  useEffect(() => {
+    if (!isNativeApp() || !sheetOpen) return;
+    return registerModalDismiss(() => {
+      setSheetOpen(false);
+      return true;
+    });
+  }, [sheetOpen]);
+
   const copy = async (value: string, label?: string) => {
     if (label) {
       const copyMode = await copyLinkedTextToClipboard(label, value);
@@ -185,7 +193,7 @@ export default function CreatorDashboard() {
   };
 
   return (
-    <main className="dashboard-layout text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+    <main className="dashboard-layout text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
       <AppHeader
         left={<NotificationBell triggerClassName="text-label hover:bg-fill" role="creator" />}
         right={
@@ -200,6 +208,8 @@ export default function CreatorDashboard() {
         }
       />
 
+      <div className="relative flex-1 min-h-0 overflow-hidden">
+        <div className="h-full overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="px-4 pt-3 sm:px-6 lg:px-8">
         <div role="tablist" aria-label="Dashboard section" className="flex gap-1 rounded-control bg-fill p-1">
           {tabButton('performance', 'Performance')}
@@ -339,12 +349,15 @@ export default function CreatorDashboard() {
         )}
       </div>
 
-      <CreatorProfileSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        creator={creator}
-        onLogout={handleLogout}
-      />
+          </div>
+
+          <CreatorProfileSheet
+            open={sheetOpen}
+            onOpenChange={setSheetOpen}
+            creator={creator}
+            onLogout={handleLogout}
+          />
+        </div>
     </main>
   );
 }

@@ -220,26 +220,25 @@ function BuyerDashboard() {
           )}
 
         </div>
+        <BuyerProfileSheet
+          open={isProfileOpen}
+          onOpenChange={setIsProfileOpen}
+          isEditingProfile={isEditingProfile}
+          isSavingProfile={isSavingProfile}
+          mobilePayment={mobilePayment}
+          area={area}
+          user={user}
+          whatsappNumber={whatsappNumber}
+          onLogout={handleLogout}
+          onMobilePaymentChange={setMobilePayment}
+          onAreaChange={setArea}
+          onSaveProfile={handleSaveProfile}
+          onToggleEdit={() => setIsEditingProfile(!isEditingProfile)}
+          onWhatsappNumberChange={setWhatsappNumber}
+        />
       </div>
 
       <BuyerBottomNav activeNav={activeNav} navItems={navItems} onSelect={setActiveTab} />
-
-      <BuyerProfileSheet
-        open={isProfileOpen}
-        onOpenChange={setIsProfileOpen}
-        isEditingProfile={isEditingProfile}
-        isSavingProfile={isSavingProfile}
-        mobilePayment={mobilePayment}
-        area={area}
-        user={user}
-        whatsappNumber={whatsappNumber}
-        onLogout={handleLogout}
-        onMobilePaymentChange={setMobilePayment}
-        onAreaChange={setArea}
-        onSaveProfile={handleSaveProfile}
-        onToggleEdit={() => setIsEditingProfile(!isEditingProfile)}
-        onWhatsappNumberChange={setWhatsappNumber}
-      />
 
       {/* First-login Byblos membership card opt-in + share */}
       <MembershipGate enabled={!!user} />

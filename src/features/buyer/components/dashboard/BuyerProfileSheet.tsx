@@ -3,7 +3,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound } from '@/shared/ui/icons';
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
+import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
 import { BuyerMembershipCard } from './BuyerMembershipCard';
 import { DeleteAccountButton } from '@/shared/components/DeleteAccountButton';
 import { deleteBuyerAccount } from '@/features/buyer/api/profile';
@@ -299,25 +299,20 @@ interface BuyerProfileSheetProps extends BuyerProfileContentProps {
 }
 
 /**
- * Buyer profile as a right-side slide-over — the same UX as the creator
- * profile. Opened from the profile icon in the buyer header.
+ * Buyer profile contained by the dashboard body. It intentionally leaves the
+ * shared header and fixed bottom navigation visible above the profile panel.
  */
 export function BuyerProfileSheet({ open, onOpenChange, ...content }: BuyerProfileSheetProps) {
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="w-full overflow-y-auto bg-surface-1 p-0 text-label sm:max-w-md">
-        <SheetHeader
-          className="px-4 pb-2 text-left"
-          style={{
-            paddingTop: 'max(2rem, calc(env(safe-area-inset-top, 0px) + 1.25rem))',
-          }}
-        >
-          <SheetTitle className="text-label">Profile</SheetTitle>
-        </SheetHeader>
-        <div className="px-4 pb-8">
-          <BuyerProfileContent {...content} />
-        </div>
-      </SheetContent>
-    </Sheet>
+    <DashboardProfilePanel
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Profile"
+      bottomInset="calc(3.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))"
+    >
+      <div className="px-4 py-4 pb-8">
+        <BuyerProfileContent {...content} />
+      </div>
+    </DashboardProfilePanel>
   );
 }

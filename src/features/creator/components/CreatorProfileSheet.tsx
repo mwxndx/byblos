@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LogOut, Mail, MessageCircle, Phone, UserRound, Loader2, Lock } from '@/shared/ui/icons';
 import { toast } from 'sonner';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/shared/ui/sheet';
+import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { ThemeSegmentedPill } from '@/shared/ui/ThemeSegmentedPill';
@@ -63,21 +63,8 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: C
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full overflow-y-auto bg-surface-1 p-0 text-label sm:max-w-md"
-      >
-        <SheetHeader
-          className="px-4 pb-2 text-left"
-          style={{
-            paddingTop: 'max(2rem, calc(env(safe-area-inset-top, 0px) + 1.25rem))',
-          }}
-        >
-          <SheetTitle className="text-label">Profile</SheetTitle>
-        </SheetHeader>
-
-        <div className="space-y-4 px-4 pb-8">
+    <DashboardProfilePanel open={open} onOpenChange={onOpenChange} title="Profile">
+      <div className="space-y-4 px-4 py-4 pb-8">
           {/* Theme + account switcher — one equal row */}
           <section className="rounded-card border border-separator bg-surface-1 p-4">
             <div className="grid grid-cols-2 gap-3">
@@ -153,8 +140,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: C
           >
             <LogOut className="mr-2 h-4 w-4" />Logout
           </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </DashboardProfilePanel>
   );
 }
