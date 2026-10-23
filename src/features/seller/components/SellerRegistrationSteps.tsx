@@ -104,7 +104,7 @@ export const SellerRegistrationSteps = ({
                         required
                         className={`input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base ${shopNameAvailable === false ? 'border-red-500' : ''}`}
                       />
-                      <p className="text-[8px] sm:text-[10px] text-slate-500 dark:text-slate-400">Byblos.space/{formData.shopName.toLowerCase() || 'yourshop'}</p>
+                      <p className="text-[8px] sm:text-[10px] text-slate-500 dark:text-slate-400">byblosafrica.site/{formData.shopName.toLowerCase() || 'yourshop'}</p>
                     </div>
 
                     <div className="space-y-0.5 sm:space-y-2">

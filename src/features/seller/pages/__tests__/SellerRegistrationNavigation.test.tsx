@@ -230,4 +230,45 @@ describe('SellerRegistrationSteps — Step 3 Shop Type Switching', () => {
     expect(updated.latitude).toBeUndefined();
     expect(updated.longitude).toBeUndefined();
   });
+
+  test('Step 1 renders shop url preview with byblosafrica.site domain', () => {
+    const testFormData: SellerRegistrationFormData = {
+      firstName: '',
+      lastName: '',
+      shopName: 'CoolApparel',
+      email: '',
+      whatsappNumber: '',
+      password: '',
+      confirmPassword: '',
+      city: 'Nairobi',
+      location: '',
+      physicalAddress: '',
+      latitude: undefined,
+      longitude: undefined,
+    };
+
+    render(
+      <SellerRegistrationSteps
+        currentStep={1}
+        formData={testFormData}
+        handleInputChange={vi.fn()}
+        setFormData={vi.fn()}
+        shopNameAvailable={true}
+        isCheckingShopName={false}
+        showPassword={false}
+        setShowPassword={vi.fn()}
+        showConfirmPassword={false}
+        setShowConfirmPassword={vi.fn()}
+        passwordError=""
+        hasPhysicalShop={null}
+        setHasPhysicalShop={vi.fn()}
+        setCurrentStep={vi.fn()}
+        termsAccepted={false}
+        setTermsAccepted={vi.fn()}
+        setIsTermsModalOpen={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('byblosafrica.site/coolapparel')).toBeInTheDocument();
+  });
 });
