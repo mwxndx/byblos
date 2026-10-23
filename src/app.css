@@ -33,7 +33,7 @@ body,
 :root {
     /* ── Safe-area inset CSS variables (set by browser env or native fallback) ─────── */
     --sat: max(env(safe-area-inset-top, 0px), 0px);
-    --sab: max(env(safe-area-inset-bottom, 0px), 0px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 16px);
     --sal: max(env(safe-area-inset-left, 0px), 0px);
     --sar: max(env(safe-area-inset-right, 0px), 0px);
 
@@ -66,13 +66,13 @@ html.capacitor-native,
 body.native-app,
 body.capacitor-native {
     --sat: max(env(safe-area-inset-top, 0px), 36px);
-    --sab: max(env(safe-area-inset-bottom, 0px), 0px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 16px);
 }
 
 html.android-native,
 body.android-native {
     --sat: max(env(safe-area-inset-top, 0px), 36px);
-    --sab: max(env(safe-area-inset-bottom, 0px), 0px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 16px);
 }
 
 /* Utility classes for safe area insets */
@@ -80,14 +80,13 @@ body.android-native {
     padding-top: var(--sat) !important;
 }
 .pb-safe-bottom {
-    padding-bottom: var(--sab) !important;
+    padding-bottom: max(var(--sab, 0px), env(safe-area-inset-bottom, 0px)) !important;
 }
 
 /* Fixed bottom navigation bars: solid themed background, zero bottom gap */
 nav.fixed.bottom-0 {
     bottom: 0 !important;
     margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
     background-color: var(--byblos-bg) !important;
 }
 .mt-safe-top {

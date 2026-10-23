@@ -166,6 +166,7 @@ export class ErrorBoundary extends Component<Props, State> {
  */
 export function RootErrorElement() {
   const error = useRouteError();
+  console.error('[RootErrorElement] Uncaught route error:', error);
 
   const isChunk =
     isDynamicImportError(error) ||

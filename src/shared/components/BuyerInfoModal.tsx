@@ -2,6 +2,7 @@ import { Dialog, DialogContent } from '@/shared/ui/dialog';
 import TermsModal from '@/shared/components/TermsModal';
 import { useBuyerInfoModal } from '@/shared/components/useBuyerInfoModal';
 import { BuyerInfoForm } from '@/shared/components/BuyerInfoForm';
+import { useScreenSecurity } from '@/shared/utils/screenSecurity';
 
 export interface BuyerInfo {
   firstName: string;
@@ -52,6 +53,7 @@ export function BuyerInfoModal({
     checkPasswordStrength,
     themeClasses,
   } = useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading, theme, phoneNumber, initialData });
+  useScreenSecurity(isOpen, 'checkout-buyer-info');
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

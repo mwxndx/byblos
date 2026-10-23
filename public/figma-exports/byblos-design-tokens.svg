@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="440" height="812" viewBox="0 0 440 812" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&amp;display=swap');
+      .font-sora { font-family: 'Sora', -apple-system, sans-serif; }
+    </style>
+    <filter id="card-shadow" x="-8%" y="-4%" width="116%" height="114%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="sheet-shadow" x="-5%" y="-10%" width="110%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="-8" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  
+  <g id="Artboard-TokensAndComponents" transform="translate(0, 0)">
+    <!-- Frame: 440 x 812 -->
+    <rect width="440" height="812" rx="40" fill="#141414" stroke="#2e2e2e" stroke-width="2"/>
+
+    <!-- Title -->
+    <text class="font-sora" x="32" y="48" font-size="22" font-weight="700" fill="#FFFFFF">Byblos Design Tokens</text>
+    <text class="font-sora" x="32" y="72" font-size="13" font-weight="400" fill="#9ca3af">Figma UI Kit Adaptation Palette</text>
+
+    <!-- Color Swatches Grid -->
+    <g transform="translate(32, 100)">
+      <!-- Swatch 1: #1c1c1c -->
+      <g transform="translate(0, 0)">
+        <rect width="118" height="64" rx="14" fill="#1c1c1c" stroke="#444444" stroke-width="1"/>
+        <text class="font-sora" x="12" y="32" font-size="13" font-weight="700" fill="#ffffff">#1c1c1c</text>
+        <text class="font-sora" x="12" y="48" font-size="11" font-weight="500" fill="#9ca3af">Primary Dark</text>
+      </g>
+      <!-- Swatch 2: #F5B700 -->
+      <g transform="translate(130, 0)">
+        <rect width="118" height="64" rx="14" fill="#F5B700"/>
+        <text class="font-sora" x="12" y="32" font-size="13" font-weight="700" fill="#1c1c1c">#F5B700</text>
+        <text class="font-sora" x="12" y="48" font-size="11" font-weight="600" fill="#1c1c1c">Brand Gold</text>
+      </g>
+      <!-- Swatch 3: #FFF8E6 -->
+      <g transform="translate(260, 0)">
+        <rect width="118" height="64" rx="14" fill="#FFF8E6"/>
+        <text class="font-sora" x="12" y="32" font-size="13" font-weight="700" fill="#1c1c1c">#FFF8E6</text>
+        <text class="font-sora" x="12" y="48" font-size="11" font-weight="600" fill="#1c1c1c">Soft Cream</text>
+      </g>
+    </g>
+
+    <!-- Geometry Standards Header -->
+    <text class="font-sora" x="32" y="210" font-size="16" font-weight="700" fill="#FFFFFF">Component Primitives</text>
+
+    <!-- 1. Primary Button Component (56px, 16px radius) -->
+    <g transform="translate(32, 230)">
+      <text class="font-sora" x="0" y="0" font-size="12" font-weight="600" fill="#FFF8E6">Button / Primary (h=56, r=16)</text>
+      <rect y="10" width="376" height="56" rx="16" fill="#F5B700"/>
+      <text class="font-sora" x="188" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#1c1c1c">Primary Action Button</text>
+    </g>
+
+    <!-- 2. Secondary Button Component (56px, 16px radius) -->
+    <g transform="translate(32, 324)">
+      <text class="font-sora" x="0" y="0" font-size="12" font-weight="600" fill="#FFF8E6">Button / Secondary (h=56, r=16)</text>
+      <rect y="10" width="376" height="56" rx="16" fill="#FFF8E6" stroke="#f5e8c4" stroke-width="1.5"/>
+      <text class="font-sora" x="188" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#1c1c1c">Secondary Action Button</text>
+    </g>
+
+    <!-- 3. Form Input Component (56px, 16px radius) -->
+    <g transform="translate(32, 418)">
+      <text class="font-sora" x="0" y="0" font-size="12" font-weight="600" fill="#FFF8E6">Input / Field (h=56, r=16)</text>
+      <rect y="10" width="376" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+      <circle cx="32" cy="38" r="8" fill="#F5B700"/>
+      <text class="font-sora" x="52" y="43" font-size="14" font-weight="400" fill="#FFFFFF">Active input field value</text>
+    </g>
+
+    <!-- 4. Badges & Chips -->
+    <g transform="translate(32, 516)">
+      <text class="font-sora" x="0" y="0" font-size="12" font-weight="600" fill="#FFF8E6">Badges &amp; Status Pills</text>
+      <!-- Badge 1 -->
+      <rect y="12" width="112" height="30" rx="15" fill="#FFF8E6"/>
+      <circle cx="16" cy="27" r="4" fill="#F5B700"/>
+      <text class="font-sora" x="26" y="31" font-size="12" font-weight="700" fill="#1c1c1c">Verified</text>
+      <!-- Badge 2 -->
+      <rect x="124" y="12" width="128" height="30" rx="15" fill="#262626" stroke="#3d3d3d" stroke-width="1"/>
+      <circle cx="140" cy="27" r="4" fill="#F5B700"/>
+      <text class="font-sora" x="150" y="31" font-size="12" font-weight="600" fill="#FFFFFF">Ksh 3 Creator</text>
+      <!-- Badge 3 -->
+      <rect x="264" y="12" width="112" height="30" rx="15" fill="#F5B700"/>
+      <text class="font-sora" x="320" y="31" text-anchor="middle" font-size="12" font-weight="700" fill="#1c1c1c">Mzigo Fast</text>
+    </g>
+
+    <!-- 5. Sheet Header Specs (32px radius) -->
+    <g transform="translate(32, 600)">
+      <text class="font-sora" x="0" y="0" font-size="12" font-weight="600" fill="#FFF8E6">Modal / Sheet Geometry (r=32px)</text>
+      <path d="M 0 32 A 32 32 0 0 1 32 0 L 344 0 A 32 32 0 0 1 376 32 L 376 96 L 0 96 Z" fill="#262626" stroke="#3d3d3d" stroke-width="1"/>
+      <rect x="164" y="10" width="48" height="5" rx="2.5" fill="#666666"/>
+      <text class="font-sora" x="188" y="44" text-anchor="middle" font-size="14" font-weight="700" fill="#FFFFFF">32px Continuous Corner Radius</text>
+      <text class="font-sora" x="188" y="64" text-anchor="middle" font-size="12" font-weight="500" fill="#9ca3af">Standard mobile bottom sheet drawer</text>
+    </g>
+  </g>
+  
+</svg>

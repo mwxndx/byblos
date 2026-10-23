@@ -8,6 +8,7 @@ import { Phone, Loader2, MapPin, Truck, ShieldCheck } from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
 import { createOptionalBuyerLocation, type BuyerLocationPayload } from '@/infrastructure/location/location';
 import { usePhoneCheck } from './usePhoneCheck';
+import { useScreenSecurity } from '@/shared/utils/screenSecurity';
 
 
 export interface DoorDeliverySelection {
@@ -75,6 +76,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
     customInstructions,
     setCustomInstructions,
   } = usePhoneCheck({ isOpen, onPhoneSubmit, isPhysicalProduct, isCustomProduct, purchaseDetails });
+  useScreenSecurity(isOpen, 'checkout-phone-check');
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

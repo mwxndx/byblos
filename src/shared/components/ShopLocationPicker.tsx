@@ -16,7 +16,7 @@ export default function ShopLocationPicker({ initialAddress = '', initialCoordin
             placeholder="Search for your shop's area or street..."
             label="Search Location"
             detailedLabel="Detailed Address (Building, Floor, Shop No)"
-            autoPopulate={false}
+            autoPopulate={true}
         />
     );
 }

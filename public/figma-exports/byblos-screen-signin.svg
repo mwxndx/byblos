@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="375" height="812" viewBox="0 0 375 812" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&amp;display=swap');
+      .font-sora { font-family: 'Sora', -apple-system, sans-serif; }
+    </style>
+    <filter id="card-shadow" x="-8%" y="-4%" width="116%" height="114%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="sheet-shadow" x="-5%" y="-10%" width="110%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="-8" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  
+  <g id="Screen-SignIn" transform="translate(0, 0)">
+    <!-- Screen Frame (375 x 812, r=40) -->
+    <rect width="375" height="812" rx="40" fill="#1c1c1c" stroke="#333333" stroke-width="2"/>
+    
+    <g id="status-bar" transform="translate(24, 14)">
+      <text class="font-sora" font-size="14" font-weight="600" fill="#ffffff" x="0" y="10">9:41</text>
+      <g transform="translate(285, 0)">
+        <!-- Signal -->
+        <rect x="0" y="7" width="3" height="5" rx="0.5" fill="#ffffff"/>
+        <rect x="5" y="5" width="3" height="7" rx="0.5" fill="#ffffff"/>
+        <rect x="10" y="3" width="3" height="9" rx="0.5" fill="#ffffff"/>
+        <rect x="15" y="1" width="3" height="11" rx="0.5" fill="#ffffff"/>
+        <!-- Wifi -->
+        <path d="M 26 1 A 10 10 0 0 1 38 1 M 28 4 A 7 7 0 0 1 36 4 M 31 8 A 3 3 0 0 1 33 8" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <!-- Battery -->
+        <rect x="44" y="0" width="22" height="12" rx="3" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+        <rect x="46" y="2" width="14" height="8" rx="1.5" fill="#ffffff"/>
+        <path d="M 67 4 L 67 8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+    </g>
+  
+
+    <!-- App Header (Back Button 40x40 r=12) -->
+    <g transform="translate(24, 52)">
+      <rect width="40" height="40" rx="12" fill="#262626" stroke="#3d3d3d" stroke-width="1"/>
+      <path d="M 23 14 L 17 20 L 23 26" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+
+    <!-- Brand Logo / Badge -->
+    <g transform="translate(24, 114)">
+      <rect width="94" height="34" rx="17" fill="#FFF8E6"/>
+      <circle cx="16" cy="17" r="5" fill="#F5B700"/>
+      <text class="font-sora" x="28" y="22" font-size="14" font-weight="700" fill="#1c1c1c">Byblos</text>
+    </g>
+
+    <!-- Header Text -->
+    <text class="font-sora" x="24" y="196" font-size="28" font-weight="700" fill="#FFFFFF">Welcome Back!</text>
+    <text class="font-sora" x="24" y="224" font-size="14" font-weight="400" fill="#9ca3af">Enter your details below to sign in</text>
+
+    <!-- Form Container -->
+    <g transform="translate(24, 260)">
+      <!-- Input 1: Email (h=56, r=16) -->
+      <g transform="translate(0, 0)">
+        <text class="font-sora" x="4" y="-8" font-size="12" font-weight="600" fill="#FFF8E6">Email or Phone</text>
+        <rect width="327" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+        <!-- Mail Icon -->
+        <rect x="18" y="19" width="18" height="14" rx="2" stroke="#9ca3af" stroke-width="1.6" fill="none"/>
+        <path d="M 18 21 L 27 27 L 36 21" stroke="#9ca3af" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <text class="font-sora" x="48" y="34" font-size="15" font-weight="400" fill="#FFFFFF">buyer@byblos.africa</text>
+      </g>
+
+      <!-- Input 2: Password (h=56, r=16) -->
+      <g transform="translate(0, 92)">
+        <text class="font-sora" x="4" y="-8" font-size="12" font-weight="600" fill="#FFF8E6">Password</text>
+        <rect width="327" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+        <!-- Lock Icon -->
+        <rect x="19" y="22" width="16" height="12" rx="2" stroke="#9ca3af" stroke-width="1.6" fill="none"/>
+        <path d="M 23 22 L 23 18 A 4 4 0 0 1 31 18 L 31 22" stroke="#9ca3af" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        <text class="font-sora" x="48" y="34" font-size="15" font-weight="400" fill="#FFFFFF">••••••••••••</text>
+        <!-- Eye toggle -->
+        <circle cx="295" cy="28" r="7" stroke="#9ca3af" stroke-width="1.6" fill="none"/>
+        <circle cx="295" cy="28" r="2.5" fill="#9ca3af"/>
+      </g>
+
+      <!-- Forgot Password -->
+      <text class="font-sora" x="327" y="174" text-anchor="end" font-size="13" font-weight="600" fill="#F5B700">Forgot password?</text>
+
+      <!-- Primary Action Button: 56px, 16px radius, #F5B700 -->
+      <g transform="translate(0, 204)">
+        <rect width="327" height="56" rx="16" fill="#F5B700"/>
+        <text class="font-sora" x="163.5" y="34" text-anchor="middle" font-size="16" font-weight="700" fill="#1c1c1c">Sign In</text>
+      </g>
+
+      <!-- Divider -->
+      <g transform="translate(0, 292)">
+        <line x1="0" y1="0" x2="135" y2="0" stroke="#3d3d3d" stroke-width="1"/>
+        <text class="font-sora" x="163.5" y="4" text-anchor="middle" font-size="12" font-weight="500" fill="#9ca3af">OR</text>
+        <line x1="192" y1="0" x2="327" y2="0" stroke="#3d3d3d" stroke-width="1"/>
+      </g>
+
+      <!-- Social / Guest Button: 56px, 16px radius -->
+      <g transform="translate(0, 318)">
+        <rect width="327" height="56" rx="16" fill="#FFF8E6" stroke="#f5e8c4" stroke-width="1"/>
+        <text class="font-sora" x="163.5" y="34" text-anchor="middle" font-size="15" font-weight="600" fill="#1c1c1c">Browse as Guest</text>
+      </g>
+
+      <!-- Bottom link -->
+      <g transform="translate(163.5, 410)">
+        <text class="font-sora" text-anchor="middle" font-size="14" font-weight="400" fill="#9ca3af">
+          Don't have an account? <tspan font-weight="700" fill="#F5B700">Sign Up</tspan>
+        </text>
+      </g>
+    </g>
+
+    <!-- Home Indicator (r=100) -->
+    <rect x="120" y="796" width="135" height="5" rx="2.5" fill="#555555"/>
+  </g>
+  
+</svg>

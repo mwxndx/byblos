@@ -6,6 +6,7 @@ import { cn, formatCurrency, getImageUrl } from '@/shared/utils/formatting';
 import { getProductCardThemeVars, getProductFlags, type ProductWithApiFields, type Theme } from '@/features/shop/utils/productCardUtils';
 import { useWishlist } from '@/features/shop/wishlist/useWishlist';
 import { useIsProductWishlisted } from '@/features/shop/wishlist/wishlistStore';
+import { useScreenSecurity } from '@/shared/utils/screenSecurity';
 
 interface ShopProductCardProps {
   product: Product;
@@ -38,6 +39,8 @@ export function ShopProductCard({
   const [showDescription, setShowDescription] = useState(false);
   const [showImages, setShowImages] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  useScreenSecurity(showImages, 'product-image:' + product.id);
 
   const { addToWishlist, removeFromWishlist } = useWishlist();
   const isAutoWishlisted = useIsProductWishlisted(product.id);

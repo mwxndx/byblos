@@ -5,6 +5,7 @@ import { useGlobalAuth } from '@/features/auth/contexts';
 import { isNativeApp, APP_DOWNLOAD_URL, getDevicePlatform, getAndroidDeepLink } from '@/infrastructure/navigation/mobileApp';
 import { Loader2 } from '@/shared/ui/icons';
 import { useToast } from '@/shared/hooks/use-toast';
+import { useScreenSecurity } from '@/shared/utils/screenSecurity';
 
 type ModalState = 'POLLING' | 'SUCCESS' | 'FAILED' | 'TIMEOUT';
 
@@ -39,6 +40,7 @@ export const PaymentStatusModal = ({
   paymentSummary
 }: Props) => {
   const { toast } = useToast();
+  useScreenSecurity(isOpen, 'checkout-payment-status');
   const [state, setState] = useState<ModalState>('POLLING');
   const [attempts, setAttempts] = useState(0);
   const [failureReason, setFailureReason] = useState<string | null>(null);

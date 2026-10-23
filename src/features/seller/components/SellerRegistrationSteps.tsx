@@ -229,19 +229,30 @@ export const SellerRegistrationSteps = ({
                       <div className="space-y-4 animate-in zoom-in-95 duration-300">
                         {hasPhysicalShop ? (
                           <>
-                            <div className="flex items-center justify-between mb-2 p-2 bg-yellow-400/10 rounded-lg border border-yellow-500/20">
-                              <div className="flex items-center gap-2">
-                                <Store className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                                <p className="text-[10px] sm:text-xs text-slate-800 dark:text-label-2 font-medium">Pin your shop's specific location.</p>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 p-3 bg-yellow-400/10 rounded-xl border border-yellow-500/20">
+                              <div className="flex items-center gap-2.5">
+                                <Store className="h-5 w-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
+                                <div>
+                                  <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">Shop Location Pin</p>
+                                  <p className="text-[11px] text-slate-600 dark:text-label-2 font-medium">Pin your physical storefront location.</p>
+                                </div>
                               </div>
                               <Button
                                 type="button"
-                                variant="ghost"
+                                variant="outline"
                                 size="sm"
-                                onClick={() => setHasPhysicalShop(null)}
-                                className="h-6 px-2 text-[10px] text-slate-500 dark:text-zinc-400 hover:text-slate-950 dark:hover:text-white"
+                                onClick={() => {
+                                  setHasPhysicalShop(null);
+                                  setFormData(prev => ({
+                                    ...prev,
+                                    physicalAddress: '',
+                                    latitude: undefined,
+                                    longitude: undefined,
+                                  }));
+                                }}
+                                className="min-h-[44px] h-11 px-3 text-xs font-semibold rounded-xl border-yellow-500/30 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-400/20 active:scale-95 transition-all"
                               >
-                                Change
+                                Change shop type
                               </Button>
                             </div>
                             <ShopLocationPicker
@@ -269,8 +280,16 @@ export const SellerRegistrationSteps = ({
                             <Button
                               type="button"
                               variant="link"
-                              onClick={() => setHasPhysicalShop(null)}
-                              className="text-yellow-600 dark:text-yellow-400 text-xs font-semibold"
+                              onClick={() => {
+                                setHasPhysicalShop(null);
+                                setFormData(prev => ({
+                                  ...prev,
+                                  physicalAddress: '',
+                                  latitude: undefined,
+                                  longitude: undefined,
+                                }));
+                              }}
+                              className="text-yellow-600 dark:text-yellow-400 text-xs font-semibold min-h-[44px] inline-flex items-center"
                             >
                               Wait, I actually have a physical shop
                             </Button>

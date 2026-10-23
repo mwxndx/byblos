@@ -26,7 +26,7 @@ describe('BuyerBottomNav', () => {
     expect(nav.className).not.toContain('/95');
     expect(nav.className).not.toContain('backdrop-blur');
 
-    // Safe area bottom inset style is applied
+    // Safe area bottom inset class is applied
     expect(nav).toHaveClass('pb-safe-bottom');
   });
 });

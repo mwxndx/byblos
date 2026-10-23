@@ -178,11 +178,12 @@ export function useSellerRegistration(onSuccess?: () => void) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate form - Check all required fields (physicalAddress is only required if hasPhysicalShop is true)
+    // Validate form - Check all required fields (physicalAddress or map pin is only required if hasPhysicalShop is true)
     const isPhysicalAddressRequired = hasPhysicalShop === true;
+    const hasShopLocation = Boolean(formData.physicalAddress || (formData.latitude && formData.longitude));
     const isMissingFields = !formData.firstName || !formData.lastName || !formData.shopName || !formData.email ||
       !formData.password || !formData.confirmPassword ||
-      !formData.city || !formData.location || (isPhysicalAddressRequired && !formData.physicalAddress);
+      !formData.city || !formData.location || (isPhysicalAddressRequired && !hasShopLocation);
 
     if (isMissingFields) {
       toast({

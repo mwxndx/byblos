@@ -44,6 +44,22 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
     handleResend,
   } = useSellerRegistration(onSuccess);
 
+  const handleBack = () => {
+    if (currentStep === 3 && hasPhysicalShop !== null) {
+      setHasPhysicalShop(null);
+      setFormData(prev => ({
+        ...prev,
+        physicalAddress: '',
+        latitude: undefined,
+        longitude: undefined,
+      }));
+    } else if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <main
       className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200"
@@ -61,7 +77,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/')}
+                onClick={handleBack}
                 className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-yellow-400 hover:text-black"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -167,7 +183,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                 {currentStep > 1 && (
                   <Button
                     type="button"
-                    onClick={() => setCurrentStep(currentStep - 1)}
+                    onClick={handleBack}
                     className="h-12 flex-1 rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-white/10 text-xs font-semibold text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 transition"
                   >
                     Back
@@ -196,9 +212,16 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                           toast({ title: "Selection Required", description: "Please select whether you have a physical shop or operate online only.", variant: 'destructive' });
                           return;
                         }
-                        if (hasPhysicalShop && !formData.physicalAddress) {
+                        const hasShopLocation = Boolean(formData.physicalAddress || (formData.latitude && formData.longitude));
+                        if (hasPhysicalShop && !hasShopLocation) {
                           toast({ title: "Shop Address Required", description: "Please provide a specific shop address or location on the map.", variant: 'destructive' });
                           return;
+                        }
+                        if (hasPhysicalShop && !formData.physicalAddress && formData.latitude && formData.longitude) {
+                          setFormData(prev => ({
+                            ...prev,
+                            physicalAddress: prev.location ? `${prev.location} (Pinned on map)` : 'Pinned on map',
+                          }));
                         }
                       }
                       setCurrentStep(currentStep + 1);

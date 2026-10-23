@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Label } from '@/shared/ui/label';
 import { Input } from '@/shared/ui/input';
-import { Loader2, X } from '@/shared/ui/icons';
+import { Loader2, X, MapPin } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/cn';
 import type { LocationCoordinates } from '@/infrastructure/location/location';
 import { useLocationSearch } from './location/useLocationSearch';
@@ -117,9 +117,20 @@ export default function LocationPicker({
           />
         </Suspense>
       </div>
-      <p className="text-center text-[10px] font-semibold text-slate-500">
-        Tap the map to pin exact location
-      </p>
+      <div className="flex items-center justify-between text-xs px-1">
+        <p className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
+          {mapState.markerPosition ? 'Location pinned' : 'Tap the map to pin exact location'}
+        </p>
+        {mapState.markerPosition && (
+          <button
+            type="button"
+            onClick={mapState.handleClearPin}
+            className="inline-flex items-center gap-1 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 py-1 px-2 rounded-md transition-colors"
+          >
+            <MapPin className="h-3.5 w-3.5" /> Remove Pin / Repin
+          </button>
+        )}
+      </div>
     </div>
   );
 }

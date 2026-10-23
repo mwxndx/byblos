@@ -48,14 +48,24 @@ export function MapFlyTo({ position }: { position: [number, number] | null }) {
     const map = useMap();
     useEffect(() => {
         if (position) {
-            map.invalidateSize({ animate: false });
-            map.flyTo(position, Math.max(map.getZoom(), 15), {
-                animate: true,
-                duration: 0.6
-            });
+            try {
+                map.invalidateSize({ animate: false });
+                map.flyTo(position, Math.max(map.getZoom(), 15), {
+                    animate: true,
+                    duration: 0.6
+                });
+            } catch {
+                // Ignore if map is in an unready state
+            }
         }
         return () => {
-            map.stop();
+            try {
+                // Leaflet's map.stop() can throw a TypeError (reading '_leaflet_pos') if the map container
+                // or panes have already started unmounting. Catching it prevents route crash into RootErrorElement ("Page Error").
+                map.stop();
+            } catch {
+                // Suppress unmount teardown exceptions
+            }
         };
     }, [position, map]);
     return null;

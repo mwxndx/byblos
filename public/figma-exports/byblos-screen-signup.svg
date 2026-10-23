@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="375" height="812" viewBox="0 0 375 812" fill="none" xmlns="http://www.w3.org/2000/svg">
+  
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&amp;display=swap');
+      .font-sora { font-family: 'Sora', -apple-system, sans-serif; }
+    </style>
+    <filter id="card-shadow" x="-8%" y="-4%" width="116%" height="114%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="sheet-shadow" x="-5%" y="-10%" width="110%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="-8" stdDeviation="16" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  
+  <g id="Screen-SignUp" transform="translate(0, 0)">
+    <!-- Screen Frame (375 x 812, r=40) -->
+    <rect width="375" height="812" rx="40" fill="#1c1c1c" stroke="#333333" stroke-width="2"/>
+    
+    <g id="status-bar" transform="translate(24, 14)">
+      <text class="font-sora" font-size="14" font-weight="600" fill="#ffffff" x="0" y="10">9:41</text>
+      <g transform="translate(285, 0)">
+        <!-- Signal -->
+        <rect x="0" y="7" width="3" height="5" rx="0.5" fill="#ffffff"/>
+        <rect x="5" y="5" width="3" height="7" rx="0.5" fill="#ffffff"/>
+        <rect x="10" y="3" width="3" height="9" rx="0.5" fill="#ffffff"/>
+        <rect x="15" y="1" width="3" height="11" rx="0.5" fill="#ffffff"/>
+        <!-- Wifi -->
+        <path d="M 26 1 A 10 10 0 0 1 38 1 M 28 4 A 7 7 0 0 1 36 4 M 31 8 A 3 3 0 0 1 33 8" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <!-- Battery -->
+        <rect x="44" y="0" width="22" height="12" rx="3" stroke="#ffffff" stroke-width="1.5" fill="none"/>
+        <rect x="46" y="2" width="14" height="8" rx="1.5" fill="#ffffff"/>
+        <path d="M 67 4 L 67 8" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+    </g>
+  
+
+    <!-- App Header (Back Button 40x40 r=12) -->
+    <g transform="translate(24, 52)">
+      <rect width="40" height="40" rx="12" fill="#262626" stroke="#3d3d3d" stroke-width="1"/>
+      <path d="M 23 14 L 17 20 L 23 26" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+
+    <!-- Header Text -->
+    <text class="font-sora" x="24" y="132" font-size="28" font-weight="700" fill="#FFFFFF">Create Account</text>
+    <text class="font-sora" x="24" y="160" font-size="14" font-weight="400" fill="#9ca3af">Start shopping with verified Kenyan shops</text>
+
+    <!-- Form Container -->
+    <g transform="translate(24, 186)">
+      <!-- Input 1: Full Name -->
+      <g transform="translate(0, 0)">
+        <text class="font-sora" x="4" y="-8" font-size="12" font-weight="600" fill="#FFF8E6">Full Name</text>
+        <rect width="327" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+        <text class="font-sora" x="20" y="34" font-size="15" font-weight="400" fill="#FFFFFF">Wanjiku Mwangi</text>
+      </g>
+
+      <!-- Input 2: Email -->
+      <g transform="translate(0, 84)">
+        <text class="font-sora" x="4" y="-8" font-size="12" font-weight="600" fill="#FFF8E6">Email Address</text>
+        <rect width="327" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+        <text class="font-sora" x="20" y="34" font-size="15" font-weight="400" fill="#FFFFFF">wanjiku@example.com</text>
+      </g>
+
+      <!-- Input 3: WhatsApp / Phone -->
+      <g transform="translate(0, 168)">
+        <text class="font-sora" x="4" y="-8" font-size="12" font-weight="600" fill="#FFF8E6">M-Pesa / Phone Number</text>
+        <rect width="327" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+        <text class="font-sora" x="20" y="34" font-size="15" font-weight="400" fill="#FFFFFF">+254 712 345 678</text>
+      </g>
+
+      <!-- Input 4: Password -->
+      <g transform="translate(0, 252)">
+        <text class="font-sora" x="4" y="-8" font-size="12" font-weight="600" fill="#FFF8E6">Create Password</text>
+        <rect width="327" height="56" rx="16" fill="#262626" stroke="#3d3d3d" stroke-width="1.5"/>
+        <text class="font-sora" x="20" y="34" font-size="15" font-weight="400" fill="#FFFFFF">••••••••••••</text>
+        <circle cx="295" cy="28" r="7" stroke="#9ca3af" stroke-width="1.6" fill="none"/>
+        <circle cx="295" cy="28" r="2.5" fill="#9ca3af"/>
+      </g>
+
+      <!-- Primary Action Button: 56px, 16px radius, #F5B700 -->
+      <g transform="translate(0, 336)">
+        <rect width="327" height="56" rx="16" fill="#F5B700"/>
+        <text class="font-sora" x="163.5" y="34" text-anchor="middle" font-size="16" font-weight="700" fill="#1c1c1c">Create Account</text>
+      </g>
+
+      <!-- Terms Notice -->
+      <text class="font-sora" x="163.5" y="420" text-anchor="middle" font-size="11" font-weight="400" fill="#9ca3af">
+        By continuing you agree to Byblos Terms &amp; Escrow Policy.
+      </text>
+
+      <!-- Bottom link -->
+      <g transform="translate(163.5, 460)">
+        <text class="font-sora" text-anchor="middle" font-size="14" font-weight="400" fill="#9ca3af">
+          Already have an account? <tspan font-weight="700" fill="#F5B700">Sign In</tspan>
+        </text>
+      </g>
+    </g>
+
+    <!-- Home Indicator -->
+    <rect x="120" y="796" width="135" height="5" rx="2.5" fill="#555555"/>
+  </g>
+  
+</svg>

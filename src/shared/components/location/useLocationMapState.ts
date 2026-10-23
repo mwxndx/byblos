@@ -33,18 +33,31 @@ export function useLocationMapState({
   addressRef.current = address;
   const markerPosRef = useRef(markerPosition);
   markerPosRef.current = markerPosition;
+  const lastSyncedCoordsRef = useRef(normalizedInitial);
+  const lastSyncedAddressRef = useRef(initialAddress);
 
   useEffect(() => {
-    if (initialAddress && initialAddress !== addressRef.current) {
-      setAddress(initialAddress);
+    if (initialAddress !== lastSyncedAddressRef.current) {
+      lastSyncedAddressRef.current = initialAddress;
+      if (initialAddress !== addressRef.current) {
+        setAddress(initialAddress || '');
+      }
     }
     const nextCoords = normalizeCoordinates(initialCoordinates);
-    if (nextCoords) {
-      const curr = markerPosRef.current;
-      if (!curr || nextCoords.lat !== curr[0] || nextCoords.lng !== curr[1]) {
+    const lastCoords = lastSyncedCoordsRef.current;
+    const coordsChanged =
+      (!lastCoords && !!nextCoords) ||
+      (!!lastCoords && !nextCoords) ||
+      (!!lastCoords && !!nextCoords && (lastCoords.lat !== nextCoords.lat || lastCoords.lng !== nextCoords.lng));
+
+    if (coordsChanged) {
+      lastSyncedCoordsRef.current = nextCoords;
+      if (nextCoords) {
         const pos: [number, number] = [nextCoords.lat, nextCoords.lng];
         setMarkerPosition(pos);
         setCenter(pos);
+      } else {
+        setMarkerPosition(null);
       }
     }
   }, [initialAddress, initialCoordinates]);
@@ -82,6 +95,12 @@ export function useLocationMapState({
     onLocationChange(selection.address, selection.coordinates);
   }, [markerPosition, onLocationChange]);
 
+  const handleClearPin = useCallback(() => {
+    setMarkerPosition(null);
+    const selection = createLocationSelection(addressRef.current, null);
+    onLocationChange(selection.address, null);
+  }, [onLocationChange]);
+
   const handleMapClick = useCallback((lat: number, lng: number) => {
     const newPos: [number, number] = [lat, lng];
     setMarkerPosition(newPos);
@@ -99,6 +118,7 @@ export function useLocationMapState({
     applyLocationResult,
     handleManualAddressChange,
     handleClearAddress,
+    handleClearPin,
     handleMapClick,
   };
 }
