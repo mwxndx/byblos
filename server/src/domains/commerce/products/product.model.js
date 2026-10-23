@@ -5,14 +5,14 @@ const PRODUCT_UPDATABLE_FIELDS = new Set([
     'status', 'sold_at', 'is_sold', 'service_options', 'service_locations',
     'track_inventory', 'quantity', 'reserved_quantity', 'low_stock_threshold',
     'is_custom_product', 'production_days', 'customization_prompt',
-    'is_imported_product', 'import_days', 'import_note', 'updated_at'
+    'is_imported_product', 'import_days', 'import_note', 'digital_category', 'updated_at'
 ]);
 
 class ProductModel {
     static async create(client, data) {
         const {
             name, price, description, image_url, images, seller_id, aesthetic,
-            is_digital, digital_file_path, digital_file_name, digital_file_size,
+            is_digital, digital_file_path, digital_file_name, digital_file_size, digital_category,
             product_type, service_locations, service_options,
             is_custom_product, production_days, customization_prompt,
             is_imported_product, import_days, import_note
@@ -22,17 +22,17 @@ class ProductModel {
       INSERT INTO products (
         name, price, description, image_url, images, seller_id, aesthetic,
         status, created_at, updated_at,
-        is_digital, digital_file_path, digital_file_name, digital_file_size,
+        is_digital, digital_file_path, digital_file_name, digital_file_size, digital_category,
         product_type, service_locations, service_options,
         is_custom_product, production_days, customization_prompt,
         is_imported_product, import_days, import_note
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'available', NOW(), NOW(), $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, 'available', NOW(), NOW(), $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
       RETURNING *
     `;
 
         const values = [
             name, price, description, image_url, images, seller_id, aesthetic,
-            is_digital, digital_file_path, digital_file_name, digital_file_size,
+            is_digital, digital_file_path, digital_file_name, digital_file_size, digital_category || null,
             product_type, service_locations, service_options,
             is_custom_product || false, production_days || null, customization_prompt || null,
             is_imported_product || false, import_days || null, import_note || null
@@ -48,7 +48,7 @@ class ProductModel {
         const { rows } = await pool.query(
             `SELECT id, seller_id, name, description, price, image_url, images, aesthetic,
                     product_type::text AS product_type, service_locations, service_options,
-                    is_digital, digital_file_path, digital_file_name, digital_file_size,
+                    is_digital, digital_file_path, digital_file_name, digital_file_size, digital_category,
                     track_inventory, quantity, reserved_quantity, low_stock_threshold,
                     is_custom_product, production_days, customization_prompt,
                     is_imported_product, import_days, import_note,
@@ -65,7 +65,7 @@ class ProductModel {
         const query = `
           SELECT id, seller_id, name, description, price, image_url, images, aesthetic,
                  product_type::text AS product_type, service_locations, service_options,
-                 is_digital, digital_file_path, digital_file_name, digital_file_size,
+                 is_digital, digital_file_path, digital_file_name, digital_file_size, digital_category,
                  track_inventory, quantity, reserved_quantity, low_stock_threshold,
                  is_custom_product, production_days, customization_prompt,
                  is_imported_product, import_days, import_note,

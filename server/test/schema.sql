@@ -1826,6 +1826,7 @@ CREATE TABLE public.products (
     digital_file_path text,
     digital_file_name text,
     digital_file_size integer,
+    digital_category character varying(32),
     service_locations jsonb,
     service_options jsonb,
     track_inventory boolean DEFAULT false,
@@ -6130,6 +6131,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (109, '20260926120000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (110, '20260926130000_add_product_orders_handoff_confirmed_at', '2026-09-26 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (111, '20261010120000_drop_redundant_checkout_token_index', '2026-10-10 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (112, '20261023130000_make_buyers_mobile_payment_nullable', '2026-10-23 13:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (113, '20261024022500_add_digital_category_to_products', '2026-10-24 02:25:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the

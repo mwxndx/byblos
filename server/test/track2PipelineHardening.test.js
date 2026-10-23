@@ -11,7 +11,9 @@ import rawEventBus from '../src/application/events/eventBus.js';
 import {
     MAX_DIGITAL_FILE_SIZE_MB,
     MAX_DIGITAL_FILE_SIZE_BYTES,
-    cloudinaryDigitalUpload
+    cloudinaryDigitalUpload,
+    DIGITAL_CATEGORIES,
+    detectDigitalCategory
 } from '../src/application/middleware/digitalUpload.js';
 
 describe('Track 2: Pipeline, Middleware & Security Hardening', () => {
@@ -88,6 +90,23 @@ describe('Track 2: Pipeline, Middleware & Security Hardening', () => {
             assert.equal(MAX_DIGITAL_FILE_SIZE_MB, 60);
             assert.equal(MAX_DIGITAL_FILE_SIZE_BYTES, 60 * 1024 * 1024);
             assert.equal(typeof cloudinaryDigitalUpload, 'function');
+        });
+
+        test('enforces digital file categories for audio, video, document', () => {
+            assert.ok(DIGITAL_CATEGORIES.audio.includes('.mp3'));
+            assert.ok(DIGITAL_CATEGORIES.audio.includes('.wav'));
+            assert.ok(DIGITAL_CATEGORIES.video.includes('.mp4'));
+            assert.ok(DIGITAL_CATEGORIES.video.includes('.mov'));
+            assert.ok(DIGITAL_CATEGORIES.document.includes('.pdf'));
+            assert.ok(DIGITAL_CATEGORIES.document.includes('.zip'));
+
+            assert.equal(detectDigitalCategory('.mp3'), 'audio');
+            assert.equal(detectDigitalCategory('.wav'), 'audio');
+            assert.equal(detectDigitalCategory('.mp4'), 'video');
+            assert.equal(detectDigitalCategory('.mkv'), 'video');
+            assert.equal(detectDigitalCategory('.pdf'), 'document');
+            assert.equal(detectDigitalCategory('.epub'), 'document');
+            assert.equal(detectDigitalCategory('.exe'), null);
         });
     });
 });

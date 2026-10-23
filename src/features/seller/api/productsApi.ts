@@ -148,9 +148,20 @@ export const sellerProductsApi = {
     await sellerApiInstance.delete(`/sellers/products/${id}`);
   },
 
-  async uploadDigitalProduct(file: File, onProgress?: (progress: number) => void): Promise<{ filePath: string; fileName: string; size: number }> {
+  async uploadDigitalProduct(
+    file: File,
+    category?: string,
+    onProgress?: (progress: number) => void
+  ): Promise<{ filePath: string; fileName: string; size: number; category?: string }> {
     const formData = new FormData();
     formData.append('digital_file', file);
+    if (category) {
+      formData.append('digital_category', category);
+    }
+
+    const uploadUrl = category
+      ? `/sellers/products/upload-digital?category=${encodeURIComponent(category)}`
+      : '/sellers/products/upload-digital';
 
     const response = await sellerApiInstance.post<{
       status: string;
@@ -158,8 +169,9 @@ export const sellerProductsApi = {
         filePath: string;
         fileName: string;
         size: number;
+        category?: string;
       }
-    }>('/sellers/products/upload-digital', formData, {
+    }>(uploadUrl, formData, {
       onUploadProgress: (progressEvent) => {
         if (onProgress && progressEvent.total) {
           const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -175,7 +187,8 @@ export const sellerProductsApi = {
     return {
       filePath: response.data.data.filePath,
       fileName: response.data.data.fileName,
-      size: response.data.data.size
+      size: response.data.data.size,
+      category: response.data.data.category
     };
   }
 };

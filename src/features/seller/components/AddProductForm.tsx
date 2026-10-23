@@ -88,7 +88,10 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
     if (Object.keys(allErrors).length > 0) {
       setErrors(allErrors);
       requestAnimationFrame(() => {
-        contentRef.current?.querySelector('[role="alert"]')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        const firstErrorEl = contentRef.current?.querySelector('[role="alert"]');
+        if (firstErrorEl && typeof firstErrorEl.scrollIntoView === 'function') {
+          firstErrorEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
       });
       return;
     }
@@ -105,6 +108,7 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
       if (formData.is_digital && formData.digital_file) {
         const res = await uploadDigitalProductMutation.mutateAsync({
           file: formData.digital_file,
+          category: formData.digital_category,
           onProgress: setUploadProgress,
         }) as Record<string, unknown>;
         digital.path = String(res.filePath);

@@ -5,8 +5,14 @@ import { Textarea } from '@/shared/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { cn } from '@/shared/utils/formatting';
 import { aestheticCategories } from '@/shared/constants/aestheticCategories';
-import { Package, FileText, Sparkles, X, ImagePlus, Info, MapPin, CheckCircle2, Clock, ChevronDown } from '@/shared/ui/icons';
-import type { AddProductFormData, FormErrors } from '../utils/addProductFormUtils';
+import { Package, FileText, Sparkles, X, ImagePlus, Info, MapPin, CheckCircle2, Clock, ChevronDown, Music, Video } from '@/shared/ui/icons';
+import {
+  type AddProductFormData,
+  type FormErrors,
+  DIGITAL_CATEGORIES,
+  getDigitalCategorySpec,
+  isFileAllowedForCategory
+} from '../utils/addProductFormUtils';
 
 interface AddProductFormStepsProps {
   formData: AddProductFormData;
@@ -102,6 +108,49 @@ export const AddProductFormSteps = ({
           })}
         </div>
         <ErrorNote message={errors.product_type} />
+
+        {formData.product_type === 'digital' && (
+          <div className="pt-2 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+            <span className="text-xs font-semibold text-label-2">Digital format</span>
+            <div role="radiogroup" aria-label="Digital format" className="grid grid-cols-3 gap-2">
+              {DIGITAL_CATEGORIES.map(cat => {
+                const isSelected = (formData.digital_category || 'document') === cat.id;
+                const Icon = cat.id === 'audio' ? Music : cat.id === 'video' ? Video : FileText;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => {
+                      clearError('digital_category');
+                      clearError('digital_file');
+                      setFormData(p => ({
+                        ...p,
+                        digital_category: cat.id,
+                        digital_file: null,
+                        digital_file_name: '',
+                        digital_file_path: '',
+                        digital_file_size: null,
+                      }));
+                    }}
+                    className={cn(
+                      'flex flex-col items-center justify-center gap-1 p-2.5 rounded-control border text-center transition-all',
+                      isSelected
+                        ? 'border-brand bg-brand/10 text-brand font-semibold shadow-sm'
+                        : 'border-separator bg-surface-1 text-label-2 hover:text-label hover:border-separator-2'
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-xs font-semibold">{cat.label}</span>
+                    <span className="text-[10px] text-label-3 line-clamp-1">{cat.description.split(',')[0]}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <ErrorNote message={errors.digital_category} />
+          </div>
+        )}
       </div>
 
       {/* Photos */}
@@ -198,42 +247,101 @@ export const AddProductFormSteps = ({
       </div>
 
       {/* Digital: required upload */}
-      {formData.product_type === 'digital' && (
-        <div className="space-y-3 rounded-card border border-separator bg-surface-1 p-4">
-          <div className="flex items-center justify-between">
-            <span className={fieldLabel}>Upload digital content</span>
-            <span className="text-[13px] text-label-3">Max {MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB</span>
-          </div>
-          <Input
-            type="file"
-            accept=".pdf,.png,.jpg,.jpeg,.webp,.svg,.gif,.bmp,.tiff,.heic,.zip,.rar,.7z,.epub,.mobi,.doc,.docx,.txt,.mp3,.wav,.mp4"
-            onChange={e => {
-              const file = e.target.files?.[0];
-              if (file) {
-                if (file.size > MAX_DIGITAL_PRODUCT_FILE_SIZE_BYTES) {
-                  alert(`File is too large. Maximum size for digital products is ${MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB.`);
-                  e.target.value = '';
-                  return;
-                }
-                setFormData(p => ({ ...p, digital_file: file }));
-              }
-            }}
-            className="h-11 cursor-pointer pt-2.5"
-          />
-          <p className="text-[13px] text-label-3">Images, PDFs, archives (ZIP, RAR), audio, and eBooks are supported (max {MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB).</p>
-          {uploadProgress > 0 && (
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-fill">
-              <div className="h-full bg-brand transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+      {formData.product_type === 'digital' && (() => {
+        const spec = getDigitalCategorySpec(formData.digital_category);
+        const Icon = formData.digital_category === 'audio' ? Music : formData.digital_category === 'video' ? Video : FileText;
+        return (
+          <div className="space-y-3 rounded-card border border-separator bg-surface-1 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <Icon className="h-4 w-4 text-brand" />
+                <span className={fieldLabel}>Upload {spec.label} file</span>
+              </div>
+              <span className="text-[13px] text-label-3">Max {MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB</span>
             </div>
-          )}
-          <div className="flex items-start gap-2.5 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_12%,transparent)] p-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-sys-orange" />
-            <p className="text-[13px] font-medium leading-relaxed text-label-2">
-              Digital products are assets like PDFs, music, or software. For a physical item (e.g. headphones), use the Physical type.
-            </p>
+
+            {formData.digital_file || formData.digital_file_name ? (
+              <div className="flex items-center justify-between rounded-control border border-separator bg-fill p-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Icon className="h-5 w-5 shrink-0 text-brand" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate text-label">
+                      {formData.digital_file?.name || formData.digital_file_name}
+                    </p>
+                    <p className="text-[11px] text-label-3">
+                      {formData.digital_file
+                        ? `${(formData.digital_file.size / (1024 * 1024)).toFixed(1)} MB`
+                        : formData.digital_file_size
+                        ? `${(formData.digital_file_size / (1024 * 1024)).toFixed(1)} MB`
+                        : spec.label} • {spec.label} format verified
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(p => ({
+                      ...p,
+                      digital_file: null,
+                      digital_file_name: '',
+                      digital_file_path: '',
+                      digital_file_size: null,
+                    }));
+                  }}
+                  className="rounded-full p-1 text-label-3 hover:text-label hover:bg-surface-2 transition"
+                  aria-label="Remove uploaded digital file"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <Input
+                type="file"
+                accept={spec.accept}
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > MAX_DIGITAL_PRODUCT_FILE_SIZE_BYTES) {
+                      alert(`File is too large. Maximum size for digital products is ${MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB.`);
+                      e.target.value = '';
+                      return;
+                    }
+                    if (!isFileAllowedForCategory(file.name, formData.digital_category)) {
+                      alert(`Invalid file format for ${spec.label}. Supported formats: ${spec.example}`);
+                      e.target.value = '';
+                      return;
+                    }
+                    clearError('digital_file');
+                    setFormData(p => ({
+                      ...p,
+                      digital_file: file,
+                      digital_file_name: file.name,
+                      digital_file_size: file.size,
+                    }));
+                  }
+                }}
+                className="h-11 cursor-pointer pt-2.5"
+              />
+            )}
+
+            <ErrorNote message={errors.digital_file} />
+            <p className="text-[12px] text-label-3">Supported formats for {spec.label}: {spec.example} (max {MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB).</p>
+
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-fill">
+                <div className="h-full bg-brand transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+              </div>
+            )}
+
+            <div className="flex items-start gap-2.5 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_12%,transparent)] p-3">
+              <Info className="mt-0.5 h-4 w-4 shrink-0 text-sys-orange" />
+              <p className="text-[13px] font-medium leading-relaxed text-label-2">
+                Digital products ({spec.label.toLowerCase()} assets) are delivered automatically to the buyer after successful payment.
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Service: required schedule */}
       {formData.product_type === 'service' && (

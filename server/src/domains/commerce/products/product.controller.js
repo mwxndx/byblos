@@ -15,7 +15,8 @@ export const uploadDigitalFile = async (req, res) => {
         // public_id is stored in products.digital_file_path and used to generate signed download URLs
         filePath: req.cloudinaryFile.public_id,
         fileName: req.cloudinaryFile.original_filename,
-        size: req.cloudinaryFile.bytes
+        size: req.cloudinaryFile.bytes,
+        category: req.cloudinaryFile.digital_category
       }
     });
   } catch (error) {

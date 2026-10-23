@@ -6,6 +6,54 @@ export interface ServiceOptions {
   end_time: string;
 }
 
+export type DigitalCategory = 'audio' | 'video' | 'document';
+
+export interface DigitalCategorySpec {
+  id: DigitalCategory;
+  label: string;
+  description: string;
+  accept: string;
+  extensions: readonly string[];
+  example: string;
+}
+
+export const DIGITAL_CATEGORIES: readonly DigitalCategorySpec[] = [
+  {
+    id: 'audio',
+    label: 'Audio',
+    description: 'Music, beats, podcasts, audiobooks',
+    accept: '.mp3,.wav,.m4a,.aac,.flac,.ogg,audio/*',
+    extensions: ['.mp3', '.wav', '.m4a', '.aac', '.flac', '.ogg'],
+    example: 'MP3, WAV, AAC, M4A, FLAC, OGG',
+  },
+  {
+    id: 'video',
+    label: 'Video',
+    description: 'Courses, tutorials, films, motion graphics',
+    accept: '.mp4,.mov,.avi,.mkv,.webm,video/*',
+    extensions: ['.mp4', '.mov', '.avi', '.mkv', '.webm'],
+    example: 'MP4, MOV, WEBM, MKV',
+  },
+  {
+    id: 'document',
+    label: 'Document',
+    description: 'eBooks, PDF guides, templates, spreadsheets',
+    accept: '.pdf,.epub,.mobi,.doc,.docx,.txt,.csv,.xlsx,.zip',
+    extensions: ['.pdf', '.epub', '.mobi', '.doc', '.docx', '.txt', '.csv', '.xlsx', '.zip'],
+    example: 'PDF, EPUB, MOBI, DOCX, TXT, CSV, XLSX, ZIP',
+  },
+] as const;
+
+export const getDigitalCategorySpec = (category?: DigitalCategory | null): DigitalCategorySpec => {
+  return DIGITAL_CATEGORIES.find(c => c.id === category) || DIGITAL_CATEGORIES[2]; // default to document
+};
+
+export const isFileAllowedForCategory = (fileName: string, category: DigitalCategory): boolean => {
+  const spec = getDigitalCategorySpec(category);
+  const ext = '.' + (fileName.split('.').pop() || '').toLowerCase();
+  return spec.extensions.includes(ext);
+};
+
 export interface AddProductFormData {
   name: string;
   price: string;
@@ -14,6 +62,7 @@ export interface AddProductFormData {
   image_url: string;
   aesthetic: string;
   is_digital: boolean;
+  digital_category: DigitalCategory;
   digital_file: File | null;
   digital_file_name: string;
   digital_file_path: string;
@@ -36,6 +85,7 @@ export const formDataDefaults: AddProductFormData = {
   image_url: '',
   aesthetic: 'noir',
   is_digital: false,
+  digital_category: 'document',
   digital_file: null,
   digital_file_name: '',
   digital_file_path: '',
@@ -74,8 +124,8 @@ export const hasServiceCoordinates = (
 };
 
 /**
- * Step 1 (What you're selling): type, name, and a main photo. Service also
- * requires the seller to have pinned shop coordinates.
+ * Step 1 (Basics): product name, primary photo, and product type.
+ * Gated by hasCoordinates for service products.
  */
 export const validateStep1 = (
   formData: AddProductFormData,
@@ -85,6 +135,9 @@ export const validateStep1 = (
   const errors: FormErrors = {};
   if (!formData.name.trim()) errors.name = 'Give your product a name.';
   if (!formData.product_type) errors.product_type = 'Choose a product type.';
+  if (formData.product_type === 'digital' && !formData.digital_category) {
+    errors.digital_category = 'Select a format (Audio, Video, or Document).';
+  }
   if (formData.product_type === 'service' && !hasCoordinates) {
     errors.product_type = 'Pin your exact shop location in Settings to offer services.';
   }
@@ -103,6 +156,17 @@ export const validateStep2 = (formData: AddProductFormData): FormErrors => {
   const price = parseFloat(formData.price || '0');
   if (!Number.isFinite(price) || price < MIN_PRICE) {
     errors.price = `Minimum price is KES ${MIN_PRICE}.`;
+  }
+
+  if (formData.product_type === 'digital') {
+    if (!formData.digital_file && !formData.digital_file_path) {
+      errors.digital_file = 'Upload a digital file.';
+    } else if (formData.digital_file) {
+      if (!isFileAllowedForCategory(formData.digital_file.name, formData.digital_category)) {
+        const spec = getDigitalCategorySpec(formData.digital_category);
+        errors.digital_file = `Invalid file format for ${spec.label}. Supported: ${spec.example}`;
+      }
+    }
   }
 
   if (formData.product_type === 'physical' && formData.is_custom_product) {
@@ -129,6 +193,7 @@ export interface DigitalUploadResult {
   path: string;
   name: string;
   size: number | null;
+  category?: DigitalCategory;
 }
 
 /**
@@ -142,6 +207,7 @@ export const buildProductData = (
   digital: DigitalUploadResult
 ) => {
   const isPhysical = formData.product_type === 'physical';
+  const isDigital = formData.product_type === 'digital';
   return {
     name: formData.name,
     price: parseFloat(formData.price || '0'),
@@ -150,7 +216,7 @@ export const buildProductData = (
     images,
     aesthetic: formData.aesthetic,
     sellerId,
-    is_digital: formData.product_type === 'digital',
+    is_digital: isDigital,
     product_type: formData.product_type,
     is_custom_product: isPhysical ? formData.is_custom_product : false,
     production_days: isPhysical && formData.is_custom_product ? Number.parseInt(formData.production_days, 10) : null,
@@ -161,6 +227,7 @@ export const buildProductData = (
     digital_file_path: digital.path,
     digital_file_name: digital.name,
     digital_file_size: digital.size,
+    digital_category: isDigital ? (formData.digital_category || digital.category || 'document') : null,
     service_options: formData.product_type === 'service' ? formData.service_options : undefined,
   };
 };
@@ -179,7 +246,7 @@ export const processImage = async (file: File): Promise<string> => {
         if (width > height) {
           if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
         } else {
-          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+          if (height > MAX_HEIGHT) { width = Math.round((height * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
         }
         canvas.width = width;
         canvas.height = height;

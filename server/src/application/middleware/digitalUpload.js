@@ -6,26 +6,62 @@ import { unlink } from 'node:fs/promises';
 import os from 'node:os';
 import { uploadToCloudinary } from '../../shared/utils/cloudinary.js';
 
-// Allowed extensions for digital products (documents, images, graphics, audio, video, archives, software)
-const ALLOWED_EXTENSIONS = [
-    // Images & Graphics
-    '.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif', '.bmp', '.tiff', '.tif', '.heic', '.heif', '.ai', '.psd', '.eps', '.ico', '.raw',
-    // Documents & eBooks
-    '.pdf', '.epub', '.mobi', '.doc', '.docx', '.txt', '.csv', '.xlsx', '.xls', '.ppt', '.pptx',
-    // Archives & Compressed
-    '.zip', '.rar', '.7z', '.tar', '.gz',
-    // Audio & Video
-    '.mp3', '.wav', '.flac', '.aac', '.ogg', '.m4a', '.mp4', '.mov', '.avi', '.mkv'
-];
+// Allowed extensions categorized strictly into Audio, Video, and Document
+export const DIGITAL_CATEGORIES = {
+    audio: ['.mp3', '.wav', '.flac', '.aac', '.ogg', '.m4a'],
+    video: ['.mp4', '.mov', '.avi', '.mkv', '.webm'],
+    document: [
+        '.pdf', '.epub', '.mobi', '.doc', '.docx', '.txt', '.csv', '.xlsx', '.xls', '.ppt', '.pptx',
+        '.zip', '.rar', '.7z', '.tar', '.gz'
+    ]
+};
 
-// File filter — validates extension before multer stores anything
+export const detectDigitalCategory = (filenameOrExt) => {
+    if (!filenameOrExt) return null;
+    const ext = (path.extname(filenameOrExt) || filenameOrExt).toLowerCase();
+    for (const [category, extensions] of Object.entries(DIGITAL_CATEGORIES)) {
+        if (extensions.includes(ext)) {
+            return category;
+        }
+    }
+    return null;
+};
+
+// File filter — validates extension and category before multer stores anything
 const fileFilter = (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ALLOWED_EXTENSIONS.includes(ext)) {
-        cb(null, true);
-    } else {
-        cb(new Error(`Allowed file types: ${ALLOWED_EXTENSIONS.join(', ')}`), false);
+    const requestedCategory = (
+        req.query?.category ||
+        req.query?.digital_category ||
+        req.body?.digital_category ||
+        ''
+    ).toLowerCase().trim();
+
+    if (requestedCategory) {
+        if (!DIGITAL_CATEGORIES[requestedCategory]) {
+            return cb(new Error("Invalid digital category. Supported categories: audio, video, document"), false);
+        }
+        if (!DIGITAL_CATEGORIES[requestedCategory].includes(ext)) {
+            return cb(new Error(
+                `Invalid file format for ${requestedCategory}. Supported formats: ${DIGITAL_CATEGORIES[requestedCategory].join(', ')}`
+            ), false);
+        }
+        file.digital_category = requestedCategory;
+        return cb(null, true);
     }
+
+    const detected = detectDigitalCategory(ext);
+    if (detected) {
+        file.digital_category = detected;
+        return cb(null, true);
+    }
+
+    const allAllowed = [
+        ...DIGITAL_CATEGORIES.audio,
+        ...DIGITAL_CATEGORIES.video,
+        ...DIGITAL_CATEGORIES.document
+    ];
+    cb(new Error(`Allowed digital file types: ${allAllowed.join(', ')}`), false);
 };
 
 export const MAX_DIGITAL_FILE_SIZE_MB = 60;
@@ -62,6 +98,7 @@ const multerInstance = multer({
  *   - secure_url         {string}  Permanent HTTPS URL (for debug only; never exposed to clients)
  *   - original_filename  {string}  Original uploaded filename
  *   - bytes              {number}  File size in bytes
+ *   - digital_category   {string}  Validated digital category ('audio' | 'video' | 'document')
  */
 export const cloudinaryDigitalUpload = (req, res, next) => {
     multerInstance.single('digital_file')(req, res, async (multerErr) => {
@@ -96,6 +133,7 @@ export const cloudinaryDigitalUpload = (req, res, next) => {
                 secure_url: cloudinaryResult.secure_url,
                 original_filename: req.file.originalname,
                 bytes: req.file.size,
+                digital_category: req.file.digital_category || detectDigitalCategory(req.file.originalname) || 'document',
             };
 
             return next();
@@ -115,5 +153,3 @@ export const cloudinaryDigitalUpload = (req, res, next) => {
         }
     });
 };
-
-

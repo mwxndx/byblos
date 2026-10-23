@@ -98,8 +98,8 @@ export function useDeleteProductMutation() {
 
 export function useUploadDigitalProductMutation() {
   return useMutation({
-    mutationFn: (args: { file: File; onProgress?: (progress: number) => void }) =>
-      sellerApi.uploadDigitalProduct(args.file, args.onProgress),
+    mutationFn: (args: { file: File; category?: string; onProgress?: (progress: number) => void }) =>
+      sellerApi.uploadDigitalProduct(args.file, args.category, args.onProgress),
   });
 }
 

@@ -1,50 +1,47 @@
-// Behaviour test for the single-screen add-product redesign (was a 2-step
-// wizard). Drives the real component with the network/data hooks mocked, so it
-// verifies the UX end to end without a seller session: everything on one
-// screen, validation gates submit, the physical options disclosure is
-// progressive, and a valid product still submits.
-import { describe, test, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import AddProductForm from './AddProductForm';
 
-const createMutate = vi.fn().mockResolvedValue({ id: 'p1' });
-const uploadMutate = vi.fn().mockResolvedValue({ filePath: 'f', fileName: 'n', size: 1 });
-const toastFn = vi.fn();
+const createMutate = vi.fn();
+const uploadMutate = vi.fn();
 
 vi.mock('@/features/seller/hooks/useSellerProducts', () => ({
   useCreateProductMutation: () => ({ mutateAsync: createMutate }),
   useUploadDigitalProductMutation: () => ({ mutateAsync: uploadMutate }),
 }));
-vi.mock('@/features/seller/hooks/useSellerProfile', () => ({
-  useSellerProfileQuery: () => ({ data: { id: 's1', city: 'Nairobi', latitude: -1.29, longitude: 36.82 } }),
-}));
-vi.mock('@/shared/hooks/use-toast', () => ({ useToast: () => ({ toast: toastFn }) }));
 
-// Stub processImage so we don't depend on a real <canvas> in jsdom; keep the
-// real validators + buildProductData so the test exercises actual gating.
-vi.mock('../utils/addProductFormUtils', async (importActual) => {
-  const actual = await importActual<typeof import('../utils/addProductFormUtils')>();
-  return { ...actual, processImage: vi.fn().mockResolvedValue('data:image/jpeg;base64,AAAA') };
+vi.mock('@/features/seller/hooks/useSellerProfile', () => ({
+  useSellerProfileQuery: () => ({
+    data: { id: 'seller-1', city: 'Nairobi', latitude: -1.2921, longitude: 36.8219 },
+  }),
+}));
+
+vi.mock('@/shared/hooks/use-toast', () => ({
+  useToast: () => ({ toast: vi.fn() }),
+}));
+
+vi.mock('../utils/addProductFormUtils', async (orig) => {
+  const actual = await orig<typeof import('../utils/addProductFormUtils')>();
+  return {
+    ...actual,
+    processImage: vi.fn(async () => 'data:image/jpeg;base64,mocked'),
+  };
 });
 
-import { AddProductForm } from './AddProductForm';
-
-describe('AddProductForm — single-screen redesign', () => {
+describe('AddProductForm — single-screen redesign with digital categories', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Element.prototype.scrollIntoView = vi.fn();
+    createMutate.mockResolvedValue({ id: 'p-1' });
+    uploadMutate.mockResolvedValue({ filePath: '/files/test.zip', fileName: 'test.zip', size: 1024 });
   });
 
   test('renders all essentials on one screen, one submit, no step wizard', () => {
     render(<AddProductForm onSuccess={() => {}} />);
-    expect(screen.getByRole('tab', { name: /physical/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+    expect(screen.getByRole('tablist', { name: /product type/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/price/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /launch product/i })).toBeInTheDocument();
-    // The wizard chrome is gone.
-    expect(screen.queryByText(/step 1 of 2/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /continue/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /^back$/i })).not.toBeInTheDocument();
   });
 
   test('blocks submit and shows errors when required fields are empty', async () => {
@@ -63,13 +60,29 @@ describe('AddProductForm — single-screen redesign', () => {
     expect(screen.getByText(/imported \/ pre-order item/i)).toBeInTheDocument();
   });
 
-  test('switching to Digital reveals the required upload and hides physical options', () => {
+  test('switching to Digital reveals the format selector and upload section', () => {
     render(<AddProductForm onSuccess={() => {}} />);
     fireEvent.click(screen.getByRole('tab', { name: /digital/i }));
-    expect(screen.getByText(/upload digital content/i)).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup', { name: /digital format/i })).toBeInTheDocument();
+    expect(screen.getByText(/upload document file/i)).toBeInTheDocument();
     expect(screen.getByText('Max 60MB')).toBeInTheDocument();
-    expect(screen.getByText(/supported \(max 60MB\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/supported formats for document/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /production or import time/i })).not.toBeInTheDocument();
+  });
+
+  test('switching digital format updates allowed file types and upload prompt', () => {
+    render(<AddProductForm onSuccess={() => {}} />);
+    fireEvent.click(screen.getByRole('tab', { name: /digital/i }));
+
+    // Switch to Audio
+    fireEvent.click(screen.getByRole('radio', { name: /audio/i }));
+    expect(screen.getByText(/upload audio file/i)).toBeInTheDocument();
+    expect(screen.getByText(/supported formats for audio/i)).toBeInTheDocument();
+
+    // Switch to Video
+    fireEvent.click(screen.getByRole('radio', { name: /video/i }));
+    expect(screen.getByText(/upload video file/i)).toBeInTheDocument();
+    expect(screen.getByText(/supported formats for video/i)).toBeInTheDocument();
   });
 
   test('submits a valid physical product end to end', async () => {

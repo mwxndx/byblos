@@ -109,7 +109,8 @@ export const sanitizeProduct = (product) => {
         status: p.status || 'available',
         is_digital: !!(p.is_digital || p.isDigital),
         // digital_file_path: NEVER returned — server-side path only
-        digital_file_name: p.digital_file_name || p.digitalFileName || null, // filename ok, path not ok
+        digital_file_name: p.digital_file_name || p.digitalFileName || null,
+        digital_category: p.digital_category || p.digitalCategory || null, // filename ok, path not ok
         product_type: p.product_type || p.productType || 'physical',
         service_options: p.service_options || p.serviceOptions || null,
         is_custom_product: !!(p.is_custom_product || p.isCustomProduct),

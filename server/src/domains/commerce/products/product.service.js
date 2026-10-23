@@ -1,3 +1,4 @@
+import { DIGITAL_CATEGORIES, detectDigitalCategory } from '../../../application/middleware/digitalUpload.js';
 import path from 'path';
 import ProductModel from './product.model.js';
 import logger from '../../../shared/utils/logger.js';
@@ -21,6 +22,7 @@ class ProductService {
         const {
             name, price, description, image, image_url, aesthetic = 'noir',
             is_digital = false, digital_file_path, digital_file_name, digital_file_size,
+            digital_category,
             product_type = 'physical', service_locations, service_options,
             is_custom_product = false, production_days, customization_prompt,
             is_imported_product = false, import_days, import_note
@@ -39,8 +41,25 @@ class ProductService {
 
         // Security: Sanitize digital file path if present
         let sanitizedDigitalPath = digital_file_path;
-        if (is_digital && digital_file_path) {
-            sanitizedDigitalPath = this._sanitizeDigitalPath(digital_file_path);
+        let sanitizedDigitalCategory = null;
+        if (is_digital) {
+            if (digital_file_path) {
+                sanitizedDigitalPath = this._sanitizeDigitalPath(digital_file_path);
+            }
+            const ext = path.extname(digital_file_name || digital_file_path || '').toLowerCase();
+            const detectedCategory = detectDigitalCategory(ext);
+            if (digital_category) {
+                const normalizedCategory = String(digital_category).toLowerCase().trim();
+                if (!DIGITAL_CATEGORIES[normalizedCategory]) {
+                    throw new Error(`Invalid digital category: ${digital_category}. Supported categories are audio, video, document`);
+                }
+                if (ext && !DIGITAL_CATEGORIES[normalizedCategory].includes(ext)) {
+                    throw new Error(`File format ${ext} is not supported for category ${normalizedCategory}`);
+                }
+                sanitizedDigitalCategory = normalizedCategory;
+            } else {
+                sanitizedDigitalCategory = detectedCategory || 'document';
+            }
         }
 
         if (product_type === 'service') {
@@ -79,6 +98,7 @@ class ProductService {
             digital_file_path: sanitizedDigitalPath || null,
             digital_file_name: digital_file_name || null,
             digital_file_size: digital_file_size || null,
+            digital_category: sanitizedDigitalCategory || null,
             product_type: finalProductType,
             service_locations: service_locations || null,
             service_options: service_options || null,
@@ -186,6 +206,13 @@ class ProductService {
                 updateFields.images = Array.isArray(images) ? JSON.stringify(images) : images;
             }
             if (aesthetic !== undefined) updateFields.aesthetic = aesthetic;
+            if (data.digital_category !== undefined) {
+                const cat = String(data.digital_category).toLowerCase().trim();
+                if (cat && !['audio', 'video', 'document'].includes(cat)) {
+                    throw new Error("Invalid digital category. Must be 'audio', 'video', or 'document'");
+                }
+                updateFields.digital_category = cat || null;
+            }
             if (
                 data.is_custom_product !== undefined
                 || data.production_days !== undefined
