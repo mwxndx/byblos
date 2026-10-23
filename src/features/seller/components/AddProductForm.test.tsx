@@ -67,6 +67,8 @@ describe('AddProductForm — single-screen redesign', () => {
     render(<AddProductForm onSuccess={() => {}} />);
     fireEvent.click(screen.getByRole('tab', { name: /digital/i }));
     expect(screen.getByText(/upload digital content/i)).toBeInTheDocument();
+    expect(screen.getByText('Max 60MB')).toBeInTheDocument();
+    expect(screen.getByText(/supported \(max 60MB\)/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /production or import time/i })).not.toBeInTheDocument();
   });
 

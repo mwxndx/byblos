@@ -53,7 +53,7 @@ export const globalErrorHandler = (err, req, res, next) => {
     error.isOperational = true;
     error.statusCode = 400;
     if (error.code === 'LIMIT_FILE_SIZE') {
-      error.message = 'File is too large. Max size is 90MB.';
+      error.message = 'File is too large. Please use the file-size limit shown for this upload.';
     }
   }
 

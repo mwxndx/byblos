@@ -84,9 +84,9 @@ describe('Track 2: Pipeline, Middleware & Security Hardening', () => {
     });
 
     describe('digitalUpload streaming & size limits', () => {
-        test('configures digital upload limit at 90MB', () => {
-            assert.equal(MAX_DIGITAL_FILE_SIZE_MB, 90);
-            assert.equal(MAX_DIGITAL_FILE_SIZE_BYTES, 90 * 1024 * 1024);
+        test('configures digital upload limit at 60MB', () => {
+            assert.equal(MAX_DIGITAL_FILE_SIZE_MB, 60);
+            assert.equal(MAX_DIGITAL_FILE_SIZE_BYTES, 60 * 1024 * 1024);
             assert.equal(typeof cloudinaryDigitalUpload, 'function');
         });
     });

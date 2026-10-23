@@ -27,6 +27,8 @@ interface AddProductFormStepsProps {
 
 const fieldLabel = 'text-sm font-medium text-label-2';
 const errorText = 'text-[13px] text-sys-red';
+const MAX_DIGITAL_PRODUCT_FILE_SIZE_MB = 60;
+const MAX_DIGITAL_PRODUCT_FILE_SIZE_BYTES = MAX_DIGITAL_PRODUCT_FILE_SIZE_MB * 1024 * 1024;
 
 const ErrorNote = ({ id, message }: { id?: string; message?: string }) =>
   message ? <p id={id} className={errorText} role="alert">{message}</p> : null;
@@ -200,7 +202,7 @@ export const AddProductFormSteps = ({
         <div className="space-y-3 rounded-card border border-separator bg-surface-1 p-4">
           <div className="flex items-center justify-between">
             <span className={fieldLabel}>Upload digital content</span>
-            <span className="text-[13px] text-label-3">Max 500MB</span>
+            <span className="text-[13px] text-label-3">Max {MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB</span>
           </div>
           <Input
             type="file"
@@ -208,8 +210,8 @@ export const AddProductFormSteps = ({
             onChange={e => {
               const file = e.target.files?.[0];
               if (file) {
-                if (file.size > 90 * 1024 * 1024) {
-                  alert('File is too large. Maximum size for digital products is 90MB.');
+                if (file.size > MAX_DIGITAL_PRODUCT_FILE_SIZE_BYTES) {
+                  alert(`File is too large. Maximum size for digital products is ${MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB.`);
                   e.target.value = '';
                   return;
                 }
@@ -218,7 +220,7 @@ export const AddProductFormSteps = ({
             }}
             className="h-11 cursor-pointer pt-2.5"
           />
-          <p className="text-[13px] text-label-3">Images, PDFs, archives (ZIP, RAR), audio, and eBooks are supported (max 90MB).</p>
+          <p className="text-[13px] text-label-3">Images, PDFs, archives (ZIP, RAR), audio, and eBooks are supported (max {MAX_DIGITAL_PRODUCT_FILE_SIZE_MB}MB).</p>
           {uploadProgress > 0 && (
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-fill">
               <div className="h-full bg-brand transition-all duration-300" style={{ width: `${uploadProgress}%` }} />

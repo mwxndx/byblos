@@ -28,10 +28,10 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-export const MAX_DIGITAL_FILE_SIZE_MB = 90;
+export const MAX_DIGITAL_FILE_SIZE_MB = 60;
 export const MAX_DIGITAL_FILE_SIZE_BYTES = MAX_DIGITAL_FILE_SIZE_MB * 1024 * 1024;
 
-// Disk storage — streams directly to OS temp directory without loading 90 MB into V8 RAM
+// Disk storage — streams directly to OS temp directory without loading 60 MB into V8 RAM
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, os.tmpdir());
@@ -46,7 +46,7 @@ const multerInstance = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: MAX_DIGITAL_FILE_SIZE_BYTES, // 90 MB
+        fileSize: MAX_DIGITAL_FILE_SIZE_BYTES, // 60 MB
     },
 });
 
@@ -66,9 +66,13 @@ const multerInstance = multer({
 export const cloudinaryDigitalUpload = (req, res, next) => {
     multerInstance.single('digital_file')(req, res, async (multerErr) => {
         if (multerErr) {
+            const message = multerErr.code === 'LIMIT_FILE_SIZE'
+                ? `File is too large. Maximum size for digital products is ${MAX_DIGITAL_FILE_SIZE_MB}MB.`
+                : multerErr.message || 'File upload error';
+
             return res.status(400).json({
                 status: 'error',
-                message: multerErr.message || 'File upload error',
+                message,
             });
         }
 
