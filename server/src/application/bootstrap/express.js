@@ -24,6 +24,24 @@ export default async (app) => {
     // 1. Basic Setup
     app.set('trust proxy', 1);
     app.use(requestId);
+
+    // Early malformed URI guard: catch malformed percent-encodings (e.g., /%c0)
+    // before route parameter matching layers throw internal URIErrors.
+    app.use((req, res, next) => {
+        try {
+            decodeURI(req.url);
+            next();
+        } catch (err) {
+            if (err instanceof URIError) {
+                return res.status(400).json({
+                    status: 'fail',
+                    message: 'Malformed URL encoding. The requested URI cannot be decoded.',
+                    requestId: req.id || req.headers['x-request-id'] || 'N/A'
+                });
+            }
+            next(err);
+        }
+    });
     app.use(compression());
     const morganFormat = process.env.NODE_ENV === 'production' ? 'short' : 'combined';
     app.use(morgan(morganFormat, { stream: logger.stream }));

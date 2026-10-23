@@ -57,6 +57,20 @@ export const globalErrorHandler = (err, req, res, next) => {
     }
   }
 
+  // Handle URIError (malformed URL percent-encoding from client/bot scans)
+  if (error.name === 'URIError' || err instanceof URIError) {
+    error.isOperational = true;
+    error.statusCode = 400;
+    error.message = 'Malformed URL encoding. The requested URI cannot be decoded.';
+  }
+
+  // Handle SyntaxError in request body (e.g. malformed JSON payload from client)
+  if (error.name === 'SyntaxError' && (error.statusCode === 400 || err.status === 400) && 'body' in error) {
+    error.isOperational = true;
+    error.statusCode = 400;
+    error.message = 'Malformed JSON in request body.';
+  }
+
   // Ensure status maps correctly (4xx should be 'fail', 5xx should be 'error')
   error.status = `${error.statusCode}`.startsWith('4') ? 'fail' : 'error';
 
@@ -65,8 +79,8 @@ export const globalErrorHandler = (err, req, res, next) => {
     logger.warn(`[Request ID: ${requestId}] 404 Not Found: ${error.message}`);
   } else if (error.statusCode === 413) {
     logger.warn(`[Request ID: ${requestId}] Image Size Too Large: ${error.message}`);
-  } else if (error.isOperational) {
-    logger.warn(`[Request ID: ${requestId}] Operational ${error.statusCode}: ${error.message}`);
+  } else if (error.isOperational || (error.statusCode >= 400 && error.statusCode < 500)) {
+    logger.warn(`[Request ID: ${requestId}] Client ${error.statusCode}: ${error.message}`);
   } else {
     // Non-operational or database/programming error: log as error with stack trace
     if (process.env.NODE_ENV === 'development') {
@@ -105,7 +119,7 @@ export const globalErrorHandler = (err, req, res, next) => {
     });
   } else {
     // Production response
-    if (error.isOperational) {
+    if (error.isOperational || (error.statusCode >= 400 && error.statusCode < 500)) {
       const response = {
         status: error.status,
         message: error.message,
