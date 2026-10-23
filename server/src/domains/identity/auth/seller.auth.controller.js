@@ -85,6 +85,14 @@ export const register = async (req, res) => {
       }
     }
   } catch (error) {
+    if (error.code === 'EXISTING_ACCOUNT') {
+      return res.status(400).json({
+        status: 'error',
+        code: 'EXISTING_ACCOUNT',
+        message: error.message,
+        data: error.existingRoles || {}
+      });
+    }
     if (error.message.includes('exists')) {
       return res.status(409).json({ status: 'error', message: error.message });
     }

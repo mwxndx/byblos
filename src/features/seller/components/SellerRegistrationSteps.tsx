@@ -108,8 +108,11 @@ export const SellerRegistrationSteps = ({
                     </div>
 
                     <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        Email Address
+                      <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                        <span>Email Address</span>
+                        {isExistingUser && (
+                          <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>
+                        )}
                       </Label>
                       <Input
                         id="email"
@@ -119,8 +122,9 @@ export const SellerRegistrationSteps = ({
                         placeholder="Your email address"
                         value={formData.email}
                         onChange={handleInputChange}
+                        readOnly={isExistingUser}
                         required
-                        className="input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base"
+                        className={`input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base ${isExistingUser ? 'opacity-80 cursor-not-allowed' : ''}`}
                       />
                     </div>
 
@@ -303,6 +307,11 @@ export const SellerRegistrationSteps = ({
                 {/* Step 4: Security */}
                 {currentStep === 4 && (
                   <>
+                    {isExistingUser && (
+                      <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-400/10 dark:bg-yellow-400/15 p-2 rounded-lg border border-yellow-400/30">
+                        Enter your existing Byblos account password to link your seller profile.
+                      </p>
+                    )}
                     <div className="space-y-0.5 sm:space-y-2">
                       <Label htmlFor="password" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
                         Password

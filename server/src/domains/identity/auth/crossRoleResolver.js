@@ -74,8 +74,8 @@ export const resolveCrossRoleAccess = async ({ user, type, signToken, pool, Buye
             buyerProfile = await Buyer.create({
                 fullName,
                 email: user.email,
-                mobilePayment: phone,
-                whatsappNumber: phone,
+                mobilePayment: phone || '',
+                whatsappNumber: phone || null,
                 city,
                 location,
                 userId: user.id,

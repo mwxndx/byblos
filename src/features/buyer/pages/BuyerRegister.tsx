@@ -30,6 +30,7 @@ export function BuyerRegister() {
     isResending,
     handleResend,
     isLoading,
+    isExistingUser,
   } = useBuyerRegister();
 
   return (
@@ -150,6 +151,7 @@ export function BuyerRegister() {
                 termsAccepted={termsAccepted}
                 setTermsAccepted={setTermsAccepted}
                 setIsTermsModalOpen={setIsTermsModalOpen}
+                isExistingUser={isExistingUser}
               />
 
               {/* Navigation Buttons */}

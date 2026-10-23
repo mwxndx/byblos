@@ -19,7 +19,7 @@ class Buyer {
       RETURNING *
     `;
     const values = [
-      fullName, email, mobilePayment, whatsappNumber,
+      fullName, email, mobilePayment || '', whatsappNumber || null,
       city, location, latitude, longitude, fullAddress, userId,
       termsAccepted
     ];
@@ -40,7 +40,7 @@ class Buyer {
     `;
 
     const values = [
-      fullName, email, mobilePayment, whatsappNumber,
+      fullName, email, mobilePayment || '', whatsappNumber || null,
       city, location, latitude, longitude, fullAddress, userId,
       termsAccepted
     ];

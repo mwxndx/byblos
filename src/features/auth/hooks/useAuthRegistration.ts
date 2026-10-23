@@ -72,7 +72,27 @@ export function useAuthRegistration({ navigate, setUser, setIsLoading, markAuthC
       navigate(getDashboardPath(role), { replace: true });
       return { status: 'success' };
     } catch (error) {
-      const err = error as AuthRequestError;
+      const err = error as AuthRequestError & {
+        response?: {
+          status?: number;
+          data?: {
+            code?: string;
+            error?: string;
+            message?: string;
+          };
+        };
+      };
+      const errCode = err.response?.data?.code || err.response?.data?.error;
+      const message = err.response?.data?.message || err.message || 'Registration failed';
+
+      if (errCode === 'EXISTING_ACCOUNT' || message.includes('Enter that account password')) {
+        toast.error('Account Linking Required', {
+          description: message,
+          duration: 8000,
+        });
+        throw error;
+      }
+
       if (err.response?.status === 409) {
         toast.error('Account Already Exists', {
           description: 'This email is already registered. Please login or use Forgot Password.',
@@ -81,8 +101,8 @@ export function useAuthRegistration({ navigate, setUser, setIsLoading, markAuthC
         throw error;
       }
 
-      const message = err.response?.data?.message || err.message || 'Registration failed';
-      toast.error('Registration Failed', { description: message });
+      const failMsg = err.response?.data?.message || err.message || 'Registration failed';
+      toast.error('Registration Failed', { description: failMsg });
       throw error;
     } finally {
       setIsLoading(false);

@@ -7,7 +7,7 @@ import { useBuyerResendVerificationMutation } from '@/features/buyer/hooks/mutat
 import { checkPasswordStrength, type BuyerRegisterFormData } from '@/features/buyer/utils/buyerRegisterUtils';
 
 export function useBuyerRegister() {
-  const { register, isLoading } = useGlobalAuth();
+  const { register, isLoading, user: authUser } = useGlobalAuth();
   const { toast } = useToast();
   const registerBuyer = (data: import('@/features/auth/types/authTypes').BuyerRegistrationData) => register(data, 'buyer');
   const navigate = useNavigate();
@@ -25,6 +25,30 @@ export function useBuyerRegister() {
     location: ''
   });
 
+  // Pre-fill fields for an already logged-in user adding buyer access
+  useEffect(() => {
+    if (authUser) {
+      const userProfile = authUser.profile as unknown as Record<string, unknown>;
+      const fullName = (userProfile?.fullName as string) || '';
+      const nameParts = fullName.trim().split(/\s+/);
+      const inferredFirst = nameParts[0] || (userProfile?.firstName as string) || '';
+      const inferredLast = nameParts.slice(1).join(' ') || (userProfile?.lastName as string) || '';
+      const inferredPhone = (userProfile?.whatsappNumber as string) || (userProfile?.phone as string) || (userProfile?.mobilePayment as string) || '';
+      const inferredCity = (userProfile?.city as string) || 'Nairobi';
+      const inferredLocation = (userProfile?.location as string) || '';
+
+      setFormData((current) => ({
+        ...current,
+        email: current.email || authUser.profile?.email || '',
+        firstName: current.firstName || inferredFirst,
+        lastName: current.lastName || inferredLast,
+        whatsappNumber: current.whatsappNumber || inferredPhone,
+        mobilePayment: current.mobilePayment || inferredPhone,
+        city: current.city || inferredCity,
+        location: current.location || inferredLocation,
+      }));
+    }
+  }, [authUser]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -171,6 +195,23 @@ export function useBuyerRegister() {
 
       // Registration success and navigation is handled by the auth context
     } catch (error: unknown) {
+      const existingAccountErr = error as { response?: { data?: { code?: string; error?: string; message?: string } }; message?: string } | null | undefined;
+      const errorCode = existingAccountErr?.response?.data?.code || existingAccountErr?.response?.data?.error;
+      const errorMsg = existingAccountErr?.response?.data?.message || existingAccountErr?.message || '';
+
+      if (errorCode === 'EXISTING_ACCOUNT' || errorMsg.includes('Enter that account password')) {
+        setErrors(prev => ({
+          ...prev,
+          password: 'Password does not match your existing account. Enter your current password to link accounts, or reset your password.'
+        }));
+        toast({
+          title: 'Account Linking Required',
+          description: 'Enter your existing account password to add buyer access, or reset your password.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Field-level validation errors (400 with an errors array) map to inline
       // field messages. `error` is unknown (an implicit-any catch variable
       // previously let `error.response.data.errors` be declared straight into
@@ -232,5 +273,6 @@ export function useBuyerRegister() {
     isResending,
     handleResend,
     isLoading,
+    isExistingUser: Boolean(authUser?.profile?.email),
   };
 }

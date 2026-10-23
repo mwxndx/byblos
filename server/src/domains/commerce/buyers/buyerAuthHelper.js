@@ -172,11 +172,19 @@ export const registerBuyerHandler = async ({ body, res, next }) => {
     };
   } catch (err) {
     if (err.code === '23505') throw new AppError('Email already in use', 409);
+    if (err.code === 'EXISTING_ACCOUNT') {
+      const appErr = new AppError(err.message, 400);
+      appErr.code = 'EXISTING_ACCOUNT';
+      if (err.existingRoles) appErr.existingRoles = err.existingRoles;
+      throw appErr;
+    }
     if (err.message && (
       err.message.includes('A buyer account with this email already exists') ||
       err.message.includes('An account with this email already exists')
     )) {
-      throw new AppError(err.message, 409);
+      const appErr = new AppError(err.message, 409);
+      if (err.code) appErr.code = err.code;
+      throw appErr;
     }
     throw err;
   }

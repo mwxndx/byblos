@@ -126,6 +126,22 @@ export function AccountSwitcher({ triggerClassName }: { triggerClassName?: strin
           );
         })}
 
+        {!data.accounts.buyer && (
+          <>
+            <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                navigate('/buyer/register');
+              }}
+              className="flex cursor-pointer items-center gap-2 px-2 py-2 text-sm text-slate-700 dark:text-white/80 focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-white"
+            >
+              <Plus className="h-4 w-4 text-slate-500 dark:text-white/50" />
+              <span className="flex-1">Add Buyer Access</span>
+            </DropdownMenuItem>
+          </>
+        )}
+
         {!data.accounts.creator && (
           <>
             <DropdownMenuSeparator className="bg-slate-200 dark:bg-white/10" />

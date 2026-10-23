@@ -19,6 +19,7 @@ interface BuyerRegisterStepsProps {
   termsAccepted: boolean;
   setTermsAccepted: Dispatch<SetStateAction<boolean>>;
   setIsTermsModalOpen: Dispatch<SetStateAction<boolean>>;
+  isExistingUser?: boolean;
 }
 
 export const BuyerRegisterSteps = ({
@@ -87,8 +88,11 @@ export const BuyerRegisterSteps = ({
                     </div>
 
                     <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        Email Address
+                      <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                        <span>Email Address</span>
+                        {isExistingUser && (
+                          <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>
+                        )}
                       </Label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
@@ -102,8 +106,9 @@ export const BuyerRegisterSteps = ({
                           placeholder="Enter your email"
                           value={formData.email}
                           onChange={handleInputChange}
+                          readOnly={isExistingUser}
                           required
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.email ? 'border-red-500' : ''}`}
+                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${isExistingUser ? 'opacity-80 cursor-not-allowed' : ''} ${errors.email ? 'border-red-500' : ''}`}
                         />
                       </div>
                       {errors.email && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.email}</p>}
@@ -226,6 +231,11 @@ export const BuyerRegisterSteps = ({
                 {/* Step 3: Security */}
                 {currentStep === 3 && (
                   <>
+                    {isExistingUser && (
+                      <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-400/10 dark:bg-yellow-400/15 p-2 rounded-lg border border-yellow-400/30">
+                        Enter your existing Byblos account password to link your buyer profile.
+                      </p>
+                    )}
                     <div className="space-y-0.5 sm:space-y-2">
                       <Label htmlFor="password" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
                         Password

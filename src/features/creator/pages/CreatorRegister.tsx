@@ -238,21 +238,31 @@ export default function CreatorRegister() {
           </div>
 
         <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+          {authUser && !token && (
+            <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-400/10 dark:bg-yellow-400/15 p-2 rounded-lg border border-yellow-400/30 sm:col-span-2">
+              Enter your existing Byblos account password to add creator access.
+            </p>
+          )}
           <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
-          <Input
-            value={form.email}
-            readOnly={Boolean(token)}
-            onChange={(e) => updateForm('email', e.target.value)}
-            type="email"
-            id="email"
-            name="email"
-            autoComplete="email"
-            aria-label="Email"
-            placeholder="Email"
-            className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white/70 placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2"
-            required
-          />
+          <div className="space-y-1 sm:col-span-2">
+            {authUser && !token && (
+              <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>
+            )}
+            <Input
+              value={form.email}
+              readOnly={Boolean(token || (authUser && !token))}
+              onChange={(e) => updateForm('email', e.target.value)}
+              type="email"
+              id="email"
+              name="email"
+              autoComplete="email"
+              aria-label="Email"
+              placeholder="Email"
+              className={`h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white/70 placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 w-full ${authUser && !token ? 'opacity-80 cursor-not-allowed' : ''}`}
+              required
+            />
+          </div>
           <Input value={form.mpesaNumber} onChange={(e) => updateForm('mpesaNumber', e.target.value)} aria-label="M-Pesa number" placeholder="M-Pesa number" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" required />
           <Input value={form.whatsappNumber} onChange={(e) => updateForm('whatsappNumber', e.target.value)} aria-label="WhatsApp number (optional)" placeholder="WhatsApp number (Optional)" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" />
           <div className="relative sm:col-span-2">

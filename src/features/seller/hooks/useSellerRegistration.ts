@@ -15,7 +15,7 @@ import { useGlobalAuth } from '@/features/auth/contexts';
 export function useSellerRegistration(onSuccess?: () => void) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { register } = useGlobalAuth();
+  const { register, user: authUser } = useGlobalAuth();
   const registerSeller = (data: import('@/features/auth/types/authTypes').SellerRegistrationData) => register(data, 'seller');
   const referralCode = searchParams.get('ref') || '';
 
@@ -33,6 +33,29 @@ export function useSellerRegistration(onSuccess?: () => void) {
     latitude: undefined as number | undefined,
     longitude: undefined as number | undefined
   });
+  // Pre-fill fields for an already logged-in user adding seller access
+  useEffect(() => {
+    if (authUser) {
+      const userProfile = authUser.profile as unknown as Record<string, unknown>;
+      const fullName = (userProfile?.fullName as string) || '';
+      const nameParts = fullName.trim().split(/\s+/);
+      const inferredFirst = nameParts[0] || (userProfile?.firstName as string) || '';
+      const inferredLast = nameParts.slice(1).join(' ') || (userProfile?.lastName as string) || '';
+      const inferredPhone = (userProfile?.whatsappNumber as string) || (userProfile?.phone as string) || (userProfile?.mobilePayment as string) || '';
+      const inferredCity = (userProfile?.city as string) || 'Nairobi';
+      const inferredLocation = (userProfile?.location as string) || '';
+
+      setFormData((current) => ({
+        ...current,
+        email: current.email || authUser.profile?.email || '',
+        firstName: current.firstName || inferredFirst,
+        lastName: current.lastName || inferredLast,
+        whatsappNumber: current.whatsappNumber || inferredPhone,
+        city: current.city || inferredCity,
+        location: current.location || inferredLocation,
+      }));
+    }
+  }, [authUser]);
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingShopName, setIsCheckingShopName] = useState(false);
   const [shopNameAvailable, setShopNameAvailable] = useState<boolean | null>(null);
@@ -260,9 +283,22 @@ export function useSellerRegistration(onSuccess?: () => void) {
 
       if (onSuccess) onSuccess();
     } catch (error: unknown) {
-      const err = error as { response?: { status?: number; data?: { message?: string; errors?: Array<{ message: string }> } }; message?: string };
+      const err = error as { response?: { status?: number; data?: { code?: string; error?: string; message?: string; errors?: Array<{ message: string }> } }; message?: string };
       if (err.response?.status === 409) return;
       console.error('Registration failed:', error);
+
+      const errorCode = err.response?.data?.code || err.response?.data?.error;
+      const errorMsg = err.response?.data?.message || err.message || '';
+
+      if (errorCode === 'EXISTING_ACCOUNT' || errorMsg.includes('Enter that account password')) {
+        setPasswordError('Password does not match your existing account. Enter your current password to link accounts, or reset your password.');
+        toast({
+          title: 'Account Linking Required',
+          description: 'Enter your existing account password to add seller access, or reset your password.',
+          variant: 'destructive',
+        });
+        return;
+      }
 
       let errorMessage = 'An error occurred during registration';
       let errorTitle = 'Registration Failed';

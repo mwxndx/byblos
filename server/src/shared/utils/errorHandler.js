@@ -97,7 +97,9 @@ export const globalErrorHandler = (err, req, res, next) => {
     res.status(error.statusCode).json({
       status: error.status,
       error: err,
+      code: error.code,
       message: error.message,
+      data: error.existingRoles,
       stack: error.stack,
       requestId
     });
@@ -111,6 +113,10 @@ export const globalErrorHandler = (err, req, res, next) => {
       };
       if (error.code) {
         response.error = error.code;
+        response.code = error.code;
+      }
+      if (error.existingRoles) {
+        response.data = error.existingRoles;
       }
       res.status(error.statusCode).json(response);
     } else {

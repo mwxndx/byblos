@@ -475,7 +475,7 @@ CREATE TABLE public.buyers (
     user_id integer,
     full_name character varying(255) NOT NULL,
     email character varying(255) NOT NULL,
-    mobile_payment character varying(50) NOT NULL,
+    mobile_payment character varying(50),
     whatsapp_number character varying(50),
     city character varying(100),
     location character varying(255),
@@ -6129,6 +6129,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (108, '20260914120000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (109, '20260926120000_drop_dead_buyers_refund_balance_column', '2026-09-26 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (110, '20260926130000_add_product_orders_handoff_confirmed_at', '2026-09-26 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (111, '20261010120000_drop_redundant_checkout_token_index', '2026-10-10 12:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (112, '20261023130000_make_buyers_mobile_payment_nullable', '2026-10-23 13:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the

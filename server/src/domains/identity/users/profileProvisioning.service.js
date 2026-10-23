@@ -4,6 +4,7 @@ import User from './user.model.js';
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
 import CacheService from '../../../shared/utils/cache.service.js';
+import { AppError } from '../../../shared/utils/errorHandler.js';
 
 async function invalidateCrossRoleCache(userId) {
     try {
@@ -31,7 +32,9 @@ function identityRequiredError(email, role) {
 
 function requirePassword(password) {
     if (!password) {
-        throw new Error('An account with this email already exists. Please login or use the correct password.');
+        const err = new AppError('An account with this email already exists. Enter that account password to link your accounts, or reset your password.', 400);
+                err.code = 'EXISTING_ACCOUNT';
+                throw err;
     }
 }
 
@@ -70,7 +73,20 @@ class ProfileProvisioningService {
             requirePassword(password);
             const isPasswordCorrect = await User.verifyPassword(password, existingUser.password_hash);
             if (!isPasswordCorrect) {
-                throw new Error('An account with this email already exists. Please login or use the correct password.');
+                const { rows: roles } = await client.query(
+                    `SELECT
+                       EXISTS(SELECT 1 FROM buyers WHERE user_id = $1) as has_buyer,
+                       EXISTS(SELECT 1 FROM sellers WHERE user_id = $1) as has_seller,
+                       EXISTS(SELECT 1 FROM creators WHERE user_id = $1) as has_creator`,
+                    [existingUser.id]
+                );
+                const hasBuyer = Boolean(roles[0]?.has_buyer);
+                const hasSeller = Boolean(roles[0]?.has_seller);
+                const hasCreator = Boolean(roles[0]?.has_creator);
+                const err = new AppError('An account with this email already exists. Enter that account password to link your accounts, or reset your password.', 400);
+                err.code = 'EXISTING_ACCOUNT';
+                err.existingRoles = { hasBuyer, hasSeller, hasCreator };
+                throw err;
             }
 
             const existingBuyer = await client.query(
@@ -140,7 +156,20 @@ class ProfileProvisioningService {
             requirePassword(password);
             const isPasswordCorrect = await User.verifyPassword(password, existingUser.password_hash);
             if (!isPasswordCorrect) {
-                throw new Error('An account with this email already exists. Please login or use the correct password.');
+                const { rows: roles } = await client.query(
+                    `SELECT
+                       EXISTS(SELECT 1 FROM buyers WHERE user_id = $1) as has_buyer,
+                       EXISTS(SELECT 1 FROM sellers WHERE user_id = $1) as has_seller,
+                       EXISTS(SELECT 1 FROM creators WHERE user_id = $1) as has_creator`,
+                    [existingUser.id]
+                );
+                const hasBuyer = Boolean(roles[0]?.has_buyer);
+                const hasSeller = Boolean(roles[0]?.has_seller);
+                const hasCreator = Boolean(roles[0]?.has_creator);
+                const err = new AppError('An account with this email already exists. Enter that account password to link your accounts, or reset your password.', 400);
+                err.code = 'EXISTING_ACCOUNT';
+                err.existingRoles = { hasBuyer, hasSeller, hasCreator };
+                throw err;
             }
 
             const existingSeller = await client.query(
