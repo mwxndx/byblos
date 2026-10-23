@@ -55,6 +55,7 @@ describe('SellerRegistration Navigation & Back Logic', () => {
     resendCooldown: 0,
     isResending: false,
     handleResend: vi.fn(),
+    isExistingUser: false,
   };
 
   beforeEach(() => {
@@ -213,6 +214,7 @@ describe('SellerRegistrationSteps — Step 3 Shop Type Switching', () => {
         termsAccepted={false}
         setTermsAccepted={vi.fn()}
         setIsTermsModalOpen={vi.fn()}
+        isExistingUser={false}
       />
     );
 
@@ -266,9 +268,53 @@ describe('SellerRegistrationSteps — Step 3 Shop Type Switching', () => {
         termsAccepted={false}
         setTermsAccepted={vi.fn()}
         setIsTermsModalOpen={vi.fn()}
+        isExistingUser={false}
       />
     );
 
     expect(screen.getByText('byblosafrica.site/coolapparel')).toBeInTheDocument();
+  });
+
+  test('Step 1 marks a linked account email as read-only', () => {
+    const testFormData: SellerRegistrationFormData = {
+      firstName: 'Jane',
+      lastName: 'Doe',
+      shopName: 'JaneShop',
+      email: 'jane@example.com',
+      whatsappNumber: '',
+      password: '',
+      confirmPassword: '',
+      city: 'Nairobi',
+      location: '',
+      physicalAddress: '',
+      latitude: undefined,
+      longitude: undefined,
+    };
+
+    render(
+      <SellerRegistrationSteps
+        currentStep={1}
+        formData={testFormData}
+        handleInputChange={vi.fn()}
+        setFormData={vi.fn()}
+        shopNameAvailable={true}
+        isCheckingShopName={false}
+        showPassword={false}
+        setShowPassword={vi.fn()}
+        showConfirmPassword={false}
+        setShowConfirmPassword={vi.fn()}
+        passwordError=""
+        hasPhysicalShop={null}
+        setHasPhysicalShop={vi.fn()}
+        setCurrentStep={vi.fn()}
+        termsAccepted={false}
+        setTermsAccepted={vi.fn()}
+        setIsTermsModalOpen={vi.fn()}
+        isExistingUser
+      />
+    );
+
+    expect(screen.getByText('Linked to Byblos account')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('jane@example.com')).toHaveAttribute('readonly');
   });
 });

@@ -25,6 +25,11 @@ export const getRoleFromRoute = (pathname: string): UserRole | null => {
 export const isPublicRoute = (pathname: string): boolean => {
   if (!pathname || pathname === '/') return true;
 
+  // These routes intentionally support guest marketplace discovery. Keep
+  // account-specific buyer routes (orders, wishlist, refunds) protected so a
+  // session-expiry signal cannot be suppressed where user data is rendered.
+  if (pathname === '/buyer/dashboard' || pathname.startsWith('/buyer/shop/')) return true;
+
   if (pathname === '/marketing/login' || pathname === '/admin/marketing/login') return true;
   if (pathname === '/verify-email' || pathname.startsWith('/verify-email?') || pathname.startsWith('/verify-email/')) return true;
 

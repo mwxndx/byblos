@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "dev": "npm run generate-firebase-sw && vite",
-    "typecheck": "tsc --noEmit --skipLibCheck",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit --skipLibCheck",
     "build": "npm run typecheck && npm run generate-sitemap && npm run generate-firebase-sw && vite build && npm run prerender",
     "build:dev": "npm run generate-firebase-sw && vite build --mode development",
     "vercel-build": "npm run typecheck && npm run generate-sitemap && npm run generate-firebase-sw && vite build --mode production && npm run prerender",

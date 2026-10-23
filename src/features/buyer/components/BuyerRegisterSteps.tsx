@@ -35,6 +35,7 @@ export const BuyerRegisterSteps = ({
   termsAccepted,
   setTermsAccepted,
   setIsTermsModalOpen,
+  isExistingUser = false,
 }: BuyerRegisterStepsProps) => {
   return (
     <>

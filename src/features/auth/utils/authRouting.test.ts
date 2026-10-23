@@ -100,9 +100,14 @@ describe('authRouting utility unit tests', () => {
       expect(isPublicRoute('/verify-email?token=abc&email=test@test.com&type=seller')).toBe(true);
     });
 
-    test('identifies protected routes as non-public', () => {
-      expect(isPublicRoute('/buyer/dashboard')).toBe(false);
+    test('identifies public buyer marketplace browsing routes', () => {
+      expect(isPublicRoute('/buyer/dashboard')).toBe(true);
+      expect(isPublicRoute('/buyer/shop/cool-shop')).toBe(true);
+    });
+
+    test('identifies account and staff routes as non-public', () => {
       expect(isPublicRoute('/buyer/orders')).toBe(false);
+      expect(isPublicRoute('/buyer/wishlist')).toBe(false);
       expect(isPublicRoute('/seller/dashboard')).toBe(false);
       expect(isPublicRoute('/admin/dashboard')).toBe(false);
       expect(isPublicRoute('/creator/dashboard')).toBe(false);

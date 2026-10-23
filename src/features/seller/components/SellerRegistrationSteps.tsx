@@ -25,6 +25,7 @@ interface SellerRegistrationStepsProps {
   termsAccepted: boolean;
   setTermsAccepted: Dispatch<SetStateAction<boolean>>;
   setIsTermsModalOpen: Dispatch<SetStateAction<boolean>>;
+  isExistingUser: boolean;
 }
 
 export const SellerRegistrationSteps = ({
@@ -45,6 +46,7 @@ export const SellerRegistrationSteps = ({
   termsAccepted,
   setTermsAccepted,
   setIsTermsModalOpen,
+  isExistingUser,
 }: SellerRegistrationStepsProps) => {
   return (
     <>

@@ -16,6 +16,7 @@ export function useSellerRegistration(onSuccess?: () => void) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { register, user: authUser } = useGlobalAuth();
+  const isExistingUser = Boolean(authUser);
   const registerSeller = (data: import('@/features/auth/types/authTypes').SellerRegistrationData) => register(data, 'seller');
   const referralCode = searchParams.get('ref') || '';
 
@@ -381,5 +382,6 @@ export function useSellerRegistration(onSuccess?: () => void) {
     resendCooldown,
     isResending,
     handleResend,
+    isExistingUser,
   };
 }

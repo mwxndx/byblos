@@ -42,6 +42,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
     resendCooldown,
     isResending,
     handleResend,
+    isExistingUser,
   } = useSellerRegistration(onSuccess);
 
   const handleBack = () => {
@@ -177,6 +178,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                 termsAccepted={termsAccepted}
                 setTermsAccepted={setTermsAccepted}
                 setIsTermsModalOpen={setIsTermsModalOpen}
+                isExistingUser={isExistingUser}
               />
 
               <div className="flex gap-2.5 pt-2">
