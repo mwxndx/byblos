@@ -16,7 +16,17 @@ let pendingRole: AppNotificationRole | null = null;
 let pendingRequestConfig: AxiosRequestConfig | undefined;
 let registrationPromise: Promise<void> | null = null;
 
-function appVersion() {
+async function getAppVersion() {
+  if (isNativeApp()) {
+    try {
+      const { App } = await import('@capacitor/app');
+      const info = await App.getInfo();
+      if (info?.build) return String(info.build);
+      if (info?.version) return String(info.version);
+    } catch {
+      // fallback
+    }
+  }
   return String(import.meta.env.VITE_APP_VERSION || import.meta.env.VITE_VERSION || '0.0.0');
 }
 
@@ -35,7 +45,7 @@ async function persistDeviceToken(
       platform,
       token,
       deviceId: getStableDeviceId(),
-      appVersion: appVersion(),
+      appVersion: await getAppVersion(),
     }, requestConfig);
 
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
@@ -121,7 +131,21 @@ function ensurePushListeners() {
   });
 
   PushNotifications.addListener('pushNotificationActionPerformed', (event) => {
-    const targetPath = event.notification.data?.path || event.notification.data?.url;
+    const data = event.notification.data || {};
+    const targetPath = data.path || data.url;
+
+    if (data.action === 'open_store' || (typeof targetPath === 'string' && targetPath.startsWith('market://'))) {
+      const storeUrl = typeof targetPath === 'string' && targetPath.startsWith('market://')
+        ? targetPath
+        : 'market://details?id=space.bybloshq.app';
+      try {
+        window.location.href = storeUrl;
+      } catch {
+        window.open('https://play.google.com/store/apps/details?id=space.bybloshq.app', '_system');
+      }
+      return;
+    }
+
     if (typeof targetPath === 'string' && targetPath.startsWith('/')) {
       // Prefer client-side navigation (no WebView reload). Falls back to a hard
       // navigation only on cold start, where it correctly boots the app at path.

@@ -613,3 +613,30 @@ export const cancelPendingPublicOrder = async (req, res) => {
   }
 };
 
+
+export const getAppVersion = async (req, res) => {
+  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '67', 10);
+  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '67', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.67';
+  const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
+  const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
+  const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
+
+  return res.status(200).json({
+    status: 'success',
+    data: {
+      platform: 'android',
+      minAndroidVersionCode,
+      latestAndroidVersionCode,
+      latestVersionName,
+      forceUpdate,
+      storeUrl,
+      webStoreUrl,
+      releaseNotes: [
+        'Important performance, security, and notification updates.',
+        'Improved delivery tracking and live status updates.',
+        'Smoother cart and checkout experience.'
+      ]
+    }
+  });
+};

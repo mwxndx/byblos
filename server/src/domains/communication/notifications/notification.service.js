@@ -461,6 +461,95 @@ class NotificationService {
         }
         return null;
     }
+
+    async broadcastAppUpdate({
+        minVersionCode = 67,
+        title = '🚀 New Byblos Update Available',
+        body = "We've released important updates. Tap to download the latest version from Google Play.",
+        storeUrl = 'market://details?id=space.bybloshq.app'
+    } = {}) {
+        const { rows: tokens } = await pool.query(
+            `SELECT token, platform, app_version
+             FROM notification_device_tokens
+             WHERE platform = 'android'
+               AND is_active = TRUE`
+        );
+
+        const outdatedTokens = tokens.filter((row) => {
+            if (!row.app_version) return true;
+            const parsed = parseInt(String(row.app_version).trim(), 10);
+            if (!isNaN(parsed)) {
+                return parsed < Number(minVersionCode);
+            }
+            return true;
+        });
+
+        if (outdatedTokens.length === 0) {
+            return { targeted: 0, sent: 0, failed: 0, reason: 'no_outdated_tokens' };
+        }
+
+        if (!isFcmConfigured()) {
+            logger.info('[NotificationService] Update broadcast skipped: FCM not configured', {
+                targeted: outdatedTokens.length
+            });
+            return { targeted: outdatedTokens.length, sent: 0, failed: 0, reason: 'push_provider_not_configured' };
+        }
+
+        const data = {
+            action: 'open_store',
+            url: storeUrl,
+            type: 'app_update',
+            minVersion: String(minVersionCode)
+        };
+
+        let sent = 0;
+        let failed = 0;
+        const invalidTokens = [];
+        const batchSize = 50;
+
+        for (let i = 0; i < outdatedTokens.length; i += batchSize) {
+            const batch = outdatedTokens.slice(i, i + batchSize);
+            const results = await Promise.allSettled(
+                batch.map(device => sendFcmV1({
+                    token: device.token,
+                    title,
+                    body,
+                    data,
+                    platform: device.platform
+                }))
+            );
+
+            results.forEach((item, index) => {
+                const device = batch[index];
+                if (item.status === 'fulfilled' && item.value?.delivered) {
+                    sent++;
+                } else {
+                    failed++;
+                    if (item.value?.shouldDeactivate) {
+                        invalidTokens.push(device.token);
+                    }
+                }
+            });
+        }
+
+        if (invalidTokens.length > 0) {
+            await pool.query(
+                `UPDATE notification_device_tokens
+                 SET is_active = FALSE, updated_at = NOW()
+                 WHERE token = ANY($1::text[])`,
+                [invalidTokens]
+            ).catch(err => logger.error('[NotificationService] Failed to deactivate invalid tokens', { err }));
+        }
+
+        logger.info('[NotificationService] App update broadcast complete', {
+            targeted: outdatedTokens.length,
+            sent,
+            failed,
+            deactivated: invalidTokens.length
+        });
+
+        return { targeted: outdatedTokens.length, sent, failed, deactivated: invalidTokens.length };
+    }
 }
 
 

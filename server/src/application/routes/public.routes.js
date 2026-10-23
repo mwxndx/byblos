@@ -6,6 +6,9 @@ import { publicApiRateLimiter } from '../middleware/rateLimiting.js';
 
 const router = express.Router();
 
+// App version & update policy
+router.get('/app-version', publicController.getAppVersion);
+
 // CSRF Protection
 router.get('/csrf-token', getCsrfToken);
 

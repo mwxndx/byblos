@@ -6,6 +6,7 @@ import { LoadingScreen } from "@/shared/components/LoadingScreen";
 import { useAndroidBackHandler, registerNavigationDelegate } from "@/shared/utils/modalBackHandler";
 import { useNativeDeepLinkHandler } from "@/infrastructure/navigation/deepLinkHandler";
 import { InstallPrompt } from "@/features/pwa/InstallPrompt";
+import { AppUpdateGate } from "@/features/app-update/components/AppUpdateGate";
 
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -33,6 +34,7 @@ function App() {
         fallbackElement={<LoadingScreen />}
       />
       <InstallPrompt />
+      <AppUpdateGate />
       <Analytics
         endpoint={isNative ? "https://byblosafrica.site/_vercel/insights" : undefined}
       />
@@ -44,5 +46,3 @@ function App() {
 }
 
 export default App;
-
-
