@@ -91,11 +91,13 @@ describe('URIError & Malformed Client Requests Handling', () => {
     const port = server.address().port;
 
     try {
-      const response = await fetch(`http://127.0.0.1:${port}/%c0`);
-      assert.equal(response.status, 400);
-      const data = await response.json();
-      assert.equal(data.status, 'fail');
-      assert.ok(data.message.includes('Malformed URL encoding'));
+      for (const path of ['/%c0', '/%zz', '/%2', '/test?q=%c0', '/test?q=%']) {
+        const response = await fetch(`http://127.0.0.1:${port}${path}`);
+        assert.equal(response.status, 400, `Expected 400 for path: ${path}`);
+        const data = await response.json();
+        assert.equal(data.status, 'fail');
+        assert.ok(data.message.includes('Malformed URL encoding'));
+      }
     } finally {
       await new Promise((resolve) => server.close(resolve));
     }
