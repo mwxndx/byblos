@@ -31,9 +31,9 @@ describe('publicController.getAppVersion', () => {
     assert.equal(statusCode, 200);
     assert.equal(responseBody.status, 'success');
     assert.equal(responseBody.data.platform, 'android');
-    assert.equal(responseBody.data.minAndroidVersionCode, 67);
-    assert.equal(responseBody.data.latestAndroidVersionCode, 67);
-    assert.equal(responseBody.data.latestVersionName, '1.0.67');
+    assert.equal(responseBody.data.minAndroidVersionCode, 68);
+    assert.equal(responseBody.data.latestAndroidVersionCode, 68);
+    assert.equal(responseBody.data.latestVersionName, '1.0.68');
     assert.equal(responseBody.data.forceUpdate, true);
     assert.equal(responseBody.data.storeUrl, 'market://details?id=space.bybloshq.app');
     assert.ok(Array.isArray(responseBody.data.releaseNotes));

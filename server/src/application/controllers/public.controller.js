@@ -512,12 +512,16 @@ export const getOrderStatus = async (req, res) => {
  * Safely cancels a pending public order before payment capture.
  * Validated by matching client_checkout_token.
  * Verifies with Paystack first: if transaction actually succeeded, marks PAID and rejects cancellation.
- * Otherwise cancels order, releases inventory/service slots, and marks payment failed.
+ * If the provider cannot be reached, preserves the pending order to avoid cancelling a settled payment.
  */
-export const cancelPendingPublicOrder = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const clientToken = req.body?.clientCheckoutToken || req.body?.client_checkout_token || req.query?.client_checkout_token;
+export function createCancelPendingPublicOrder({
+  orderStatusRepository = publicOrderStatusRepository,
+  paymentClient = paymentService,
+} = {}) {
+  return async (req, res) => {
+    try {
+      const { id } = req.params;
+      const clientToken = req.body?.clientCheckoutToken || req.body?.client_checkout_token || req.query?.client_checkout_token;
 
     if (!clientToken) {
       return res.status(400).json({
@@ -526,7 +530,7 @@ export const cancelPendingPublicOrder = async (req, res) => {
       });
     }
 
-    const order = await publicOrderStatusRepository.findStatusByIdentifier(id);
+    const order = await orderStatusRepository.findStatusByIdentifier(id);
     if (!order) {
       return res.status(404).json({
         status: 'error',
@@ -561,7 +565,7 @@ export const cancelPendingPublicOrder = async (req, res) => {
     const reference = order.provider_reference || order.api_ref;
     if (reference) {
       try {
-        const providerStatus = await paymentService.checkTransactionStatus(reference);
+        const providerStatus = await paymentClient.checkTransactionStatus(reference);
         const normalizedStatus = String(providerStatus.status || '').toLowerCase();
         if (PAYMENT_SUCCESS_STATUSES.has(normalizedStatus)) {
           // If Paystack actually succeeded, complete it instead of cancelling!
@@ -580,7 +584,12 @@ export const cancelPendingPublicOrder = async (req, res) => {
           });
         }
       } catch (err) {
-        console.warn('[cancelPendingPublicOrder] Provider status check error (proceeding with cancellation):', err.message);
+        console.warn('[cancelPendingPublicOrder] Provider status check failed; cancellation deferred:', err.message);
+        return res.status(503).json({
+          status: 'pending_verification',
+          code: 'PAYMENT_STATUS_UNVERIFIED',
+          message: 'We could not verify the payment status. Your order remains unchanged while verification is retried.'
+        });
       }
     }
 
@@ -604,20 +613,23 @@ export const cancelPendingPublicOrder = async (req, res) => {
       status: 'success',
       message: 'Order has been safely cancelled and stock released.'
     });
-  } catch (error) {
-    console.error(`Error cancelling public order ${req.params.id}:`, error);
-    return res.status(500).json({
-      status: 'error',
-      message: 'Failed to cancel order'
-    });
-  }
-};
+    } catch (error) {
+      console.error(`Error cancelling public order ${req.params.id}:`, error);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Failed to cancel order'
+      });
+    }
+  };
+}
+
+export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '67', 10);
-  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '67', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.67';
+  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '68', 10);
+  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '68', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.68';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -633,9 +645,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Important performance, security, and notification updates.',
-        'Improved delivery tracking and live status updates.',
-        'Smoother cart and checkout experience.'
+        'Profiles now stay inside dashboard headers, safe areas, and bottom navigation.',
+        'Buyer profile scrolling is contained to the profile panel.',
+        'Improved profile dismissal and authenticated dashboard stability.'
       ]
     }
   });
