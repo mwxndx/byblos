@@ -778,9 +778,7 @@ body.dashboard-active .seller-tab-selected {
 button.btn-white,
 .auth-page .btn-white,
 .auth-page button.btn-white,
-.auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]),
-.auth-step-active,
-.auth-step-line-active {
+.auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
     background-color: #ffffff !important;
     background: #ffffff !important;
     color: #000000 !important;
@@ -797,12 +795,45 @@ button.btn-white:hover,
     color: #000000 !important;
 }
 
+.auth-step-active {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+.dark .auth-step-active,
+[data-theme="dark"] .auth-step-active {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.auth-step-line-active {
+    background-color: #0f172a !important;
+}
+
+.dark .auth-step-line-active,
+[data-theme="dark"] .auth-step-line-active {
+    background-color: #ffffff !important;
+}
+
 .auth-step-inactive {
+    background-color: rgba(0, 0, 0, 0.07) !important;
+    color: rgba(0, 0, 0, 0.45) !important;
+}
+
+.dark .auth-step-inactive,
+[data-theme="dark"] .auth-step-inactive {
     background-color: rgba(255, 255, 255, 0.12) !important;
     color: rgba(255, 255, 255, 0.5) !important;
 }
 
 .auth-step-line-inactive {
+    background-color: rgba(0, 0, 0, 0.07) !important;
+}
+
+.dark .auth-step-line-inactive,
+[data-theme="dark"] .auth-step-line-inactive {
     background-color: rgba(255, 255, 255, 0.12) !important;
 }
 

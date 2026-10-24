@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Check, Eye, EyeOff, Loader2, X } from '@/shared/ui/icons';
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Sparkles, X } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { useCreatorRegisterMutation } from '@/features/creator/hooks/mutations/useCreatorAuthMutations';
 import { useCreatorInviteQuery } from '@/features/creator/hooks/queries/useCreatorInviteQuery';
@@ -187,7 +187,7 @@ export default function CreatorRegister() {
           <button
             type="button"
             onClick={() => navigate('/creator/login')}
-            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-yellow-400 text-sm font-semibold text-black hover:bg-yellow-300 transition"
+            className="btn-white inline-flex h-11 w-full items-center justify-center rounded-2xl bg-white text-sm font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
           >
             Go to creator login
           </button>
@@ -198,7 +198,7 @@ export default function CreatorRegister() {
 
   return (
     <main className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">
@@ -207,14 +207,15 @@ export default function CreatorRegister() {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
-                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-yellow-400 hover:text-black"
+                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span>Back</span>
               </Button>
             </div>
 
-            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center text-center sm:max-w-[50%]">
+            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center gap-2 text-center sm:max-w-[50%]">
+              <Sparkles className="h-5 w-5 text-yellow-400 shrink-0" />
               <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">Creator Portal</h1>
             </div>
 
@@ -226,9 +227,6 @@ export default function CreatorRegister() {
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">
-              {token ? 'Creator invite' : 'Byblos creators'}
-            </p>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
             <p className="text-xs font-medium text-slate-600 dark:text-white/55">
               {invite
@@ -330,7 +328,7 @@ export default function CreatorRegister() {
             </div>
           </div>
           <div className="grid gap-3 sm:col-span-2 sm:grid-cols-2">
-            <Button disabled={loading || !passwordsMatch || !termsAccepted} className="h-12 rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-50">
+            <Button disabled={loading || !passwordsMatch || !termsAccepted} className="btn-white h-12 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create creator account'}
             </Button>
             <Link to="/creator/login" className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/[0.08] dark:border-separator bg-slate-100 dark:bg-white/[0.03] px-4 text-sm font-semibold text-slate-900 dark:text-white transition hover:bg-slate-200 dark:hover:bg-white/10">
@@ -373,7 +371,7 @@ export default function CreatorRegister() {
               <Button
                 type="button"
                 onClick={() => navigate('/seller/login')}
-                className="h-11 flex-1 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
+                className="btn-white h-11 flex-1 rounded-xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
               >
                 Log in as Seller
               </Button>
@@ -381,7 +379,7 @@ export default function CreatorRegister() {
               <Button
                 type="button"
                 onClick={() => navigate('/buyer/login')}
-                className="h-11 flex-1 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
+                className="btn-white h-11 flex-1 rounded-xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
               >
                 Log in as Buyer
               </Button>
@@ -390,14 +388,14 @@ export default function CreatorRegister() {
                 <Button
                   type="button"
                   onClick={() => navigate('/buyer/login')}
-                  className="h-11 flex-1 rounded-xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
+                  className="btn-white h-11 flex-1 rounded-xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
                 >
                   Buyer Login
                 </Button>
                 <Button
                   type="button"
                   onClick={() => navigate('/seller/login')}
-                  className="h-11 flex-1 rounded-xl border border-yellow-400/40 bg-yellow-400/10 font-bold text-yellow-600 dark:text-yellow-300 hover:bg-yellow-400/20 transition"
+                  className="btn-white h-11 flex-1 rounded-xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
                 >
                   Seller Login
                 </Button>

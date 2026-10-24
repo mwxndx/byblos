@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Check, Eye, EyeOff, Loader2, Lock, X } from '@/shared/ui/icons';
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Lock, Sparkles, X } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -49,7 +49,7 @@ export default function CreatorResetPassword() {
 
   return (
     <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <Button
@@ -57,12 +57,13 @@ export default function CreatorResetPassword() {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/creator/login')}
-              className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-yellow-400 hover:text-black"
+              className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span>Back</span>
             </Button>
-            <div className="absolute left-1/2 -translate-x-1/2 text-center">
+            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center gap-2 text-center sm:max-w-[50%]">
+              <Sparkles className="h-5 w-5 text-yellow-400 shrink-0" />
               <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">Creator Portal</h1>
             </div>
             <div className="flex-1" aria-hidden="true" />
@@ -127,7 +128,7 @@ export default function CreatorResetPassword() {
           <Button
             type="submit"
             disabled={resetMut.isPending}
-            className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300"
+            className="btn-white h-12 w-full rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
           >
             {resetMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Update password'}
           </Button>
