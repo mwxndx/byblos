@@ -26,13 +26,13 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     }
   });
 
-  it('renders the desktop illustration on the left side occupying half the left side with 60% increased dimensions (245px x 203px)', () => {
+  it('renders the desktop illustration on the left side occupying half the left side with increased dimensions (490px x 406px)', () => {
     renderPage();
     const illustration = screen.getByAltText(/byblos marketplace illustration/i);
     expect(illustration).toBeInTheDocument();
     expect(illustration).toHaveAttribute('src', '/illustration.svg');
-    expect(illustration).toHaveClass('w-[245px]');
-    expect(illustration).toHaveClass('h-[203px]');
+    expect(illustration).toHaveClass('w-[490px]');
+    expect(illustration).toHaveClass('h-[406px]');
 
     const leftHalf = illustration.closest('div');
     expect(leftHalf).toHaveClass('hidden', 'lg:flex', 'lg:w-1/2');

@@ -53,9 +53,9 @@ const LandingHome = () => (
         <img
           src="/illustration.svg"
           alt="Byblos marketplace illustration"
-          className="h-[203px] w-[245px] max-h-[75vh] object-contain select-none pointer-events-none"
-          width={245}
-          height={203}
+          className="h-[406px] w-[490px] max-h-[75vh] max-w-full object-contain select-none pointer-events-none"
+          width={490}
+          height={406}
         />
       </div>
 
