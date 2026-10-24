@@ -463,13 +463,13 @@ class NotificationService {
     }
 
     async broadcastAppUpdate({
-        minVersionCode = 67,
+        minVersionCode = 69,
         title = '🚀 New Byblos Update Available',
         body = "We've released important updates. Tap to download the latest version from Google Play.",
         storeUrl = 'market://details?id=space.bybloshq.app'
     } = {}) {
         const { rows: tokens } = await pool.query(
-            `SELECT token, platform, app_version
+            `SELECT token, platform, app_version, user_id, role
              FROM notification_device_tokens
              WHERE platform = 'android'
                AND is_active = TRUE`
@@ -488,19 +488,39 @@ class NotificationService {
             return { targeted: 0, sent: 0, failed: 0, reason: 'no_outdated_tokens' };
         }
 
-        if (!isFcmConfigured()) {
-            logger.info('[NotificationService] Update broadcast skipped: FCM not configured', {
-                targeted: outdatedTokens.length
-            });
-            return { targeted: outdatedTokens.length, sent: 0, failed: 0, reason: 'push_provider_not_configured' };
-        }
-
         const data = {
             action: 'open_store',
             url: storeUrl,
             type: 'app_update',
             minVersion: String(minVersionCode)
         };
+
+        const distinctRecipients = new Map();
+        for (const device of outdatedTokens) {
+            if (device.user_id && device.role && !distinctRecipients.has(device.user_id + '-' + device.role)) {
+                distinctRecipients.set(device.user_id + '-' + device.role, {
+                    userId: device.user_id,
+                    role: device.role
+                });
+            }
+        }
+
+        if (distinctRecipients.size > 0) {
+            const inAppPromises = Array.from(distinctRecipients.values()).map(r =>
+                pool.query(
+                    'INSERT INTO app_notifications (recipient_user_id, recipient_role, type, title, body, data, channels) VALUES ($1, $2, $3, $4, $5, $6, ARRAY[\'in_app\', \'push\'])',
+                    [r.userId, r.role, 'app_update', title, body, JSON.stringify(data)]
+                ).catch(err => logger.warn('[NotificationService] In-app update alert insert failed', { err: err.message }))
+            );
+            await Promise.allSettled(inAppPromises);
+        }
+
+        if (!isFcmConfigured()) {
+            logger.info('[NotificationService] Update broadcast skipped: FCM not configured', {
+                targeted: outdatedTokens.length
+            });
+            return { targeted: outdatedTokens.length, inAppSent: distinctRecipients.size, sent: 0, failed: 0, reason: 'push_provider_not_configured' };
+        }
 
         let sent = 0;
         let failed = 0;

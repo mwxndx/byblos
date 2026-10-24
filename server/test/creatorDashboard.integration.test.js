@@ -271,3 +271,46 @@ describe('creator clearance — earnings split', () => {
     assert.equal(Number(clearance.referralEarnings), 3);
   });
 });
+
+
+describe('creator collaboration requests — state guards and duplicate prevention', () => {
+  test('rejects accepting an already denied request and enforces cooldown on re-request', async (t) => {
+    let seller;
+    let creator;
+
+    t.after(async () => {
+      if (creator) await cleanupCreatorFinancials(creator.id);
+      if (creator) await cleanupCreator(creator.id).catch(() => {});
+      if (seller) await cleanupSeller(seller.id).catch(() => {});
+    });
+
+    seller = await createSeller({ isCreatorMarketplaceEnabled: true });
+    creator = await createCreator({});
+
+    // 1. Initial request from creator
+    const req = await CreatorService.requestCollaboration(creator.id, seller.id, 'Let me promote your shop');
+    assert.equal(req.status, 'pending');
+
+    // 2. Cannot send duplicate request while one is already pending
+    await assert.rejects(
+      () => CreatorService.requestCollaboration(creator.id, seller.id, 'Another message'),
+      /already have a pending collaboration request/
+    );
+
+    // 3. Seller declines the request
+    const denyRes = await CreatorService.respondToCreatorCollaborationRequest(seller.id, req.id, 'deny');
+    assert.equal(denyRes.status, 'denied');
+
+    // 4. Seller CANNOT accept a request that is already denied
+    await assert.rejects(
+      () => CreatorService.respondToCreatorCollaborationRequest(seller.id, req.id, 'accept'),
+      /already denied/
+    );
+
+    // 5. Creator CANNOT immediately re-request after being declined
+    await assert.rejects(
+      () => CreatorService.requestCollaboration(creator.id, seller.id, 'Trying again right away'),
+      /declined by this shop/
+    );
+  });
+});

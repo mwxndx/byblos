@@ -1794,11 +1794,38 @@ class CreatorService {
       throw new AppError(`You can promote at most ${MAX_ACTIVE_PROMOTIONS} shops at once. Leave one before requesting another.`, 400);
     }
 
+    const existingReq = await pool.query(
+      `SELECT id, status, updated_at FROM creator_shop_requests WHERE creator_id = $1 AND seller_id = $2 LIMIT 1`,
+      [creatorId, sellerId]
+    );
+
+    if (existingReq.rows[0]) {
+      const { status, updated_at } = existingReq.rows[0];
+      if (status === 'pending') {
+        throw new AppError('You already have a pending collaboration request for this shop.', 400);
+      }
+      if (status === 'accepted') {
+        throw new AppError('You already have an accepted collaboration with this shop.', 400);
+      }
+      if (status === 'denied') {
+        const DENIED_COOLDOWN_DAYS = 14;
+        const cooldownMs = DENIED_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+        const timeSinceDenied = Date.now() - new Date(updated_at).getTime();
+        if (timeSinceDenied < cooldownMs) {
+          const remainingDays = Math.max(1, Math.ceil((cooldownMs - timeSinceDenied) / (24 * 60 * 60 * 1000)));
+          throw new AppError(
+            `Your collaboration request was declined by this shop. You may re-apply in ${remainingDays} day${remainingDays === 1 ? '' : 's'}.`,
+            400
+          );
+        }
+      }
+    }
+
     const { rows } = await pool.query(
-      `INSERT INTO creator_shop_requests (creator_id, seller_id, status, message, updated_at)
-       VALUES ($1, $2, 'pending', $3, NOW())
+      `INSERT INTO creator_shop_requests (creator_id, seller_id, status, message, created_at, updated_at)
+       VALUES ($1, $2, 'pending', $3, NOW(), NOW())
        ON CONFLICT (creator_id, seller_id)
-       DO UPDATE SET status = 'pending', message = EXCLUDED.message, updated_at = NOW()
+       DO UPDATE SET status = 'pending', message = EXCLUDED.message, created_at = NOW(), updated_at = NOW()
        RETURNING *`,
       [creatorId, sellerId, String(message || '').trim() || null]
     );
@@ -2082,6 +2109,10 @@ class CreatorService {
       );
       const request = rows[0];
       if (!request) throw new AppError('Collaboration request not found.', 404);
+
+      if (request.status !== 'pending') {
+        throw new AppError(`Cannot ${normalizedAction} request that is already ${request.status}.`, 400);
+      }
 
       if (normalizedAction === 'deny') {
         await client.query(

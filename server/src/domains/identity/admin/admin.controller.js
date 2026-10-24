@@ -1,3 +1,4 @@
+import NotificationService from '../../communication/notifications/notification.service.js';
 import { promisify } from 'util';
 import dotenv from 'dotenv';
 import { AppError } from '../../../shared/utils/errorHandler.js';
@@ -642,6 +643,22 @@ const resolveFlaggedCreatorEarning = async (req, res, next) => {
   }
 };
 
+
+const broadcastAppUpdate = async (req, res, next) => {
+  try {
+    const { minVersionCode, title, body, storeUrl } = req.body || {};
+    const result = await NotificationService.broadcastAppUpdate({
+      minVersionCode: minVersionCode ? Number(minVersionCode) : undefined,
+      title: title ? String(title) : undefined,
+      body: body ? String(body) : undefined,
+      storeUrl: storeUrl ? String(storeUrl) : undefined,
+    });
+    res.status(200).json({ status: 'success', message: 'Update broadcast processed.', data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   adminLogin,
   getPaymentProviderBalances,
@@ -669,5 +686,6 @@ export {
   exceptionalOrderReversal,
   listFlaggedCreatorEarnings,
   resolveFlaggedCreatorEarning,
-  getMe
+  getMe,
+  broadcastAppUpdate
 };

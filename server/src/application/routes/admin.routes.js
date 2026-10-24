@@ -82,5 +82,8 @@ router.post('/logistics/requests/:requestId/disputes/resolve', validate(V.resolv
 // Exceptional Order Reversal (Admin safety valve)
 router.post('/orders/:id/exceptional-reversal', validate(V.exceptionalOrderReversal), adminController.exceptionalOrderReversal);
 
+// Android release broadcast notification
+router.post('/broadcast-app-update', adminController.broadcastAppUpdate);
+
 export default router;
 

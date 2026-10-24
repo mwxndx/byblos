@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Store, ExternalLink, Send, Check, Clock, Loader2, MapPin, Package } from '@/shared/ui/icons';
+import { Store, ExternalLink, Send, Check, Clock, Loader2, MapPin, Package, X } from '@/shared/ui/icons';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/shared/ui/button';
@@ -129,6 +129,11 @@ export function CreatorAvailableShops() {
                     <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_14%,transparent)] px-3 text-xs font-medium text-sys-orange">
                       <Clock className="h-3.5 w-3.5" />
                       Pending
+                    </span>
+                  ) : shop.collaborationStatus === 'denied' ? (
+                    <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-slate-100 dark:bg-white/10 px-3 text-xs font-medium text-slate-500 dark:text-white/50 cursor-not-allowed">
+                      <X className="h-3.5 w-3.5" />
+                      Declined
                     </span>
                   ) : (
                     <Button
