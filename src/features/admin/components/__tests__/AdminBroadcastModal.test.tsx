@@ -25,15 +25,15 @@ describe('AdminBroadcastModal', () => {
     render(<AdminBroadcastModal isOpen={true} onClose={vi.fn()} />);
 
     expect(screen.getByRole('heading', { name: /Broadcast App Update/i })).toBeDefined();
-    expect(screen.getByDisplayValue('69')).toBeDefined();
-    expect(screen.getByDisplayValue('Update Available: Byblos 1.0.69')).toBeDefined();
+    expect(screen.getByDisplayValue('70')).toBeDefined();
+    expect(screen.getByDisplayValue('Update Available: Byblos 1.0.70')).toBeDefined();
     expect(screen.getByRole('button', { name: /Broadcast Update/i })).toBeDefined();
   });
 
   it('dispatches broadcast update and shows results grid', async () => {
     vi.mocked(adminApi.broadcastAppUpdate).mockResolvedValueOnce({
       success: true,
-      minVersionCode: 69,
+      minVersionCode: 70,
       targetedDevices: 12,
       fcmSent: 10,
       fcmFailed: 2,
@@ -47,8 +47,8 @@ describe('AdminBroadcastModal', () => {
 
     await waitFor(() => {
       expect(adminApi.broadcastAppUpdate).toHaveBeenCalledWith({
-        minVersionCode: 69,
-        title: 'Update Available: Byblos 1.0.69',
+        minVersionCode: 70,
+        title: 'Update Available: Byblos 1.0.70',
         body: 'A new version of Byblos is available. Please update now to continue using all features.',
         storeUrl: undefined,
       });

@@ -38,9 +38,9 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Admin
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base font-bold text-label">Android Release v1.0.69</h3>
+              <h3 className="text-base font-bold text-label">Android Release v1.0.70</h3>
               <Badge className="bg-green-500/10 text-green-400 border-none text-[10px] uppercase font-semibold">
-                Active Gate (Code: 69)
+                Active Gate (Code: 70)
               </Badge>
             </div>
             <p className="text-xs text-label-2 mt-0.5">

@@ -31,18 +31,18 @@ describe('publicController.getAppVersion', () => {
     assert.equal(statusCode, 200);
     assert.equal(responseBody.status, 'success');
     assert.equal(responseBody.data.platform, 'android');
-    assert.equal(responseBody.data.minAndroidVersionCode, 69);
-    assert.equal(responseBody.data.latestAndroidVersionCode, 69);
-    assert.equal(responseBody.data.latestVersionName, '1.0.69');
+    assert.equal(responseBody.data.minAndroidVersionCode, 70);
+    assert.equal(responseBody.data.latestAndroidVersionCode, 70);
+    assert.equal(responseBody.data.latestVersionName, '1.0.70');
     assert.equal(responseBody.data.forceUpdate, true);
     assert.equal(responseBody.data.storeUrl, 'market://details?id=space.bybloshq.app');
     assert.ok(Array.isArray(responseBody.data.releaseNotes));
   });
 
   test('respects custom environment configuration for version codes and force update', async () => {
-    process.env.MIN_ANDROID_VERSION_CODE = '70';
-    process.env.LATEST_ANDROID_VERSION_CODE = '72';
-    process.env.LATEST_ANDROID_VERSION_NAME = '1.0.72';
+    process.env.MIN_ANDROID_VERSION_CODE = '75';
+    process.env.LATEST_ANDROID_VERSION_CODE = '76';
+    process.env.LATEST_ANDROID_VERSION_NAME = '1.0.76';
     process.env.FORCE_ANDROID_UPDATE = 'false';
 
     let statusCode = null;
@@ -63,9 +63,9 @@ describe('publicController.getAppVersion', () => {
     await getAppVersion(req, res);
 
     assert.equal(statusCode, 200);
-    assert.equal(responseBody.data.minAndroidVersionCode, 70);
-    assert.equal(responseBody.data.latestAndroidVersionCode, 72);
-    assert.equal(responseBody.data.latestVersionName, '1.0.72');
+    assert.equal(responseBody.data.minAndroidVersionCode, 75);
+    assert.equal(responseBody.data.latestAndroidVersionCode, 76);
+    assert.equal(responseBody.data.latestVersionName, '1.0.76');
     assert.equal(responseBody.data.forceUpdate, false);
   });
 });
