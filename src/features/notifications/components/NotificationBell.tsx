@@ -9,9 +9,11 @@ export interface NotificationBellProps {
   variant?: NotificationVariant;
   triggerClassName?: string;
   role?: string;
+  iconClassName?: string;
+  iconStyle?: React.CSSProperties;
 }
 
-export function NotificationBell({ variant = 'default', triggerClassName, role }: NotificationBellProps) {
+export function NotificationBell({ variant = 'default', triggerClassName, role, iconClassName, iconStyle }: NotificationBellProps) {
   const { unreadCount } = useNotifications(variant, true, role);
 
   return (
@@ -25,7 +27,7 @@ export function NotificationBell({ variant = 'default', triggerClassName, role }
           )}
           aria-label="Notifications"
         >
-          <Bell className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+          <Bell className={cn('h-5 w-5', iconClassName)} style={iconStyle ?? { color: 'var(--theme-accent, #f5c518)' }} />
           {unreadCount > 0 && (
             <span
               className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center"

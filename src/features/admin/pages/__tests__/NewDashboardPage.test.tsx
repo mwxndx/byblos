@@ -130,10 +130,10 @@ describe('NewAdminDashboard Header & Actions', () => {
       </QueryClientProvider>
     );
 
-    // 1. Byblos logo
+    // 1. Byblos logo (black mark for white header)
     const logo = screen.getByAltText('Byblos');
     expect(logo).toBeDefined();
-    expect(logo.getAttribute('src')).toContain('byblos-mark-dark');
+    expect(logo.getAttribute('src')).toContain('byblos-mark-light');
 
     // 2. Admin text in header
     const adminHeading = screen.getByRole('heading', { name: 'Admin', level: 1 });
@@ -142,6 +142,38 @@ describe('NewAdminDashboard Header & Actions', () => {
 
     // 3. "Byblos operations" text is removed
     expect(screen.queryByText('Byblos operations')).toBeNull();
+  });
+
+  it('renders Notification bell with black color in the admin header', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <NewAdminDashboard />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const bellBtn = screen.getByRole('button', { name: /notifications/i });
+    expect(bellBtn).toBeDefined();
+    expect(bellBtn.className).toContain('!text-black');
+    const bellSvg = bellBtn.querySelector('svg');
+    expect(bellSvg).toBeDefined();
+    expect(bellSvg?.getAttribute('style')).toContain('rgb(0, 0, 0)');
+  });
+
+  it('renders admin tab selectors with white active state styling', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <NewAdminDashboard />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    const overviewTab = screen.getByRole('tab', { name: /overview/i });
+    expect(overviewTab).toBeDefined();
+    expect(overviewTab.className).toContain('data-[state=active]:!bg-white');
+    expect(overviewTab.className).toContain('data-[state=active]:!text-black');
   });
 
   it('renders Sign out button and invokes logout upon click', async () => {

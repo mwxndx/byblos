@@ -151,10 +151,10 @@ describe('MarketingDashboard UI & Data Flow', () => {
     );
 
     await waitFor(() => {
-      // 1. Byblos logo in header
+      // 1. Byblos logo in header (black mark for white header)
       const logo = screen.getByAltText('Byblos');
       expect(logo).toBeDefined();
-      expect(logo.getAttribute('src')).toContain('byblos-mark');
+      expect(logo.getAttribute('src')).toBe('/byblos-mark-light.png');
 
       // 2. Top Seller Locations rendered
       expect(screen.getByText('Top Seller Locations')).toBeDefined();

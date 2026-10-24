@@ -182,7 +182,7 @@ export function AdminLogisticsTab() {
                 type="button"
                 size="sm"
                 onClick={() => setStatus(filter.value)}
-                className={status === filter.value ? 'bg-yellow-300 text-black hover:bg-yellow-200' : 'bg-fill text-label hover:bg-white hover:text-black'}
+                className={status === filter.value ? 'bg-white text-black hover:bg-gray-100 border border-gray-200 shadow-sm' : 'bg-fill text-label hover:bg-white hover:text-black border border-transparent'}
               >
                 {filter.label}
               </Button>

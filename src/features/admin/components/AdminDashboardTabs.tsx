@@ -32,14 +32,14 @@ export function AdminDashboardTabs({ counts = {} }: AdminDashboardTabsProps) {
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="flex-shrink-0 md:flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-3 md:px-4 py-2.5 text-xs md:text-sm font-semibold transition-colors
-              data-[state=active]:bg-yellow-400 data-[state=active]:text-black
-              data-[state=inactive]:text-label-2 data-[state=inactive]:hover:text-label data-[state=inactive]:hover:bg-fill"
+              className="flex-shrink-0 md:flex-1 inline-flex items-center justify-center gap-2 rounded-xl px-3 md:px-4 py-2.5 text-xs md:text-sm font-semibold transition-all
+              data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:border data-[state=active]:border-gray-200 data-[state=active]:shadow-sm
+              data-[state=inactive]:text-label-2 data-[state=inactive]:hover:text-label data-[state=inactive]:hover:bg-white/10"
             >
               <Icon className="h-4 w-4 shrink-0" />
               <span>{tab.label}</span>
               {count > 0 && (
-                <span className="ml-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-400 data-[state=active]:bg-black/15">
+                <span className="ml-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-red-500/15 px-1.5 py-0.5 text-[10px] font-bold text-red-500 data-[state=active]:bg-red-50 data-[state=active]:text-red-600 data-[state=active]:border data-[state=active]:border-red-200">
                   {count > 99 ? '99+' : count}
                 </span>
               )}

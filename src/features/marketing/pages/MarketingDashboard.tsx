@@ -144,7 +144,7 @@ export default function MarketingDashboard() {
                 left={
                     <div className="flex min-w-0 items-center gap-2">
                         <img
-                            src="/byblos-mark-dark.png"
+                            src="/byblos-mark-light.png"
                             alt="Byblos"
                             className="h-8 w-8 object-contain shrink-0"
                         />

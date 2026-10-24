@@ -150,7 +150,7 @@ const NewAdminDashboard = () => {
         left={
           <div className="flex items-center gap-2 sm:gap-3">
             <img
-              src="/byblos-mark-dark.png"
+              src="/byblos-mark-light.png"
               alt="Byblos"
               className="h-8 w-8 object-contain shrink-0"
             />
@@ -180,7 +180,11 @@ const NewAdminDashboard = () => {
             <span className="hidden text-sm text-gray-500 md:inline">
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
-            <NotificationBell />
+            <NotificationBell
+              triggerClassName="!bg-white hover:!bg-gray-100 !border-gray-200 !text-black shadow-sm"
+              iconClassName="!text-black"
+              iconStyle={{ color: '#000000' }}
+            />
           </div>
         }
       />
