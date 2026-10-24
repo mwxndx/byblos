@@ -135,7 +135,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
               </Button>
               <Button
                 onClick={handleClose}
-                className="w-full h-11 bg-yellow-400 hover:bg-yellow-300 text-black rounded-xl text-xs font-semibold"
+                className="w-full h-11 bg-white hover:bg-gray-100 text-black border border-gray-200 rounded-xl text-xs font-semibold shadow-sm"
               >
                 Close
               </Button>
@@ -229,7 +229,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-11 bg-yellow-400 hover:bg-yellow-300 text-black font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5"
+                className="w-full h-11 bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm"
               >
                 {isSubmitting ? (
                   <>

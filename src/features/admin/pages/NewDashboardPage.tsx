@@ -5,7 +5,7 @@ import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent } from "@/shared/ui/tabs";
 import { AppHeader } from "@/shared/ui/AppHeader";
 import { DashboardSkeleton } from "@/shared/ui/DashboardSkeleton";
-import { Activity, RefreshCw, Send, Shield, Truck, WalletCards, XCircle } from '@/shared/ui/icons';
+import { Activity, LogOut, RefreshCw, Send, Shield, Truck, WalletCards, XCircle } from '@/shared/ui/icons';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { adminApi } from '@/features/admin/api';
 import { adminQueryKeys } from '@/features/admin/api/queryKeys';
@@ -21,11 +21,13 @@ import { AdminBuyersTab } from '../components/AdminBuyersTab';
 import { AdminWithdrawalsTab } from '../components/AdminWithdrawalsTab';
 import { AdminBroadcastModal } from '../components/AdminBroadcastModal';
 import { useAdminDashboard } from '../hooks/useAdminDashboard';
+import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';
 
 const money = (value: number) => `KSh ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const NewAdminDashboard = () => {
   const navigate = useNavigate();
+  const { logout } = useGlobalAuth();
   const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const {
     authLoading,
@@ -133,7 +135,7 @@ const NewAdminDashboard = () => {
             <h2 className="text-2xl font-semibold text-label tracking-tight">Something went wrong</h2>
             <p className="text-label-2 font-medium">{error}</p>
           </div>
-          <Button onClick={retryDashboard} className="w-full h-12 bg-yellow-400 text-black font-semibold rounded-2xl hover:bg-yellow-300 transition-all">
+          <Button onClick={retryDashboard} className="w-full h-12 bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold rounded-2xl transition-all shadow-sm">
             Try again
           </Button>
         </div>
@@ -144,22 +146,38 @@ const NewAdminDashboard = () => {
   return (
     <div className="min-h-full overflow-x-hidden bg-[var(--bg)] text-label font-sans">
       <AppHeader
+        className="!bg-white border-b border-gray-200"
         left={
-          <div className="flex items-baseline gap-2 sm:gap-3">
-            <h1 className="text-lg font-semibold tracking-tight text-label sm:text-xl">Admin</h1>
-            <span className="hidden text-sm text-label-3 sm:inline">Byblos operations</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <img
+              src="/byblos-mark-dark.png"
+              alt="Byblos"
+              className="h-8 w-8 object-contain shrink-0"
+            />
+            <h1 className="text-lg font-semibold tracking-tight text-black sm:text-xl">Admin</h1>
           </div>
         }
         right={
           <div className="flex items-center gap-2 sm:gap-3">
             <Button
               onClick={() => setIsBroadcastModalOpen(true)}
-              className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
             >
               <Send className="h-4 w-4" />
               <span>Broadcast Update</span>
             </Button>
-            <span className="hidden text-sm text-label-2 md:inline">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                await logout();
+                navigate('/admin/login', { replace: true });
+              }}
+              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign out</span>
+            </Button>
+            <span className="hidden text-sm text-gray-500 md:inline">
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
             <NotificationBell />
@@ -187,7 +205,7 @@ const NewAdminDashboard = () => {
                     <Icon className="h-4 w-4" />
                     <span className="text-xs font-semibold">{tile.label}</span>
                   </div>
-                  <p className="mt-2 text-2xl font-semibold tabular-nums text-label">{tile.count.toLocaleString()}</p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-label">{(tile.count ?? 0).toLocaleString()}</p>
                   <p className="mt-0.5 text-xs text-label-3">{tile.hint}{clickable ? ' →' : ''}</p>
                 </button>
               );

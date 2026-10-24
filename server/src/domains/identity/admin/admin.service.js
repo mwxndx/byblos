@@ -117,7 +117,7 @@ class AdminService {
                 FROM sellers s
                 WHERE s.user_id IS NOT NULL
                 ORDER BY COALESCE(s.total_sales, 0) DESC
-                LIMIT 3
+                LIMIT 6
             `);
       topShops = topShopsRes.rows.map(row => ({
         id: row.id,
@@ -170,7 +170,8 @@ class AdminService {
               SELECT 
                 to_char(m.month, 'Mon') as name,
                 (SELECT COUNT(*) FROM buyers WHERE user_id IS NOT NULL AND date_trunc('month', created_at) <= m.month) as buyers,
-                (SELECT COUNT(*) FROM sellers WHERE user_id IS NOT NULL AND date_trunc('month', created_at) <= m.month) as sellers
+                (SELECT COUNT(*) FROM sellers WHERE user_id IS NOT NULL AND date_trunc('month', created_at) <= m.month) as sellers,
+                (SELECT CASE WHEN to_regclass('creators') IS NOT NULL THEN (SELECT COUNT(*) FROM creators WHERE date_trunc('month', created_at) <= m.month) ELSE 0 END) as creators
               FROM months m
               ORDER BY m.month;
             `;
@@ -191,7 +192,7 @@ class AdminService {
                 COALESCE(SUM(platform_fee_amount), 0) as revenue,
                 COUNT(id) as orders
               FROM months m
-              LEFT JOIN product_orders o ON date_trunc('month', o.created_at) = m.month 
+              LEFT JOIN product_orders o ON date_trunc('month', COALESCE(o.paid_at, o.created_at)) = m.month 
                 AND o.payment_status = 'completed'
                 AND o.status::text NOT IN ${excludedOrderStatuses}
               GROUP BY m.month
@@ -211,7 +212,7 @@ class AdminService {
                 to_char(m.month, 'Mon') as name,
                 COALESCE(SUM(total_amount), 0) as sales
               FROM months m
-              LEFT JOIN product_orders o ON date_trunc('month', o.created_at) = m.month 
+              LEFT JOIN product_orders o ON date_trunc('month', COALESCE(o.paid_at, o.created_at)) = m.month 
                 AND o.payment_status = 'completed'
                 AND o.status::text NOT IN ${excludedOrderStatuses}
               GROUP BY m.month
@@ -234,33 +235,97 @@ class AdminService {
               GROUP BY 1;
             `;
 
-      // 4. Geographic Distribution (buyers, sellers, and paid order GMV)
+      // 3b. Category Distribution
+      const categoryDistributionQuery = `
+              SELECT 
+                CASE 
+                  WHEN aesthetic IS NOT NULL AND TRIM(aesthetic) != '' THEN INITCAP(REPLACE(TRIM(aesthetic), '-', ' '))
+                  WHEN is_digital = true OR product_type = 'digital' THEN COALESCE(INITCAP(TRIM(digital_category)), 'Digital')
+                  WHEN product_type = 'service' THEN 'Services'
+                  ELSE 'General'
+                END as name,
+                COUNT(*) as value
+              FROM products p
+              LEFT JOIN sellers s ON s.id = p.seller_id
+              WHERE s.user_id IS NOT NULL
+                AND COALESCE(p.status::text, 'available') != 'draft'
+              GROUP BY 1
+              ORDER BY value DESC
+              LIMIT 6;
+            `;
+
+      // 4. Geographic Distribution (buyers, sellers, creators, and paid order GMV)
       const geoQuery = `
               WITH buyer_regions AS (
                 SELECT
-                  COALESCE(NULLIF(TRIM(city), ''), NULLIF(TRIM(location), ''), 'Unknown') AS name,
+                  COALESCE(
+                    NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(b.location), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(latest_order.city), ''), 'Unknown City'),
+                    'Nairobi'
+                  ) AS name,
                   COUNT(*) AS buyers,
                   0::int AS sellers,
+                  0::int AS creators,
                   0::numeric AS gmv
-                FROM buyers
-                WHERE user_id IS NOT NULL
+                FROM buyers b
+                LEFT JOIN LATERAL (
+                  SELECT
+                    COALESCE(
+                      NULLIF(TRIM(po.delivery_location->>'city'), ''),
+                      NULLIF(TRIM(po.location_address), '')
+                    ) AS city
+                  FROM product_orders po
+                  WHERE po.buyer_id = b.id
+                  ORDER BY po.created_at DESC
+                  LIMIT 1
+                ) latest_order ON true
+                WHERE b.user_id IS NOT NULL
                 GROUP BY 1
               ),
               seller_regions AS (
                 SELECT
-                  COALESCE(NULLIF(TRIM(city), ''), NULLIF(TRIM(location), ''), 'Unknown') AS name,
+                  COALESCE(
+                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
+                    'Nairobi'
+                  ) AS name,
                   0::int AS buyers,
                   COUNT(*) AS sellers,
+                  0::int AS creators,
                   0::numeric AS gmv
-                FROM sellers
-                WHERE user_id IS NOT NULL
+                FROM sellers s
+                WHERE s.user_id IS NOT NULL
+                GROUP BY 1
+              ),
+              creator_regions AS (
+                SELECT
+                  COALESCE(
+                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
+                    'Nairobi'
+                  ) AS name,
+                  0::int AS buyers,
+                  0::int AS sellers,
+                  COUNT(DISTINCT scl.creator_id) AS creators,
+                  0::numeric AS gmv
+                FROM seller_creator_links scl
+                JOIN sellers s ON s.id = scl.seller_id
                 GROUP BY 1
               ),
               order_regions AS (
                 SELECT
-                  COALESCE(NULLIF(TRIM(po.location_address), ''), NULLIF(TRIM(s.city), ''), NULLIF(TRIM(s.location), ''), 'Unknown') AS name,
+                  COALESCE(
+                    NULLIF(NULLIF(TRIM(po.delivery_location->>'city'), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(po.location_address), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
+                    'Nairobi'
+                  ) AS name,
                   0::int AS buyers,
                   0::int AS sellers,
+                  0::int AS creators,
                   COALESCE(SUM(po.total_amount), 0) AS gmv
                 FROM product_orders po
                 LEFT JOIN sellers s ON s.id = po.seller_id
@@ -273,21 +338,27 @@ class AdminService {
                 UNION ALL
                 SELECT * FROM seller_regions
                 UNION ALL
+                SELECT * FROM creator_regions
+                UNION ALL
                 SELECT * FROM order_regions
               )
               SELECT
-                name,
+                CASE 
+                  WHEN name IS NULL OR LOWER(TRIM(name)) IN ('unknown', 'unknown city', '') THEN 'Nairobi' 
+                  ELSE name 
+                END AS name,
                 SUM(buyers) AS buyers,
                 SUM(sellers) AS sellers,
+                SUM(creators) AS creators,
                 SUM(gmv) AS gmv,
-                SUM(buyers + sellers) AS value
+                SUM(buyers + sellers + creators) AS value
               FROM combined
-              GROUP BY name
+              GROUP BY 1
               ORDER BY gmv DESC, value DESC
               LIMIT 8;
             `;
 
-      const [userGrowth, revenueTrends, salesTrends, productStatus, geoDist] = await Promise.all([
+      const [userGrowth, revenueTrends, salesTrends, productStatus, categoryDist, geoDist] = await Promise.all([
         pool.query(userGrowthQuery).catch(e => {
           logger.error('Analytics: userGrowthQuery failed', e);
           return { rows: [] };
@@ -304,6 +375,10 @@ class AdminService {
           logger.error('Analytics: productStatusQuery failed', e);
           return { rows: [] };
         }),
+        pool.query(categoryDistributionQuery).catch(e => {
+          logger.error('Analytics: categoryDistributionQuery failed', e);
+          return { rows: [] };
+        }),
         pool.query(geoQuery).catch(e => {
           logger.error('Analytics: geoQuery failed', e);
           return { rows: [] };
@@ -311,19 +386,36 @@ class AdminService {
       ]);
 
       return {
-        userGrowth: userGrowth.rows,
-        revenueTrends: revenueTrends.rows,
-        salesTrends: salesTrends.rows,
+        userGrowth: userGrowth.rows.map(row => ({
+          name: row.name,
+          buyers: Number.parseInt(row.buyers, 10) || 0,
+          sellers: Number.parseInt(row.sellers, 10) || 0,
+          creators: Number.parseInt(row.creators, 10) || 0
+        })),
+        revenueTrends: revenueTrends.rows.map(row => ({
+          name: row.name,
+          revenue: Number.parseFloat(row.revenue) || 0,
+          orders: Number.parseInt(row.orders, 10) || 0
+        })),
+        salesTrends: salesTrends.rows.map(row => ({
+          name: row.name,
+          sales: Number.parseFloat(row.sales) || 0
+        })),
         productStatus: productStatus.rows.map(row => ({
           ...row,
           value: Number.parseInt(row.value, 10) || 0,
           inventory: Number.parseInt(row.inventory, 10) || 0
+        })),
+        categoryDistribution: (categoryDist?.rows || []).map(row => ({
+          name: row.name,
+          value: Number.parseInt(row.value, 10) || 0
         })),
         geoDistribution: geoDist.rows.map(row => ({
           name: row.name,
           value: Number.parseInt(row.value, 10) || 0,
           buyers: Number.parseInt(row.buyers, 10) || 0,
           sellers: Number.parseInt(row.sellers, 10) || 0,
+          creators: Number.parseInt(row.creators, 10) || 0,
           gmv: Number.parseFloat(row.gmv) || 0
         }))
       };

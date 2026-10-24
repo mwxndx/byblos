@@ -140,14 +140,15 @@ export default function MarketingDashboard() {
     return (
         <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
             <AppHeader
+                className="!bg-white border-b border-gray-200"
                 left={
                     <div className="flex min-w-0 items-center gap-2">
                         <img
-                            src={isLight ? "/byblos-mark-dark.png" : "/byblos-mark-light.png"}
+                            src="/byblos-mark-dark.png"
                             alt="Byblos"
                             className="h-8 w-8 object-contain shrink-0"
                         />
-                        <h1 className="truncate text-base font-semibold tracking-tight text-label sm:text-lg">Marketing<span className="text-yellow-500">.</span></h1>
+                        <h1 className="truncate text-base font-semibold tracking-tight text-black sm:text-lg">Marketing<span className="text-yellow-500">.</span></h1>
                     </div>
                 }
                 right={
@@ -155,7 +156,7 @@ export default function MarketingDashboard() {
                         <select
                             value={period}
                             onChange={(e) => setPeriod(Number(e.target.value))}
-                            className="cursor-pointer rounded-xl border border-separator bg-[#171717] px-3 py-2 text-xs font-semibold text-label transition-colors focus:border-yellow-500 focus:outline-none"
+                            className="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm transition-colors focus:border-yellow-500 focus:outline-none"
                         >
                             <option value={3}>Last 3 Months</option>
                             <option value={6}>Last 6 Months</option>
@@ -166,7 +167,7 @@ export default function MarketingDashboard() {
                                 await logout();
                                 navigate('/admin/marketing/login');
                             }}
-                            className="rounded-xl border border-separator bg-fill px-3 py-2 text-xs font-semibold text-label-2 transition-colors hover:bg-white/10"
+                            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
                         >
                             Sign out
                         </button>
