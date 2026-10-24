@@ -21,6 +21,12 @@ export interface MarketingOverview {
 
 export type MarketingRecord = Record<string, unknown>;
 
+export interface GeographyData {
+  buyers?: MarketingRecord[];
+  sellers?: MarketingRecord[];
+  [key: string]: unknown;
+}
+
 export const marketingApi = {
     getOverview: () =>
         apiClient.get<{ data: MarketingOverview }>('/admin/marketing/overview'),
@@ -33,7 +39,9 @@ export const marketingApi = {
     getOrderFunnel: () =>
         apiClient.get<{ data: MarketingRecord }>('/admin/marketing/order-funnel'),
     getGeography: () =>
-        apiClient.get<{ data: MarketingRecord }>('/admin/marketing/geography'),
+        apiClient.get<{ data: GeographyData | MarketingRecord[] }>('/admin/marketing/geography'),
+    getSellerLocations: () =>
+        apiClient.get<{ data: MarketingRecord[] }>('/admin/marketing/seller-locations'),
     getTopPerformers: () =>
         apiClient.get<{ data: MarketingRecord }>('/admin/marketing/top-performers'),
     getReferrals: () =>

@@ -20,7 +20,8 @@ export async function findOverviewStats() {
       (SELECT COUNT(*) FROM product_orders) AS total_orders,
       (SELECT COUNT(*) FROM sellers WHERE created_at >= date_trunc('month', CURRENT_DATE)) AS new_sellers_this_month,
       (SELECT COUNT(*) FROM buyers WHERE created_at >= date_trunc('month', CURRENT_DATE)) AS new_buyers_this_month,
-      (SELECT COALESCE(SUM(total_amount), 0) FROM product_orders WHERE payment_status = 'completed' AND paid_at >= date_trunc('month', CURRENT_DATE)) AS gmv_this_month,
+      (SELECT COALESCE(SUM(total_amount), 0) FROM product_orders WHERE payment_status = 'completed' AND COALESCE(status::text, '') NOT IN ('CANCELLED', 'cancelled') AND COALESCE(paid_at, created_at) >= date_trunc('month', CURRENT_DATE)) AS gmv_this_month,
+      (SELECT COALESCE(SUM(total_amount), 0) FROM product_orders WHERE payment_status = 'completed' AND COALESCE(status::text, '') NOT IN ('CANCELLED', 'cancelled') AND COALESCE(paid_at, created_at) >= date_trunc('month', CURRENT_DATE - INTERVAL '1 month') AND COALESCE(paid_at, created_at) < date_trunc('month', CURRENT_DATE)) AS gmv_prev_month,
       (SELECT CASE WHEN to_regclass('wishlists') IS NOT NULL THEN (SELECT COUNT(*) FROM wishlists) ELSE 0 END) AS total_wishlists,
       (SELECT CASE WHEN to_regclass('refund_requests') IS NOT NULL THEN (SELECT COALESCE(SUM(amount), 0) FROM refund_requests WHERE status = 'completed') ELSE 0 END) AS total_refunded,
       (SELECT CASE WHEN to_regclass('referral_earnings_log') IS NOT NULL THEN (SELECT COALESCE(SUM(reward_amount), 0) FROM referral_earnings_log) ELSE 0 END) AS total_referral_rewards
@@ -55,8 +56,9 @@ export async function findGmvTrend({ months }) {
       COALESCE(AVG(o.total_amount), 0)                                       AS avg_order_value
     FROM month_series ms
     LEFT JOIN product_orders o
-      ON date_trunc('month', o.paid_at) = ms.month
+      ON date_trunc('month', COALESCE(o.paid_at, o.created_at)) = ms.month
       AND o.payment_status = 'completed'
+      AND COALESCE(o.status::text, '') NOT IN ('CANCELLED', 'cancelled')
     GROUP BY ms.month
     ORDER BY ms.month ASC
   `;
@@ -84,10 +86,12 @@ export async function findUserGrowth({ months }) {
       TO_CHAR(ms.month, 'YYYY-MM')  AS month,
       TO_CHAR(ms.month, 'Mon YY')   AS label,
       COUNT(DISTINCT s.id)          AS new_sellers,
-      COUNT(DISTINCT b.id)          AS new_buyers
+      COUNT(DISTINCT b.id)          AS new_buyers,
+      COUNT(DISTINCT c.id)          AS new_creators
     FROM month_series ms
     LEFT JOIN sellers s ON date_trunc('month', s.created_at) = ms.month
     LEFT JOIN buyers  b ON date_trunc('month', b.created_at) = ms.month
+    LEFT JOIN creators c ON date_trunc('month', c.created_at) = ms.month
     GROUP BY ms.month
     ORDER BY ms.month ASC
   `;
@@ -141,6 +145,31 @@ export async function findOrderStatusFunnel() {
  *
  * @returns {Promise<Array<{location: string, buyer_count: string}>>}
  */
+
+/**
+ * Top 10 cities by seller count.
+ *
+ * @returns {Promise<Array<{location: string, seller_count: string}>>}
+ */
+export async function findSellerLocations() {
+  const sql = `
+    SELECT
+      COALESCE(
+        NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
+        'Nairobi'
+      ) AS location,
+      COUNT(*) AS seller_count
+    FROM sellers s
+    WHERE s.is_active = true OR s.status = 'active'
+    GROUP BY 1
+    ORDER BY seller_count DESC
+    LIMIT 10
+  `;
+  const { rows } = await query(sql);
+  return rows;
+}
 export async function findBuyerLocations() {
   const sql = `
     SELECT

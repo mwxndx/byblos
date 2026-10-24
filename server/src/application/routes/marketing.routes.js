@@ -16,6 +16,7 @@ import {
     getProductMix,
     getOrderFunnel,
     getGeography,
+    getSellerLocations,
     getTopPerformers,
     getReferralPerformance,
     getRecentActivity
@@ -36,6 +37,7 @@ router.get('/user-growth', getUserGrowth)
 router.get('/product-mix', getProductMix)
 router.get('/order-funnel', getOrderFunnel)
 router.get('/geography', getGeography)
+router.get('/seller-locations', getSellerLocations)
 router.get('/top-performers', getTopPerformers)
 router.get('/referrals', getReferralPerformance)
 router.get('/activity', getRecentActivity)

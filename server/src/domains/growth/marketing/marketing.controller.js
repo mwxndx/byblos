@@ -87,6 +87,14 @@ export const getOverview = async (req, res, next) => {
     const totalUsers = totalSellers + totalBuyers + activeCreators
     const totalGmvKsh = Number.parseFloat(d?.total_gmv || 0)
     const totalGmvCents = Math.round(totalGmvKsh * 100)
+    const gmvThisMonth = Number.parseFloat(d?.gmv_this_month || 0)
+    const gmvPrevMonth = Number.parseFloat(d?.gmv_prev_month || 0)
+    let gmvGrowthMoM = Number.parseFloat(d?.gmv_growth_mom || '8.4')
+    if (gmvPrevMonth > 0) {
+      gmvGrowthMoM = Number.parseFloat((((gmvThisMonth - gmvPrevMonth) / gmvPrevMonth) * 100).toFixed(1))
+    } else if (gmvThisMonth > 0) {
+      gmvGrowthMoM = 100
+    }
 
     res.status(200).json({
       status: 'success',
@@ -100,7 +108,7 @@ export const getOverview = async (req, res, next) => {
         creatorEarningsTotalKsh: Number.parseFloat(d?.total_referral_rewards || 0),
         totalGmvCents,
         userGrowthMoM: Number.parseFloat(d?.user_growth_mom || '12.5'),
-        gmvGrowthMoM: Number.parseFloat(d?.gmv_growth_mom || '8.4'),
+        gmvGrowthMoM,
         totalOrders: Number.parseInt(d?.total_orders || 0),
         completedOrders: Number.parseInt(d?.completed_orders || 0),
         cancelledOrders: Number.parseInt(d?.cancelled_orders || 0),
@@ -228,27 +236,91 @@ export const getOrderFunnel = async (req, res, next) => {
  * GET /api/admin/marketing/geography
  * City-level breakdown of buyers, sellers, and GMV.
  */
-export const getGeography = async (req, res, next) => {
+export const getSellerLocations = async (req, res, next) => {
   try {
-    const buyerLocations = await marketingAnalyticsRepository.findBuyerLocations()
-    const totalCount = buyerLocations.reduce((acc, r) => acc + Number.parseInt(r.buyer_count || 0), 0)
+    const sellerLocations = await marketingAnalyticsRepository.findSellerLocations()
+    const totalCount = sellerLocations.reduce((acc, r) => acc + Number.parseInt(r.seller_count || 0), 0)
 
-    const formatted = buyerLocations.map(r => {
-      const count = Number.parseInt(r.buyer_count || 0)
+    const formatted = sellerLocations.map(r => {
+      const count = Number.parseInt(r.seller_count || 0)
       const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0
-      const rawLocation = r.location && String(r.location).trim();
+      const rawLocation = r.location && String(r.location).trim()
       const city = (!rawLocation || rawLocation.toLowerCase() === 'unknown city' || rawLocation.toLowerCase() === 'unknown')
         ? 'Nairobi'
-        : rawLocation;
+        : rawLocation
       return {
         city,
-        percentage: pct
+        percentage: pct,
+        count
       }
     })
 
     res.status(200).json({
       status: 'success',
-      data: formatted.length > 0 ? formatted : [{ city: 'Nairobi', percentage: 100 }]
+      data: formatted.length > 0 ? formatted : [{ city: 'Nairobi', percentage: 100, count: 0 }]
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export const getGeography = async (req, res, next) => {
+  try {
+    const [buyerLocations, sellerLocations] = await Promise.all([
+      marketingAnalyticsRepository.findBuyerLocations(),
+      marketingAnalyticsRepository.findSellerLocations()
+    ])
+
+    const totalBuyerCount = buyerLocations.reduce((acc, r) => acc + Number.parseInt(r.buyer_count || 0), 0)
+    const formattedBuyers = buyerLocations.map(r => {
+      const count = Number.parseInt(r.buyer_count || 0)
+      const pct = totalBuyerCount > 0 ? Math.round((count / totalBuyerCount) * 100) : 0
+      const rawLocation = r.location && String(r.location).trim()
+      const city = (!rawLocation || rawLocation.toLowerCase() === 'unknown city' || rawLocation.toLowerCase() === 'unknown')
+        ? 'Nairobi'
+        : rawLocation
+      return {
+        city,
+        percentage: pct,
+        count
+      }
+    })
+
+    const totalSellerCount = sellerLocations.reduce((acc, r) => acc + Number.parseInt(r.seller_count || 0), 0)
+    const formattedSellers = sellerLocations.map(r => {
+      const count = Number.parseInt(r.seller_count || 0)
+      const pct = totalSellerCount > 0 ? Math.round((count / totalSellerCount) * 100) : 0
+      const rawLocation = r.location && String(r.location).trim()
+      const city = (!rawLocation || rawLocation.toLowerCase() === 'unknown city' || rawLocation.toLowerCase() === 'unknown')
+        ? 'Nairobi'
+        : rawLocation
+      return {
+        city,
+        percentage: pct,
+        count
+      }
+    })
+
+    if (req.query.type === 'sellers') {
+      return res.status(200).json({
+        status: 'success',
+        data: formattedSellers.length > 0 ? formattedSellers : [{ city: 'Nairobi', percentage: 100, count: 0 }]
+      })
+    }
+
+    if (req.query.type === 'buyers') {
+      return res.status(200).json({
+        status: 'success',
+        data: formattedBuyers.length > 0 ? formattedBuyers : [{ city: 'Nairobi', percentage: 100, count: 0 }]
+      })
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        buyers: formattedBuyers.length > 0 ? formattedBuyers : [{ city: 'Nairobi', percentage: 100, count: 0 }],
+        sellers: formattedSellers.length > 0 ? formattedSellers : [{ city: 'Nairobi', percentage: 100, count: 0 }]
+      }
     })
   } catch (err) {
     next(err)

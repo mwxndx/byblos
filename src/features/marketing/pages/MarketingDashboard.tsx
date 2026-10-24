@@ -66,11 +66,10 @@ export default function MarketingDashboard() {
     const [gmvTrend, setGmvTrend] = useState<MarketingRecord[]>([]);
     const [userGrowth, setUserGrowth] = useState<MarketingRecord[]>([]);
     const [productMix, setProductMix] = useState<MarketingRecord[] | null>(null);
-    const [orderFunnel, setOrderFunnel] = useState<MarketingRecord[] | null>(null);
-    const [geography, setGeography] = useState<MarketingRecord[] | null>(null);
+    const [buyerLocations, setBuyerLocations] = useState<MarketingRecord[]>([]);
+    const [sellerLocations, setSellerLocations] = useState<MarketingRecord[]>([]);
     const [topPerfs, setTopPerfs] = useState<MarketingRecord | null>(null);
     const [referrals, setReferrals] = useState<MarketingRecord | null>(null);
-    const [activity, setActivity] = useState<MarketingRecord[]>([]);
 
     const user = globalUser?.profile || JSON.parse(sessionStorage.getItem('marketing_user') || '{}');
 
@@ -78,16 +77,14 @@ export default function MarketingDashboard() {
         setLoading(true);
         setError('');
         try {
-            const [ov, gmv, ug, pm, of_, geo, tp, ref, act] = await Promise.all([
+            const [ov, gmv, ug, pm, geo, tp, ref] = await Promise.all([
                 marketingApi.getOverview(),
                 marketingApi.getGmvTrend(period),
                 marketingApi.getUserGrowth(period),
                 marketingApi.getProductMix(),
-                marketingApi.getOrderFunnel(),
                 marketingApi.getGeography(),
                 marketingApi.getTopPerformers(),
-                marketingApi.getReferrals(),
-                marketingApi.getActivity(20)
+                marketingApi.getReferrals()
             ]);
             const extractArray = (res: unknown): MarketingRecord[] => {
                 const r = res as { data?: { data?: unknown } } | undefined;
@@ -105,11 +102,19 @@ export default function MarketingDashboard() {
             setGmvTrend(extractArray(gmv));
             setUserGrowth(extractArray(ug));
             setProductMix(extractArray(pm));
-            setOrderFunnel(extractArray(of_));
-            setGeography(extractArray(geo));
+
+            const geoPayload = (geo as { data?: { data?: unknown } } | undefined)?.data?.data ?? (geo as { data?: unknown } | undefined)?.data;
+            if (geoPayload && typeof geoPayload === 'object' && !Array.isArray(geoPayload)) {
+                const typedGeo = geoPayload as { buyers?: MarketingRecord[]; sellers?: MarketingRecord[] };
+                setBuyerLocations(Array.isArray(typedGeo.buyers) ? typedGeo.buyers : []);
+                setSellerLocations(Array.isArray(typedGeo.sellers) ? typedGeo.sellers : []);
+            } else if (Array.isArray(geoPayload)) {
+                setBuyerLocations(geoPayload as MarketingRecord[]);
+                setSellerLocations([]);
+            }
+
             setTopPerfs(extractObject(tp));
             setReferrals(extractObject(ref));
-            setActivity(extractArray(act));
         } catch (err) {
             setError('Failed to load dashboard data. Please refresh.');
         } finally {
@@ -137,9 +142,11 @@ export default function MarketingDashboard() {
             <AppHeader
                 left={
                     <div className="flex min-w-0 items-center gap-2">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-yellow-400 shadow-sm">
-                            <span className="text-black font-semibold text-lg">B</span>
-                        </div>
+                        <img
+                            src={isLight ? "/byblos-mark-dark.png" : "/byblos-mark-light.png"}
+                            alt="Byblos"
+                            className="h-8 w-8 object-contain shrink-0"
+                        />
                         <h1 className="truncate text-base font-semibold tracking-tight text-label sm:text-lg">Marketing<span className="text-yellow-500">.</span></h1>
                     </div>
                 }
@@ -236,13 +243,13 @@ export default function MarketingDashboard() {
                             <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                             <Bar dataKey="buyers" name="Buyers" fill="#F5C842" radius={[4, 4, 0, 0]} />
                             <Bar dataKey="sellers" name="Sellers" fill="#737373" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="creators" name="Creators" fill="#E5E5E5" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="creators" name="Creators" fill="#38BDF8" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </ChartCard>
             </div>
 
-            {/* Charts Section 2: Funnel & Mix */}
+            {/* Charts Section 2: Product Mix & Geographic Distribution */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
                 {Array.isArray(productMix) && productMix.length > 0 && (
                     <ChartCard title="Product Mix" subtitle="Orders by category">
@@ -267,24 +274,28 @@ export default function MarketingDashboard() {
                     </ChartCard>
                 )}
 
-                {Array.isArray(orderFunnel) && orderFunnel.length > 0 && (
-                    <ChartCard title="Order Conversion Funnel" subtitle="Visitor to delivery breakdown">
-                        <ResponsiveContainer width="100%" height={260}>
-                            <BarChart data={orderFunnel} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid} />
-                                <XAxis type="number" stroke={chartTheme.axis} tick={{ fontSize: 11 }} />
-                                <YAxis dataKey="stage" type="category" stroke={chartTheme.axis} tick={{ fontSize: 11 }} width={90} />
-                                <Tooltip content={<CustomTooltip />} />
-                                <Bar dataKey="count" name="Count" fill="#F5C842" radius={[0, 4, 4, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                {Array.isArray(sellerLocations) && sellerLocations.length > 0 && (
+                    <ChartCard title="Top Seller Locations" subtitle="Geographic distribution">
+                        <div className="space-y-3 pt-2">
+                            {sellerLocations.map((item: MarketingRecord, i: number) => (
+                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2">
+                                    <span className="text-xs font-medium text-label-2">{String(item.city || '')}</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-24 bg-white/10 h-2 rounded-full overflow-hidden">
+                                            <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${Number(item.percentage || 0)}%` }} />
+                                        </div>
+                                        <span className="text-xs font-bold text-label w-10 text-right">{Number(item.percentage || 0)}%</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </ChartCard>
                 )}
 
-                {Array.isArray(geography) && geography.length > 0 && (
+                {Array.isArray(buyerLocations) && buyerLocations.length > 0 && (
                     <ChartCard title="Top Buyer Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
-                            {geography.map((item: MarketingRecord, i: number) => (
+                            {buyerLocations.map((item: MarketingRecord, i: number) => (
                                 <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2">
                                     <span className="text-xs font-medium text-label-2">{String(item.city || '')}</span>
                                     <div className="flex items-center gap-3">
@@ -342,24 +353,6 @@ export default function MarketingDashboard() {
                     </div>
                 )}
             </div>
-
-            {/* Section 4: Live Activity Log */}
-            {activity?.length > 0 && (
-                <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
-                    <SectionTitle title="Live Platform Activity" subtitle="Recent signups, orders, and referrals" />
-                    <div className="space-y-3 mt-4">
-                        {activity.map((item: MarketingRecord, idx: number) => (
-                            <div key={String(item.id || idx)} className="flex items-center justify-between text-xs py-2 border-b border-separator last:border-0">
-                                <div className="flex items-center gap-3">
-                                    <span className="w-2 h-2 rounded-full bg-yellow-400" />
-                                    <span className="text-label-2 font-medium">{String(item.description || '')}</span>
-                                </div>
-                                <span className="text-label-3 font-mono">{String(item.timeAgo || 'Just now')}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
             </div>
         </div>
     );
