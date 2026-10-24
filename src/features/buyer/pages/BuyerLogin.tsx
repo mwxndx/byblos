@@ -187,7 +187,7 @@ export function BuyerLogin() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="h-12 w-full rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
+            className="btn-white h-12 w-full rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
           >
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Sign In'}
           </Button>

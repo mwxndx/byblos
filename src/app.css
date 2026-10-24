@@ -773,20 +773,53 @@ body.dashboard-active .seller-tab-selected {
     color: #ffffff !important;
 }
 
+/* ── Explicit solid white controls & indicators ────────────────────────────── */
+.btn-white,
+button.btn-white,
+.auth-page .btn-white,
+.auth-page button.btn-white,
+.auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]),
+.auth-step-active,
+.auth-step-line-active {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border-color: #e2e8f0 !important;
+}
+
+.btn-white:hover,
+button.btn-white:hover,
+.auth-page .btn-white:hover,
+.auth-page button.btn-white:hover,
+.auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
+    background-color: #f1f5f9 !important;
+    background: #f1f5f9 !important;
+    color: #000000 !important;
+}
+
+.auth-step-inactive {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.auth-step-line-inactive {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
 /* ── Dark-theme visibility layer ───────────────────────────────────────────
    Components were authored dark-on-light. On the black theme, remap dark
    neutral text utilities to light and light-surface utilities to charcoal so
    nothing renders black-on-black. Accent hues (yellow/green/red/…) and
    text-black (used on yellow buttons) are intentionally left untouched. */
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-"], [class*="text-stone-"], [class*="text-neutral-"]) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-"], [class*="text-stone-"], [class*="text-neutral-"]):not(.btn-white):not(.auth-step-active):not(.auth-step-inactive) {
     color: var(--byblos-text) !important;
 }
 
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-400"], [class*="text-slate-500"], [class*="text-stone-400"], [class*="text-stone-500"], [class*="text-neutral-400"], [class*="text-neutral-500"]) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-400"], [class*="text-slate-500"], [class*="text-stone-400"], [class*="text-stone-500"], [class*="text-neutral-400"], [class*="text-neutral-500"]):not(.btn-white):not(.auth-step-active):not(.auth-step-inactive) {
     color: var(--byblos-muted) !important;
 }
 
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="bg-white"], [class*="bg-slate-50"], [class*="bg-slate-100"], [class*="bg-stone-50"], [class*="bg-stone-100"], [class*="bg-stone-200"], [class*="bg-gray-50"], [class*="bg-gray-100"], [class*="bg-neutral-50"], [class*="bg-neutral-100"]) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="bg-white"], [class*="bg-slate-50"], [class*="bg-slate-100"], [class*="bg-stone-50"], [class*="bg-stone-100"], [class*="bg-stone-200"], [class*="bg-gray-50"], [class*="bg-gray-100"], [class*="bg-neutral-50"], [class*="bg-neutral-100"]):not(.btn-white):not(.auth-step-active):not(.auth-step-line-active):not(.auth-step-inactive) {
     background-color: var(--byblos-surface) !important;
 }
 

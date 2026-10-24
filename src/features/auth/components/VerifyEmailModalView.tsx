@@ -57,7 +57,7 @@ export function VerifyEmailModalView({
             className={`w-full h-12 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
               isSuccess
                 ? 'bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/30 border border-green-500/30'
-                : 'bg-white text-black hover:bg-gray-100 font-bold border border-gray-200 shadow-sm'
+                : 'btn-white bg-white text-black hover:bg-gray-100 font-bold border border-gray-200 shadow-sm'
             }`}
           >
             {isResending ? (

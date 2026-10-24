@@ -1,7 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { useToast } from '@/shared/hooks/use-toast';
-import { Loader2, Mail, ArrowLeft, RefreshCw } from '@/shared/ui/icons';
+import { Loader2, Mail, ArrowLeft, RefreshCw, ShoppingBag } from '@/shared/ui/icons';
 import TermsModal from '@/shared/components/TermsModal';
 import { BuyerRegisterSteps } from '@/features/buyer/components/BuyerRegisterSteps';
 import { useBuyerRegister } from '@/features/buyer/hooks/useBuyerRegister';
@@ -59,7 +59,8 @@ export function BuyerRegister() {
             </div>
 
             {/* Center: Title */}
-            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center text-center sm:max-w-[50%]">
+            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center gap-2 text-center sm:max-w-[50%]">
+              <ShoppingBag className="h-5 w-5 text-yellow-400 shrink-0" />
               <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Buyer Portal
               </h1>
@@ -86,15 +87,15 @@ export function BuyerRegister() {
 
             {!isRegistered && (
               <div className="pt-2 flex items-center justify-center gap-2">
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'bg-white text-black shadow-sm' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                   1
                 </div>
-                <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'bg-white' : 'bg-slate-200 dark:bg-white/10'}`} />
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'bg-white text-black shadow-sm' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+                <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                   2
                 </div>
-                <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'bg-white' : 'bg-slate-200 dark:bg-white/10'}`} />
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'bg-white text-black shadow-sm' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+                <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                   3
                 </div>
               </div>
@@ -116,7 +117,7 @@ export function BuyerRegister() {
               <div className="pt-3 space-y-2.5">
                 <Button
                   onClick={() => navigate('/buyer/login')}
-                  className="h-12 w-full rounded-2xl bg-white font-semibold text-black transition hover:bg-gray-100 border border-gray-200 shadow-sm"
+                  className="btn-white h-12 w-full rounded-2xl bg-white font-semibold text-black transition hover:bg-gray-100 border border-gray-200 shadow-sm"
                 >
                   Go to Login
                 </Button>
@@ -161,7 +162,7 @@ export function BuyerRegister() {
                   <Button
                     type="button"
                     onClick={() => setCurrentStep(currentStep - 1)}
-                    className="h-12 flex-1 rounded-2xl border border-gray-200 bg-white text-xs font-semibold text-black hover:bg-gray-100 shadow-sm transition"
+                    className="btn-white h-12 flex-1 rounded-2xl border border-gray-200 bg-white text-xs font-semibold text-black hover:bg-gray-100 shadow-sm transition"
                   >
                     Back
                   </Button>
@@ -191,14 +192,14 @@ export function BuyerRegister() {
                       }
                       setCurrentStep(currentStep + 1);
                     }}
-                    className="h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
+                    className="btn-white h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
+                    className="btn-white h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
                     disabled={isLoading || !termsAccepted}
                   >
                     {isLoading ? (

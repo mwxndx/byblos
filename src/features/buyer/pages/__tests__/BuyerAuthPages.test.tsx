@@ -72,16 +72,21 @@ describe('BuyerLogin and BuyerRegister UI Specifications', () => {
     const step1 = screen.getByText('1');
     expect(step1.className).toContain('bg-white');
     expect(step1.className).toContain('text-black');
+    expect(step1.className).toContain('auth-step-active');
 
     // 4. Next button is white
     const nextBtn = screen.getByRole('button', { name: /next/i });
     expect(nextBtn).toBeInTheDocument();
     expect(nextBtn.className).toContain('bg-white');
     expect(nextBtn.className).toContain('text-black');
+    expect(nextBtn.className).toContain('btn-white');
 
     // 5. Back button hover is white
     const backBtn = screen.getByRole('button', { name: /back/i });
     expect(backBtn).toBeInTheDocument();
     expect(backBtn.className).toContain('hover:bg-white');
+
+    // 6. Header has Buyer Portal with icon
+    expect(screen.getByRole('heading', { level: 1, name: /buyer portal/i })).toBeInTheDocument();
   });
 });
