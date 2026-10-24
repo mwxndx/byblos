@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -16,43 +16,53 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
       </HelmetProvider>
     );
 
-  it('renders the 144px logo (scaled 6x from 24px)', () => {
+  it('renders the logo increased by 30% (187px from 144px)', () => {
     renderPage();
     const logos = screen.getAllByAltText('Byblos logo');
     expect(logos.length).toBeGreaterThanOrEqual(1);
     for (const logo of logos) {
-      expect(logo).toHaveClass('h-36');
-      expect(logo).toHaveClass('w-36');
+      expect(logo).toHaveClass('h-[187px]');
+      expect(logo).toHaveClass('w-[187px]');
     }
   });
 
-  it('renders the Creator button with yellow background and black text linking to /creator/login', () => {
+  it('renders the desktop illustration on the left side occupying half the left side', () => {
+    renderPage();
+    const illustration = screen.getByAltText(/byblos marketplace illustration/i);
+    expect(illustration).toBeInTheDocument();
+    expect(illustration).toHaveAttribute('src', '/illustration.svg');
+
+    const leftHalf = illustration.closest('div');
+    expect(leftHalf).toHaveClass('hidden', 'lg:flex', 'lg:w-1/2');
+  });
+
+  it('renders the Creator button with white background and black text linking to /creator/login', () => {
     renderPage();
     const creatorLink = screen.getByRole('link', { name: /^creator$/i });
     expect(creatorLink).toBeInTheDocument();
     expect(creatorLink).toHaveAttribute('href', '/creator/login');
     const button = creatorLink.querySelector('button');
-    expect(button).toHaveClass('bg-brand');
+    expect(button).toHaveClass('bg-white');
     expect(button).toHaveClass('text-black');
   });
 
-  it('renders the View Brands button with yellow background and black text linking to /buyer/login', () => {
+  it('renders the View Brands button with white background and black text linking to /buyer/dashboard', () => {
     renderPage();
     const viewBrandsLink = screen.getByRole('link', { name: /view brands/i });
     expect(viewBrandsLink).toBeInTheDocument();
-    expect(viewBrandsLink).toHaveAttribute('href', '/buyer/login');
+    expect(viewBrandsLink).toHaveAttribute('href', '/buyer/dashboard');
     const button = viewBrandsLink.querySelector('button');
-    expect(button).toHaveClass('bg-brand');
+    expect(button).toHaveClass('bg-white');
     expect(button).toHaveClass('text-black');
   });
 
-  it('renders the Add Brand button with yellow background and black text linking to /seller/register', () => {
+  it('renders the Add Brand button with white background and black text linking to /seller/register', () => {
     renderPage();
     const addBrandLink = screen.getByRole('link', { name: /add brand/i });
     expect(addBrandLink).toBeInTheDocument();
     expect(addBrandLink).toHaveAttribute('href', '/seller/register');
     const button = addBrandLink.querySelector('button');
-    expect(button).toHaveClass('bg-brand');
+    expect(button).toHaveClass('bg-white');
     expect(button).toHaveClass('text-black');
   });
 
@@ -63,7 +73,7 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
 
     const links = buttonGroup ? Array.from(buttonGroup.querySelectorAll('a')) : [];
     expect(links.length).toBe(3);
-    expect(links[0]).toHaveAttribute('href', '/buyer/login');
+    expect(links[0]).toHaveAttribute('href', '/buyer/dashboard');
     expect(links[1]).toHaveAttribute('href', '/seller/register');
     expect(links[2]).toHaveAttribute('href', '/creator/login');
   });

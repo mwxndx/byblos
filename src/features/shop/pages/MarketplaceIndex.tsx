@@ -16,13 +16,12 @@ export const isPwaStandalone = (): boolean => {
 };
 
 /**
- * Simplified Byblos landing screen:
- * - Clean solid background adapted for light & dark themes
- * - Responsive safe-area layout adapted for iOS (Dynamic Island/home bar) & Android (status/nav bars)
- * - 144px x 144px centered logo
- * - Vertically stacked buttons of equal length: View Brands, Add Brand, Creator
- * - Yellow buttons with black text
- * - Spacing between buttons increased by 3 (gap-6)
+ * Byblos landing screen:
+ * - Desktop: Split layout with SVG illustration on the left half and branding + action buttons on the right half
+ * - Mobile: Centered branding + action buttons
+ * - Logo size increased by 30% (144px * 1.3 = 187px -> h-[187px] w-[187px])
+ * - Three white buttons with black text: View Brands, Add Brand, Creator
+ * - Spacing between buttons: gap-6
  */
 const LandingHome = () => (
   <div
@@ -36,7 +35,7 @@ const LandingHome = () => (
   >
     <Link
       to="/mzigo/login"
-      className="absolute z-10"
+      className="absolute z-20"
       style={{
         top: 'max(2.5rem, calc(env(safe-area-inset-top, 0px) + 0.85rem))',
         left: 'max(1rem, calc(env(safe-area-inset-left, 0px) + 0.5rem))',
@@ -48,74 +47,84 @@ const LandingHome = () => (
       </Button>
     </Link>
 
-    <main className="relative z-10 my-auto flex w-full max-w-xs flex-col items-center text-center">
-      {/* Logo scaled by a factor of 6 (24px * 6 = 144px -> h-36 w-36) */}
-      <div className="mb-8 flex items-center justify-center">
+    <div className="relative z-10 my-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center lg:flex-row lg:items-center px-4 sm:px-8">
+      {/* Left side on desktop: occupies half the left side, placed in the middle */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-8 lg:p-12">
         <img
-          src="/byblos-mark-dark.png"
-          alt="Byblos logo"
-          className="hidden dark:block h-36 w-36 object-contain"
-          width={144}
-          height={144}
-        />
-        <img
-          src="/byblos-mark-light.png"
-          alt="Byblos logo"
-          className="block dark:hidden h-36 w-36 object-contain"
-          width={144}
-          height={144}
+          src="/illustration.svg"
+          alt="Byblos marketplace illustration"
+          className="max-h-[70vh] w-auto max-w-[85%] object-contain select-none pointer-events-none"
         />
       </div>
 
-      {/* Buttons of identical length with yellow background, black text, gap-6 spacing, and elevated lift effect */}
-      <div className="flex w-full flex-col items-center gap-6">
-        <Link to="/buyer/dashboard" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold shadow-[0_8px_20px_-4px_rgba(245,197,24,0.38),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-4px_rgba(245,197,24,0.5),0_6px_12px_-2px_rgba(0,0,0,0.25)] hover:bg-brand-press active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
-            View Brands
-          </Button>
-        </Link>
-
-        <Link to="/seller/register" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold shadow-[0_8px_20px_-4px_rgba(245,197,24,0.38),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-4px_rgba(245,197,24,0.5),0_6px_12px_-2px_rgba(0,0,0,0.25)] hover:bg-brand-press active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
-            Add Brand
-          </Button>
-        </Link>
-
-        <Link to="/creator/login" className="w-full">
-          <Button className="w-full h-11 rounded-full bg-brand text-black font-semibold shadow-[0_8px_20px_-4px_rgba(245,197,24,0.38),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-4px_rgba(245,197,24,0.5),0_6px_12px_-2px_rgba(0,0,0,0.25)] hover:bg-brand-press active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
-            Creator
-          </Button>
-        </Link>
-      </div>
-
-      {/* Play Store download: web only (native already has the app installed),
-          and never on iOS — an Android store link is useless there. */}
-      {!isNativeApp() && getDevicePlatform() !== 'ios' && (
-        <div className="mt-8">
-          <a
-            href={PLAY_STORE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Get Byblos on Google Play"
-            className="inline-block rounded-2xl bg-black p-2"
-          >
+      {/* Right side on desktop (centered on mobile): Byblos logo and three buttons */}
+      <main className="my-auto flex w-full lg:w-1/2 flex-col items-center justify-center text-center p-4 lg:p-8">
+        <div className="flex w-full max-w-xs flex-col items-center text-center">
+          {/* Logo increased by 30% (144px * 1.30 = 187px) */}
+          <div className="mb-8 flex items-center justify-center">
             <img
-              src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-              alt="Get it on Google Play"
-              className="h-12 w-auto"
+              src="/byblos-mark-dark.png"
+              alt="Byblos logo"
+              className="hidden dark:block h-[187px] w-[187px] object-contain"
+              width={187}
+              height={187}
             />
-          </a>
+            <img
+              src="/byblos-mark-light.png"
+              alt="Byblos logo"
+              className="block dark:hidden h-[187px] w-[187px] object-contain"
+              width={187}
+              height={187}
+            />
+          </div>
+
+          {/* Three white buttons with black text, gap-6 spacing, and elevated lift effect */}
+          <div className="flex w-full flex-col items-center gap-6">
+            <Link to="/buyer/dashboard" className="w-full">
+              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
+                View Brands
+              </Button>
+            </Link>
+
+            <Link to="/seller/register" className="w-full">
+              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
+                Add Brand
+              </Button>
+            </Link>
+
+            <Link to="/creator/login" className="w-full">
+              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
+                Creator
+              </Button>
+            </Link>
+          </div>
+
+          {/* Play Store download */}
+          {!isNativeApp() && getDevicePlatform() !== 'ios' && (
+            <div className="mt-8">
+              <a
+                href={PLAY_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Get Byblos on Google Play"
+                className="inline-block rounded-2xl bg-black p-2"
+              >
+                <img
+                  src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                  alt="Get it on Google Play"
+                  className="h-12 w-auto"
+                />
+              </a>
+            </div>
+          )}
         </div>
-      )}
-    </main>
+      </main>
+    </div>
   </div>
 );
 
 const IndexPage = () => {
   const auth = useContext(GlobalAuthContext);
-  // When opening on Android native or iOS standalone PWA:
-  // If auth is actively restoring a session (isLoading) or user is already known (isAuthenticated),
-  // render the seamless dark splash mark rather than flashing the public action buttons.
   const isMobileAppShell = isNativeApp() || isPwaStandalone();
   const isSessionPending = auth ? (auth.isLoading || auth.isAuthenticated) : false;
 
@@ -128,9 +137,9 @@ const IndexPage = () => {
         <img
           src="/byblos-mark-dark.png"
           alt="Byblos"
-          className="h-36 w-36 object-contain"
-          width={144}
-          height={144}
+          className="h-[187px] w-[187px] object-contain"
+          width={187}
+          height={187}
         />
       </div>
     );
