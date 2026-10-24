@@ -1,7 +1,7 @@
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card';
-import { Store } from '@/shared/ui/icons';
+import { Store, UploadCloud, Send } from '@/shared/ui/icons';
 import {
   ChartContainer,
   GeoDistributionChart,
@@ -20,93 +20,123 @@ interface AdminOverviewTabProps {
   };
   safeFormatDate: (dateString: string | null | undefined, formatStr?: string) => string;
   onShowSellers: () => void;
+  onOpenBroadcastModal?: () => void;
 }
 
-export function AdminOverviewTab({ dashboardState, safeFormatDate, onShowSellers }: AdminOverviewTabProps) {
+export function AdminOverviewTab({ dashboardState, safeFormatDate, onShowSellers, onOpenBroadcastModal }: AdminOverviewTabProps) {
   const analytics = (dashboardState.analytics ?? {}) as Record<string, unknown>;
   const asChartData = (value: unknown): Record<string, unknown>[] =>
     Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <ChartContainer title="Top Shops" description="Highest total sales" className="col-span-4">
-        <div className="space-y-4 h-full flex flex-col justify-center">
-          {dashboardState.topShops?.length ? dashboardState.topShops.slice(0, 3).map((shop: Record<string, unknown>, index: number) => (
-            <div key={String(shop.id)} className="flex items-center justify-between p-5 bg-white/[0.03] rounded-[1.5rem] border border-separator hover:bg-white/10 transition-all duration-500 group/shop">
-              <div className="flex items-center gap-5">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-semibold italic shadow-inner transition-transform group-hover/shop:scale-110 ${index === 0 ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
-                  index === 1 ? 'bg-gray-400/20 text-label-2 border border-gray-400/30' :
-                    'bg-orange-800/20 text-orange-600 border border-orange-800/30'
-                  }`}
-                >
-                  {index + 1}
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-label tracking-tight">{String(shop.shopName || shop.name || '')}</p>
-                  <p className="text-[10px] text-label-3 font-semibold uppercase tracking-widest mt-1 opacity-50">{String(shop.name || '')}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-semibold text-label tracking-tight tabular-nums group-hover/shop:text-yellow-500 transition-colors">{`KES ${Number(shop.totalSales ?? 0).toLocaleString()}`}</p>
-                <p className="text-[10px] text-label-3 uppercase font-semibold tracking-widest opacity-50">Sales</p>
-              </div>
-            </div>
-          )) : (
-            <p className="text-center text-sm font-semibold text-label-3">No shop conversion data yet</p>
-          )}
-        </div>
-      </ChartContainer>
-
-      <Card className="lg:col-span-4 bg-surface-1 border border-separator rounded-2xl overflow-hidden shadow-xl">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 md:p-8 border-b border-separator bg-white/[0.01] gap-4">
+      {/* App Release Management Banner */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 bg-surface-1 rounded-2xl border border-separator shadow-sm gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0">
+            <UploadCloud className="w-6 h-6" />
+          </div>
           <div>
-            <CardTitle className="text-xl md:text-2xl font-semibold text-label tracking-tight">Recent sellers</CardTitle>
-            <CardDescription className="text-xs md:text-sm text-label-2 font-medium">Newest sellers to join</CardDescription>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-base font-bold text-label">Android Release v1.0.69</h3>
+              <Badge className="bg-green-500/10 text-green-400 border-none text-[10px] uppercase font-semibold">
+                Active Gate (Code: 69)
+              </Badge>
+            </div>
+            <p className="text-xs text-label-2 mt-0.5">
+              Remote force-update gate active. Broadcast FCM push notifications and in-app alerts directly to outdated devices without SSH.
+            </p>
           </div>
-          <Button variant="outline" className="border-separator text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-xl font-semibold uppercase tracking-widest h-12 px-8 transition-all" onClick={onShowSellers}>
-            View all
+        </div>
+        {onOpenBroadcastModal && (
+          <Button
+            onClick={onOpenBroadcastModal}
+            className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold text-xs sm:text-sm h-10 px-5 rounded-xl flex items-center gap-2 transition-all w-full sm:w-auto justify-center shrink-0"
+          >
+            <Send className="h-4 w-4" />
+            Broadcast Update
           </Button>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
-                <tr>
-                  <th className="px-5 md:px-10 py-4 md:py-6">Seller</th>
-                  <th className="px-5 md:px-10 py-4 md:py-6 text-center hidden sm:table-cell">Status</th>
-                  <th className="px-5 md:px-10 py-4 md:py-6 text-right">Joined</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-separator">
-                {(dashboardState.sellers ?? []).slice(0, 5).map((seller: Record<string, unknown>) => (
-                  <tr key={String(seller.id)} className="hover:bg-white/[0.02] transition-all group">
-                    <td className="px-5 md:px-10 py-4 md:py-6">
-                      <div className="flex items-center gap-3 md:gap-5">
-                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-fill flex items-center justify-center border border-separator group-hover:border-yellow-500/30 transition-all">
-                          <Store className="w-4 h-4 md:w-5 md:h-5 text-label-3 group-hover:text-yellow-500 transition-all" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm md:text-base font-bold text-label tracking-tight truncate">{String(seller.name || '')}</p>
-                          <p className="text-[10px] md:text-xs text-label-2 font-medium italic truncate">{String(seller.email || '')}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-5 md:px-10 py-4 md:py-6 text-center hidden sm:table-cell">
-                      <Badge className={`px-3 md:px-5 py-1 rounded-full text-[9px] md:text-[10px] font-semibold uppercase tracking-widest border-none ${seller.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-label-2'}`}>
-                        {String(seller.status || '')}
-                      </Badge>
-                    </td>
-                    <td className="px-5 md:px-10 py-4 md:py-6 text-right text-[10px] md:text-sm font-bold text-label-2 tabular-nums">
-                      {safeFormatDate(seller.createdAt as string)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <ChartContainer title="Top Shops" description="Highest total sales" className="col-span-4">
+          <div className="space-y-4 h-full flex flex-col justify-center">
+            {dashboardState.topShops?.length ? dashboardState.topShops.slice(0, 3).map((shop: Record<string, unknown>, index: number) => (
+              <div key={String(shop.id)} className="flex items-center justify-between p-5 bg-white/[0.03] rounded-[1.5rem] border border-separator hover:bg-white/10 transition-all duration-500 group/shop">
+                <div className="flex items-center gap-5">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg font-semibold italic shadow-inner transition-transform group-hover/shop:scale-110 ${index === 0 ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :
+                    index === 1 ? 'bg-gray-400/20 text-label-2 border border-gray-400/30' :
+                      'bg-orange-800/20 text-orange-600 border border-orange-800/30'
+                    }`}
+                  >
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-label tracking-tight">{String(shop.shopName || shop.name || '')}</p>
+                    <p className="text-[10px] text-label-3 font-semibold uppercase tracking-widest mt-1 opacity-50">{String(shop.name || '')}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-semibold text-label tracking-tight tabular-nums group-hover/shop:text-yellow-500 transition-colors">{`KES ${Number(shop.totalSales ?? 0).toLocaleString()}`}</p>
+                  <p className="text-[10px] text-label-3 uppercase font-semibold tracking-widest opacity-50">Sales</p>
+                </div>
+              </div>
+            )) : (
+              <p className="text-center text-sm font-semibold text-label-3">No shop conversion data yet</p>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </ChartContainer>
+
+        <Card className="lg:col-span-4 bg-surface-1 border border-separator rounded-2xl overflow-hidden shadow-xl">
+          <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 md:p-8 border-b border-separator bg-white/[0.01] gap-4">
+            <div>
+              <CardTitle className="text-xl md:text-2xl font-semibold text-label tracking-tight">Recent sellers</CardTitle>
+              <CardDescription className="text-xs md:text-sm text-label-2 font-medium">Newest sellers to join</CardDescription>
+            </div>
+            <Button variant="outline" className="border-separator text-yellow-500 hover:bg-yellow-500 hover:text-black rounded-xl font-semibold uppercase tracking-widest h-12 px-8 transition-all" onClick={onShowSellers}>
+              View all
+            </Button>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
+                  <tr>
+                    <th className="px-5 md:px-10 py-4 md:py-6">Seller</th>
+                    <th className="px-5 md:px-10 py-4 md:py-6 text-center hidden sm:table-cell">Status</th>
+                    <th className="px-5 md:px-10 py-4 md:py-6 text-right">Joined</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-separator">
+                  {(dashboardState.sellers ?? []).slice(0, 5).map((seller: Record<string, unknown>) => (
+                    <tr key={String(seller.id)} className="hover:bg-white/[0.02] transition-all group">
+                      <td className="px-5 md:px-10 py-4 md:py-6">
+                        <div className="flex items-center gap-3 md:gap-5">
+                          <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-fill flex items-center justify-center border border-separator group-hover:border-yellow-500/30 transition-all">
+                            <Store className="w-4 h-4 md:w-5 md:h-5 text-label-3 group-hover:text-yellow-500 transition-all" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm md:text-base font-bold text-label tracking-tight truncate">{String(seller.name || '')}</p>
+                            <p className="text-[10px] md:text-xs text-label-2 font-medium italic truncate">{String(seller.email || '')}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-5 md:px-10 py-4 md:py-6 text-center hidden sm:table-cell">
+                        <Badge className={`px-3 md:px-5 py-1 rounded-full text-[9px] md:text-[10px] font-semibold uppercase tracking-widest border-none ${seller.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-label-2'}`}>
+                          {String(seller.status || '')}
+                        </Badge>
+                      </td>
+                      <td className="px-5 md:px-10 py-4 md:py-6 text-right text-[10px] md:text-sm font-bold text-label-2 tabular-nums">
+                        {safeFormatDate(seller.createdAt as string)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Analytics — insight, kept below the daily-driver summary. */}

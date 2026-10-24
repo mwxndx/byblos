@@ -1,6 +1,6 @@
 import { adminApiInstance } from './instance';
 import { login, getMe } from './auth';
-import { getDashboardStats } from './dashboard';
+import { getDashboardStats, broadcastAppUpdate } from './dashboard';
 import { getAnalytics, getMonthlyMetrics } from './analytics';
 import { getBuyers, getBuyerById, deleteUser } from './buyers';
 import { getSellers, getSellerById } from './sellers';
@@ -27,6 +27,7 @@ export const adminApi = {
   getMe,
   getAnalytics,
   getDashboardStats,
+  broadcastAppUpdate,
   getBuyers,
   getBuyerById,
   getSellers,
@@ -52,5 +53,3 @@ export const adminApi = {
 
 export default adminApi;
 export { adminApiInstance };
-
-

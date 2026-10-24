@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent } from "@/shared/ui/tabs";
 import { AppHeader } from "@/shared/ui/AppHeader";
 import { DashboardSkeleton } from "@/shared/ui/DashboardSkeleton";
-import { Activity, RefreshCw, Shield, Truck, WalletCards, XCircle } from '@/shared/ui/icons';
+import { Activity, RefreshCw, Send, Shield, Truck, WalletCards, XCircle } from '@/shared/ui/icons';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { adminApi } from '@/features/admin/api';
 import { adminQueryKeys } from '@/features/admin/api/queryKeys';
@@ -18,12 +19,14 @@ import { AdminSellersTab } from '../components/AdminSellersTab';
 import { AdminCreatorsTab } from '../components/AdminCreatorsTab';
 import { AdminBuyersTab } from '../components/AdminBuyersTab';
 import { AdminWithdrawalsTab } from '../components/AdminWithdrawalsTab';
+import { AdminBroadcastModal } from '../components/AdminBroadcastModal';
 import { useAdminDashboard } from '../hooks/useAdminDashboard';
 
 const money = (value: number) => `KSh ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const NewAdminDashboard = () => {
   const navigate = useNavigate();
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
   const {
     authLoading,
     isAuthenticated,
@@ -148,10 +151,19 @@ const NewAdminDashboard = () => {
           </div>
         }
         right={
-          <>
-            <span className="text-sm text-label-2">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button
+              onClick={() => setIsBroadcastModalOpen(true)}
+              className="bg-yellow-400 hover:bg-yellow-300 text-black font-semibold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+            >
+              <Send className="h-4 w-4" />
+              <span>Broadcast Update</span>
+            </Button>
+            <span className="hidden text-sm text-label-2 md:inline">
+              {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
             <NotificationBell />
-          </>
+          </div>
         }
       />
       <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-5 md:p-8 space-y-6">
@@ -215,6 +227,7 @@ const NewAdminDashboard = () => {
               }}
               safeFormatDate={safeFormatDate}
               onShowSellers={() => setActiveTab('sellers')}
+              onOpenBroadcastModal={() => setIsBroadcastModalOpen(true)}
             />
           </TabsContent>
 
@@ -306,6 +319,11 @@ const NewAdminDashboard = () => {
           closeBuyerModal={closeBuyerModal}
           safeFormatDate={safeFormatDate}
           inspectionSessionId={inspectionSessionId}
+        />
+
+        <AdminBroadcastModal
+          isOpen={isBroadcastModalOpen}
+          onClose={() => setIsBroadcastModalOpen(false)}
         />
       </div>
     </div>
