@@ -146,6 +146,51 @@ describe('SellerRegistration Navigation & Back Logic', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
+  test('Step 4: Back button resets physical shop choice and navigates to Step 3', () => {
+    const setHasPhysicalShop = vi.fn();
+    const setFormData = vi.fn();
+    const setCurrentStep = vi.fn();
+
+    vi.spyOn(sellerRegHook, 'useSellerRegistration').mockReturnValue({
+      ...defaultHookState,
+      currentStep: 4,
+      hasPhysicalShop: true,
+      setHasPhysicalShop,
+      setFormData,
+      setCurrentStep,
+    });
+
+    render(
+      <MemoryRouter>
+        <SellerRegistration />
+      </MemoryRouter>
+    );
+
+    const backButtons = screen.getAllByRole('button', { name: /back/i });
+    const bottomBackButton = backButtons[1];
+    fireEvent.click(bottomBackButton);
+
+    expect(setCurrentStep).toHaveBeenCalledWith(3);
+    expect(setHasPhysicalShop).toHaveBeenCalledWith(null);
+    expect(setFormData).toHaveBeenCalled();
+  });
+
+  test('Step 3 without choice made (hasPhysicalShop is null): Next button is not rendered', () => {
+    vi.spyOn(sellerRegHook, 'useSellerRegistration').mockReturnValue({
+      ...defaultHookState,
+      currentStep: 3,
+      hasPhysicalShop: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <SellerRegistration />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByRole('button', { name: /next/i })).toBeNull();
+  });
+
   test('Step 3 without choice made (hasPhysicalShop is null): Back button navigates back to Step 2', () => {
     const setCurrentStep = vi.fn();
 
@@ -176,7 +221,7 @@ describe('SellerRegistrationSteps — Step 3 Shop Type Switching', () => {
     vi.clearAllMocks();
   });
 
-  test('renders "Change shop type" button with min-h-[44px] and resets form data when clicked', () => {
+  test('does NOT render "Change shop type" button when physical shop is active', () => {
     const setHasPhysicalShop = vi.fn();
     const setFormData = vi.fn();
 
@@ -218,19 +263,8 @@ describe('SellerRegistrationSteps — Step 3 Shop Type Switching', () => {
       />
     );
 
-    const changeBtn = screen.getByRole('button', { name: /change shop type/i });
-    expect(changeBtn).toBeInTheDocument();
-    expect(changeBtn.className).toContain('min-h-[44px]');
-
-    fireEvent.click(changeBtn);
-
-    expect(setHasPhysicalShop).toHaveBeenCalledWith(null);
-    expect(setFormData).toHaveBeenCalled();
-    const updater = setFormData.mock.calls[0][0];
-    const updated = updater({ physicalAddress: 'Shop 12', latitude: -1.285, longitude: 36.824 });
-    expect(updated.physicalAddress).toBe('');
-    expect(updated.latitude).toBeUndefined();
-    expect(updated.longitude).toBeUndefined();
+    const changeBtn = screen.queryByRole('button', { name: /change shop type/i });
+    expect(changeBtn).toBeNull();
   });
 
   test('Step 1 renders shop url preview with byblosafrica.site domain', () => {

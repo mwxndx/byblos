@@ -51,7 +51,7 @@ export function BuyerRegister() {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
-                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-yellow-400 hover:text-black"
+                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span>Back</span>
@@ -75,25 +75,26 @@ export function BuyerRegister() {
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
         <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Buyer Community</p>
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               {isRegistered ? 'Verification Sent!' : 'Create Account'}
             </h2>
-            <p className="text-xs font-medium text-slate-600 dark:text-white/55">
-              {isRegistered ? 'One more step to join us' : 'Join our buyer community'}
-            </p>
+            {isRegistered && (
+              <p className="text-xs font-medium text-slate-600 dark:text-white/55">
+                One more step to join us
+              </p>
+            )}
 
             {!isRegistered && (
               <div className="pt-2 flex items-center justify-center gap-2">
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'bg-white text-black shadow-sm' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                   1
                 </div>
-                <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'bg-yellow-400' : 'bg-slate-200 dark:bg-white/10'}`} />
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+                <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'bg-white' : 'bg-slate-200 dark:bg-white/10'}`} />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'bg-white text-black shadow-sm' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                   2
                 </div>
-                <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'bg-yellow-400' : 'bg-slate-200 dark:bg-white/10'}`} />
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'bg-yellow-400 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
+                <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'bg-white' : 'bg-slate-200 dark:bg-white/10'}`} />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'bg-white text-black shadow-sm' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40'}`}>
                   3
                 </div>
               </div>
@@ -103,19 +104,19 @@ export function BuyerRegister() {
           {isRegistered ? (
             <div className="text-center py-6 space-y-4">
               <div className="mx-auto flex items-center justify-center pb-2">
-                <Mail className="h-14 w-14 text-yellow-400 animate-pulse" />
+                <Mail className="h-14 w-14 text-slate-900 dark:text-white animate-pulse" />
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Check your email</h3>
                 <p className="text-slate-600 dark:text-white/60 text-xs leading-relaxed max-w-[280px] mx-auto">
-                  We've sent a verification link to <span className="text-yellow-600 dark:text-yellow-300 font-semibold">{formData.email}</span>.
+                  We've sent a verification link to <span className="text-slate-900 dark:text-white font-semibold underline">{formData.email}</span>.
                   Please click the link to activate your account.
                 </p>
               </div>
               <div className="pt-3 space-y-2.5">
                 <Button
                   onClick={() => navigate('/buyer/login')}
-                  className="h-12 w-full rounded-2xl bg-yellow-400 font-semibold text-black transition hover:bg-yellow-300"
+                  className="h-12 w-full rounded-2xl bg-white font-semibold text-black transition hover:bg-gray-100 border border-gray-200 shadow-sm"
                 >
                   Go to Login
                 </Button>
@@ -160,7 +161,7 @@ export function BuyerRegister() {
                   <Button
                     type="button"
                     onClick={() => setCurrentStep(currentStep - 1)}
-                    className="h-12 flex-1 rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-white/10 text-xs font-semibold text-slate-800 dark:text-white hover:bg-black/10 dark:hover:bg-white/20 transition"
+                    className="h-12 flex-1 rounded-2xl border border-gray-200 bg-white text-xs font-semibold text-black hover:bg-gray-100 shadow-sm transition"
                   >
                     Back
                   </Button>
@@ -190,14 +191,14 @@ export function BuyerRegister() {
                       }
                       setCurrentStep(currentStep + 1);
                     }}
-                    className="h-12 flex-1 rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
+                    className="h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
                   >
                     Next
                   </Button>
                 ) : (
                   <Button
                     type="submit"
-                    className="h-12 flex-1 rounded-2xl bg-yellow-400 font-semibold text-black hover:bg-yellow-300 transition"
+                    className="h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
                     disabled={isLoading || !termsAccepted}
                   >
                     {isLoading ? (

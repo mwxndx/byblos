@@ -26,14 +26,14 @@ export function VerifyEmailModalView({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl overflow-hidden shadow-2xl transition-colors duration-200">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 to-yellow-600" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white to-gray-200" />
 
         <DialogHeader className="pt-6">
-          <div className="w-16 h-16 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-yellow-500/20">
+          <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-white/20">
             {isSuccess ? (
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             ) : (
-              <Mail className="h-8 w-8 text-yellow-500" />
+              <Mail className="h-8 w-8 text-slate-900 dark:text-white" />
             )}
           </div>
           <DialogTitle className="text-2xl font-bold text-center text-slate-950 dark:text-white">
@@ -57,7 +57,7 @@ export function VerifyEmailModalView({
             className={`w-full h-12 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
               isSuccess
                 ? 'bg-green-500/20 text-green-600 dark:text-green-400 hover:bg-green-500/30 border border-green-500/30'
-                : 'bg-yellow-400 text-black hover:bg-yellow-300 font-extrabold'
+                : 'bg-white text-black hover:bg-gray-100 font-bold border border-gray-200 shadow-sm'
             }`}
           >
             {isResending ? (

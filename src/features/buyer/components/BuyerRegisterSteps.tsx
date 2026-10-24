@@ -138,27 +138,6 @@ export const BuyerRegisterSteps = ({
                       {errors.mobilePayment && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.mobilePayment}</p>}
                     </div>
 
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="whatsappNumber" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                        <span>WhatsApp Number <span className="text-slate-400 dark:text-slate-500 font-normal text-[10px] sm:text-xs">(Optional)</span></span>
-                        <span className="text-[8px] sm:text-[10px] text-yellow-600 dark:text-yellow-400 font-semibold">For Order Updates</span>
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                          <Phone className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Input
-                          id="whatsappNumber"
-                          name="whatsappNumber"
-                          type="tel"
-                          placeholder="e.g. 0712345678 (Optional)"
-                          value={formData.whatsappNumber}
-                          onChange={handleInputChange}
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.whatsappNumber ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors.whatsappNumber && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.whatsappNumber}</p>}
-                    </div>
                   </>
                 )}
 

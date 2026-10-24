@@ -130,20 +130,6 @@ export const SellerRegistrationSteps = ({
                       />
                     </div>
 
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="whatsappNumber" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        WhatsApp Number <span className="text-slate-400 dark:text-slate-500 font-normal text-[10px] sm:text-xs">(Optional)</span>
-                      </Label>
-                      <Input
-                        id="whatsappNumber"
-                        name="whatsappNumber"
-                        type="tel"
-                        placeholder="07... or 01... (Optional)"
-                        value={formData.whatsappNumber}
-                        onChange={handleInputChange}
-                        className="input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base"
-                      />
-                    </div>
                   </>
                 )}
 
@@ -156,11 +142,11 @@ export const SellerRegistrationSteps = ({
                         value={formData.city}
                         onValueChange={(value) => setFormData(prev => ({ ...prev, city: value, location: '' }))}
                       >
-                        <SelectTrigger className="!pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base">
+                        <SelectTrigger className="!pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-white dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-white focus:ring-white text-[10px] sm:text-base">
                           <SelectValue placeholder="Nairobi" className="text-slate-400 dark:text-slate-400" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
-                          <SelectItem value="Nairobi" className="text-slate-900 dark:text-white focus:bg-yellow-400 focus:text-black text-xs">
+                          <SelectItem value="Nairobi" className="text-slate-900 dark:text-white focus:bg-gray-100 focus:text-black dark:focus:bg-white/10 dark:focus:text-white text-xs">
                             Nairobi
                           </SelectItem>
                         </SelectContent>
@@ -174,12 +160,12 @@ export const SellerRegistrationSteps = ({
                         onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}
                         disabled={!formData.city}
                       >
-                        <SelectTrigger className="!pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 disabled:opacity-50 text-[10px] sm:text-base">
+                        <SelectTrigger className="!pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-white dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-white focus:ring-white disabled:opacity-50 text-[10px] sm:text-base">
                           <SelectValue placeholder={formData.city ? 'Select your area' : 'Select city first'} className="text-slate-400 dark:text-slate-400" />
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
                           {formData.city && locationData[formData.city]?.sort((a, b) => a.localeCompare(b)).map((area) => (
-                            <SelectItem key={area} value={area} className="text-slate-900 dark:text-white focus:bg-yellow-400 focus:text-black text-xs">{area}</SelectItem>
+                            <SelectItem key={area} value={area} className="text-slate-900 dark:text-white focus:bg-gray-100 focus:text-black dark:focus:bg-white/10 dark:focus:text-white text-xs">{area}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -220,12 +206,12 @@ export const SellerRegistrationSteps = ({
                             type="button"
                             onClick={() => setHasPhysicalShop(true)}
                             variant="ghost"
-                            className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-all group active:scale-95 border border-slate-200 dark:border-separator hover:bg-yellow-400/10 hover:text-yellow-600 dark:hover:text-yellow-400 uppercase tracking-wider bg-slate-50 dark:bg-fill text-center"
+                            className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-all group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill uppercase tracking-wider bg-slate-50 dark:bg-fill text-center"
                           >
                             <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
-                              <Store className="h-8 w-8 text-yellow-500" />
+                              <Store className="h-8 w-8 text-slate-800 dark:text-white" />
                             </div>
-                            <span className="font-bold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-yellow-600 dark:group-hover:text-yellow-400 transition-colors leading-tight break-words">
+                            <span className="font-bold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
                               Have a Shop
                             </span>
                           </Button>
@@ -233,73 +219,19 @@ export const SellerRegistrationSteps = ({
                       </div>
                     ) : (
                       <div className="space-y-4 animate-in zoom-in-95 duration-300">
-                        {hasPhysicalShop ? (
-                          <>
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 p-3 bg-yellow-400/10 rounded-xl border border-yellow-500/20">
-                              <div className="flex items-center gap-2.5">
-                                <Store className="h-5 w-5 text-yellow-600 dark:text-yellow-400 shrink-0" />
-                                <div>
-                                  <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">Shop Location Pin</p>
-                                  <p className="text-[11px] text-slate-600 dark:text-label-2 font-medium">Pin your physical storefront location.</p>
-                                </div>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  setHasPhysicalShop(null);
-                                  setFormData(prev => ({
-                                    ...prev,
-                                    physicalAddress: '',
-                                    latitude: undefined,
-                                    longitude: undefined,
-                                  }));
-                                }}
-                                className="min-h-[44px] h-11 px-3 text-xs font-semibold rounded-xl border-yellow-500/30 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-400/20 active:scale-95 transition-all"
-                              >
-                                Change shop type
-                              </Button>
-                            </div>
-                            <ShopLocationPicker
-                              initialAddress={formData.physicalAddress}
-                              initialCoordinates={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : null}
-                              onLocationChange={(address, coords) => {
-                                setFormData(prev => ({
-                                  ...prev,
-                                  physicalAddress: address,
-                                  latitude: coords?.lat,
-                                  longitude: coords?.lng
-                                }));
-                              }}
-                            />
-                          </>
-                        ) : (
-                          <div className="py-8 text-center space-y-4 bg-slate-50 dark:bg-fill rounded-2xl border border-slate-200 dark:border-separator animate-in slide-in-from-top-4 duration-500">
-                            <div className="w-12 h-12 mx-auto bg-yellow-400/10 rounded-full flex items-center justify-center">
-                              <Check className="h-6 w-6 text-yellow-500" />
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-slate-950 dark:text-white font-bold">Online-only Shop</p>
-                              <p className="text-slate-600 dark:text-zinc-400 text-xs px-8 font-medium">You've selected that your shop only operates online. You can add a physical address later from your settings.</p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="link"
-                              onClick={() => {
-                                setHasPhysicalShop(null);
-                                setFormData(prev => ({
-                                  ...prev,
-                                  physicalAddress: '',
-                                  latitude: undefined,
-                                  longitude: undefined,
-                                }));
-                              }}
-                              className="text-yellow-600 dark:text-yellow-400 text-xs font-semibold min-h-[44px] inline-flex items-center"
-                            >
-                              Wait, I actually have a physical shop
-                            </Button>
-                          </div>
+                        {hasPhysicalShop && (
+                          <ShopLocationPicker
+                            initialAddress={formData.physicalAddress}
+                            initialCoordinates={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : null}
+                            onLocationChange={(address, coords) => {
+                              setFormData(prev => ({
+                                ...prev,
+                                physicalAddress: address,
+                                latitude: coords?.lat,
+                                longitude: coords?.lng
+                              }));
+                            }}
+                          />
                         )}
                       </div>
                     )}

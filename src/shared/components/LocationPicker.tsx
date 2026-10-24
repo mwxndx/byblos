@@ -21,6 +21,7 @@ export interface LocationPickerProps {
   mapClassName?: string;
   autoPopulate?: boolean;
   initialValue?: string;
+  showRepinButton?: boolean;
 }
 
 export default function LocationPicker({
@@ -34,6 +35,7 @@ export default function LocationPicker({
   mapClassName,
   autoPopulate = true,
   initialValue = '',
+  showRepinButton = true,
 }: LocationPickerProps) {
   const mapState = useLocationMapState({
     initialAddress,
@@ -121,7 +123,7 @@ export default function LocationPicker({
         <p className="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
           {mapState.markerPosition ? 'Location pinned' : 'Tap the map to pin exact location'}
         </p>
-        {mapState.markerPosition && (
+        {showRepinButton && mapState.markerPosition && (
           <button
             type="button"
             onClick={mapState.handleClearPin}
