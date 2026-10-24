@@ -111,19 +111,19 @@ async function ensureRoleLink(client, userId, roleSlug) {
   );
 }
 
-async function upsertBuyer(client, userId, { email, fullName, mobilePayment }) {
+async function upsertBuyer(client, userId, { email, fullName, mobilePayment, city = 'Nairobi', location = 'Nairobi' }) {
   const existing = await client.query('SELECT id FROM buyers WHERE user_id = $1', [userId]);
   if (existing.rows[0]) {
     await client.query(
-      `UPDATE buyers SET full_name = $2, email = $3, mobile_payment = $4, terms_accepted = TRUE, is_verified = TRUE, updated_at = NOW() WHERE id = $1`,
-      [existing.rows[0].id, fullName, email.toLowerCase(), mobilePayment]
+      `UPDATE buyers SET full_name = $2, email = $3, mobile_payment = $4, city = COALESCE(city, $5), location = COALESCE(location, $6), terms_accepted = TRUE, is_verified = TRUE, updated_at = NOW() WHERE id = $1`,
+      [existing.rows[0].id, fullName, email.toLowerCase(), mobilePayment, city, location]
     );
     return existing.rows[0].id;
   }
   const { rows } = await client.query(
-    `INSERT INTO buyers (user_id, full_name, email, mobile_payment, terms_accepted, is_verified, status, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, TRUE, TRUE, 'active', NOW(), NOW()) RETURNING id`,
-    [userId, fullName, email.toLowerCase(), mobilePayment]
+    `INSERT INTO buyers (user_id, full_name, email, mobile_payment, city, location, terms_accepted, is_verified, status, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, TRUE, TRUE, 'active', NOW(), NOW()) RETURNING id`,
+    [userId, fullName, email.toLowerCase(), mobilePayment, city, location]
   );
   return rows[0].id;
 }

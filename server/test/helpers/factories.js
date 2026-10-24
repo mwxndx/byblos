@@ -30,12 +30,12 @@ export async function createUser({ email, role = null } = {}) {
   return rows[0];
 }
 
-export async function createBuyer({ userId = null, email, mobilePayment, fullName = 'Test Buyer' } = {}) {
+export async function createBuyer({ userId = null, email, mobilePayment, fullName = 'Test Buyer', city = 'Nairobi', location = 'Nairobi' } = {}) {
   const { rows } = await pool.query(
-    `INSERT INTO buyers (user_id, full_name, email, mobile_payment)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO buyers (user_id, full_name, email, mobile_payment, city, location)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
-    [userId, fullName, email || `${unique('buyer')}@test.byblos.local`, mobilePayment || `2547${String(unique('')).slice(-8)}`]
+    [userId, fullName, email || `${unique('buyer')}@test.byblos.local`, mobilePayment || `2547${String(unique('')).slice(-8)}`, city, location]
   );
   return rows[0];
 }

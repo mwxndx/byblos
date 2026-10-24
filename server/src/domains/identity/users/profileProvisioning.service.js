@@ -102,8 +102,8 @@ class ProfileProvisioningService {
                 email: normalizedEmail,
                 mobilePayment: mobile_payment,
                 whatsappNumber: whatsapp_number,
-                city,
-                location,
+                city: city || 'Nairobi',
+                location: location || city || 'Nairobi',
                 userId: existingUser.id,
                 termsAccepted
             }, client);

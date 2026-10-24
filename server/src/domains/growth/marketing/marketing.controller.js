@@ -233,8 +233,12 @@ export const getGeography = async (req, res, next) => {
     const formatted = buyerLocations.map(r => {
       const count = Number.parseInt(r.buyer_count || 0)
       const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0
+      const rawLocation = r.location && String(r.location).trim();
+      const city = (!rawLocation || rawLocation.toLowerCase() === 'unknown city' || rawLocation.toLowerCase() === 'unknown')
+        ? 'Nairobi'
+        : rawLocation;
       return {
-        city: r.location || 'Nairobi',
+        city,
         percentage: pct
       }
     })

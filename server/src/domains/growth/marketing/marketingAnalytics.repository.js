@@ -144,9 +144,25 @@ export async function findOrderStatusFunnel() {
 export async function findBuyerLocations() {
   const sql = `
     SELECT
-      COALESCE(NULLIF(TRIM(city), ''), 'Unknown City') AS location,
+      COALESCE(
+        NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(b.location), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(latest_order.city), ''), 'Unknown City'),
+        'Nairobi'
+      ) AS location,
       COUNT(*) AS buyer_count
-    FROM buyers
+    FROM buyers b
+    LEFT JOIN LATERAL (
+      SELECT
+        COALESCE(
+          NULLIF(TRIM(po.delivery_location->>'city'), ''),
+          NULLIF(TRIM(po.location_address), '')
+        ) AS city
+      FROM product_orders po
+      WHERE po.buyer_id = b.id
+      ORDER BY po.created_at DESC
+      LIMIT 1
+    ) latest_order ON true
     GROUP BY 1
     ORDER BY buyer_count DESC
     LIMIT 10
