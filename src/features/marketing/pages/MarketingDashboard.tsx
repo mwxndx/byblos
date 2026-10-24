@@ -170,13 +170,19 @@ export default function MarketingDashboard() {
 
             {/* Overview Stat Cards */}
             {overview && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
                     <StatCard
                         title="Total Registered Users"
                         value={Number(overview.totalUsers || 0).toLocaleString()}
                         trend={overview.userGrowthMoM}
                         label="MoM growth"
                         color="yellow"
+                    />
+                    <StatCard
+                        title="Registered Buyers"
+                        value={Number(overview.totalBuyers || 0).toLocaleString()}
+                        sub={overview.newBuyersThisMonth !== undefined ? `${overview.newBuyersThisMonth} joined this month` : undefined}
+                        color="gray"
                     />
                     <StatCard
                         title="Active Sellers"

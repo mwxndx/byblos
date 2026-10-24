@@ -7,6 +7,8 @@ import apiClient from '@/infrastructure/http/apiClient';
 
 export interface MarketingOverview {
   totalUsers?: number;
+  totalBuyers?: number;
+  newBuyersThisMonth?: number;
   activeSellers?: number;
   activeCreators?: number;
   totalOrders?: number;

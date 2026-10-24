@@ -81,6 +81,7 @@ export const getOverview = async (req, res, next) => {
 
     const totalSellers = Number.parseInt(d?.total_sellers || 0)
     const totalBuyers = Number.parseInt(d?.total_buyers || 0)
+    const newBuyersThisMonth = Number.parseInt(d?.new_buyers_this_month || 0)
     const activeCreators = Number.parseInt(d?.total_creators || 0)
     const pendingSellers = Number.parseInt(d?.pending_sellers || 0)
     const totalUsers = totalSellers + totalBuyers + activeCreators
@@ -91,6 +92,8 @@ export const getOverview = async (req, res, next) => {
       status: 'success',
       data: {
         totalUsers,
+        totalBuyers,
+        newBuyersThisMonth,
         activeSellers: totalSellers,
         pendingSellers,
         activeCreators,
