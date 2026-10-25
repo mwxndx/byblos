@@ -79,6 +79,13 @@ describe('AppUpdateGate Component', () => {
     expect(screen.getByText('Important security updates')).toBeInTheDocument();
     expect(screen.getByText('Faster Mzigo tracking')).toBeInTheDocument();
 
+    // Verify initials BY are removed and Byblos logos for dark and light theme are present
+    expect(screen.queryByText('BY')).toBeNull();
+    const logos = screen.getAllByRole('img', { name: /byblos logo/i });
+    expect(logos).toHaveLength(2);
+    expect(logos.some((img) => img.getAttribute('src') === '/byblos-logo-dark.png')).toBe(true);
+    expect(logos.some((img) => img.getAttribute('src') === '/byblos-logo-light.png')).toBe(true);
+
     // Verify back button interceptor was registered to prevent bypass
     expect(modalBackHandler.registerModalDismiss).toHaveBeenCalled();
 

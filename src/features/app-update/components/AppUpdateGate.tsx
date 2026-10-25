@@ -55,8 +55,21 @@ export function AppUpdateGate() {
       }}
     >
       <div className="flex-1 flex flex-col items-center justify-center text-center max-w-sm w-full mx-auto">
-        <div className="w-20 h-20 mb-6 rounded-2xl bg-slate-900 dark:bg-white flex items-center justify-center shadow-xl">
-          <span className="text-white dark:text-black font-black text-3xl tracking-tighter">BY</span>
+        <div className="mb-6 flex items-center justify-center">
+          <img
+            src="/byblos-logo-dark.png"
+            alt="Byblos logo"
+            className="hidden dark:block h-20 w-20 object-contain drop-shadow-md"
+            width={80}
+            height={80}
+          />
+          <img
+            src="/byblos-logo-light.png"
+            alt="Byblos logo"
+            className="block dark:hidden h-20 w-20 object-contain drop-shadow-md"
+            width={80}
+            height={80}
+          />
         </div>
 
         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 mb-4">
