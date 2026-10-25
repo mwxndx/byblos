@@ -263,6 +263,28 @@ describe('GATE 4: Administration & Authorization Business Journey', () => {
       assert.equal(flaggedBody.status, 'success');
       assert.ok(Array.isArray(flaggedBody.data));
     });
+
+    test('Admin token successfully broadcasts app update via /broadcast-update and /broadcast-app-update', async () => {
+      for (const endpoint of ['/api/admin/broadcast-update', '/api/admin/broadcast-app-update']) {
+        const res = await fetch(`${baseUrl}${endpoint}`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            minVersionCode: 70,
+            title: 'Test App Update',
+            body: 'Testing broadcast'
+          })
+        });
+        assert.equal(res.status, 200, `Endpoint ${endpoint} must succeed with 200 for admin`);
+        const body = await res.json();
+        assert.equal(body.status, 'success');
+        assert.equal(body.data.success, true);
+        assert.equal(body.data.minVersionCode, 70);
+      }
+    });
   });
 
   // ---------------------------------------------------------------------------

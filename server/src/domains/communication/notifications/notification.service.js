@@ -485,7 +485,7 @@ class NotificationService {
         });
 
         if (outdatedTokens.length === 0) {
-            return { targeted: 0, sent: 0, failed: 0, reason: 'no_outdated_tokens' };
+            return { targeted: 0, sent: 0, failed: 0, inAppSent: 0, reason: 'no_outdated_tokens' };
         }
 
         const data = {
@@ -568,7 +568,13 @@ class NotificationService {
             deactivated: invalidTokens.length
         });
 
-        return { targeted: outdatedTokens.length, sent, failed, deactivated: invalidTokens.length };
+        return {
+            targeted: outdatedTokens.length,
+            sent,
+            failed,
+            inAppSent: distinctRecipients.size,
+            deactivated: invalidTokens.length
+        };
     }
 }
 

@@ -28,5 +28,13 @@ export async function getDashboardStats() {
 
 export async function broadcastAppUpdate(payload?: BroadcastUpdatePayload): Promise<BroadcastUpdateResult> {
   const { data } = await api.post('/admin/broadcast-update', payload || {});
-  return data.data;
+  const res = data?.data || {};
+  return {
+    success: res.success ?? true,
+    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 70,
+    targetedDevices: res.targetedDevices ?? res.targeted ?? 0,
+    fcmSent: res.fcmSent ?? res.sent ?? 0,
+    fcmFailed: res.fcmFailed ?? res.failed ?? 0,
+    inAppNotificationsCreated: res.inAppNotificationsCreated ?? res.inAppSent ?? 0,
+  };
 }

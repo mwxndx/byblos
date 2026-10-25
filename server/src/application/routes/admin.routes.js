@@ -84,6 +84,7 @@ router.post('/orders/:id/exceptional-reversal', validate(V.exceptionalOrderRever
 
 // Android release broadcast notification
 router.post('/broadcast-app-update', adminController.broadcastAppUpdate);
+router.post('/broadcast-update', adminController.broadcastAppUpdate);
 
 export default router;
 

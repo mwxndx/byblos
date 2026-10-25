@@ -647,13 +647,26 @@ const resolveFlaggedCreatorEarning = async (req, res, next) => {
 const broadcastAppUpdate = async (req, res, next) => {
   try {
     const { minVersionCode, title, body, storeUrl } = req.body || {};
+    const parsedMinVersion = minVersionCode ? Number(minVersionCode) : 70;
     const result = await NotificationService.broadcastAppUpdate({
-      minVersionCode: minVersionCode ? Number(minVersionCode) : undefined,
+      minVersionCode: parsedMinVersion,
       title: title ? String(title) : undefined,
       body: body ? String(body) : undefined,
       storeUrl: storeUrl ? String(storeUrl) : undefined,
     });
-    res.status(200).json({ status: 'success', message: 'Update broadcast processed.', data: result });
+    res.status(200).json({
+      status: 'success',
+      message: 'Update broadcast processed.',
+      data: {
+        success: true,
+        minVersionCode: parsedMinVersion,
+        targetedDevices: result?.targeted ?? result?.targetedDevices ?? 0,
+        fcmSent: result?.sent ?? result?.fcmSent ?? 0,
+        fcmFailed: result?.failed ?? result?.fcmFailed ?? 0,
+        inAppNotificationsCreated: result?.inAppSent ?? result?.inAppNotificationsCreated ?? 0,
+        ...result,
+      }
+    });
   } catch (error) {
     next(error);
   }
