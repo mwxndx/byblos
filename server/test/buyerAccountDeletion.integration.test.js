@@ -31,7 +31,7 @@ async function seedBuyer({ refunds = 0, reserved = 0 } = {}) {
 }
 
 async function readBuyerAndUser(buyerId, userId) {
-  const b = (await pool.query('SELECT full_name, mobile_payment, refunds FROM buyers WHERE id = $1', [buyerId])).rows[0];
+  const b = (await pool.query('SELECT full_name, mobile_payment, refunds, status FROM buyers WHERE id = $1', [buyerId])).rows[0];
   const u = (await pool.query('SELECT is_active FROM users WHERE id = $1', [userId])).rows[0];
   return { b, u };
 }
@@ -86,6 +86,7 @@ describe('Buyer.softDeleteAccount — refund-balance guard', () => {
 
     const { b, u } = await readBuyerAndUser(buyer.id, user.id);
     assert.equal(b.full_name, 'Deleted user', 'buyer row must be tombstoned');
+    assert.equal(b.status, 'deleted', 'buyer status must be marked as deleted');
     assert.equal(b.mobile_payment, 'deleted', 'M-Pesa number must be cleared on delete');
     assert.equal(u.is_active, false, 'user account must be deactivated');
   });

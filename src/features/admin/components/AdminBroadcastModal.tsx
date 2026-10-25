@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import { Label } from '@/shared/ui/label';
 import { Loader2, Send, CheckCircle2, AlertCircle, RefreshCw } from '@/shared/ui/icons';
 import { adminApi, type BroadcastUpdateResult } from '@/features/admin/api';
 import { classifyApiError } from '@/shared/utils/errorClassification';
-import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
+import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
 import { toast } from 'sonner';
 
 interface AdminBroadcastModalProps {
@@ -22,8 +22,8 @@ interface AdminBroadcastModalProps {
 }
 
 export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProps) {
-  const [minVersionCode, setMinVersionCode] = useState<number>(71);
-  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.71');
+  const [minVersionCode, setMinVersionCode] = useState<number>(72);
+  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.72');
   const [body, setBody] = useState<string>(
     'A new version of Byblos is available. Please update now to continue using all features.'
   );
@@ -31,18 +31,12 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [result, setResult] = useState<BroadcastUpdateResult | null>(null);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    return registerModalDismiss(() => {
-      onClose();
-      return true;
-    });
-  }, [isOpen, onClose]);
+  useModalBackDismiss(isOpen, onClose);
 
   const handleReset = () => {
     setResult(null);
-    setMinVersionCode(71);
-    setTitle('Update Available: Byblos 1.0.71');
+    setMinVersionCode(72);
+    setTitle('Update Available: Byblos 1.0.72');
     setBody('A new version of Byblos is available. Please update now to continue using all features.');
     setStoreUrl('');
   };
@@ -173,7 +167,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isSubmitting}
                 className="h-10 text-sm bg-fill border-separator rounded-xl"
-                placeholder="Update Available: Byblos 1.0.71"
+                placeholder="Update Available: Byblos 1.0.72"
                 required
               />
             </div>

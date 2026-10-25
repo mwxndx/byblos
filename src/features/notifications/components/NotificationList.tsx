@@ -1,5 +1,6 @@
 import { CheckCheck, Clock } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
+import type { UserRole } from '@/shared/types';
 import { useNotifications, type NotificationVariant } from '../hooks/useNotifications';
 import { IosNotificationBanner } from './IosNotificationBanner';
 
@@ -38,7 +39,7 @@ interface NotificationListProps {
   /** Height class for the scroll region — popover uses a capped height, the full page section can grow. */
   scrollClassName?: string;
   className?: string;
-  role?: string;
+  role?: UserRole;
 }
 
 /**
@@ -77,7 +78,7 @@ export function NotificationList({
         )}
       </div>
 
-      <IosNotificationBanner role={role as any} />
+      <IosNotificationBanner role={role} />
 
       <div className={cn('overflow-y-auto divide-y divide-slate-100 dark:divide-white/5', scrollClassName)}>
         {isLoading ? (

@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { ShieldAlert, Loader2 } from '@/shared/ui/icons';
 import { DetectionCard } from '../components/DetectionCard';
 import { useDetections } from '../hooks/useDetections';
+import { formatCurrency } from '@/shared/utils/formatting';
 
 export default function DetectionsPage() {
   const {
@@ -24,14 +25,7 @@ export default function DetectionsPage() {
     handleReverse,
   } = useDetections();
 
-  const formatCurrency = (value: string) => {
-    return `KSh ${Number.parseFloat(value).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}`;
-  };
-
-  if (isLoading) {
+    if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-orange-500" />

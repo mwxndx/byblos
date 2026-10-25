@@ -259,9 +259,9 @@ class AdminService {
               WITH buyer_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
                     NULLIF(NULLIF(TRIM(b.location), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(latest_order.city), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(latest_order.location), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
                     'Nairobi'
                   ) AS name,
                   COUNT(*) AS buyers,
@@ -272,9 +272,11 @@ class AdminService {
                 LEFT JOIN LATERAL (
                   SELECT
                     COALESCE(
-                      NULLIF(TRIM(po.delivery_location->>'city'), ''),
-                      NULLIF(TRIM(po.location_address), '')
-                    ) AS city
+                      NULLIF(TRIM(po.delivery_location->>'location'), ''),
+                      NULLIF(TRIM(po.location_address), ''),
+                      NULLIF(TRIM(po.delivery_location->>'address'), ''),
+                      NULLIF(TRIM(po.delivery_location->>'city'), '')
+                    ) AS location
                   FROM product_orders po
                   WHERE po.buyer_id = b.id
                   ORDER BY po.created_at DESC
@@ -286,9 +288,9 @@ class AdminService {
               seller_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
                     NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
                     NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
                     'Nairobi'
                   ) AS name,
                   0::int AS buyers,
@@ -302,8 +304,9 @@ class AdminService {
               creator_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
                     NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
                     'Nairobi'
                   ) AS name,
                   0::int AS buyers,
@@ -317,10 +320,12 @@ class AdminService {
               order_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(po.delivery_location->>'city'), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(po.delivery_location->>'location'), ''), 'Unknown City'),
                     NULLIF(NULLIF(TRIM(po.location_address), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(po.delivery_location->>'address'), ''), 'Unknown City'),
                     NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(po.delivery_location->>'city'), ''), 'Unknown City'),
+                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
                     'Nairobi'
                   ) AS name,
                   0::int AS buyers,
@@ -334,13 +339,13 @@ class AdminService {
                 GROUP BY 1
               ),
               combined AS (
-                SELECT * FROM buyer_regions
+                SELECT name, buyers, sellers, creators, gmv FROM buyer_regions
                 UNION ALL
-                SELECT * FROM seller_regions
+                SELECT name, buyers, sellers, creators, gmv FROM seller_regions
                 UNION ALL
-                SELECT * FROM creator_regions
+                SELECT name, buyers, sellers, creators, gmv FROM creator_regions
                 UNION ALL
-                SELECT * FROM order_regions
+                SELECT name, buyers, sellers, creators, gmv FROM order_regions
               )
               SELECT
                 CASE 
@@ -720,6 +725,7 @@ class AdminService {
         await client.query(`
           UPDATE buyers
           SET user_id = NULL,
+              status = 'deleted',
               full_name = 'Deleted buyer',
               email = $2,
               mobile_payment = CONCAT('deleted-', $1::text),

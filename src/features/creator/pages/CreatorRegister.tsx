@@ -7,7 +7,7 @@ import { useCreatorInviteQuery } from '@/features/creator/hooks/queries/useCreat
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
+import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
 import TermsModal from '@/shared/components/TermsModal';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 
@@ -102,13 +102,7 @@ export default function CreatorRegister() {
 
   const registerMutation = useCreatorRegisterMutation();
 
-  useEffect(() => {
-    if (!existingAccountPrompt) return;
-    return registerModalDismiss(() => {
-      setExistingAccountPrompt(false);
-      return true;
-    });
-  }, [existingAccountPrompt]);
+  useModalBackDismiss(existingAccountPrompt, () => setExistingAccountPrompt(false));
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

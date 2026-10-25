@@ -284,8 +284,8 @@ export default function MarketingDashboard() {
                     <ChartCard title="Top Seller Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
                             {sellerLocations.map((item: MarketingRecord, i: number) => (
-                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2 gap-2">
-                                    <span className="text-xs font-medium text-label-2 truncate">{String(item.city || '')}</span>
+                                <div key={String(item.location || item.city || i)} className="flex items-center justify-between border-b border-separator pb-2 gap-2">
+                                    <span className="text-xs font-medium text-label-2 truncate">{String(item.location || item.city || '')}</span>
                                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                                         <div className="w-16 sm:w-24 bg-white/10 h-2 rounded-full overflow-hidden">
                                             <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${Number(item.percentage || 0)}%` }} />
@@ -302,8 +302,8 @@ export default function MarketingDashboard() {
                     <ChartCard title="Top Buyer Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
                             {buyerLocations.map((item: MarketingRecord, i: number) => (
-                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2 gap-2">
-                                    <span className="text-xs font-medium text-label-2 truncate">{String(item.city || '')}</span>
+                                <div key={String(item.location || item.city || i)} className="flex items-center justify-between border-b border-separator pb-2 gap-2">
+                                    <span className="text-xs font-medium text-label-2 truncate">{String(item.location || item.city || '')}</span>
                                     <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                                         <div className="w-16 sm:w-24 bg-white/10 h-2 rounded-full overflow-hidden">
                                             <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${Number(item.percentage || 0)}%` }} />

@@ -172,4 +172,34 @@ describe('MarketingDashboard UI & Data Flow', () => {
       expect(screen.queryByText('Recent Platform Activity')).toBeNull();
     });
   });
+
+  it('renders specific location names (e.g. Westlands, Nyali) over generic city names', async () => {
+    vi.mocked(marketingApi.getOverview).mockResolvedValueOnce({ data: { data: {} } } as unknown as ReturnType<typeof marketingApi.getOverview>);
+    vi.mocked(marketingApi.getGmvTrend).mockResolvedValueOnce({ data: { data: [] } } as unknown as ReturnType<typeof marketingApi.getGmvTrend>);
+    vi.mocked(marketingApi.getUserGrowth).mockResolvedValueOnce({ data: { data: [] } } as unknown as ReturnType<typeof marketingApi.getUserGrowth>);
+    vi.mocked(marketingApi.getProductMix).mockResolvedValueOnce({ data: { data: [] } } as unknown as ReturnType<typeof marketingApi.getProductMix>);
+
+    vi.mocked(marketingApi.getGeography).mockResolvedValueOnce({
+      data: {
+        data: {
+          buyers: [{ location: 'Westlands', city: 'Nairobi', count: 90, percentage: 60 }],
+          sellers: [{ location: 'Nyali', city: 'Mombasa', count: 40, percentage: 50 }],
+        },
+      },
+    } as unknown as ReturnType<typeof marketingApi.getGeography>);
+
+    vi.mocked(marketingApi.getTopPerformers).mockResolvedValueOnce({ data: { data: {} } } as unknown as ReturnType<typeof marketingApi.getTopPerformers>);
+    vi.mocked(marketingApi.getReferrals).mockResolvedValueOnce({ data: { data: {} } } as unknown as ReturnType<typeof marketingApi.getReferrals>);
+
+    render(
+      <MemoryRouter>
+        <MarketingDashboard />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Westlands')).toBeDefined();
+      expect(screen.getByText('Nyali')).toBeDefined();
+    });
+  });
 });

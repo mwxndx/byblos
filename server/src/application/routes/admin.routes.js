@@ -12,11 +12,15 @@ const router = express.Router();
 // Public route for admin login
 router.post('/login', authLimiter, validate(V.login), adminController.adminLogin);
 
-router.post('/logout', async (req, res) => {
-    // Revoke BOTH the access token and the refresh token so the session truly ends.
-    await revokeSessionTokens(req);
-    clearAuthCookies(res);
-    res.status(200).json({ status: 'success', message: 'Admin logged out' });
+router.post('/logout', async (req, res, next) => {
+    try {
+        // Revoke BOTH the access token and the refresh token so the session truly ends.
+        await revokeSessionTokens(req);
+        clearAuthCookies(res);
+        res.status(200).json({ status: 'success', message: 'Admin logged out' });
+    } catch (error) {
+        next(error);
+    }
 });
 
 // Middleware to protect subsequent admin routes

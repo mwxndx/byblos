@@ -62,7 +62,7 @@ export function useShopPage() {
         }
       }
     });
-  }, [location.search, trackCreatorLink]);
+  }, [location.search, shopName, trackCreatorLink]);
 
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
   const { data: sellerProducts, isLoading: isProductsLoading } = usePublicSellerProductsQuery(seller?.id || '', !!seller?.id);
@@ -149,7 +149,7 @@ export function useShopPage() {
     }
 
     setIsLoading(false);
-  }, [seller, sellerProducts, isSellerLoading, isProductsLoading, sellerError, shopName]);
+  }, [seller, sellerProducts, isSellerLoading, isProductsLoading, sellerError, shopName, location.search]);
 
   // Digital products are hidden inside the native app: Google Play requires
   // digital goods to be sold via Play Billing, so they stay web-only.

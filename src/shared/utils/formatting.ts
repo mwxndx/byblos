@@ -12,10 +12,12 @@ const currencyFormatter = new Intl.NumberFormat('en-KE', {
   maximumFractionDigits: 2,
 });
 
-export function formatCurrency(amount: number | string | null | undefined): string {
+export function formatCurrency(amount: number | string | null | undefined, currency?: string): string {
+  const prefix = (!currency || currency.toUpperCase() === 'KES' || currency.toUpperCase() === 'KSH') ? 'KSh' : currency;
+
   // Handle null, undefined, or empty string
   if (amount === null || amount === undefined || amount === '') {
-    return 'KSh 0';
+    return `${prefix} 0`;
   }
 
   // Handle objects - if amount is an object, try to extract a numeric value
@@ -26,7 +28,7 @@ export function formatCurrency(amount: number | string | null | undefined): stri
     if (typeof numericValue === 'number' && !isNaN(numericValue)) {
       amount = numericValue;
     } else {
-      return 'KSh 0';
+      return `${prefix} 0`;
     }
   }
 
@@ -41,17 +43,20 @@ export function formatCurrency(amount: number | string | null | undefined): stri
 
   // Check if parsing was successful
   if (isNaN(numericAmount)) {
-    return 'KSh 0';
+    return `${prefix} 0`;
   }
 
   try {
-    // Format as Kenyan Shillings using cached formatter
-    const formatted = currencyFormatter.format(numericAmount);
+    if (prefix === 'KSh') {
+      // Format as Kenyan Shillings using cached formatter
+      const formatted = currencyFormatter.format(numericAmount);
 
-    // Standardize currency symbol to capital KSh
-    return formatted.replace(/Ksh/i, 'KSh');
+      // Standardize currency symbol to capital KSh
+      return formatted.replace(/Ksh/i, 'KSh');
+    }
+    return `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   } catch (error) {
-    const fallback = `KSh ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    const fallback = `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
     return fallback;
   }
 }
@@ -180,6 +185,20 @@ export function isSellerShopless(input: unknown): boolean {
   if (hasShop) return false;
 
   return true;
+}
+
+/**
+ * Extract up to two uppercase initials from a name or label.
+ *
+ * @param name The primary name/label to extract initials from.
+ * @param fallback Alternative string if name is missing or empty. Defaults to 'Shop'.
+ * @returns 1-2 character uppercase string, or 'S' if empty.
+ */
+export function getInitials(name?: string, fallback?: string): string {
+  const source = (name || fallback || 'Shop').trim();
+  const parts = source.split(/[\s._-]+/).filter(Boolean);
+  if (parts.length === 0) return 'S';
+  return parts.slice(0, 2).map((part) => part[0]?.toUpperCase()).join('');
 }
 
 

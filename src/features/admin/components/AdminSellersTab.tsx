@@ -83,7 +83,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                     </div>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">
-                    <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-widest border-none ${seller.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-label-2'}`}>
+                    <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-widest border-none ${String(seller.status).toLowerCase() === 'active' ? 'bg-green-500/10 text-green-400' : String(seller.status).toLowerCase() === 'deleted' ? 'bg-red-500/10 text-red-400' : 'bg-gray-500/10 text-label-2'}`}>
                       {seller.status}
                     </Badge>
                   </td>
@@ -101,14 +101,14 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={deletingId === String(seller.user_id)}
+                        disabled={deletingId === String(seller.user_id) || String(seller.status).toLowerCase() === 'deleted' || !seller.user_id}
                         className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
                         onClick={() => onDelete(seller.user_id, 'seller')}
                       >
                         {deletingId === String(seller.user_id)
                           ? <Loader2 className="h-3 md:h-3.5 w-3 md:w-3.5 animate-spin" />
                           : <XCircle className="h-3 md:h-3.5 w-3 md:w-3.5" />}
-                        <span className="hidden sm:inline ml-2">Delete</span>
+                        <span className="hidden sm:inline ml-2">{String(seller.status).toLowerCase() === 'deleted' ? 'Deleted' : 'Delete'}</span>
                       </Button>
                     </div>
                   </td>

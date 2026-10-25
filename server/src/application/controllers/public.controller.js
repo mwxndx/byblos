@@ -627,9 +627,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '71', 10);
-  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '71', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.71';
+  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '72', 10);
+  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '72', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.72';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -645,9 +645,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Optimized Admin and Marketing backoffice dashboards with seamless mobile responsiveness, fluid layout scaling, and horizontal table navigation.',
-        'Hardened broadcast update delivery infrastructure with automated status telemetry and dual-route server compatibility.',
-        'Refreshed the app update screen with crisp, theme-adaptive Byblos branding across light and dark modes.'
+        'Consolidated shared financial calculations and unified currency formatting across admin logistics, seller orders, and courier dispatch.',
+        'Strengthened mobile gesture navigation with automated modal back-button dismissal and streamlined overlay memory management.',
+        'Hardened backend administration routing with resilient error trapping and synchronized buyer account lifecycle statuses.'
       ]
     }
   });

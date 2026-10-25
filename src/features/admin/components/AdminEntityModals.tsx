@@ -1,10 +1,9 @@
-import { useEffect } from 'react';
 import { AdminSellerDetailModal, type SellerDetail } from './AdminSellerDetailModal';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card } from '@/shared/ui/card';
 import { Loader2, UserCircle, X } from '@/shared/ui/icons';
-import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
+import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
 
 
 interface AdminEntityModalsProps {
@@ -43,13 +42,7 @@ export function AdminEntityModals({
   const seller = selectedSeller as SellerDetail | null;
   const buyer = selectedBuyer as BuyerDetail | null;
 
-  useEffect(() => {
-    if (!buyer) return;
-    return registerModalDismiss(() => {
-      closeBuyerModal();
-      return true;
-    });
-  }, [buyer, closeBuyerModal]);
+  useModalBackDismiss(Boolean(buyer), closeBuyerModal);
   return (
     <>
             {/* Modals Layer */}
@@ -103,7 +96,17 @@ export function AdminEntityModals({
                                 <div key={i} className="flex justify-between items-center py-2 border-b border-separator">
                                   <span className="text-label-3 text-sm font-medium">{info.label}</span>
                                   {info.isBadge ? (
-                                    <Badge className="bg-green-500/10 text-green-400 border-none">{info.value}</Badge>
+                                    <Badge
+                                      className={`border-none capitalize ${
+                                        String(info.value).toLowerCase() === 'active'
+                                          ? 'bg-green-500/10 text-green-400'
+                                          : String(info.value).toLowerCase() === 'deleted'
+                                          ? 'bg-red-500/10 text-red-400'
+                                          : 'bg-gray-500/10 text-label-2'
+                                      }`}
+                                    >
+                                      {info.value}
+                                    </Badge>
                                   ) : (
                                     <span className="text-sm font-bold text-gray-200">{info.value || 'N/A'}</span>
                                   )}

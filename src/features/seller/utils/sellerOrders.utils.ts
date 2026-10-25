@@ -1,15 +1,12 @@
 import { format, isValid, parseISO } from 'date-fns';
 import type { ApiOrder } from '@/shared/types';
+export { formatCurrency } from '@/shared/utils/formatting';
 
 export const formatDate = (dateString: string | Date) => {
     const date = typeof dateString === 'string' ? parseISO(dateString) : dateString;
     return isValid(date) ? format(date, 'MMM d, yyyy') : 'Date not available';
 };
 
-export const formatCurrency = (value: number | undefined, currency: string = 'KSH') => {
-    if (value === undefined || isNaN(value)) return `${currency} 0.00`;
-    return `${currency} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-};
 
 export const HUB_DROPOFF_LOCATION = 'Dynamic Mall, Tom Mboya St, Nairobi | Shop SL 32';
 

@@ -373,12 +373,21 @@ const getAllBuyers = async (req, res, next) => {
     const rows = await buyerRepository.findAllForAdmin({ limit, offset, search: req.query.search });
     const pagination = buildPaginationMeta({ rows, page, limit, offset });
 
-    // Process the rows to include default values for city and location
+    const isDeletedBuyer = (b) =>
+      b.status === 'deleted' ||
+      (typeof b.email === 'string' && (b.email.startsWith('deleted_buyer_') || b.email.startsWith('deleted-user-'))) ||
+      b.name === 'Deleted user' ||
+      b.full_name === 'Deleted user' ||
+      b.name === 'Deleted buyer' ||
+      b.full_name === 'Deleted buyer' ||
+      b.mobile_payment === 'deleted';
+
+    // Process the rows to include default values for city, location, and accurate status
     const buyers = rows.map(buyer => ({
       ...buyer,
       city: buyer.city || 'N/A',
       location: buyer.location || 'N/A',
-      status: buyer.status || 'Active',
+      status: isDeletedBuyer(buyer) ? 'deleted' : (buyer.status || 'Active'),
       createdAt: buyer.created_at
     }));
 

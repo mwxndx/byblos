@@ -149,6 +149,7 @@ export function usePhoneCheck({
     };
   }, [
     doorDeliveryEnabled,
+    deliveryLocation,
     deliveryLocation?.address,
     deliveryLocation?.lat,
     deliveryLocation?.lng,

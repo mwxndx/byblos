@@ -23,12 +23,7 @@ export const pendingOverviewStatuses = new Set([
 
 
 
-export const getSellerInitials = (name?: string, fallback?: string) => {
-  const source = (name || fallback || 'Shop').trim();
-  const parts = source.split(/[\s._-]+/).filter(Boolean);
-  if (parts.length === 0) return 'S';
-  return parts.slice(0, 2).map(part => part[0]?.toUpperCase()).join('');
-};
+export { getInitials as getSellerInitials } from '@/shared/utils/formatting';
 
 export const formatOrderStatusLabel = (status: string) => {
   return status

@@ -197,7 +197,7 @@ class Buyer {
       }
       const tombstone = `deleted_buyer_${userId || buyerId}_${Date.now()}@deleted.byblos`;
       await client.query(
-        `UPDATE buyers SET full_name = 'Deleted user', email = $1, mobile_payment = 'deleted',
+        `UPDATE buyers SET status = 'deleted', full_name = 'Deleted user', email = $1, mobile_payment = 'deleted',
            whatsapp_number = NULL, city = NULL, location = NULL, latitude = NULL, longitude = NULL,
            full_address = NULL, updated_at = NOW() WHERE id = $2`,
         [tombstone, buyerId]

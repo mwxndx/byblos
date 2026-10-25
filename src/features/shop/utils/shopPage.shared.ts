@@ -15,12 +15,7 @@ export function isAesthetic(value: string): value is Aesthetic {
   ].includes(value);
 }
 
-export const getSellerInitials = (shopName?: string, fullName?: string) => {
-  const source = (shopName || fullName || 'Shop').trim();
-  const parts = source.split(/[\s._-]+/).filter(Boolean);
-  if (parts.length === 0) return 'S';
-  return parts.slice(0, 2).map(part => part[0]?.toUpperCase()).join('');
-};
+export { getInitials as getSellerInitials } from '@/shared/utils/formatting';
 
 // Base product type that matches the Product interface but makes some fields optional
 export interface BaseProduct extends Omit<Product, 'seller' | 'aesthetic' | 'isSold' | 'status'> {

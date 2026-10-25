@@ -1,7 +1,4 @@
-export function formatCurrency(value: number | string | null | undefined) {
-  const amount = Number(value || 0);
-  return `KSh ${amount.toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
-}
+export { formatCurrency } from '@/shared/utils/formatting';
 
 export function formatDate(value?: string | null) {
   if (!value) return 'Not set';

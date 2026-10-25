@@ -155,9 +155,9 @@ export async function findSellerLocations() {
   const sql = `
     SELECT
       COALESCE(
-        NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
         NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
         NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
         'Nairobi'
       ) AS location,
       COUNT(*) AS seller_count
@@ -174,9 +174,9 @@ export async function findBuyerLocations() {
   const sql = `
     SELECT
       COALESCE(
-        NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
         NULLIF(NULLIF(TRIM(b.location), ''), 'Unknown City'),
-        NULLIF(NULLIF(TRIM(latest_order.city), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(latest_order.location), ''), 'Unknown City'),
+        NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
         'Nairobi'
       ) AS location,
       COUNT(*) AS buyer_count
@@ -184,9 +184,11 @@ export async function findBuyerLocations() {
     LEFT JOIN LATERAL (
       SELECT
         COALESCE(
-          NULLIF(TRIM(po.delivery_location->>'city'), ''),
-          NULLIF(TRIM(po.location_address), '')
-        ) AS city
+          NULLIF(TRIM(po.delivery_location->>'location'), ''),
+          NULLIF(TRIM(po.location_address), ''),
+          NULLIF(TRIM(po.delivery_location->>'address'), ''),
+          NULLIF(TRIM(po.delivery_location->>'city'), '')
+        ) AS location
       FROM product_orders po
       WHERE po.buyer_id = b.id
       ORDER BY po.created_at DESC

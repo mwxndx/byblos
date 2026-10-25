@@ -10,6 +10,7 @@ import { RefundRequestCard } from '../components/RefundRequestCard';
 import { useRefundRequests } from '../hooks/useRefundRequests';
 import type { RefundRequest } from '../types/refunds';
 import { AdminPaginationControls } from '../components/AdminPaginationControls';
+import { formatCurrency } from '@/shared/utils/formatting';
 import type { PaginationMeta } from '../types/dashboard';
 import { useState, useMemo, useEffect } from 'react';
 
@@ -124,14 +125,7 @@ export default function RefundRequestsPage() {
     }
   };
 
-  const formatCurrency = (value: string) => {
-    return `KSh ${Number.parseFloat(value).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })}`;
-  };
-
-  if (isLoadingRequests) {
+    if (isLoadingRequests) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />

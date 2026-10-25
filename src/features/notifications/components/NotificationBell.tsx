@@ -4,11 +4,12 @@ import { IconButton } from '@/shared/ui/icon-button';
 import { cn } from '@/shared/utils/formatting';
 import { useNotifications, type NotificationVariant } from '../hooks/useNotifications';
 import { NotificationList } from './NotificationList';
+import type { UserRole } from '@/shared/types';
 
 export interface NotificationBellProps {
   variant?: NotificationVariant;
   triggerClassName?: string;
-  role?: string;
+  role?: UserRole;
   iconClassName?: string;
   iconStyle?: React.CSSProperties;
 }

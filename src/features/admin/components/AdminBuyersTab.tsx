@@ -85,7 +85,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
                     </div>
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">
-                    <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-widest border-none ${buyer.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-label-2'}`}>
+                    <Badge className={`px-5 py-1.5 rounded-full text-[10px] font-semibold uppercase tracking-widest border-none ${String(buyer.status).toLowerCase() === 'active' ? 'bg-green-500/10 text-green-400' : String(buyer.status).toLowerCase() === 'deleted' ? 'bg-red-500/10 text-red-400' : 'bg-gray-500/10 text-label-2'}`}>
                       {buyer.status}
                     </Badge>
                   </td>
@@ -103,14 +103,14 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
                       <Button
                         variant="outline"
                         size="sm"
-                        disabled={deletingId === String(buyer.user_id)}
+                        disabled={deletingId === String(buyer.user_id) || String(buyer.status).toLowerCase() === 'deleted' || !buyer.user_id}
                         className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
                         onClick={() => onDelete(buyer.user_id, 'buyer')}
                       >
                         {deletingId === String(buyer.user_id)
                           ? <Loader2 className="h-3 md:h-3.5 w-3 md:w-3.5 animate-spin" />
                           : <XCircle className="h-3 md:h-3.5 w-3 md:w-3.5" />}
-                        <span className="hidden sm:inline ml-2">Delete</span>
+                        <span className="hidden sm:inline ml-2">{String(buyer.status).toLowerCase() === 'deleted' ? 'Deleted' : 'Delete'}</span>
                       </Button>
                     </div>
                   </td>

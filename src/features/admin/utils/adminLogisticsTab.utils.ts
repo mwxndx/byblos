@@ -1,5 +1,6 @@
 import type { AdminLogisticsStatusFilter } from '@/features/admin/api';
 import type { LogisticsSort, LogisticsStatusUpdate } from '@/features/logistics/api';
+export { formatCurrency } from '@/shared/utils/formatting';
 
 export const STATUS_FILTERS: Array<{ value: AdminLogisticsStatusFilter; label: string }> = [
   { value: 'all', label: 'All' },
@@ -50,11 +51,6 @@ export function formatDate(value?: string | null) {
   }).format(new Date(value));
 }
 
-export function formatCurrency(value: number | string | null | undefined, currency = 'KES') {
-  const amount = Number(value || 0);
-  const prefix = currency === 'KES' ? 'KSh' : currency;
-  return `${prefix} ${amount.toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
-}
 
 export function normalizePhone(value?: string | null) {
   const digits = String(value || '').replace(/\D/g, '');
