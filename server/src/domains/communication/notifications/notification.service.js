@@ -463,7 +463,7 @@ class NotificationService {
     }
 
     async broadcastAppUpdate({
-        minVersionCode = 70,
+        minVersionCode = 71,
         title = '🚀 New Byblos Update Available',
         body = "We've released important updates. Tap to download the latest version from Google Play.",
         storeUrl = 'market://details?id=space.bybloshq.app'

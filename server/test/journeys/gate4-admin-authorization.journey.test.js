@@ -273,7 +273,7 @@ describe('GATE 4: Administration & Authorization Business Journey', () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            minVersionCode: 70,
+            minVersionCode: 71,
             title: 'Test App Update',
             body: 'Testing broadcast'
           })
@@ -282,7 +282,7 @@ describe('GATE 4: Administration & Authorization Business Journey', () => {
         const body = await res.json();
         assert.equal(body.status, 'success');
         assert.equal(body.data.success, true);
-        assert.equal(body.data.minVersionCode, 70);
+        assert.equal(body.data.minVersionCode, 71);
       }
     });
   });

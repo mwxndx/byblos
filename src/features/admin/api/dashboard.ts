@@ -31,7 +31,7 @@ export async function broadcastAppUpdate(payload?: BroadcastUpdatePayload): Prom
   const res = data?.data || {};
   return {
     success: res.success ?? true,
-    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 70,
+    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 71,
     targetedDevices: res.targetedDevices ?? res.targeted ?? 0,
     fcmSent: res.fcmSent ?? res.sent ?? 0,
     fcmFailed: res.fcmFailed ?? res.failed ?? 0,
