@@ -124,47 +124,47 @@ export function AdminLogisticsTab() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
         <Card className="border-separator bg-surface-1 text-label">
-          <CardContent className="p-4">
-            <Truck className="mb-3 h-5 w-5 text-yellow-300" />
-            <p className="text-xs uppercase tracking-widest text-label-2">Total</p>
-            <p className="text-2xl font-semibold">{dashboard?.count || 0}</p>
+          <CardContent className="p-3 sm:p-4">
+            <Truck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Total</p>
+            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.count || 0}</p>
           </CardContent>
         </Card>
         <Card className="border-red-300/20 bg-red-500/10 text-label">
-          <CardContent className="p-4">
-            <AlertTriangle className="mb-3 h-5 w-5 text-red-300" />
-            <p className="text-xs uppercase tracking-widest text-label-2">Failed</p>
-            <p className="text-2xl font-semibold">{dashboard?.summary?.failed || 0}</p>
+          <CardContent className="p-3 sm:p-4">
+            <AlertTriangle className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-red-300" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Failed</p>
+            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.failed || 0}</p>
           </CardContent>
         </Card>
         <Card className="border-yellow-300/20 bg-yellow-300/10 text-label">
-          <CardContent className="p-4">
-            <Clock className="mb-3 h-5 w-5 text-yellow-300" />
-            <p className="text-xs uppercase tracking-widest text-label-2">Delayed</p>
-            <p className="text-2xl font-semibold">{dashboard?.summary?.delayed || 0}</p>
+          <CardContent className="p-3 sm:p-4">
+            <Clock className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Delayed</p>
+            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.delayed || 0}</p>
           </CardContent>
         </Card>
         <Card className="border-cyan-300/20 bg-cyan-300/10 text-label">
-          <CardContent className="p-4">
-            <ShieldCheck className="mb-3 h-5 w-5 text-cyan-200" />
-            <p className="text-xs uppercase tracking-widest text-label-2">Review</p>
-            <p className="text-2xl font-semibold">{dashboard?.summary?.manualReview || 0}</p>
+          <CardContent className="p-3 sm:p-4">
+            <ShieldCheck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-cyan-200" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Review</p>
+            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.manualReview || 0}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Reconciliation: fees owed to Mzigo across the requests in this view. */}
       <Card className="border-separator bg-surface-1 text-label">
-        <CardContent className="p-4">
-          <p className="text-xs uppercase tracking-widest text-label-2">Owed to Mzigo — this view</p>
-          <div className="mt-2 flex flex-wrap items-baseline gap-x-8 gap-y-2 text-sm">
+        <CardContent className="p-3 sm:p-4">
+          <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Owed to Mzigo — this view</p>
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-4 sm:gap-x-8 gap-y-2 text-xs sm:text-sm">
             <span className="text-label-2">Delivery fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.delivery)}</span></span>
             <span className="text-label-2">Collection fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.collection)}</span></span>
             <span className="text-label-2">Pickup fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.pickup)}</span></span>
-            <span className="text-base font-semibold">Total <span className="ml-1 tabular-nums">{formatCurrency(feeTotals.pickup + feeTotals.delivery + feeTotals.collection)}</span></span>
+            <span className="text-sm sm:text-base font-semibold">Total <span className="ml-1 tabular-nums">{formatCurrency(feeTotals.pickup + feeTotals.delivery + feeTotals.collection)}</span></span>
           </div>
         </CardContent>
       </Card>

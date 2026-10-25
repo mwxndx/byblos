@@ -142,21 +142,21 @@ export default function MarketingDashboard() {
             <AppHeader
                 className="!bg-white border-b border-gray-200"
                 left={
-                    <div className="flex min-w-0 items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
                         <img
                             src="/byblos-mark-light.png"
                             alt="Byblos"
-                            className="h-8 w-8 object-contain shrink-0"
+                            className="h-7 w-7 sm:h-8 sm:w-8 object-contain shrink-0"
                         />
-                        <h1 className="truncate text-base font-semibold tracking-tight text-black sm:text-lg">Marketing<span className="text-yellow-500">.</span></h1>
+                        <h1 className="truncate text-sm sm:text-base md:text-lg font-semibold tracking-tight text-black">Marketing<span className="text-yellow-500">.</span></h1>
                     </div>
                 }
                 right={
-                    <>
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                         <select
                             value={period}
                             onChange={(e) => setPeriod(Number(e.target.value))}
-                            className="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-800 shadow-sm transition-colors focus:border-yellow-500 focus:outline-none"
+                            className="cursor-pointer rounded-xl border border-gray-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-semibold text-gray-800 shadow-sm transition-colors focus:border-yellow-500 focus:outline-none"
                         >
                             <option value={3}>Last 3 Months</option>
                             <option value={6}>Last 6 Months</option>
@@ -167,42 +167,46 @@ export default function MarketingDashboard() {
                                 await logout();
                                 navigate('/admin/marketing/login');
                             }}
-                            className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+                            className="rounded-xl border border-gray-200 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 shrink-0"
                         >
                             Sign out
                         </button>
-                    </>
+                    </div>
                 }
             />
-            <div className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-8 md:space-y-12">
+            <div className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-6 md:space-y-12">
 
             {/* Overview Stat Cards */}
             {overview && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5 sm:gap-4 md:gap-6">
                     <StatCard
                         title="Total Registered Users"
                         value={Number(overview.totalUsers || 0).toLocaleString()}
                         trend={overview.userGrowthMoM}
                         label="MoM growth"
                         color="yellow"
+                        className="p-3.5 sm:p-5"
                     />
                     <StatCard
                         title="Registered Buyers"
                         value={Number(overview.totalBuyers || 0).toLocaleString()}
                         sub={overview.newBuyersThisMonth !== undefined ? `${overview.newBuyersThisMonth} joined this month` : undefined}
                         color="gray"
+                        className="p-3.5 sm:p-5"
                     />
                     <StatCard
                         title="Active Sellers"
                         value={Number(overview.activeSellers || 0).toLocaleString()}
                         sub={`${overview.pendingSellers || 0} pending verification`}
                         color="gray"
+                        className="p-3.5 sm:p-5"
                     />
                     <StatCard
                         title="Active Creators"
                         value={Number(overview.activeCreators || 0).toLocaleString()}
                         sub={`KSh ${Number(overview.creatorEarningsTotalKsh || 0).toLocaleString()} paid out`}
                         color="gray"
+                        className="p-3.5 sm:p-5"
                     />
                     <StatCard
                         title="Gross Merchandise Value"
@@ -210,6 +214,7 @@ export default function MarketingDashboard() {
                         trend={typeof overview.gmvGrowthMoM === 'number' || typeof overview.gmvGrowthMoM === 'string' ? overview.gmvGrowthMoM : undefined}
                         label="MoM growth"
                         color="yellow"
+                        className="p-3.5 sm:p-5 col-span-2 sm:col-span-1 xl:col-span-1"
                     />
                 </div>
             )}
@@ -279,13 +284,13 @@ export default function MarketingDashboard() {
                     <ChartCard title="Top Seller Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
                             {sellerLocations.map((item: MarketingRecord, i: number) => (
-                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2">
-                                    <span className="text-xs font-medium text-label-2">{String(item.city || '')}</span>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-24 bg-white/10 h-2 rounded-full overflow-hidden">
+                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2 gap-2">
+                                    <span className="text-xs font-medium text-label-2 truncate">{String(item.city || '')}</span>
+                                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                        <div className="w-16 sm:w-24 bg-white/10 h-2 rounded-full overflow-hidden">
                                             <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${Number(item.percentage || 0)}%` }} />
                                         </div>
-                                        <span className="text-xs font-bold text-label w-10 text-right">{Number(item.percentage || 0)}%</span>
+                                        <span className="text-xs font-bold text-label w-8 sm:w-10 text-right">{Number(item.percentage || 0)}%</span>
                                     </div>
                                 </div>
                             ))}
@@ -297,13 +302,13 @@ export default function MarketingDashboard() {
                     <ChartCard title="Top Buyer Locations" subtitle="Geographic distribution">
                         <div className="space-y-3 pt-2">
                             {buyerLocations.map((item: MarketingRecord, i: number) => (
-                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2">
-                                    <span className="text-xs font-medium text-label-2">{String(item.city || '')}</span>
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-24 bg-white/10 h-2 rounded-full overflow-hidden">
+                                <div key={String(item.city || i)} className="flex items-center justify-between border-b border-separator pb-2 gap-2">
+                                    <span className="text-xs font-medium text-label-2 truncate">{String(item.city || '')}</span>
+                                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                                        <div className="w-16 sm:w-24 bg-white/10 h-2 rounded-full overflow-hidden">
                                             <div className="bg-yellow-400 h-full rounded-full" style={{ width: `${Number(item.percentage || 0)}%` }} />
                                         </div>
-                                        <span className="text-xs font-bold text-label w-10 text-right">{Number(item.percentage || 0)}%</span>
+                                        <span className="text-xs font-bold text-label w-8 sm:w-10 text-right">{Number(item.percentage || 0)}%</span>
                                     </div>
                                 </div>
                             ))}
@@ -315,19 +320,19 @@ export default function MarketingDashboard() {
             {/* Section 3: Top Performers & Referrals */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 {Array.isArray(topPerfs?.sellers) && (topPerfs.sellers as MarketingRecord[]).length > 0 && (
-                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Top Performing Shops" subtitle="Highest GMV sellers this month" />
                         <div className="divide-y divide-separator">
                             {(topPerfs.sellers as MarketingRecord[]).map((s: MarketingRecord, idx: number) => (
-                                <div key={String(s.id || idx)} className="py-3 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs font-bold text-yellow-500 w-5">#{idx + 1}</span>
-                                        <div>
-                                            <p className="text-sm font-semibold text-label">{String(s.shopName || s.name || '')}</p>
-                                            <p className="text-xs text-label-2">{String(s.category || 'General')}</p>
+                                <div key={String(s.id || idx)} className="py-2.5 sm:py-3 flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                        <span className="text-xs font-bold text-yellow-500 w-5 shrink-0">#{idx + 1}</span>
+                                        <div className="min-w-0">
+                                            <p className="text-xs sm:text-sm font-semibold text-label truncate">{String(s.shopName || s.name || '')}</p>
+                                            <p className="text-[11px] sm:text-xs text-label-2 truncate">{String(s.category || 'General')}</p>
                                         </div>
                                     </div>
-                                    <span className="text-sm font-bold text-label">KSh {Number(s.gmvKsh || 0).toLocaleString()}</span>
+                                    <span className="text-xs sm:text-sm font-bold text-label shrink-0">KSh {Number(s.gmvKsh || 0).toLocaleString()}</span>
                                 </div>
                             ))}
                         </div>
@@ -335,19 +340,19 @@ export default function MarketingDashboard() {
                 )}
 
                 {Array.isArray(referrals?.creators) && (referrals.creators as MarketingRecord[]).length > 0 && (
-                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Creator Referrals" subtitle="Top performing creators" />
                         <div className="divide-y divide-separator">
                             {(referrals.creators as MarketingRecord[]).map((c: MarketingRecord, idx: number) => (
-                                <div key={String(c.id || idx)} className="py-3 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs font-bold text-yellow-500 w-5">#{idx + 1}</span>
-                                        <div>
-                                            <p className="text-sm font-semibold text-label">{String(c.name || '')}</p>
-                                            <p className="text-xs text-label-2">{Number(c.referredSellersCount || 0)} sellers invited</p>
+                                <div key={String(c.id || idx)} className="py-2.5 sm:py-3 flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                        <span className="text-xs font-bold text-yellow-500 w-5 shrink-0">#{idx + 1}</span>
+                                        <div className="min-w-0">
+                                            <p className="text-xs sm:text-sm font-semibold text-label truncate">{String(c.name || '')}</p>
+                                            <p className="text-[11px] sm:text-xs text-label-2 truncate">{Number(c.referredSellersCount || 0)} sellers invited</p>
                                         </div>
                                     </div>
-                                    <span className="text-sm font-bold text-yellow-400">KSh {Number(c.earnedKsh || 0).toLocaleString()}</span>
+                                    <span className="text-xs sm:text-sm font-bold text-yellow-400 shrink-0">KSh {Number(c.earnedKsh || 0).toLocaleString()}</span>
                                 </div>
                             ))}
                         </div>

@@ -26,26 +26,26 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
 
   return (
     <Card className="bg-surface-1 backdrop-blur-2xl border border-separator rounded-card overflow-hidden shadow-2xl">
-      <CardHeader className="p-5 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+      <CardHeader className="p-4 sm:p-6 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-6">
         <div>
-          <CardTitle className="text-2xl md:text-3xl font-semibold text-label tracking-tight">Buyers</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl font-semibold text-label tracking-tight">Buyers</CardTitle>
           <CardDescription className="text-xs md:text-sm text-label-2 font-medium">All registered buyers</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
           <div className="absolute -inset-0.5 bg-cyan-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-cyan-500 transition-colors" />
+          <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-cyan-500 transition-colors" />
           <Input
             type="text"
             aria-label="Search buyers"
             placeholder="Search buyers..."
-            className="pl-12 w-full md:w-[320px] lg:w-[400px] h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-cyan-500/50 focus:ring-cyan-500/10 transition-all font-medium text-sm"
+            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-cyan-500/50 focus:ring-cyan-500/10 transition-all font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto no-scrollbar touch-pan-x">
           <table className="w-full text-left border-collapse">
             <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
               <tr>
@@ -120,7 +120,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
           </table>
         </div>
       </CardContent>
-      <CardFooter className="p-8 border-t border-separator bg-white/[0.01]">
+      <CardFooter className="p-4 sm:p-6 md:p-8 border-t border-separator bg-white/[0.01]">
         <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>

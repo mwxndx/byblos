@@ -80,13 +80,13 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-w-md p-6 bg-surface-1 border border-separator rounded-3xl">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-surface-1 border border-separator rounded-2xl sm:rounded-3xl">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500">
-              <Send className="w-4 h-4" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0">
+              <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
-            <DialogTitle className="text-lg font-bold text-label">Broadcast App Update</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg font-bold text-label">Broadcast App Update</DialogTitle>
           </div>
           <DialogDescription className="text-xs text-label-2">
             Send an instant push notification and in-app update banner to users running outdated versions of Byblos.
@@ -95,7 +95,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
 
         {result ? (
           <div className="space-y-4 py-2">
-            <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-start gap-3">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-green-400">Broadcast Dispatched</p>
@@ -105,44 +105,44 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[11px] text-label-3 uppercase tracking-wider font-semibold">Target Devices</p>
-                <p className="text-xl font-bold text-label mt-1">{result.targetedDevices}</p>
+            <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
+                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">Target Devices</p>
+                <p className="text-lg sm:text-xl font-bold text-label mt-1">{result.targetedDevices}</p>
               </div>
-              <div className="p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[11px] text-label-3 uppercase tracking-wider font-semibold">In-App Alerts</p>
-                <p className="text-xl font-bold text-label mt-1">{result.inAppNotificationsCreated}</p>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
+                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">In-App Alerts</p>
+                <p className="text-lg sm:text-xl font-bold text-label mt-1">{result.inAppNotificationsCreated}</p>
               </div>
-              <div className="p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[11px] text-label-3 uppercase tracking-wider font-semibold">FCM Sent</p>
-                <p className="text-xl font-bold text-green-400 mt-1">{result.fcmSent}</p>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
+                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">FCM Sent</p>
+                <p className="text-lg sm:text-xl font-bold text-green-400 mt-1">{result.fcmSent}</p>
               </div>
-              <div className="p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[11px] text-label-3 uppercase tracking-wider font-semibold">FCM Failed</p>
-                <p className="text-xl font-bold text-label-3 mt-1">{result.fcmFailed}</p>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
+                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">FCM Failed</p>
+                <p className="text-lg sm:text-xl font-bold text-label-3 mt-1">{result.fcmFailed}</p>
               </div>
             </div>
 
-            <DialogFooter className="mt-4 flex gap-2">
+            <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row gap-2">
               <Button
                 variant="outline"
                 onClick={handleReset}
-                className="w-full h-11 rounded-xl text-xs font-semibold"
+                className="w-full sm:w-1/2 h-11 rounded-xl text-xs font-semibold"
               >
                 <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                 Broadcast Again
               </Button>
               <Button
                 onClick={handleClose}
-                className="w-full h-11 bg-white hover:bg-gray-100 text-black border border-gray-200 rounded-xl text-xs font-semibold shadow-sm"
+                className="w-full sm:w-1/2 h-11 bg-white hover:bg-gray-100 text-black border border-gray-200 rounded-xl text-xs font-semibold shadow-sm"
               >
                 Close
               </Button>
             </DialogFooter>
           </div>
         ) : (
-          <form onSubmit={handleBroadcast} className="space-y-4 py-2">
+          <form onSubmit={handleBroadcast} className="space-y-3 sm:space-y-4 py-2">
             <div className="space-y-1.5">
               <Label htmlFor="minVersionCode" className="text-xs font-semibold text-label">
                 Target Minimum Version Code
@@ -188,7 +188,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                 onChange={(e) => setBody(e.target.value)}
                 disabled={isSubmitting}
                 rows={3}
-                className="w-full px-3 py-2 text-sm bg-fill border border-separator rounded-xl text-label focus:outline-none focus:ring-1 focus:ring-yellow-400 resize-none"
+                className="w-full px-3 py-2 text-sm bg-fill border border-separator rounded-xl text-label focus:outline-none focus:ring-1 focus:ring-yellow-400 resize-none min-h-[72px]"
                 placeholder="A new version of Byblos is available..."
                 required
               />
@@ -216,20 +216,20 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
               </p>
             </div>
 
-            <DialogFooter className="mt-4 flex gap-2">
+            <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row gap-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleClose}
                 disabled={isSubmitting}
-                className="w-full h-11 rounded-xl text-xs font-semibold"
+                className="w-full sm:w-1/2 h-11 rounded-xl text-xs font-semibold"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full h-11 bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm"
+                className="w-full sm:w-1/2 h-11 bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm"
               >
                 {isSubmitting ? (
                   <>

@@ -13,11 +13,11 @@ const hasChartData = (data: Record<string, unknown>[] = []) =>
 
 export const ChartContainer = ({ title, description, children, className = '' }: { title: string, description: string, children: ReactNode, className?: string }) => (
   <Card className={`${className} bg-surface-1 border border-separator shadow-xl rounded-2xl overflow-hidden group hover:border-yellow-500/30 transition-all duration-300`}>
-    <CardHeader className="relative z-10 pb-2">
-      <CardTitle className="text-xl font-semibold text-label transition-colors">{title}</CardTitle>
-      <CardDescription className="text-label-2 font-medium">{description}</CardDescription>
+    <CardHeader className="relative z-10 pb-2 p-4 sm:p-6">
+      <CardTitle className="text-base sm:text-xl font-semibold text-label transition-colors">{title}</CardTitle>
+      <CardDescription className="text-xs sm:text-sm text-label-2 font-medium">{description}</CardDescription>
     </CardHeader>
-    <CardContent className="relative z-10 h-[350px] w-full pt-4">
+    <CardContent className="relative z-10 h-[300px] sm:h-[350px] w-full p-2 sm:p-6 pt-2 sm:pt-4">
       {children}
     </CardContent>
   </Card>
@@ -169,10 +169,10 @@ export const GeoDistributionChart = ({ data }: { data: Record<string, unknown>[]
   <ChartContainer title="Geographic Reach" description="Regions by GMV, buyers, sellers, and creators" className="col-span-4 lg:col-span-2">
     {hasChartData(data) ? (
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={{ left: 24, right: 12 }}>
+        <BarChart data={data} layout="vertical" margin={{ left: 4, right: 8, top: 4, bottom: 4 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#262626" horizontal={false} />
-          <XAxis type="number" stroke="#6b7280" axisLine={false} tickLine={false} fontSize={12} />
-          <YAxis type="category" dataKey="name" width={96} stroke="#9ca3af" axisLine={false} tickLine={false} fontSize={12} />
+          <XAxis type="number" stroke="#6b7280" axisLine={false} tickLine={false} fontSize={11} />
+          <YAxis type="category" dataKey="name" width={72} stroke="#9ca3af" axisLine={false} tickLine={false} fontSize={11} />
           <Tooltip
             cursor={{ fill: 'rgba(250, 204, 21, 0.08)' }}
             contentStyle={{ backgroundColor: '#0A0A0A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', color: '#f5f5f5' }}

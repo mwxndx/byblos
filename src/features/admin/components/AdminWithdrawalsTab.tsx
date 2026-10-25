@@ -52,34 +52,34 @@ export const AdminWithdrawalsTab = ({
 }: AdminWithdrawalsTabProps) => {
   return (
     <Card className="bg-surface-1 backdrop-blur-2xl border border-separator rounded-card overflow-hidden shadow-2xl">
-      <CardHeader className="p-5 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+      <CardHeader className="p-4 sm:p-6 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-6">
         <div>
-          <CardTitle className="text-2xl md:text-3xl font-semibold text-label tracking-tight">Payouts</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl font-semibold text-label tracking-tight">Payouts</CardTitle>
           <CardDescription className="text-xs md:text-sm text-label-2 font-medium">Seller withdrawal requests</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
           <div className="absolute -inset-0.5 bg-green-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-green-500 transition-colors" />
+          <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-green-500 transition-colors" />
           <Input
             type="text"
             aria-label="Search payouts"
             placeholder="Search payouts..."
-            className="pl-12 w-full md:w-[320px] lg:w-[400px] h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-green-500/50 focus:ring-green-500/10 transition-all font-medium text-sm"
+            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-green-500/50 focus:ring-green-500/10 transition-all font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
       </CardHeader>
-      <div className="grid grid-cols-1 gap-3 border-b border-separator bg-white/[0.012] p-5 md:grid-cols-3 md:p-8">
-        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/[0.06] p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 border-b border-separator bg-white/[0.012] p-4 sm:p-6 md:p-8">
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/[0.06] p-3 sm:p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-blue-200/70">Open orders</p>
             <Activity className="h-4 w-4 text-blue-300" />
           </div>
-          <p className="mt-3 text-2xl font-semibold text-label tabular-nums">{activeOrders?.toLocaleString() || '0'}</p>
+          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{activeOrders?.toLocaleString() || '0'}</p>
           <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-blue-100/50">Paid and not closed</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-3 sm:p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-200/70">Pending payouts</p>
             <DollarSign className="h-4 w-4 text-emerald-300" />
@@ -116,7 +116,7 @@ export const AdminWithdrawalsTab = ({
         </div>
       </div>
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto no-scrollbar touch-pan-x">
           <table className="w-full text-left border-collapse">
             <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
               <tr>
@@ -212,7 +212,7 @@ export const AdminWithdrawalsTab = ({
           </table>
         </div>
       </CardContent>
-      <CardFooter className="p-8 border-t border-separator bg-white/[0.01]">
+      <CardFooter className="p-4 sm:p-6 md:p-8 border-t border-separator bg-white/[0.01]">
         <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>

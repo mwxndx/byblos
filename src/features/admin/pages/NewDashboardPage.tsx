@@ -152,32 +152,36 @@ const NewAdminDashboard = () => {
             <img
               src="/byblos-mark-light.png"
               alt="Byblos"
-              className="h-8 w-8 object-contain shrink-0"
+              className="h-7 w-7 sm:h-8 sm:w-8 object-contain shrink-0"
             />
-            <h1 className="text-lg font-semibold tracking-tight text-black sm:text-xl">Admin</h1>
+            <h1 className="text-base font-semibold tracking-tight text-black sm:text-xl">Admin</h1>
           </div>
         }
         right={
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <Button
               onClick={() => setIsBroadcastModalOpen(true)}
-              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+              aria-label="Broadcast Update"
+              title="Broadcast Update"
+              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
             >
-              <Send className="h-4 w-4" />
-              <span>Broadcast Update</span>
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Broadcast Update</span>
             </Button>
             <Button
               variant="outline"
+              aria-label="Sign out"
+              title="Sign out"
               onClick={async () => {
                 await logout();
                 navigate('/admin/login', { replace: true });
               }}
-              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-9 sm:h-10 px-3 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
             >
-              <LogOut className="h-4 w-4" />
-              <span>Sign out</span>
+              <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+              <span className="hidden sm:inline">Sign out</span>
             </Button>
-            <span className="hidden text-sm text-gray-500 md:inline">
+            <span className="hidden lg:inline text-xs sm:text-sm text-gray-500">
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
             <NotificationBell
@@ -188,11 +192,11 @@ const NewAdminDashboard = () => {
           </div>
         }
       />
-      <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-5 md:p-8 space-y-6">
+      <div className="mx-auto w-full max-w-[1600px] p-3 sm:p-5 md:p-8 space-y-4 sm:space-y-6">
         {/* Needs attention — the admin's action queue, first thing. */}
         <section>
-          <p className="mb-2 text-sm font-semibold text-label-2">Needs attention</p>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+          <p className="mb-2 text-xs sm:text-sm font-semibold text-label-2">Needs attention</p>
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-5">
             {attention.map((tile) => {
               const active = tile.count > 0 && tile.tone !== 'neutral';
               const Icon = tile.icon;
@@ -203,14 +207,14 @@ const NewAdminDashboard = () => {
                   type="button"
                   disabled={!clickable}
                   onClick={() => tile.key && setActiveTab(tile.key)}
-                  className={`rounded-2xl border p-4 text-left transition-colors ${toneClass(tile.tone, active)} ${clickable ? 'hover:border-yellow-500/40 cursor-pointer' : 'cursor-default'}`}
+                  className={`rounded-2xl border p-3 sm:p-4 text-left transition-colors ${toneClass(tile.tone, active)} ${clickable ? 'hover:border-yellow-500/40 cursor-pointer' : 'cursor-default'}`}
                 >
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
-                    <span className="text-xs font-semibold">{tile.label}</span>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                    <span className="text-[11px] sm:text-xs font-semibold truncate">{tile.label}</span>
                   </div>
-                  <p className="mt-2 text-2xl font-semibold tabular-nums text-label">{(tile.count ?? 0).toLocaleString()}</p>
-                  <p className="mt-0.5 text-xs text-label-3">{tile.hint}{clickable ? ' →' : ''}</p>
+                  <p className="mt-1.5 sm:mt-2 text-xl sm:text-2xl font-semibold tabular-nums text-label">{(tile.count ?? 0).toLocaleString()}</p>
+                  <p className="mt-0.5 text-[10px] sm:text-xs text-label-3 truncate">{tile.hint}{clickable ? ' →' : ''}</p>
                 </button>
               );
             })}

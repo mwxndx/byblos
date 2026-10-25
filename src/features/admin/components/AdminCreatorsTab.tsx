@@ -39,44 +39,44 @@ export const AdminCreatorsTab = ({
 
   return (
     <Card className="bg-surface-1 backdrop-blur-2xl border border-separator rounded-card overflow-hidden shadow-2xl">
-      <CardHeader className="p-5 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+      <CardHeader className="p-4 sm:p-6 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-6">
         <div>
-          <CardTitle className="text-2xl md:text-3xl font-semibold text-label tracking-tight">Creators</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl font-semibold text-label tracking-tight">Creators</CardTitle>
           <CardDescription className="text-xs md:text-sm text-label-2 font-medium">Shop links, clicks, and earnings</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
           <div className="absolute -inset-0.5 bg-yellow-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-yellow-500 transition-colors" />
+          <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-yellow-500 transition-colors" />
           <Input
             type="text"
             aria-label="Search creators"
             placeholder="Search creators..."
-            className="pl-12 w-full md:w-[320px] lg:w-[400px] h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-all font-medium text-sm"
+            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-all font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
       </CardHeader>
-      <div className="grid grid-cols-1 gap-3 border-b border-separator bg-white/[0.012] p-5 md:grid-cols-4 md:p-8">
-        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-4">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 border-b border-separator bg-white/[0.012] p-4 sm:p-6 md:grid-cols-4 md:p-8">
+        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-3 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-yellow-200/70">Creators</p>
-          <p className="mt-3 text-2xl font-semibold text-label tabular-nums">{pagination.total.toLocaleString()}</p>
+          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{pagination.total.toLocaleString()}</p>
         </div>
-        <div className="rounded-2xl border border-lime-500/20 bg-lime-500/[0.06] p-4">
+        <div className="rounded-2xl border border-lime-500/20 bg-lime-500/[0.06] p-3 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-lime-200/70">Creator sales</p>
-          <p className="mt-3 text-2xl font-semibold text-label tabular-nums">{totalCreatorSales.toLocaleString()}</p>
+          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{totalCreatorSales.toLocaleString()}</p>
         </div>
-        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-4">
+        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-3 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-cyan-200/70">Link clicks</p>
-          <p className="mt-3 text-2xl font-semibold text-label tabular-nums">{totalCreatorLinkClicks.toLocaleString()}</p>
+          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{totalCreatorLinkClicks.toLocaleString()}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-3 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-200/70">Creator earnings</p>
-          <p className="mt-3 text-2xl font-semibold text-label tabular-nums">KSh {totalCreatorEarnings.toLocaleString()}</p>
+          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">KSh {totalCreatorEarnings.toLocaleString()}</p>
         </div>
       </div>
       <CardContent className="p-0">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto no-scrollbar touch-pan-x">
           <table className="w-full text-left border-collapse">
             <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
               <tr>
@@ -139,7 +139,7 @@ export const AdminCreatorsTab = ({
           </table>
         </div>
       </CardContent>
-      <CardFooter className="p-8 border-t border-separator bg-white/[0.01]">
+      <CardFooter className="p-4 sm:p-6 md:p-8 border-t border-separator bg-white/[0.01]">
         <AdminPaginationControls pagination={pagination} onPageChange={onPageChange} />
       </CardFooter>
     </Card>
