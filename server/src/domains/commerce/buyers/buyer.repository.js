@@ -33,6 +33,7 @@ export async function findAllForAdmin({ limit, offset, search } = {}) {
     SELECT ${ADMIN_BUYER_COLUMNS}, COUNT(*) OVER() AS total_count
     FROM buyers
     WHERE user_id IS NOT NULL
+      AND (status IS NULL OR status != 'deleted')
   `;
   if (searchClause) sql += ` AND ${searchClause}`;
 

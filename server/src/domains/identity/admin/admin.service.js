@@ -445,6 +445,7 @@ class AdminService {
                    COUNT(*) OVER() AS total_count
             FROM sellers
             WHERE user_id IS NOT NULL
+              AND (status IS NULL OR status != 'deleted')
         `;
     if (searchClause) sql += ` AND ${searchClause}`;
 
@@ -487,6 +488,7 @@ class AdminService {
       LEFT JOIN seller_creator_links scl ON scl.creator_id = c.id
       LEFT JOIN seller_creator_invites sci ON sci.accepted_creator_id = c.id
       WHERE c.user_id IS NOT NULL
+        AND (c.status IS NULL OR c.status != 'deleted')
     `;
     if (searchClause) sql += ` AND ${searchClause}`;
     sql += ` GROUP BY c.id`;
@@ -706,6 +708,8 @@ class AdminService {
           await client.query(`
             UPDATE sellers
             SET user_id = NULL,
+                status = 'deleted',
+                is_active = FALSE,
                 full_name = 'Deleted seller',
                 email = $2,
                 whatsapp_number = NULL,
@@ -713,7 +717,55 @@ class AdminService {
             WHERE id = $1
           `, [sellerId, deletedEmail]);
 
+          await client.query(`
+            UPDATE seller_creator_links
+            SET status = 'deleted',
+                updated_at = NOW()
+            WHERE seller_id = $1
+              AND status IN ('active', 'paused')
+          `, [sellerId]);
+
+          await client.query(`
+            UPDATE seller_creator_invites
+            SET status = 'seller_deleted',
+                updated_at = NOW()
+            WHERE seller_id = $1
+              AND status = 'pending'
+          `, [sellerId]);
         }
+      }
+
+      // Handle creator profile cleanup on user deletion
+      const creatorRow = await client.query('SELECT id FROM creators WHERE user_id = $1 FOR UPDATE', [userId]);
+      if (creatorRow.rows.length > 0) {
+        const creatorId = creatorRow.rows[0].id;
+
+        await client.query(`
+          UPDATE seller_creator_links
+          SET status = 'deleted',
+              updated_at = NOW()
+          WHERE creator_id = $1
+            AND status IN ('active', 'paused')
+        `, [creatorId]);
+
+        await client.query(`
+          UPDATE seller_creator_invites
+          SET status = 'creator_deleted',
+              updated_at = NOW()
+          WHERE accepted_creator_id = $1
+            AND status = 'pending'
+        `, [creatorId]);
+
+        await client.query(`
+          UPDATE creators
+          SET user_id = NULL,
+              status = 'deleted',
+              email = $2,
+              mpesa_number = CONCAT('deleted-', $1::text),
+              whatsapp_number = NULL,
+              updated_at = NOW()
+          WHERE id = $1
+        `, [creatorId, deletedEmail]);
       }
 
       // --- Universal cleanup: runs for ALL roles (Sellers can be Buyers too) ---

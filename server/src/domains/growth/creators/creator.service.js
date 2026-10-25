@@ -1581,6 +1581,8 @@ class CreatorService {
        LEFT JOIN creator_earnings ce ON ce.seller_creator_link_id = scl.id
        WHERE scl.creator_id = $1
          AND scl.status IN ('active', 'paused')
+         AND s.user_id IS NOT NULL
+         AND (s.status IS NULL OR s.status != 'deleted')
        GROUP BY scl.id, scl.seller_id, s.shop_name, s.slug, s.avatar_url, s.full_name, s.is_creator_marketplace_enabled
        ORDER BY scl.created_at DESC`,
       [creatorId]
@@ -1611,6 +1613,8 @@ class CreatorService {
        JOIN sellers s ON s.id = sci.seller_id
        WHERE sci.accepted_creator_id = $1
          AND sci.status = 'pending'
+         AND s.user_id IS NOT NULL
+         AND (s.status IS NULL OR s.status != 'deleted')
        ORDER BY sci.created_at DESC`,
       [creatorId]
     );
@@ -1879,6 +1883,8 @@ class CreatorService {
        FROM creator_shop_requests csr
        JOIN creators c ON c.id = csr.creator_id
        WHERE csr.seller_id = $1 AND csr.status = 'pending'
+         AND c.user_id IS NOT NULL
+         AND (c.status IS NULL OR c.status != 'deleted')
        ORDER BY csr.created_at DESC`,
       [sellerId]
     );
@@ -1905,6 +1911,8 @@ class CreatorService {
        JOIN creators c ON c.id = scl.creator_id
        LEFT JOIN creator_earnings ce ON ce.seller_creator_link_id = scl.id
        WHERE scl.seller_id = $1 AND scl.status = 'active'
+         AND c.user_id IS NOT NULL
+         AND (c.status IS NULL OR c.status != 'deleted')
        GROUP BY scl.id, c.id
        ORDER BY scl.created_at DESC`,
       [sellerId]

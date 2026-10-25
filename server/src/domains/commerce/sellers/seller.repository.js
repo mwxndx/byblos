@@ -67,6 +67,9 @@ export async function findActiveWithStats({ limit, offset }) {
       WHERE sk.seller_id = s.id
         AND sk.created_at >= NOW() - INTERVAL '24 hours'
     ) k ON true
+    WHERE s.user_id IS NOT NULL
+      AND (s.status IS NULL OR s.status NOT IN ('deleted', 'suspended'))
+      AND (s.is_active = true OR s.is_active IS NULL)
     GROUP BY s.id, k.knock_count
     ORDER BY total_wishlist_count DESC, s.id ASC
     LIMIT $1 OFFSET $2

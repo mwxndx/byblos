@@ -406,12 +406,30 @@ export const softDeleteSeller = async (sellerId, userId) => {
     const tag = `${userId || sellerId}_${Date.now()}`;
     const tombstone = `deleted_seller_${tag}@deleted.byblos`;
     await client.query(
-      `UPDATE sellers SET status = 'deleted', full_name = 'Deleted user', email = $1,
+      `UPDATE sellers SET user_id = NULL, status = 'deleted', is_active = FALSE, full_name = 'Deleted user', email = $1,
          shop_name = $2, slug = $3, whatsapp_number = NULL, instagram_link = NULL,
          tiktok_link = NULL, facebook_link = NULL,
          city = NULL, location = NULL, physical_address = NULL,
          latitude = NULL, longitude = NULL, updated_at = NOW() WHERE id = $4`,
       [tombstone, `deleted-shop-${tag}`, `deleted-shop-${tag}`, sellerId]
+    );
+
+    await client.query(
+      `UPDATE seller_creator_links
+       SET status = 'deleted',
+           updated_at = NOW()
+       WHERE seller_id = $1
+         AND status IN ('active', 'paused')`,
+      [sellerId]
+    );
+
+    await client.query(
+      `UPDATE seller_creator_invites
+       SET status = 'seller_deleted',
+           updated_at = NOW()
+       WHERE seller_id = $1
+         AND status = 'pending'`,
+      [sellerId]
     );
     if (userId) {
       await client.query(
