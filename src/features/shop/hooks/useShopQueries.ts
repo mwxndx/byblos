@@ -27,8 +27,8 @@ export function usePublicSellersQuery(params: { page?: number; limit?: number } 
   return useQuery({
     queryKey: commonQueryKeys.public.sellers(params),
     queryFn: () => publicApiService.getSellersPage(params),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
   });
 }
 
@@ -41,5 +41,3 @@ export function useKnockSellerMutation() {
     },
   });
 }
-
-

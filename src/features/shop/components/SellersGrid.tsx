@@ -3,6 +3,7 @@ import type { ApiPublicSeller } from '@/shared/types/api/seller';
 import SellerBrandCard from '@/features/shop/components/SellerBrandCard';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { usePublicSellersQuery } from '@/features/shop/hooks/useShopQueries';
+import { isDeletedSeller } from '@/features/shop/utils/sellerTransforms';
 
 interface SellersGridProps {
     filterCity: string;
@@ -59,6 +60,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
         const query = deferredSearchQuery.trim().toLowerCase();
 
         return sellers.filter(seller => {
+            if (isDeletedSeller(seller)) return false;
             if (filterCity && seller.city !== filterCity) return false;
             if (filterArea && seller.location !== filterArea) return false;
             if (query) {
@@ -86,7 +88,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
 
     return (
         <div className="grid grid-cols-2 gap-3 sm:gap-4 [@media(min-width:640px)]:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
-            {filteredSellers.map((seller) => (
+            {visibleSellers.map((seller) => (
                 <SellerBrandCard key={seller.id} seller={seller} isBuyer={isBuyer} />
             ))}
         </div>
@@ -94,5 +96,3 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
 };
 
 export default memo(SellersGrid);
-
-

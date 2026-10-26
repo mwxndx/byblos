@@ -60,8 +60,35 @@ function extractSellerMetrics(sObj: Record<string, unknown>) {
   };
 }
 
+export function isDeletedSeller(seller: unknown): boolean {
+  if (!seller || typeof seller !== 'object') return false;
+  const sObj = seller as Record<string, unknown>;
+
+  const status = String(sObj.status || '').toLowerCase();
+  if (status === 'deleted' || status === 'suspended') return true;
+
+  if (sObj.is_active === false || sObj.isActive === false) return true;
+
+  const shopName = String(sObj.shop_name || '').trim();
+  const camelShopName = String(sObj.shopName || '').trim();
+  if (/^deleted-shop-/i.test(shopName) || /^deleted-shop-/i.test(camelShopName)) return true;
+
+  const fullName = String(sObj.full_name || '').trim().toLowerCase();
+  const camelFullName = String(sObj.fullName || '').trim().toLowerCase();
+  if (
+    fullName === 'deleted user' ||
+    fullName === 'deleted seller' ||
+    camelFullName === 'deleted user' ||
+    camelFullName === 'deleted seller'
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 export function transformSeller(seller: unknown): ApiPublicSeller | null {
-  if (!seller) return null;
+  if (!seller || isDeletedSeller(seller)) return null;
   const sObj = seller as Record<string, unknown>;
 
   return {
@@ -71,6 +98,3 @@ export function transformSeller(seller: unknown): ApiPublicSeller | null {
     ...extractSellerMetrics(sObj)
   };
 }
-
-
-
