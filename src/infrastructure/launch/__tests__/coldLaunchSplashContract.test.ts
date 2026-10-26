@@ -32,6 +32,26 @@ describe('Cold Launch & Splash Screen Verification (Android & iOS PWA)', () => {
       expect(content).toContain('@drawable/splash_icon');
     });
 
+    it('ensures no legacy stretched splash.png files exist to prevent qualifier shadowing of splash.xml', () => {
+      const resDir = path.join(rootDir, 'android/app/src/main/res');
+      const findSplashPngs = (dir: string): string[] => {
+        let results: string[] = [];
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+          const fullPath = path.join(dir, entry.name);
+          if (entry.isDirectory()) {
+            results = results.concat(findSplashPngs(fullPath));
+          } else if (entry.name === 'splash.png') {
+            results.push(path.relative(resDir, fullPath));
+          }
+        }
+        return results;
+      };
+
+      const legacySplashPngs = findSplashPngs(resDir);
+      expect(legacySplashPngs).toEqual([]);
+    });
+
     it('invokes SplashScreen.installSplashScreen in MainActivity before super.onCreate', () => {
       const mainActivityPath = path.join(
         rootDir,
