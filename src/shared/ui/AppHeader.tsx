@@ -31,7 +31,7 @@ export function AppHeader({ left, center, right, className }: AppHeaderProps) {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 bg-[var(--bg,#000000)] pt-safe-top transition-colors duration-200',
+        'sticky top-0 z-50 bg-[var(--bg,#000000)] border-b border-separator shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.45)] pt-safe-top transition-colors duration-200',
         className
       )}
     >

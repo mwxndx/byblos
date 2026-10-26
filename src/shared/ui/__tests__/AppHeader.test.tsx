@@ -17,7 +17,7 @@ describe('AppHeader', () => {
     expect(screen.getByTestId('header-right')).toBeInTheDocument();
 
     const header = screen.getByRole('banner');
-    expect(header).toHaveClass('sticky', 'top-0', 'z-50', 'pt-safe-top');
+    expect(header).toHaveClass('sticky', 'top-0', 'z-50', 'pt-safe-top', 'border-b', 'border-separator');
 
     // The inner container must use compact min-h-11 on mobile (iOS standard 44px)
     // expanding to min-h-14 on sm and min-h-16 on lg

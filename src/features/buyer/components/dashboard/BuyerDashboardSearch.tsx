@@ -19,7 +19,7 @@ export function BuyerDashboardSearch({
   const isSingleCity = cities.length <= 1;
 
   return (
-    <div className="w-full px-4 sm:px-6 pb-3 pt-1 flex flex-col items-center shrink-0 gap-2.5">
+    <div className="w-full px-4 sm:px-6 pb-3 pt-3 sm:pt-3.5 flex flex-col items-center shrink-0 gap-2.5">
       {/* City selector — centered in the middle above search products search bar */}
       <div className="relative inline-flex items-center rounded-full border border-slate-200 bg-slate-100 text-slate-900 dark:border-separator dark:bg-white/[0.04] dark:text-white">
         <MapPin className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-slate-500 dark:text-white/60" aria-hidden="true" />
