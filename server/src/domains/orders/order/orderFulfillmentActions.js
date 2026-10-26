@@ -9,13 +9,10 @@ import paymentService from '../../payments/payments/payment.service.js';
 import OrderHubDropoffService from './orderHubDropoff.service.js';
 import OrderService from './OrderService.js';
 import { sanitizeOrder } from '../../../shared/utils/orderSanitizer.js';
+import { timingSafeEqualString } from '../../../shared/utils/crypto.utils.js';
 
 export function safeTokenCompare(a, b) {
-    if (typeof a !== 'string' || typeof b !== 'string') return false;
-    const bufA = Buffer.from(a);
-    const bufB = Buffer.from(b);
-    if (bufA.length !== bufB.length) return false;
-    return crypto.timingSafeEqual(bufA, bufB);
+    return timingSafeEqualString(a, b);
 }
 
 export function resolvePickupStatusCode(error) {

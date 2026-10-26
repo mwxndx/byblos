@@ -6,6 +6,7 @@ import * as sellerRepository from '../../domains/commerce/sellers/seller.reposit
 import * as publicOrderStatusRepository from '../../domains/orders/repositories/publicOrderStatus.repository.js';
 import { sanitizePublicProduct, sanitizePublicSeller } from '../../shared/utils/sanitize.js';
 import { signAutoLoginToken } from '../../shared/utils/jwt.js';
+import { timingSafeEqualString } from '../../shared/utils/crypto.utils.js';
 import { pool } from '../../infrastructure/database/database.js';
 
 const PUBLIC_PAYMENT_STATUS_SYNC_INTERVAL_MS = 5000;
@@ -469,7 +470,7 @@ export const getOrderStatus = async (req, res) => {
     }
 
     let digitalDownloads = null;
-    if (clientToken && paid && order.client_checkout_token === clientToken) {
+    if (clientToken && paid && timingSafeEqualString(order.client_checkout_token, clientToken)) {
       const { rows: digRows } = await pool.query(
         `SELECT oi.product_id, p.name, p.digital_file_name
            FROM order_items oi
@@ -539,7 +540,7 @@ export function createCancelPendingPublicOrder({
     }
 
     // Verify token ownership
-    if (order.client_checkout_token && order.client_checkout_token !== clientToken) {
+    if (order.client_checkout_token && !timingSafeEqualString(order.client_checkout_token, clientToken)) {
       return res.status(403).json({
         status: 'error',
         message: 'Unauthorized: client token does not match order.'

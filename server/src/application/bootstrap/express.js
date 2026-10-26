@@ -18,6 +18,7 @@ import { globalErrorHandler, notFoundHandler } from '../../shared/utils/errorHan
 import requestId from '../middleware/requestId.js';
 import fixApiPrefix from '../middleware/fixApiPrefix.js';
 import { globalLimiter } from '../middleware/globalRateLimiter.js';
+import { timingSafeEqualString } from '../../shared/utils/crypto.utils.js';
 
 
 export default async (app) => {
@@ -259,7 +260,7 @@ export default async (app) => {
         const cookieToken = req.cookies['csrf-token-v2'];
         const headerToken = req.headers['x-csrf-token'];
 
-        if (cookieToken && headerToken && cookieToken === headerToken) {
+        if (cookieToken && headerToken && timingSafeEqualString(cookieToken, headerToken)) {
             return next();
         }
 

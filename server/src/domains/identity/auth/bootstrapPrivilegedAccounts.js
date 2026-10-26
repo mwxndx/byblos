@@ -1,13 +1,9 @@
-import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import logger from '../../../shared/utils/logger.js';
 import { pool } from '../../../infrastructure/database/database.js';
+import { timingSafeEqualString } from '../../../shared/utils/crypto.utils.js';
 
-export const timingSafeStrEqual = (a, b) => {
-    const aHash = crypto.createHash('sha256').update(String(a)).digest();
-    const bHash = crypto.createHash('sha256').update(String(b)).digest();
-    return crypto.timingSafeEqual(aHash, bHash);
-};
+export const timingSafeStrEqual = timingSafeEqualString;
 
 export const bootstrapPrivilegedAccountIfConfigured = async (normalizedEmail, password) => {
     const candidates = [
