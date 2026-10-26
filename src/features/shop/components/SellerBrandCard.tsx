@@ -111,30 +111,35 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                 boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 24px ${palette.accentSoft}`,
             }}
         >
-            {/* Top ~66%: business photo. */}
-            <div className="relative flex h-[66%] w-full items-center justify-center overflow-hidden" style={{ background: palette.avatarGradient }}>
-                {hasAvatar ? (
-                    <>
-                        <img
-                            src={getImageUrl(avatarUrl)}
-                            alt=""
-                            aria-hidden="true"
-                            className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-30 blur-sm scale-110"
-                            loading="lazy"
-                        />
+            {/* Top ~66%: business photo in circular frame */}
+            <div className="relative flex h-[66%] w-full items-center justify-center overflow-hidden p-3" style={{ background: palette.avatarGradient }}>
+                {hasAvatar && (
+                    <img
+                        src={getImageUrl(avatarUrl)}
+                        alt=""
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-25 blur-sm scale-110"
+                        loading="lazy"
+                    />
+                )}
+                <div
+                    className="relative z-10 flex aspect-square h-full max-h-[88%] items-center justify-center overflow-hidden rounded-full border-2 bg-black/40 shadow-lg backdrop-blur-sm transition-transform duration-200 group-hover:scale-105"
+                    style={{ borderColor: palette.border }}
+                >
+                    {hasAvatar ? (
                         <img
                             src={getImageUrl(avatarUrl)}
                             alt={`${shopName} business photo`}
-                            className="relative z-10 h-full w-full object-contain p-1.5 sm:p-2"
+                            className="h-full w-full object-cover"
                             loading="lazy"
                             onError={() => setAvatarFailed(true)}
                         />
-                    </>
-                ) : (
-                    <div className="flex h-full w-full items-center justify-center">
-                        <Store className="h-10 w-10 text-white/90" strokeWidth={1.6} />
-                    </div>
-                )}
+                    ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                            <Store className="h-8 w-8 text-white/90 sm:h-10 sm:w-10" strokeWidth={1.6} />
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Bottom section: shop name clearly placed above Instagram + TikTok + Location row */}

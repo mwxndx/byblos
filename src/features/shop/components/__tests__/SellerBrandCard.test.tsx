@@ -8,7 +8,7 @@ vi.mock('@/features/shop/hooks/useShopQueries', () => ({
   useKnockSellerMutation: () => ({ mutate: vi.fn() }),
 }));
 
-describe('SellerBrandCard — Business Profile Photo Fitting', () => {
+describe('SellerBrandCard — Business Profile Photo Circular Frame', () => {
   const mockSeller: ApiPublicSeller = {
     id: 'seller-1',
     shopName: 'Amani Styles',
@@ -19,7 +19,7 @@ describe('SellerBrandCard — Business Profile Photo Fitting', () => {
     theme: 'default',
   };
 
-  it('renders business profile photo with object-contain to avoid image clipping from being rendered too big', () => {
+  it('renders business profile photo inside a circular frame with rounded-full and overflow-hidden', () => {
     render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
@@ -29,8 +29,24 @@ describe('SellerBrandCard — Business Profile Photo Fitting', () => {
     const businessImg = screen.getByAltText('Amani Styles business photo');
     expect(businessImg).toBeInTheDocument();
 
-    // Must use object-contain (not object-cover) so full business profile photo fits without edge cropping
-    expect(businessImg).toHaveClass('object-contain');
-    expect(businessImg).not.toHaveClass('object-cover');
+    // The image parent must be a circular frame
+    const circularFrame = businessImg.parentElement;
+    expect(circularFrame).toBeInTheDocument();
+    expect(circularFrame).toHaveClass('rounded-full');
+    expect(circularFrame).toHaveClass('overflow-hidden');
+    expect(circularFrame).toHaveClass('aspect-square');
+  });
+
+  it('renders store fallback icon inside a circular frame when no avatar exists', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
+      </MemoryRouter>
+    );
+
+    const circularFrame = container.querySelector('.rounded-full');
+    expect(circularFrame).toBeInTheDocument();
+    expect(circularFrame).toHaveClass('aspect-square');
+    expect(circularFrame?.querySelector('svg')).toBeInTheDocument();
   });
 });
