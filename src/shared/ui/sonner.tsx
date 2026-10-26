@@ -18,13 +18,13 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-white dark:group-[.toaster]:bg-[#0d0d0d] group-[.toaster]:text-slate-950 dark:group-[.toaster]:text-white group-[.toaster]:border-slate-200 dark:group-[.toaster]:border-white/10 group-[.toaster]:shadow-2xl w-full sm:w-[356px] max-w-full sm:max-w-[400px] border rounded-2xl transition-colors duration-200",
-          description: "group-[.toast]:text-slate-600 dark:group-[.toast]:text-white/60 text-sm",
+            "group toast group-[.toaster]:bg-white dark:group-[.toaster]:bg-black group-[.toaster]:text-label group-[.toaster]:border-separator group-[.toaster]:shadow-[var(--shadow-pop)] w-full sm:w-[356px] max-w-full sm:max-w-[400px] border rounded-2xl transition-all duration-200",
+          description: "group-[.toast]:text-label-2 text-sm",
           actionButton:
             "group-[.toast]:bg-yellow-400 group-[.toast]:text-slate-950 font-bold",
           cancelButton:
-            "group-[.toast]:bg-slate-100 dark:group-[.toast]:bg-white/10 group-[.toast]:text-slate-700 dark:group-[.toast]:text-white",
-          title: "text-sm sm:text-base font-bold text-slate-950 dark:text-white",
+            "group-[.toast]:bg-fill group-[.toast]:text-label",
+          title: "text-sm sm:text-base font-bold text-label",
           icon: "w-5 h-5 sm:w-6 sm:h-6"
         },
       }}
@@ -34,5 +34,3 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 export { Toaster };
-
-

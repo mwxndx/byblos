@@ -23,7 +23,7 @@ export function NotificationBell({ variant = 'default', triggerClassName, role, 
         <IconButton
           variant="ghost"
           className={cn(
-            'relative border border-slate-200 bg-slate-100 hover:bg-slate-200 dark:border-white/10 dark:bg-white/[0.06] dark:hover:bg-white/[0.12]',
+            'relative border border-separator bg-white dark:bg-black hover:bg-fill text-label shadow-sm',
             triggerClassName,
           )}
           aria-label="Notifications"
@@ -42,7 +42,7 @@ export function NotificationBell({ variant = 'default', triggerClassName, role, 
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-[calc(100vw-2rem)] sm:w-[440px] md:w-[480px] max-w-[480px] p-0 overflow-hidden bg-white dark:bg-[#0a0a0a] border border-slate-200 dark:border-white/10 text-slate-950 dark:text-white shadow-2xl rounded-2xl transition-colors duration-200"
+        className="w-[calc(100vw-2rem)] sm:w-[440px] md:w-[480px] max-w-[480px] p-0 overflow-hidden bg-white dark:bg-black border border-separator text-label shadow-[var(--shadow-pop)] rounded-2xl transition-all duration-200"
       >
         <NotificationList variant={variant} role={role} scrollClassName="max-h-[390px]" />
       </PopoverContent>

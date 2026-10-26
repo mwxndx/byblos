@@ -5,6 +5,7 @@ export type ThemeScope = 'buyer' | 'seller' | 'creator' | 'shop' | 'default';
 
 const LEGACY_KEY = 'byblos-app-theme';
 const keyFor = (scope: ThemeScope) => `byblos-theme-${scope}`;
+const KNOWN_SCOPES: ThemeScope[] = ['default', 'buyer', 'seller', 'creator', 'shop'];
 
 function getSystemIsDark(): boolean {
   return typeof window !== 'undefined'
@@ -25,7 +26,7 @@ export function applyResolvedTheme(resolved: 'light' | 'dark'): void {
   el.classList.toggle('dark', resolved === 'dark');
   el.classList.toggle('light', resolved === 'light');
 
-  const themeColor = resolved === 'light' ? '#f5f4f0' : '#000000';
+  const themeColor = resolved === 'light' ? '#ffffff' : '#000000';
   const metaThemeColor = document.getElementById('theme-color-meta') || document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
     metaThemeColor.setAttribute('content', themeColor);
@@ -81,14 +82,20 @@ export function readScopePref(scope: ThemeScope): AppTheme {
 }
 
 export function writeScopePref(scope: ThemeScope, pref: AppTheme): void {
-  try { localStorage.setItem(keyFor(scope), pref); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(LEGACY_KEY, pref);
+    KNOWN_SCOPES.forEach((s) => {
+      localStorage.setItem(keyFor(s), pref);
+    });
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('byblos-theme-change', { detail: { theme: pref, scope } }));
+    }
+  } catch { /* ignore */ }
 }
 
 /**
- * Read/write one scope's theme preference. A scope's selector only renders on its
- * own surface (the active route), so `setTheme` applies to <html> immediately and
- * the effect keeps <html> in sync while the surface is mounted, following the OS
- * when the preference is 'system'.
+ * Read/write one scope's theme preference. Synchronizes with global app theme
+ * across all scopes (buyer, seller, creator, shop, default).
  */
 export function useThemeScope(scope: ThemeScope): { theme: AppTheme; setTheme: (t: AppTheme) => void } {
   const [theme, setThemeState] = useState<AppTheme>(() => readScopePref(scope));
@@ -101,16 +108,29 @@ export function useThemeScope(scope: ThemeScope): { theme: AppTheme; setTheme: (
 
     // Cross-tab theme sync handler
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === keyFor(scope) && isAppTheme(e.newValue)) {
+      if ((e.key === keyFor(scope) || e.key === LEGACY_KEY) && isAppTheme(e.newValue)) {
         setThemeState(e.newValue);
         applyResolvedTheme(resolveTheme(e.newValue));
       }
     };
 
+    // In-window cross-scope theme sync handler
+    const handleThemeChange = (e: Event) => {
+      const custom = e as CustomEvent<{ theme: AppTheme }>;
+      if (custom.detail?.theme && isAppTheme(custom.detail.theme)) {
+        setThemeState(custom.detail.theme);
+        applyResolvedTheme(resolveTheme(custom.detail.theme));
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('byblos-theme-change', handleThemeChange);
 
     if (theme !== 'system') {
-      return () => window.removeEventListener('storage', handleStorageChange);
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('byblos-theme-change', handleThemeChange);
+      };
     }
 
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -118,10 +138,12 @@ export function useThemeScope(scope: ThemeScope): { theme: AppTheme; setTheme: (
       applyResolvedTheme(mq.matches ? 'dark' : 'light');
       setSystemTick((prev) => prev + 1);
     };
+
     mq.addEventListener('change', handler);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('byblos-theme-change', handleThemeChange);
       mq.removeEventListener('change', handler);
     };
   }, [theme, scope]);

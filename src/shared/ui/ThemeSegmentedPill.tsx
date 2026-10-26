@@ -46,11 +46,11 @@ export function ThemeSegmentedPill({ value, onChange, showLabels = true, classNa
   return (
     <div
       className={cn(
-        'relative inline-flex items-center rounded-full border border-slate-200 bg-slate-100 text-slate-900 dark:border-white/10 dark:bg-white/[0.04] dark:text-white',
+        'relative inline-flex items-center rounded-full border border-separator bg-white dark:bg-black text-label shadow-sm transition-colors duration-200',
         className,
       )}
     >
-      <Icon className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-slate-500 dark:text-white/60" aria-hidden="true" />
+      <Icon className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-label-2" aria-hidden="true" />
       <select
         aria-label="Theme"
         value={resolved}
@@ -61,13 +61,13 @@ export function ThemeSegmentedPill({ value, onChange, showLabels = true, classNa
         )}
       >
         {OPTIONS.map(({ value: optionValue, label }) => (
-          <option key={optionValue} value={optionValue} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-white">
+          <option key={optionValue} value={optionValue} className="bg-white text-slate-900 dark:bg-black dark:text-white">
             {label}
           </option>
         ))}
       </select>
       <svg
-        className="pointer-events-none absolute right-2 h-3 w-3 text-slate-500 dark:text-white/60"
+        className="pointer-events-none absolute right-2 h-3 w-3 text-label-2"
         viewBox="0 0 12 12" fill="none" aria-hidden="true"
       >
         <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

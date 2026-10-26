@@ -58,11 +58,11 @@ export function NotificationList({
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-white/10">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-separator">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-sm text-slate-950 dark:text-white">Notifications</span>
+          <span className="font-bold text-sm text-label">Notifications</span>
           {notifications.length > 0 && (
-            <span className="rounded-full bg-slate-100 dark:bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:text-white/60">
+            <span className="rounded-full bg-fill px-2 py-0.5 text-[11px] font-semibold text-label-2">
               {notifications.length}
             </span>
           )}
@@ -71,7 +71,7 @@ export function NotificationList({
           <button
             type="button"
             onClick={() => markAllRead()}
-            className="text-xs text-slate-500 dark:text-white/60 hover:text-slate-900 dark:hover:text-white inline-flex items-center gap-1 font-medium transition-colors"
+            className="text-xs text-label-2 hover:text-label inline-flex items-center gap-1 font-medium transition-colors"
           >
             <CheckCheck className="h-3.5 w-3.5" /> Mark all read
           </button>
@@ -80,11 +80,11 @@ export function NotificationList({
 
       <IosNotificationBanner role={role} />
 
-      <div className={cn('overflow-y-auto divide-y divide-slate-100 dark:divide-white/5', scrollClassName)}>
+      <div className={cn('overflow-y-auto divide-y divide-separator/40', scrollClassName)}>
         {isLoading ? (
-          <div className="px-4 py-10 text-center text-sm text-slate-400 dark:text-white/40">Loading…</div>
+          <div className="px-4 py-10 text-center text-sm text-label-3">Loading…</div>
         ) : notifications.length === 0 ? (
-          <div className="px-4 py-10 text-center text-sm text-slate-400 dark:text-white/40">No notifications yet</div>
+          <div className="px-4 py-10 text-center text-sm text-label-3">No notifications yet</div>
         ) : (
           notifications.map((n) => (
             <div
@@ -101,14 +101,14 @@ export function NotificationList({
                   />
                 )}
                 <div className={cn('flex-1 min-w-0', n.read_at && 'pl-3.5')}>
-                  <div className="text-sm font-semibold text-slate-950 dark:text-white break-words">
+                  <div className="text-sm font-semibold text-label break-words">
                     {n.title}
                   </div>
-                  <div className="mt-1 text-xs text-slate-600 dark:text-white/70 whitespace-pre-line leading-relaxed break-words">
+                  <div className="mt-1 text-xs text-label-2 whitespace-pre-line leading-relaxed break-words">
                     {n.body}
                   </div>
-                  <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-white/50">
-                    <Clock className="h-3 w-3 shrink-0 text-slate-400 dark:text-white/40" />
+                  <div className="mt-2 flex items-center gap-1.5 text-[11px] font-medium text-label-3">
+                    <Clock className="h-3 w-3 shrink-0 text-label-3" />
                     <span>{formatNotificationDateTime(n.created_at)}</span>
                   </div>
                 </div>

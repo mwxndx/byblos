@@ -111,16 +111,16 @@ nav.fixed.bottom-0 {
 }
 
 :root {
-    /* ── Byblos dark theme — pure black base, charcoal surfaces, yellow accent. */
+    /* ── Byblos dark theme — pure black base, pure black surfaces, yellow accent. */
     --byblos-bg: #000000;
-    --byblos-surface: #0a0a0a;
-    --byblos-surface-soft: #141414;
+    --byblos-surface: #000000;
+    --byblos-surface-soft: #000000;
     --byblos-text: #f5f5f5;
     --byblos-muted: #a3a3a3;
-    --byblos-border: #262626;
+    --byblos-border: rgba(255, 255, 255, 0.12);
     --byblos-yellow: #f5c518;
     --byblos-yellow-soft: #26210a;
-    --byblos-black: #050505;
+    --byblos-black: #000000;
     --bg: var(--byblos-bg);
     --surface: var(--byblos-surface);
     --surface2: var(--byblos-surface-soft);
@@ -136,29 +136,27 @@ nav.fixed.bottom-0 {
     --nav-h: 56px;
     --tab-h: 40px;
 
-    /* ── Apple semantic layer — DARK (this :root is the dark default) ─────────
-       Additive: the shared primitives migrate onto these; existing pages keep
-       using --byblos-* until each portal is converted. */
+    /* ── Apple semantic layer — DARK (pure black surfaces raised by shadows & hairline separators) ── */
     --label: #f5f5f7;
     --label-2: #a1a1a8;
     --label-3: #8e8e93;
-    --surface-1: #1c1c1e;
-    --surface-2: #2c2c2e;
-    --separator: rgba(84, 84, 88, 0.55);
-    --separator-strong: rgba(120, 120, 128, 0.6);
-    --fill: rgba(120, 120, 128, 0.24);
-    --fill-2: rgba(120, 120, 128, 0.16);
+    --surface-1: #000000;
+    --surface-2: #000000;
+    --separator: rgba(255, 255, 255, 0.10);
+    --separator-strong: rgba(255, 255, 255, 0.18);
+    --fill: rgba(255, 255, 255, 0.08);
+    --fill-2: rgba(255, 255, 255, 0.05);
     --brand: #f5c518;          /* restrained accent — fills & selection */
     --brand-press: #ffd426;
-    --on-brand: #1d1d1f;
+    --on-brand: #000000;
     --brand-text: #f5c518;     /* accent-as-text is legible on dark */
     --sys-red: #ff453a;
     --sys-green: #30d158;
     --sys-orange: #ff9f0a;
     --sys-blue: #0a84ff;
-    --chrome: rgba(28, 28, 30, 0.72);
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.6);
+    --chrome: rgba(0, 0, 0, 0.75);
+    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 6px -1px rgba(0, 0, 0, 0.6);
+    --shadow-pop: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 64px -12px rgba(0, 0, 0, 0.95), 0 8px 24px -4px rgba(0, 0, 0, 0.8);
 }
 
 .page-enter {
@@ -212,40 +210,40 @@ nav.fixed.bottom-0 {
         --background: 0 0% 0%;
         --foreground: 0 0% 96%;
 
-        --card: 0 0% 4%;
+        --card: 0 0% 0%;
         --card-foreground: 0 0% 96%;
 
-        --popover: 0 0% 4%;
+        --popover: 0 0% 0%;
         --popover-foreground: 0 0% 96%;
 
         --primary: 47 91% 53%;
         --primary-foreground: 0 0% 0%;
 
-        --secondary: 0 0% 10%;
+        --secondary: 0 0% 8%;
         --secondary-foreground: 0 0% 96%;
 
-        --muted: 0 0% 12%;
+        --muted: 0 0% 8%;
         --muted-foreground: 0 0% 64%;
 
-        --accent: 0 0% 14%;
+        --accent: 0 0% 10%;
         --accent-foreground: 0 0% 96%;
 
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 100%;
 
-        --border: 0 0% 16%;
-        --input: 0 0% 16%;
+        --border: 0 0% 14%;
+        --input: 0 0% 14%;
         --ring: 47 91% 53%;
 
         --radius: 1rem;
 
-        --sidebar-background: 0 0% 3%;
+        --sidebar-background: 0 0% 0%;
         --sidebar-foreground: 0 0% 96%;
         --sidebar-primary: 45 100% 60%;
         --sidebar-primary-foreground: 0 0% 5%;
-        --sidebar-accent: 0 0% 10%;
+        --sidebar-accent: 0 0% 8%;
         --sidebar-accent-foreground: 0 0% 96%;
-        --sidebar-border: 0 0% 16%;
+        --sidebar-border: 0 0% 14%;
         --sidebar-ring: 45 100% 60%;
     }
 
@@ -253,37 +251,37 @@ nav.fixed.bottom-0 {
         --background: 0 0% 0%;
         --foreground: 0 0% 100%;
 
-        --card: 240 10% 3.9%;
+        --card: 0 0% 0%;
         --card-foreground: 0 0% 100%;
 
-        --popover: 240 10% 3.9%;
+        --popover: 0 0% 0%;
         --popover-foreground: 0 0% 100%;
 
         --primary: 47 91% 53%;
         --primary-foreground: 240 6% 12%;
 
-        --secondary: 240 3.7% 15.9%;
+        --secondary: 0 0% 8%;
         --secondary-foreground: 0 0% 100%;
 
-        --muted: 240 3.7% 15.9%;
+        --muted: 0 0% 8%;
         --muted-foreground: 240 5% 64.9%;
 
-        --accent: 240 3.7% 15.9%;
+        --accent: 0 0% 10%;
         --accent-foreground: 0 0% 100%;
 
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 100%;
 
-        --border: 240 3.7% 15.9%;
-        --input: 240 3.7% 15.9%;
+        --border: 0 0% 14%;
+        --input: 0 0% 14%;
         --ring: 47 91% 53%;
         --sidebar-background: 0 0% 0%;
         --sidebar-foreground: 0 0% 95%;
         --sidebar-primary: 45 100% 60%;
         --sidebar-primary-foreground: 0 0% 5%;
-        --sidebar-accent: 0 0% 10%;
+        --sidebar-accent: 0 0% 8%;
         --sidebar-accent-foreground: 0 0% 100%;
-        --sidebar-border: 0 0% 20%;
+        --sidebar-border: 0 0% 14%;
         --sidebar-ring: 45 100% 60%;
     }
 }
@@ -667,9 +665,9 @@ body.dashboard-active .seller-tab-selected {
 .light [role="dialog"],
 .light [data-radix-dialog-content] {
     background-color: #ffffff !important;
-    border-color: #e2e8f0 !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
     color: #0f172a !important;
-    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.18) !important;
+    box-shadow: var(--shadow-pop) !important;
 }
 
 [data-theme="light"] [role="dialog"] label,
@@ -692,9 +690,10 @@ body.dashboard-active .seller-tab-selected {
 .light [role="dialog"] input,
 .light [role="dialog"] textarea,
 .light [role="dialog"] select {
-    background-color: #f8fafc !important;
-    border-color: #cbd5e1 !important;
+    background-color: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
     color: #0f172a !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 [data-theme="light"] [role="dialog"] input::placeholder,
@@ -709,8 +708,8 @@ body.dashboard-active .seller-tab-selected {
     [class*="bg-zinc-"],
     [class*="bg-[#0"]
 ):not(.btn-primary):not([class*="bg-yellow"]):not([class*="bg-amber"]):not([class*="bg-emerald"]):not([class*="bg-red"]) {
-    background-color: #f1f5f9 !important;
-    border-color: #e2e8f0 !important;
+    background-color: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
     color: #0f172a !important;
 }
 
@@ -727,9 +726,10 @@ body.dashboard-active .seller-tab-selected {
 [data-theme="dark"] [data-radix-dialog-content],
 .dark [role="dialog"],
 .dark [data-radix-dialog-content] {
-    background-color: #0d0d0d !important;
+    background-color: #000000 !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
     color: #f8fafc !important;
+    box-shadow: var(--shadow-pop) !important;
 }
 
 [data-theme="dark"] [role="dialog"] label,
@@ -750,9 +750,10 @@ body.dashboard-active .seller-tab-selected {
 .dark [role="dialog"] input,
 .dark [role="dialog"] textarea,
 .dark [role="dialog"] select {
-    background-color: #161616 !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+    background-color: #000000 !important;
+    border-color: rgba(255, 255, 255, 0.14) !important;
     color: #ffffff !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="dark"] [role="dialog"] input::placeholder,
@@ -768,9 +769,38 @@ body.dashboard-active .seller-tab-selected {
     [class*="bg-slate-200"],
     [class*="bg-white/"]
 ):not([class*="bg-yellow"]):not([class*="bg-amber"]):not([class*="bg-emerald"]):not([class*="bg-red"]) {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: #000000 !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
     color: #ffffff !important;
+}
+
+/* ── Radix Popovers & Dropdown Menus Theme Elevation ───────────── */
+[role="menu"],
+[data-radix-menu-content],
+[data-radix-popover-content] {
+    box-shadow: var(--shadow-pop) !important;
+}
+
+[data-theme="light"] [role="menu"],
+[data-theme="light"] [data-radix-menu-content],
+[data-theme="light"] [data-radix-popover-content],
+.light [role="menu"],
+.light [data-radix-menu-content],
+.light [data-radix-popover-content] {
+    background-color: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.08) !important;
+    color: #0f172a !important;
+}
+
+[data-theme="dark"] [role="menu"],
+[data-theme="dark"] [data-radix-menu-content],
+[data-theme="dark"] [data-radix-popover-content],
+.dark [role="menu"],
+.dark [data-radix-menu-content],
+.dark [data-radix-popover-content] {
+    background-color: #000000 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f8fafc !important;
 }
 
 /* ── Explicit solid white controls & indicators ────────────────────────────── */
@@ -927,13 +957,13 @@ button.btn-white:hover,
    ═══════════════════════════════════════════════════════════════════════════ */
 
 [data-theme="light"] {
-    /* Byblos palette — warm white base, light grey surfaces, rich black text */
-    --byblos-bg: #f5f4f0;
+    /* Byblos palette — clean pure white base, pure white surfaces, rich dark text */
+    --byblos-bg: #ffffff;
     --byblos-surface: #ffffff;
-    --byblos-surface-soft: #ede9e3;
+    --byblos-surface-soft: #ffffff;
     --byblos-text: #0f0f0e;
     --byblos-muted: #6b675f;
-    --byblos-border: #d6d2c8;
+    --byblos-border: rgba(0, 0, 0, 0.08);
     --byblos-yellow: #c69b19;
     --byblos-yellow-soft: #fef9e7;
     --byblos-black: #0f0f0e;
@@ -950,7 +980,7 @@ button.btn-white:hover,
     --text-sub: #7a766e;
 
     /* Tailwind HSL design tokens */
-    --background: 40 12% 96%;
+    --background: 0 0% 100%;
     --foreground: 30 4% 6%;
     --card: 0 0% 100%;
     --card-foreground: 30 4% 6%;
@@ -958,36 +988,36 @@ button.btn-white:hover,
     --popover-foreground: 30 4% 6%;
     --primary: 47 91% 53%;
     --primary-foreground: 240 6% 12%;
-    --secondary: 36 10% 92%;
+    --secondary: 0 0% 96%;
     --secondary-foreground: 30 4% 12%;
-    --muted: 36 10% 92%;
+    --muted: 0 0% 96%;
     --muted-foreground: 30 6% 42%;
-    --accent: 36 10% 90%;
+    --accent: 0 0% 95%;
     --accent-foreground: 30 4% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 36 10% 84%;
-    --input: 36 10% 84%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 47 91% 53%;
-    --sidebar-background: 36 12% 98%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 30 4% 8%;
     --sidebar-primary: 47 91% 53%;
     --sidebar-primary-foreground: 240 6% 12%;
-    --sidebar-accent: 36 10% 92%;
+    --sidebar-accent: 0 0% 96%;
     --sidebar-accent-foreground: 30 4% 10%;
-    --sidebar-border: 36 10% 86%;
+    --sidebar-border: 0 0% 90%;
     --sidebar-ring: 47 91% 53%;
 
-    /* ── Apple semantic layer — LIGHT ──────────────────────────────────────── */
+    /* ── Apple semantic layer — LIGHT (pure white surfaces raised by layered shadows) ── */
     --label: #1d1d1f;
     --label-2: #6e6e73;
     --label-3: #a0a0a6;
     --surface-1: #ffffff;
-    --surface-2: #fafaf8;
-    --separator: rgba(60, 60, 67, 0.16);
-    --separator-strong: rgba(60, 60, 67, 0.29);
-    --fill: rgba(118, 118, 128, 0.12);
-    --fill-2: rgba(118, 118, 128, 0.08);
+    --surface-2: #ffffff;
+    --separator: rgba(0, 0, 0, 0.08);
+    --separator-strong: rgba(0, 0, 0, 0.16);
+    --fill: rgba(0, 0, 0, 0.04);
+    --fill-2: rgba(0, 0, 0, 0.02);
     --brand: #f5c518;
     --brand-press: #e0b10e;
     --on-brand: #1d1d1f;
@@ -996,9 +1026,9 @@ button.btn-white:hover,
     --sys-green: #34c759;
     --sys-orange: #ff9500;
     --sys-blue: #007aff;
-    --chrome: rgba(255, 255, 255, 0.72);
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.05);
-    --shadow-pop: 0 12px 40px rgba(0, 0, 0, 0.14);
+    --chrome: rgba(255, 255, 255, 0.85);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.06);
+    --shadow-pop: 0 20px 48px -12px rgba(0, 0, 0, 0.16), 0 8px 24px -6px rgba(0, 0, 0, 0.08);
 }
 
 /* html/body background in light mode */
@@ -1143,7 +1173,7 @@ button.btn-white:hover,
 
 [data-theme="light"] .seller-surface table thead,
 [data-theme="light"] .seller-surface table tr.bg-slate-50 {
-    background-color: #f8fafc !important;
+    background-color: #ffffff !important;
     border-bottom-color: rgba(0, 0, 0, 0.06) !important;
 }
 
@@ -1152,7 +1182,7 @@ button.btn-white:hover,
 }
 
 [data-theme="light"] .seller-surface table tr:hover {
-    background-color: #f8fafc !important;
+    background-color: rgba(0, 0, 0, 0.02) !important;
 }
 
 /* Mobile nav bottom bar in light mode */
@@ -1179,8 +1209,8 @@ button.btn-white:hover,
 
 .shop-page-root[data-shop-theme="dark"] {
     --byblos-bg: #000000;
-    --byblos-surface: #141414;
-    --byblos-surface-soft: #1a1a1a;
+    --byblos-surface: #000000;
+    --byblos-surface-soft: #000000;
     --byblos-text: #f8fafc;
     --byblos-muted: #94a3b8;
     --byblos-border: rgba(255, 255, 255, 0.12);
@@ -1196,17 +1226,16 @@ button.btn-white:hover,
 }
 
 .shop-page-root[data-shop-theme="dark"] .shop-products-card {
-    background: #0d0d0d !important;
-    border: 1px solid rgba(255, 255, 255, 0.09) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset,
-                0 24px 60px -16px rgba(0, 0, 0, 0.95),
-                0 4px 14px -4px rgba(0, 0, 0, 0.6) !important;
+    background: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: var(--shadow-card) !important;
 }
 
 .shop-page-root[data-shop-theme="dark"] input[type="text"] {
-    background-color: #0e0e0e !important;
+    background-color: #000000 !important;
     color: #f8fafc !important;
     border-color: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
 }
 
 .shop-page-root[data-shop-theme="dark"] input[type="text"]::placeholder {
@@ -1221,48 +1250,45 @@ button.btn-white:hover,
 }
 
 .shop-page-root[data-shop-theme="dark"] .product-card-item {
-    background-color: #080808 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset,
-                0 16px 36px -8px rgba(0, 0, 0, 0.95),
-                0 4px 12px -2px rgba(0, 0, 0, 0.7) !important;
+    background-color: #000000 !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: var(--shadow-card) !important;
 }
 
 .shop-page-root[data-shop-theme="dark"] .product-card-item:hover {
     transform: translateY(-6px) !important;
     border-color: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset,
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15),
                 0 24px 50px -12px rgba(0, 0, 0, 0.98),
                 0 0 28px -4px rgba(var(--theme-accent-rgb, 245, 158, 11), 0.35) !important;
 }
 
 .shop-page-root[data-shop-theme="light"] {
-    --byblos-bg: #f5f4f0;
+    --byblos-bg: #ffffff;
     --byblos-surface: #ffffff;
-    --byblos-surface-soft: #ede9e3;
+    --byblos-surface-soft: #ffffff;
     --byblos-text: #0f0f0e;
     --byblos-muted: #64748b;
-    --byblos-border: #e2e0d8;
+    --byblos-border: rgba(0, 0, 0, 0.08);
     /* See dark block above — mirror the global light label values. */
     --label: #1d1d1f;
     --label-2: #6e6e73;
     --label-3: #a0a0a6;
-    background: #f5f4f0 !important;
+    background: #ffffff !important;
     color: #0f0f0e !important;
 }
 
 .shop-page-root[data-shop-theme="light"] .shop-products-card {
     background: #ffffff !important;
     border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset,
-                0 20px 48px -15px rgba(0, 0, 0, 0.08),
-                0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    box-shadow: var(--shadow-card) !important;
 }
 
 .shop-page-root[data-shop-theme="light"] input[type="text"] {
     background-color: #ffffff !important;
     color: #0f0f0e !important;
-    border-color: #e2e0d8 !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 .shop-page-root[data-shop-theme="light"] input[type="text"]::placeholder {
@@ -1271,18 +1297,36 @@ button.btn-white:hover,
 
 .shop-page-root[data-shop-theme="light"] .product-card-item {
     background-color: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.11) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 1) inset,
-                0 14px 32px -6px rgba(15, 23, 42, 0.12),
-                0 4px 10px -2px rgba(15, 23, 42, 0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: var(--shadow-card) !important;
 }
 
 .shop-page-root[data-shop-theme="light"] .product-card-item:hover {
     transform: translateY(-6px) !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 1) inset,
-                0 24px 48px -10px rgba(15, 23, 42, 0.18),
-                0 8px 18px -4px rgba(15, 23, 42, 0.08) !important;
+    border-color: rgba(0, 0, 0, 0.18) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
+                0 24px 48px -10px rgba(15, 23, 42, 0.14) !important;
+}
+
+/* ── Universal Theme Switch Transition ───────────────────────────────────── */
+html,
+body,
+#root,
+.dashboard-layout,
+header,
+nav,
+[role="dialog"],
+[data-radix-dialog-content],
+[data-radix-popover-content],
+[role="menu"],
+.rounded-card,
+.rounded-sheet,
+.seller-surface,
+.shop-page-root {
+    transition: background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 

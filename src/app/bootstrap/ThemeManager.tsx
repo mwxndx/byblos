@@ -76,13 +76,23 @@ export function ThemeManager() {
     return () => mq.removeEventListener('change', handler);
   }, [pathname]);
 
-  // Cross-tab: re-apply when a theme preference changes in another tab.
+  // Cross-tab and in-window theme sync: re-apply whenever preference changes.
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key && e.key.startsWith('byblos-theme-')) applyForPath(window.location.pathname);
+      if (e.key && (e.key.startsWith('byblos-theme-') || e.key === 'byblos-app-theme')) {
+        applyForPath(window.location.pathname);
+      }
     };
+    const onThemeChange = () => {
+      applyForPath(window.location.pathname);
+    };
+
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener('byblos-theme-change', onThemeChange);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('byblos-theme-change', onThemeChange);
+    };
   }, []);
 
   return null;

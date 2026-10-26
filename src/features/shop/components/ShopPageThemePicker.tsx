@@ -54,18 +54,18 @@ export function ShopPageThemePicker({ theme, onThemeChange }: ShopPageThemePicke
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label="Change theme"
         aria-expanded={isOpen}
-        className="flex items-center gap-1.5 rounded-full border border-black/10 bg-white/80 px-2.5 py-1.5 text-slate-800 shadow-md backdrop-blur-md transition-colors hover:bg-white dark:border-white/15 dark:bg-black/60 dark:text-white dark:hover:bg-black/80"
+        className="flex items-center gap-1.5 rounded-full border border-separator bg-white dark:bg-black px-2.5 py-1.5 text-label shadow-[var(--shadow-card)] transition-colors hover:bg-fill"
       >
         {resolved === 'dark' ? (
           <Moon className="h-4 w-4 text-yellow-400" />
         ) : (
           <Sun className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
         )}
-        <ChevronDown className={cn('h-3 w-3 opacity-60 transition-transform duration-200', isOpen && 'rotate-180')} />
+        <ChevronDown className={cn('h-3 w-3 text-label-2 transition-transform duration-200', isOpen && 'rotate-180')} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-1.5 flex flex-col gap-1 rounded-2xl border border-black/10 bg-white/95 p-1 shadow-xl backdrop-blur-md dark:border-white/15 dark:bg-zinc-900/95">
+        <div className="absolute right-0 mt-1.5 flex flex-col gap-1 rounded-2xl border border-separator bg-white dark:bg-black p-1 shadow-[var(--shadow-pop)]">
           <button
             type="button"
             onClick={() => {
@@ -78,7 +78,7 @@ export function ShopPageThemePicker({ theme, onThemeChange }: ShopPageThemePicke
               'flex h-8 w-8 items-center justify-center rounded-xl transition-colors',
               resolved === 'light'
                 ? 'bg-yellow-400/25 text-yellow-600 dark:text-yellow-400'
-                : 'text-slate-600 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10'
+                : 'text-label-2 hover:bg-fill'
             )}
           >
             <Sun className="h-4 w-4" />
@@ -95,7 +95,7 @@ export function ShopPageThemePicker({ theme, onThemeChange }: ShopPageThemePicke
               'flex h-8 w-8 items-center justify-center rounded-xl transition-colors',
               resolved === 'dark'
                 ? 'bg-yellow-400/25 text-yellow-400'
-                : 'text-slate-600 hover:bg-black/5 dark:text-white/70 dark:hover:bg-white/10'
+                : 'text-label-2 hover:bg-fill'
             )}
           >
             <Moon className="h-4 w-4" />
