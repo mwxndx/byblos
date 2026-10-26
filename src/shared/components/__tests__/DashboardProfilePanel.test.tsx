@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DashboardProfilePanel } from '../DashboardProfilePanel';
 
@@ -88,5 +88,53 @@ describe('DashboardProfilePanel', () => {
     // Drawer aside has crisp border boundary and elevation
     const drawerAside = screen.getByRole('complementary', { name: 'Profile' });
     expect(drawerAside).toHaveClass('border-l', 'border-separator', 'max-w-md');
+  });
+
+  it('smoothly transitions through a slide-out exit lifecycle when closing before unmounting', async () => {
+    vi.useFakeTimers();
+    try {
+      const onOpenChange = vi.fn();
+      const { rerender } = render(
+        <div className="relative h-[600px]">
+          <DashboardProfilePanel open={true} onOpenChange={onOpenChange} title="Profile">
+            <div>Profile content</div>
+          </DashboardProfilePanel>
+        </div>,
+      );
+
+      const panelHost = screen.getByTestId('dashboard-profile-panel');
+      const drawerAside = screen.getByRole('complementary', { name: 'Profile' });
+
+      // In open state, elements have data-state="open" and GPU transform acceleration
+      expect(panelHost).toHaveAttribute('data-state', 'open');
+      expect(drawerAside).toHaveAttribute('data-state', 'open');
+      expect(drawerAside).toHaveClass('transform-gpu', 'will-change-transform');
+      expect(drawerAside.className).toContain('slide-in-from-right');
+      expect(drawerAside.className).toContain('slide-out-to-right');
+
+      // Now close the panel
+      rerender(
+        <div className="relative h-[600px]">
+          <DashboardProfilePanel open={false} onOpenChange={onOpenChange} title="Profile">
+            <div>Profile content</div>
+          </DashboardProfilePanel>
+        </div>,
+      );
+
+      // It must NOT instantly disappear (zero-frame cut/glitch); it must remain in DOM with data-state="closed"
+      expect(screen.queryByTestId('dashboard-profile-panel')).not.toBeNull();
+      expect(screen.getByTestId('dashboard-profile-panel')).toHaveAttribute('data-state', 'closed');
+      expect(screen.getByRole('complementary', { name: 'Profile' })).toHaveAttribute('data-state', 'closed');
+
+      // Advance timers past the exit animation duration (220ms)
+      act(() => {
+        vi.advanceTimersByTime(250);
+      });
+
+      // Now it has cleanly unmounted
+      expect(screen.queryByTestId('dashboard-profile-panel')).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

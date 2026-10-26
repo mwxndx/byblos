@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { X } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/utils/cn';
@@ -17,6 +17,10 @@ interface DashboardProfilePanelProps {
  * A profile panel that stays inside a dashboard's content region. Unlike the
  * global Sheet primitive, it does not portal to document.body, so a dashboard
  * header and bottom navigation remain visible and interactive above it.
+ *
+ * Implements smooth hardware-accelerated slide-in and slide-out transitions
+ * with iOS-calibrated easing curves, ensuring no visual glitch or abrupt cutoff
+ * across buyer, seller, and creator dashboards.
  */
 export function DashboardProfilePanel({
   open,
@@ -29,6 +33,21 @@ export function DashboardProfilePanel({
   const titleId = useId();
   const panelRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Presence lifecycle: retain in DOM during exit animation so it slides out cleanly
+  const [isRendered, setIsRendered] = useState(open);
+
+  useEffect(() => {
+    if (open) {
+      setIsRendered(true);
+    } else {
+      // 200ms exit transition + 20ms buffer before unmounting
+      const timer = window.setTimeout(() => {
+        setIsRendered(false);
+      }, 220);
+      return () => window.clearTimeout(timer);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -48,11 +67,21 @@ export function DashboardProfilePanel({
     };
   }, [onOpenChange, open]);
 
-  if (!open) return null;
+  const isVisible = open || isRendered;
+  if (!isVisible) return null;
+
+  const state = open ? 'open' : 'closed';
 
   return (
     <div
-      className="dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 flex justify-end overflow-hidden animate-in fade-in-0 duration-200"
+      data-state={state}
+      className={cn(
+        'dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 flex justify-end overflow-hidden transform-gpu',
+        'data-[state=open]:animate-in data-[state=closed]:animate-out',
+        'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
+        'data-[state=open]:duration-[280ms] data-[state=closed]:duration-200',
+        !open && 'pointer-events-none',
+      )}
       style={{ bottom: bottomInset }}
       data-testid="dashboard-profile-panel"
     >
@@ -61,14 +90,20 @@ export function DashboardProfilePanel({
         aria-label={`Close ${title}`}
         className="absolute inset-0 cursor-default focus:outline-none"
         onClick={() => onOpenChange(false)}
+        tabIndex={open ? 0 : -1}
       />
       <aside
         ref={panelRef}
         role="complementary"
         aria-labelledby={titleId}
         tabIndex={-1}
+        data-state={state}
         className={cn(
-          'relative z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-2xl border-l border-separator animate-in slide-in-from-right duration-250 ease-out',
+          'relative z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-[var(--shadow-pop)] border-l border-separator',
+          'transform-gpu will-change-transform [animation-timing-function:var(--ease-ios,cubic-bezier(0.32,0.72,0,1))]',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out',
+          'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
+          'data-[state=open]:duration-[280ms] data-[state=closed]:duration-200',
           className,
         )}
       >
