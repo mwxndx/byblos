@@ -69,17 +69,21 @@ async function getAccessToken() {
     const now = Math.floor(Date.now() / 1000);
     if (cachedToken && cachedToken.expiresAt > now + 60) return cachedToken.accessToken;
 
+    const jwtOptions = {
+        algorithm: 'RS256',
+        issuer: sa.client_email,
+        subject: sa.client_email,
+        audience: 'https://oauth2.googleapis.com/token',
+        expiresIn: 3600,
+    };
+    if (sa.private_key_id) {
+        jwtOptions.keyid = sa.private_key_id;
+    }
+
     const assertion = jwt.sign(
         { scope: 'https://www.googleapis.com/auth/firebase.messaging' },
         sa.private_key,
-        {
-            algorithm: 'RS256',
-            issuer: sa.client_email,
-            subject: sa.client_email,
-            audience: 'https://oauth2.googleapis.com/token',
-            expiresIn: 3600,
-            keyid: sa.private_key_id,
-        }
+        jwtOptions
     );
 
     const res = await fetch('https://oauth2.googleapis.com/token', {

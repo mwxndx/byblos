@@ -541,11 +541,20 @@ class NotificationService {
 
             results.forEach((item, index) => {
                 const device = batch[index];
-                if (item.status === 'fulfilled' && item.value?.delivered) {
+                if (item.status === 'fulfilled' && item.value?.ok) {
                     sent++;
                 } else {
                     failed++;
-                    if (item.value?.shouldDeactivate) {
+                    const failureDetail = item.status === 'fulfilled' ? item.value : { error: item.reason?.message || item.reason };
+                    logger.warn('[NotificationService] Update broadcast push failed for device token', {
+                        platform: device.platform,
+                        tokenPrefix: device.token ? `${device.token.substring(0, 10)}...` : undefined,
+                        status: item.value?.status,
+                        reason: item.value?.reason,
+                        error: failureDetail?.error
+                    });
+
+                    if (item.value?.unregistered) {
                         invalidTokens.push(device.token);
                     }
                 }
