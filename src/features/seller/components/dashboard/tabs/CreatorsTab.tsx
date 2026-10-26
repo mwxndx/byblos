@@ -109,8 +109,7 @@ export function CreatorsTab() {
     setIsMarketplaceEnabled(next);
     try {
       await updateListingMutation.mutateAsync({
-        isCreatorMarketplaceEnabled: next,
-        creatorCommissionRate: data?.creatorCommissionRate ?? 0.05,
+        isCreatorMarketplaceEnabled: next
       });
       toast.success(next ? 'Shop listed in the Creator Marketplace.' : 'Shop removed from the Creator Marketplace.');
     } catch (err: unknown) {
@@ -216,10 +215,11 @@ export function CreatorsTab() {
                   type="button"
                   role="switch"
                   aria-checked={isMarketplaceEnabled}
+                  aria-label="List Shop for Creator Requests"
                   onClick={handleToggleMarketplace}
                   disabled={updateListingMutation.isPending}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-60 ${
-                    isMarketplaceEnabled ? 'bg-yellow-400' : 'bg-white/20'
+                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
+                    isMarketplaceEnabled ? 'bg-yellow-400' : 'bg-slate-300 dark:bg-white/20'
                   }`}
                 >
                   <span

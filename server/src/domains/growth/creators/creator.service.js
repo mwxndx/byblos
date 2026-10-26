@@ -1968,7 +1968,7 @@ class CreatorService {
     if (creatorCommissionRate !== undefined) {
       const numericRate = Number(creatorCommissionRate);
       if (!Number.isFinite(numericRate) || numericRate < MIN_CREATOR_COMMISSION_RATE || numericRate > MAX_CREATOR_COMMISSION_RATE) {
-        throw new Error('Creator commission must be between 1% and 30%');
+        throw new AppError('Creator commission must be between 1% and 30%', 400);
       }
     }
 

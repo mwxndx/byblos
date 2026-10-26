@@ -10,19 +10,27 @@ describe('Creator Commission Bounds (1% to 30%)', () => {
     assert.equal(Fees.CREATOR_MAX_COMMISSION_RATE, 0.30);
   });
 
-  test('CreatorService.updateSellerCreatorListing throws on rate below 1% or above 30%', async () => {
+  test('CreatorService.updateSellerCreatorListing throws AppError 400 on rate below 1% or above 30%', async () => {
     await assert.rejects(
       async () => {
         await CreatorService.updateSellerCreatorListing(99999, { creatorCommissionRate: 0.005 });
       },
-      { message: /Creator commission must be between 1% and 30%/ }
+      (err) => {
+        assert.equal(err.statusCode, 400, 'Must be operational AppError 400');
+        assert.match(err.message, /Creator commission must be between 1% and 30%/);
+        return true;
+      }
     );
 
     await assert.rejects(
       async () => {
         await CreatorService.updateSellerCreatorListing(99999, { creatorCommissionRate: 0.35 });
       },
-      { message: /Creator commission must be between 1% and 30%/ }
+      (err) => {
+        assert.equal(err.statusCode, 400, 'Must be operational AppError 400');
+        assert.match(err.message, /Creator commission must be between 1% and 30%/);
+        return true;
+      }
     );
   });
 
