@@ -54,6 +54,70 @@ export const paymentRateLimiter = createResilientRateLimiter('payment', {
 });
 
 // ========================================
+// 4b. Logistics Quote Calculation (READ-ONLY)
+// ========================================
+export const logisticsQuoteRateLimiter = createResilientRateLimiter('logistics-quote', {
+    windowMs: 60 * 1000, // 1 minute
+    max: 60, // 60 quote calculations per minute per IP
+    message: {
+        status: 'error',
+        message: 'Too many delivery quote requests. Please wait a moment before trying again.',
+        retryAfter: '1 minute'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+        const userId = req.user?.id || req.user?.userId;
+        return userId ? `user:${userId}` : `ip:${req.ip}`;
+    },
+    handler: (req, res) => {
+        logger.warn('[RATE-LIMIT] Logistics quote rate limit exceeded', {
+            ip: req.ip,
+            userId: req.user?.id,
+            path: req.path
+        });
+
+        res.status(429).json({
+            status: 'error',
+            message: 'Too many delivery quote requests. Please wait a moment before trying again.',
+            retryAfter: 60
+        });
+    }
+});
+
+// ========================================
+// 4c. Payment Status Polling (READ-ONLY)
+// ========================================
+export const paymentStatusRateLimiter = createResilientRateLimiter('payment-status', {
+    windowMs: 2 * 60 * 1000, // 2 minutes
+    max: 60, // 60 status checks per 2 minutes per IP (supports 30-attempt 5s polling loop)
+    message: {
+        status: 'error',
+        message: 'Too many payment status requests. Please wait a moment.',
+        retryAfter: '2 minutes'
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+        const userId = req.user?.id || req.user?.userId;
+        return userId ? `user:${userId}` : `ip:${req.ip}`;
+    },
+    handler: (req, res) => {
+        logger.warn('[RATE-LIMIT] Payment status check rate limit exceeded', {
+            ip: req.ip,
+            userId: req.user?.id,
+            path: req.path
+        });
+
+        res.status(429).json({
+            status: 'error',
+            message: 'Too many payment status checks. Please wait a moment.',
+            retryAfter: 120
+        });
+    }
+});
+
+// ========================================
 // 5. Withdrawal Requests (MODERATE)
 // ========================================
 export const withdrawalRateLimiter = createResilientRateLimiter('withdrawal', {
@@ -203,6 +267,8 @@ export const createRateLimiter = (name, options) => {
 
 export default {
     payment: paymentRateLimiter,
+    logisticsQuote: logisticsQuoteRateLimiter,
+    paymentStatus: paymentStatusRateLimiter,
     withdrawal: withdrawalRateLimiter,
     publicApi: publicApiRateLimiter,
     upload: uploadRateLimiter,

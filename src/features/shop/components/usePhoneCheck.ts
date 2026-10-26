@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import type { DoorDeliverySelection } from './PhoneCheckModal';
 import type { OptionalBuyerLocation } from '@/infrastructure/location/location';
 import { getLogisticsQuote } from '@/features/buyer/api/payments';
@@ -48,6 +48,9 @@ export function usePhoneCheck({
   const [quoteError, setQuoteError] = useState('');
   const [isQuoteLoading, setIsQuoteLoading] = useState(false);
   const [customInstructions, setCustomInstructions] = useState('');
+  const lastQuotedCoordsRef = useRef<{ lat: number; lng: number } | null>(null);
+  const addressRef = useRef(deliveryLocation?.address || '');
+  addressRef.current = deliveryLocation?.address || '';
 
   const canUseDoorDelivery = Boolean(isPhysicalProduct);
   const productPrice = purchaseDetails?.productPrice || 0;
@@ -70,21 +73,34 @@ export function usePhoneCheck({
       setDeliveryQuote(null);
       setQuoteError('');
       setIsQuoteLoading(false);
+      lastQuotedCoordsRef.current = null;
       setCustomInstructions('');
     }
   }, [isOpen, initialPhone]);
 
-  // Fetch logistics quote when door delivery is enabled and location is chosen
+  // Fetch logistics quote only when door delivery is enabled and coordinates change
+  const targetLat = deliveryLocation?.lat ?? null;
+  const targetLng = deliveryLocation?.lng ?? null;
+
   useEffect(() => {
     if (
       !doorDeliveryEnabled ||
-      !deliveryLocation ||
-      deliveryLocation.lat === null ||
-      deliveryLocation.lng === null
+      targetLat === null ||
+      targetLng === null
     ) {
+      lastQuotedCoordsRef.current = null;
       setDeliveryQuote(null);
       setQuoteError('');
       setIsQuoteLoading(false);
+      return;
+    }
+
+    // Skip recalculation if coordinates are unchanged (prevents keystroke churn while typing address)
+    if (
+      lastQuotedCoordsRef.current &&
+      lastQuotedCoordsRef.current.lat === targetLat &&
+      lastQuotedCoordsRef.current.lng === targetLng
+    ) {
       return;
     }
 
@@ -97,9 +113,9 @@ export function usePhoneCheck({
           {
             legType: 'delivery',
             location: {
-              address: deliveryLocation.address,
-              latitude: deliveryLocation.lat!,
-              longitude: deliveryLocation.lng!,
+              address: addressRef.current,
+              latitude: targetLat,
+              longitude: targetLng,
             },
           },
           abortController.signal
@@ -107,6 +123,7 @@ export function usePhoneCheck({
 
         const quoteData = response?.data || response;
         if (quoteData) {
+          lastQuotedCoordsRef.current = { lat: targetLat, lng: targetLng };
           setDeliveryQuote({
             feeAmount: Number(quoteData.feeAmount || 0),
             distanceKm: Number(quoteData.distanceKm || 0),
@@ -147,13 +164,7 @@ export function usePhoneCheck({
       window.clearTimeout(timer);
       abortController.abort();
     };
-  }, [
-    doorDeliveryEnabled,
-    deliveryLocation,
-    deliveryLocation?.address,
-    deliveryLocation?.lat,
-    deliveryLocation?.lng,
-  ]);
+  }, [doorDeliveryEnabled, targetLat, targetLng]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();

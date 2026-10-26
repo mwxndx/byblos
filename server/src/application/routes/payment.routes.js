@@ -5,7 +5,7 @@ import paymentController from '../../domains/payments/payments/payment.controlle
 import { protect, hasPermission } from '../middleware/auth.js';
 import { requirePaystackWebhookHmac, verifyPaystackWebhook, webhookRateLimiter } from '../middleware/paystackWebhookSecurity.js';
 import paymentRequestLogger from '../middleware/payment-logger.middleware.js';
-import { paymentRateLimiter } from '../middleware/rateLimiting.js';
+import { paymentRateLimiter, logisticsQuoteRateLimiter, paymentStatusRateLimiter } from '../middleware/rateLimiting.js';
 import { enforceIdempotency } from '../middleware/idempotency.middleware.js';
 
 const router = express.Router();
@@ -73,7 +73,7 @@ publicRouter.post(
 
 publicRouter.post(
   '/logistics-quote',
-  paymentRateLimiter,
+  logisticsQuoteRateLimiter,
   validate(logisticsQuoteSchema),
   paymentController.quoteLogistics
 );
@@ -90,7 +90,7 @@ publicRouter.post(
 // Check payment status (public)
 publicRouter.get(
   '/status/:invoiceId',
-  paymentRateLimiter,
+  paymentStatusRateLimiter,
   validate(checkStatusSchema),
   (req, res, next) => {
     // Map invoiceId to paymentId for backward compatibility
