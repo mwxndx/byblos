@@ -32,6 +32,9 @@ export function useUpdateThemeMutation() {
     mutationFn: (theme: string) => sellerApi.updateTheme(theme as import('@/features/seller/api').Theme),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['seller-profile'] });
+      queryClient.invalidateQueries({ queryKey: sellerQueryKeys.profile() });
+      queryClient.invalidateQueries({ queryKey: ['seller-shop'] });
+      queryClient.invalidateQueries({ queryKey: ['public-sellers'] });
     },
   });
 }

@@ -36,6 +36,7 @@ interface SettingsTabProps {
   setFormData: React.Dispatch<React.SetStateAction<SellerSettingsFormData>>;
   shopNameAvailable: boolean | null;
   onLogout: () => void;
+  onThemeChange?: (theme: Theme) => void;
   toggleEdit: () => void;
 }
 
@@ -58,6 +59,7 @@ export function SettingsTab({
   setFormData,
   shopNameAvailable,
   onLogout,
+  onThemeChange,
   toggleEdit
 }: SettingsTabProps) {
   const [isEditingContacts, setIsEditingContacts] = useState(false);
@@ -140,7 +142,7 @@ export function SettingsTab({
       <section className="seller-card p-4 sm:p-5 lg:p-6">
         <ThemeSelector
           currentTheme={(sellerProfile?.theme as Theme) || 'default'}
-          onThemeChange={() => undefined}
+          onThemeChange={onThemeChange || (() => undefined)}
         />
       </section>
 

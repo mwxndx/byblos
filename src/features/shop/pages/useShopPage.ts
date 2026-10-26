@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useSellerByShopNameQuery, usePublicSellerProductsQuery } from '@/features/shop/hooks/useShopQueries';
 import { useTrackCreatorLinkMutation } from '@/features/creator/hooks/mutations/useTrackCreatorLinkMutation';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-import { useShopAccentOnly, type Theme } from '@/shared/hooks/useShopTheme';
+import { useShopAccentOnly, getShopThemeAccentVars, type Theme } from '@/shared/hooks/useShopTheme';
 import { useShopPageTheme } from '../components/ShopPageThemePicker';
 import { isAesthetic, getSellerInitials, type ShopProduct, type ShopSeller } from '../utils/shopPage.shared';
 
@@ -23,10 +23,6 @@ export function useShopPage() {
 
   // Visitor-controlled page theme (light / dark / system)
   const { theme: shopPageTheme, setTheme: setShopPageTheme, resolved: resolvedShopTheme } = useShopPageTheme();
-
-  // Seller's saved colour theme drives accent/button vars only (not bg/text)
-  const [sellerTheme, setSellerTheme] = useState<Theme>('default');
-  const themeClasses = useShopAccentOnly(sellerTheme);
 
   const [creatorModeNotice, setCreatorModeNotice] = useState<string | null>(null);
   const trackCreatorLink = useTrackCreatorLinkMutation();
@@ -66,6 +62,12 @@ export function useShopPage() {
 
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
   const { data: sellerProducts, isLoading: isProductsLoading } = usePublicSellerProductsQuery(seller?.id || '', !!seller?.id);
+
+  // Seller's saved colour theme drives accent/button vars only (not bg/text)
+  const [sellerTheme, setSellerTheme] = useState<Theme>('default');
+  const effectiveTheme: Theme = (seller?.theme as Theme) || sellerTheme;
+  const themeClasses = useShopAccentOnly(effectiveTheme);
+  const themeAccentVars = useMemo(() => getShopThemeAccentVars(effectiveTheme), [effectiveTheme]);
 
   useEffect(() => {
     if (sellerError) {
@@ -186,6 +188,8 @@ export function useShopPage() {
     sellerInfo,
     creatorModeNotice,
     themeClasses,
+    sellerTheme: effectiveTheme,
+    themeAccentVars,
     shopPageTheme,
     setShopPageTheme,
     resolvedShopTheme,

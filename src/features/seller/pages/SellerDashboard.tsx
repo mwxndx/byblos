@@ -324,8 +324,11 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
         >
           <div className="px-4 py-4 pb-8">
             <SettingsTab
-              sellerProfile={sellerProfile}
+              sellerProfile={liveSellerProfile && sellerProfile ? { ...sellerProfile, ...liveSellerProfile } : sellerProfile!}
               onLogout={handleLogout}
+              onThemeChange={(newTheme) => {
+                void updateSellerProfile({ theme: newTheme });
+              }}
               {...settingsForm}
             />
           </div>

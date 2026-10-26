@@ -20,6 +20,7 @@ const ShopPage = () => {
     sellerInfo,
     creatorModeNotice,
     themeClasses,
+    themeAccentVars,
     shopPageTheme,
     setShopPageTheme,
     resolvedShopTheme,
@@ -95,6 +96,7 @@ const ShopPage = () => {
     <div
       className="shop-page-root min-h-screen transition-colors duration-300"
       data-shop-theme={resolvedShopTheme}
+      style={themeAccentVars}
     >
       <SEOHead
         title={sellerInfo?.shopName || sellerInfo?.fullName || 'Shop'}

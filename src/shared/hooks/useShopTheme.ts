@@ -201,7 +201,16 @@ const THEME_DEFINITIONS: Record<Theme, ThemeDefinition> = {
 };
 
 // ─── Accent-only variant ─────────────────────────────────────────────────────
-const ACCENT_KEYS = ['--theme-accent', '--theme-accent-rgb', '--theme-button-bg', '--theme-button-text'] as const;
+export const ACCENT_KEYS = ['--theme-accent', '--theme-accent-rgb', '--theme-button-bg', '--theme-button-text'] as const;
+
+export function getShopThemeAccentVars(themeName: Theme = 'default'): Record<string, string> {
+    const config = THEME_DEFINITIONS[themeName] || THEME_DEFINITIONS.default;
+    const accentVars: Record<string, string> = {};
+    ACCENT_KEYS.forEach((key) => {
+        if (config.vars[key]) accentVars[key] = config.vars[key];
+    });
+    return accentVars;
+}
 
 export function useShopAccentOnly(
     themeName: Theme = 'default',
