@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { AdminOverviewTab } from '../AdminOverviewTab';
+import { GeoDistributionChart } from '../AdminDashboardCharts';
 
 // Mock Recharts
 vi.mock('recharts', async () => {
@@ -29,8 +30,8 @@ describe('AdminOverviewTab', () => {
         { name: 'Jun', buyers: 40, sellers: 10, creators: 5 },
       ],
       geoDistribution: [
-        { name: 'Nairobi', buyers: 50, sellers: 12, creators: 4, gmv: 85000, value: 66 },
-        { name: 'Mombasa', buyers: 25, sellers: 6, creators: 2, gmv: 35000, value: 33 },
+        { name: 'CBD', buyers: 50, sellers: 12, creators: 4, gmv: 85000, value: 66 },
+        { name: 'Westlands', buyers: 25, sellers: 6, creators: 2, gmv: 35000, value: 33 },
       ],
       productStatus: [
         { name: 'Physical', value: 80, inventory: 400 },
@@ -99,5 +100,27 @@ describe('AdminOverviewTab', () => {
     expect(screen.getByText('Revenue Trends')).toBeDefined();
     expect(screen.getByText('User Growth')).toBeDefined();
     expect(screen.getByText('Geographic Reach')).toBeDefined();
+  });
+
+  describe('GeoDistributionChart', () => {
+    it('filters out generic "Nairobi" entries and displays genuine Nairobi locations', () => {
+      const data = [
+        { name: 'Nairobi', buyers: 10, sellers: 2, creators: 1, gmv: 5000 },
+        { name: 'CBD', buyers: 4, sellers: 1, creators: 1, gmv: 2500 }
+      ];
+      render(<GeoDistributionChart data={data} />);
+      expect(screen.getByText('Geographic Reach')).toBeDefined();
+      expect(screen.getByText('Nairobi locations by GMV, buyers, sellers, and creators')).toBeDefined();
+      expect(screen.queryByText('No geographic activity yet')).toBeNull();
+    });
+
+    it('shows empty state when data only contains filtered "Nairobi" or empty entries', () => {
+      const data = [
+        { name: 'Nairobi', buyers: 10, sellers: 2, creators: 1, gmv: 5000 },
+        { name: 'unknown city', buyers: 1, sellers: 0, creators: 0, gmv: 0 }
+      ];
+      render(<GeoDistributionChart data={data} />);
+      expect(screen.getByText('No geographic activity yet')).toBeDefined();
+    });
   });
 });

@@ -165,36 +165,43 @@ export const ProductStatusChart = ({ data }: { data: Record<string, unknown>[] }
   </ChartContainer>
 );
 
-export const GeoDistributionChart = ({ data }: { data: Record<string, unknown>[] }) => (
-  <ChartContainer title="Geographic Reach" description="Regions by GMV, buyers, sellers, and creators" className="col-span-4 lg:col-span-2">
-    {hasChartData(data) ? (
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} layout="vertical" margin={{ left: 4, right: 8, top: 4, bottom: 4 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#262626" horizontal={false} />
-          <XAxis type="number" stroke="#6b7280" axisLine={false} tickLine={false} fontSize={11} />
-          <YAxis type="category" dataKey="name" width={72} stroke="#9ca3af" axisLine={false} tickLine={false} fontSize={11} />
-          <Tooltip
-            cursor={{ fill: 'rgba(250, 204, 21, 0.08)' }}
-            contentStyle={{ backgroundColor: '#0A0A0A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', color: '#f5f5f5' }}
-            formatter={(value, name) => {
-              if (name === 'GMV') return [`KES ${Number(value || 0).toLocaleString()}`, String(name)];
-              return [Number(value || 0).toLocaleString(), String(name)];
-            }}
-          />
-          <Legend />
-          <Bar dataKey="buyers" fill="#38bdf8" radius={[0, 8, 8, 0]} name="Buyers" />
-          <Bar dataKey="sellers" fill="#22c55e" radius={[0, 8, 8, 0]} name="Sellers" />
-          <Bar dataKey="creators" fill="#a855f7" radius={[0, 8, 8, 0]} name="Creators" />
-          <Bar dataKey="gmv" fill="#f59e0b" radius={[0, 8, 8, 0]} name="GMV" />
-        </BarChart>
-      </ResponsiveContainer>
-    ) : (
-      <div className="flex h-full items-center justify-center text-center">
-        <p className="text-sm font-semibold text-label-3">No geographic activity yet</p>
-      </div>
-    )}
-  </ChartContainer>
-);
+export const GeoDistributionChart = ({ data }: { data: Record<string, unknown>[] }) => {
+  const chartData = (data || []).filter(item => {
+    const name = String(item?.name || '').trim().toLowerCase();
+    return name && name !== 'nairobi' && name !== 'unknown' && name !== 'unknown city';
+  });
+
+  return (
+    <ChartContainer title="Geographic Reach" description="Nairobi locations by GMV, buyers, sellers, and creators" className="col-span-4 lg:col-span-2">
+      {hasChartData(chartData) ? (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={chartData} layout="vertical" margin={{ left: 4, right: 8, top: 4, bottom: 4 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#262626" horizontal={false} />
+            <XAxis type="number" stroke="#6b7280" axisLine={false} tickLine={false} fontSize={11} />
+            <YAxis type="category" dataKey="name" width={72} stroke="#9ca3af" axisLine={false} tickLine={false} fontSize={11} />
+            <Tooltip
+              cursor={{ fill: 'rgba(250, 204, 21, 0.08)' }}
+              contentStyle={{ backgroundColor: '#0A0A0A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '0.75rem', color: '#f5f5f5' }}
+              formatter={(value, name) => {
+                if (name === 'GMV') return [`KES ${Number(value || 0).toLocaleString()}`, String(name)];
+                return [Number(value || 0).toLocaleString(), String(name)];
+              }}
+            />
+            <Legend />
+            <Bar dataKey="buyers" fill="#38bdf8" radius={[0, 8, 8, 0]} name="Buyers" />
+            <Bar dataKey="sellers" fill="#22c55e" radius={[0, 8, 8, 0]} name="Sellers" />
+            <Bar dataKey="creators" fill="#a855f7" radius={[0, 8, 8, 0]} name="Creators" />
+            <Bar dataKey="gmv" fill="#f59e0b" radius={[0, 8, 8, 0]} name="GMV" />
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="flex h-full items-center justify-center text-center">
+          <p className="text-sm font-semibold text-label-3">No geographic activity yet</p>
+        </div>
+      )}
+    </ChartContainer>
+  );
+};
 
 export const CategoryDistributionChart = ({ data }: { data: Record<string, unknown>[] }) => (
   <ChartContainer title="Category Distribution" description="Product mix by product category" className="col-span-4 lg:col-span-2">

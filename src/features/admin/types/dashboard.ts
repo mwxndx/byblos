@@ -45,7 +45,7 @@ export interface DashboardAnalytics {
   revenueTrends?: Array<{ name: string; revenue: number; orders: number }>;
   salesTrends?: Array<{ name: string; sales: number }>;
   productStatus?: Array<{ name: string; value: number }>;
-  geoDistribution?: Array<{ name: string; value: number }>;
+  geoDistribution?: Array<{ name: string; value: number; buyers?: number; sellers?: number; creators?: number; gmv?: number }>;
 }
 
 

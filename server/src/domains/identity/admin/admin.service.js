@@ -8,6 +8,7 @@ import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUti
 import CacheService from '../../../shared/utils/cache.service.js';
 import { buildSearchClause } from '../../../shared/utils/pagination.utils.js';
 import { invalidateUserSessions } from '../../../shared/utils/sessionRevocation.js';
+import { normalizeNairobiLocationSql } from '../../../shared/utils/location.utils.js';
 
 class AdminService {
   async getDashboardStats() {
@@ -254,17 +255,15 @@ class AdminService {
               LIMIT 6;
             `;
 
-      // 4. Geographic Distribution (buyers, sellers, creators, and paid order GMV)
+      // 4. Geographic Distribution (Nairobi locations by buyers, sellers, creators, and paid order GMV)
       const geoQuery = `
               WITH buyer_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(b.location), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(latest_order.location), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(b.city), ''), 'Unknown City'),
-                    'Nairobi'
+                    ${normalizeNairobiLocationSql('b.location')},
+                    ${normalizeNairobiLocationSql('latest_order.location')}
                   ) AS name,
-                  COUNT(*) AS buyers,
+                  COUNT(DISTINCT b.id) AS buyers,
                   0::int AS sellers,
                   0::int AS creators,
                   0::numeric AS gmv
@@ -272,10 +271,9 @@ class AdminService {
                 LEFT JOIN LATERAL (
                   SELECT
                     COALESCE(
-                      NULLIF(TRIM(po.delivery_location->>'location'), ''),
-                      NULLIF(TRIM(po.location_address), ''),
-                      NULLIF(TRIM(po.delivery_location->>'address'), ''),
-                      NULLIF(TRIM(po.delivery_location->>'city'), '')
+                      po.delivery_location->>'location',
+                      po.location_address,
+                      po.delivery_location->>'address'
                     ) AS location
                   FROM product_orders po
                   WHERE po.buyer_id = b.id
@@ -284,49 +282,108 @@ class AdminService {
                 ) latest_order ON true
                 WHERE b.user_id IS NOT NULL
                 GROUP BY 1
+                HAVING COALESCE(
+                  ${normalizeNairobiLocationSql('b.location')},
+                  ${normalizeNairobiLocationSql('latest_order.location')}
+                ) IS NOT NULL
               ),
               seller_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
-                    'Nairobi'
+                    ${normalizeNairobiLocationSql('s.location')},
+                    ${normalizeNairobiLocationSql('s.physical_address')}
                   ) AS name,
                   0::int AS buyers,
-                  COUNT(*) AS sellers,
+                  COUNT(DISTINCT s.id) AS sellers,
                   0::int AS creators,
                   0::numeric AS gmv
                 FROM sellers s
                 WHERE s.user_id IS NOT NULL
                 GROUP BY 1
+                HAVING COALESCE(
+                  ${normalizeNairobiLocationSql('s.location')},
+                  ${normalizeNairobiLocationSql('s.physical_address')}
+                ) IS NOT NULL
+              ),
+              creator_locations AS (
+                SELECT
+                  scl.creator_id,
+                  COALESCE(
+                    ${normalizeNairobiLocationSql('s.location')},
+                    ${normalizeNairobiLocationSql('s.physical_address')}
+                  ) AS name
+                FROM seller_creator_links scl
+                JOIN sellers s ON s.id = scl.seller_id
+                WHERE scl.status IN ('active', 'approved')
+
+                UNION
+
+                SELECT
+                  c.id AS creator_id,
+                  COALESCE(
+                    ${normalizeNairobiLocationSql('b.location')},
+                    ${normalizeNairobiLocationSql('latest_buyer_order.location')},
+                    ${normalizeNairobiLocationSql('s2.location')},
+                    ${normalizeNairobiLocationSql('s2.physical_address')}
+                  ) AS name
+                FROM creators c
+                LEFT JOIN buyers b ON b.user_id = c.user_id
+                LEFT JOIN LATERAL (
+                  SELECT
+                    COALESCE(
+                      po.delivery_location->>'location',
+                      po.location_address,
+                      po.delivery_location->>'address'
+                    ) AS location
+                  FROM product_orders po
+                  WHERE po.buyer_id = b.id
+                  ORDER BY po.created_at DESC
+                  LIMIT 1
+                ) latest_buyer_order ON true
+                LEFT JOIN sellers s2 ON s2.user_id = c.user_id
+                WHERE c.status != 'suspended'
+
+                UNION
+
+                SELECT
+                  csr.creator_id,
+                  COALESCE(
+                    ${normalizeNairobiLocationSql('s3.location')},
+                    ${normalizeNairobiLocationSql('s3.physical_address')}
+                  ) AS name
+                FROM creator_shop_requests csr
+                JOIN sellers s3 ON s3.id = csr.seller_id
+
+                UNION
+
+                SELECT
+                  ce.creator_id,
+                  COALESCE(
+                    ${normalizeNairobiLocationSql('s4.location')},
+                    ${normalizeNairobiLocationSql('s4.physical_address')}
+                  ) AS name
+                FROM creator_earnings ce
+                JOIN sellers s4 ON s4.id = ce.seller_id
               ),
               creator_regions AS (
                 SELECT
-                  COALESCE(
-                    NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.physical_address), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
-                    'Nairobi'
-                  ) AS name,
+                  name,
                   0::int AS buyers,
                   0::int AS sellers,
-                  COUNT(DISTINCT scl.creator_id) AS creators,
+                  COUNT(DISTINCT creator_id) AS creators,
                   0::numeric AS gmv
-                FROM seller_creator_links scl
-                JOIN sellers s ON s.id = scl.seller_id
+                FROM creator_locations
+                WHERE name IS NOT NULL
                 GROUP BY 1
               ),
               order_regions AS (
                 SELECT
                   COALESCE(
-                    NULLIF(NULLIF(TRIM(po.delivery_location->>'location'), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(po.location_address), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(po.delivery_location->>'address'), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.location), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(po.delivery_location->>'city'), ''), 'Unknown City'),
-                    NULLIF(NULLIF(TRIM(s.city), ''), 'Unknown City'),
-                    'Nairobi'
+                    ${normalizeNairobiLocationSql("po.delivery_location->>'location'")},
+                    ${normalizeNairobiLocationSql("po.location_address")},
+                    ${normalizeNairobiLocationSql("po.delivery_location->>'address'")},
+                    ${normalizeNairobiLocationSql("s.location")},
+                    ${normalizeNairobiLocationSql("s.physical_address")}
                   ) AS name,
                   0::int AS buyers,
                   0::int AS sellers,
@@ -337,6 +394,13 @@ class AdminService {
                 WHERE po.payment_status = 'completed'
                   AND po.status::text NOT IN ${excludedOrderStatuses}
                 GROUP BY 1
+                HAVING COALESCE(
+                  ${normalizeNairobiLocationSql("po.delivery_location->>'location'")},
+                  ${normalizeNairobiLocationSql("po.location_address")},
+                  ${normalizeNairobiLocationSql("po.delivery_location->>'address'")},
+                  ${normalizeNairobiLocationSql("s.location")},
+                  ${normalizeNairobiLocationSql("s.physical_address")}
+                ) IS NOT NULL
               ),
               combined AS (
                 SELECT name, buyers, sellers, creators, gmv FROM buyer_regions
@@ -348,16 +412,14 @@ class AdminService {
                 SELECT name, buyers, sellers, creators, gmv FROM order_regions
               )
               SELECT
-                CASE 
-                  WHEN name IS NULL OR LOWER(TRIM(name)) IN ('unknown', 'unknown city', '') THEN 'Nairobi' 
-                  ELSE name 
-                END AS name,
+                name,
                 SUM(buyers) AS buyers,
                 SUM(sellers) AS sellers,
                 SUM(creators) AS creators,
                 SUM(gmv) AS gmv,
                 SUM(buyers + sellers + creators) AS value
               FROM combined
+              WHERE name IS NOT NULL
               GROUP BY 1
               ORDER BY gmv DESC, value DESC
               LIMIT 8;
