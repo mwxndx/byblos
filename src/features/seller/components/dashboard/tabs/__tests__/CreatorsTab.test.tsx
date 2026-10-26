@@ -45,7 +45,7 @@ vi.mock('sonner', () => ({
   },
 }));
 
-describe('CreatorsTab - Marketplace Toggle', () => {
+describe('CreatorsTab - Marketplace Listing Controls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockMutateAsync.mockResolvedValue({ isCreatorMarketplaceEnabled: true });
@@ -69,12 +69,31 @@ describe('CreatorsTab - Marketplace Toggle', () => {
     });
   });
 
-  it('renders toggle switch with high-contrast visible track class in light and dark mode', () => {
+  it('renders switch with high-contrast visible track and white thumb when off', () => {
     render(<CreatorsTab />);
 
     const toggleButton = screen.getByRole('switch', { name: /list shop for creator requests/i });
-    expect(toggleButton.className).toContain('bg-slate-300');
-    expect(toggleButton.className).toContain('dark:bg-white/20');
     expect(toggleButton.className).toContain('shrink-0');
+
+    const thumb = toggleButton.querySelector('span');
+    // In dark mode, an off switch MUST have a visible white thumb, NOT bg-black
+    expect(thumb?.className).toContain('bg-white');
+  });
+
+  it('renders a prominent "List Shop in Marketplace" button when not listed', async () => {
+    render(<CreatorsTab />);
+
+    const actionButton = screen.getByRole('button', { name: /list shop in marketplace/i });
+    expect(actionButton).toBeInTheDocument();
+
+    fireEvent.click(actionButton);
+
+    await waitFor(() => {
+      expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+    });
+
+    expect(mockMutateAsync).toHaveBeenCalledWith({
+      isCreatorMarketplaceEnabled: true,
+    });
   });
 });

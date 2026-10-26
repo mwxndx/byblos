@@ -206,32 +206,61 @@ export function CreatorsTab() {
           {/* Marketplace toggle card */}
           <div className="rounded-2xl border border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.02] p-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <label htmlFor="marketplace-toggle" className="text-sm font-bold text-slate-900 dark:text-white cursor-pointer">
                   List Shop for Creator Requests
                 </label>
-                <button
-                  id="marketplace-toggle"
-                  type="button"
-                  role="switch"
-                  aria-checked={isMarketplaceEnabled}
-                  aria-label="List Shop for Creator Requests"
-                  onClick={handleToggleMarketplace}
-                  disabled={updateListingMutation.isPending}
-                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
-                    isMarketplaceEnabled ? 'bg-yellow-400' : 'bg-slate-300 dark:bg-white/20'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-black transition-transform ${
-                      isMarketplaceEnabled ? 'translate-x-6' : 'translate-x-1'
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-semibold ${isMarketplaceEnabled ? 'text-yellow-400' : 'text-slate-500 dark:text-white/40'}`}>
+                    {isMarketplaceEnabled ? 'ON' : 'OFF'}
+                  </span>
+                  <button
+                    id="marketplace-toggle"
+                    type="button"
+                    role="switch"
+                    aria-checked={isMarketplaceEnabled}
+                    aria-label="List Shop for Creator Requests"
+                    onClick={handleToggleMarketplace}
+                    disabled={updateListingMutation.isPending}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-60 ${
+                      isMarketplaceEnabled ? 'bg-yellow-400' : 'bg-slate-400/50 dark:bg-zinc-700 border border-slate-400/40 dark:border-white/20'
                     }`}
-                  />
-                </button>
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full shadow-sm transition-transform ${
+                        isMarketplaceEnabled ? 'translate-x-6 bg-black' : 'translate-x-1 bg-white'
+                      }`}
+                    />
+                  </button>
+                </div>
               </div>
               <p className="mt-2 text-xs text-slate-500 dark:text-white/50 leading-relaxed">
                 When enabled, creators can preview your shop in read-only mode and send you collaboration requests. You can accept or decline each request.
               </p>
+
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  onClick={handleToggleMarketplace}
+                  disabled={updateListingMutation.isPending}
+                  className={`h-11 px-5 font-semibold transition-all ${
+                    isMarketplaceEnabled
+                      ? 'border border-slate-300 dark:border-separator bg-transparent text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10'
+                      : 'bg-yellow-400 text-black hover:bg-yellow-300 shadow-sm'
+                  }`}
+                >
+                  {updateListingMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : isMarketplaceEnabled ? (
+                    'Remove Shop from Marketplace'
+                  ) : (
+                    <span className="inline-flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      List Shop in Marketplace
+                    </span>
+                  )}
+                </Button>
+              </div>
             </div>
 
             <div className="mt-4 pt-3 border-t border-slate-200 dark:border-separator text-[11px] text-slate-500 dark:text-white/40">
