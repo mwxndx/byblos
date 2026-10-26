@@ -84,4 +84,13 @@ describe('ShopProductCard', () => {
     expect(handleTap).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog', { name: /Byblos Silk Shirt images/i })).toBeInTheDocument();
   });
+
+  it('renders product photo with object-contain to avoid image clipping from being rendered too big', () => {
+    render(<ShopProductCard product={mockProduct} onTap={vi.fn()} />);
+
+    const productImg = screen.getByAltText('Byblos Silk Shirt');
+    expect(productImg).toBeInTheDocument();
+    expect(productImg).toHaveClass('object-contain');
+    expect(productImg).not.toHaveClass('object-cover');
+  });
 });

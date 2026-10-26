@@ -112,15 +112,24 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             }}
         >
             {/* Top ~66%: business photo. */}
-            <div className="h-[66%] w-full overflow-hidden" style={{ background: palette.avatarGradient }}>
+            <div className="relative flex h-[66%] w-full items-center justify-center overflow-hidden" style={{ background: palette.avatarGradient }}>
                 {hasAvatar ? (
-                    <img
-                        src={getImageUrl(avatarUrl)}
-                        alt={`${shopName} business photo`}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                        onError={() => setAvatarFailed(true)}
-                    />
+                    <>
+                        <img
+                            src={getImageUrl(avatarUrl)}
+                            alt=""
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-30 blur-sm scale-110"
+                            loading="lazy"
+                        />
+                        <img
+                            src={getImageUrl(avatarUrl)}
+                            alt={`${shopName} business photo`}
+                            className="relative z-10 h-full w-full object-contain p-1.5 sm:p-2"
+                            loading="lazy"
+                            onError={() => setAvatarFailed(true)}
+                        />
+                    </>
                 ) : (
                     <div className="flex h-full w-full items-center justify-center">
                         <Store className="h-10 w-10 text-white/90" strokeWidth={1.6} />
