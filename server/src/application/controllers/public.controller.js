@@ -646,9 +646,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Consolidated shared financial calculations and unified currency formatting across admin logistics, seller orders, and courier dispatch.',
-        'Strengthened mobile gesture navigation with automated modal back-button dismissal and streamlined overlay memory management.',
-        'Hardened backend administration routing with resilient error trapping and synchronized buyer account lifecycle statuses.'
+        'Hardened authentication token grace caching, order cancellations, and public payment status lookups against unauthorized cross-account access.',
+        'Polished profile drawer slide gestures across seller, creator, and buyer dashboards with fluid single-pass hardware-accelerated animations.',
+        'Strengthened guest checkout order claiming with email ownership validation and decoupled seller analytics from background cron jobs.'
       ]
     }
   });
