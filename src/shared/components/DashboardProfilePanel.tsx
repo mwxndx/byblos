@@ -34,20 +34,23 @@ export function DashboardProfilePanel({
   const panelRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // Presence lifecycle: retain in DOM during exit animation so it slides out cleanly
-  const [isRendered, setIsRendered] = useState(open);
+  // Synchronous presence initialization: when open becomes true, render immediately
+  // without triggering a second render in useEffect (which causes animation restart/double-play).
+  const [shouldRender, setShouldRender] = useState(open);
+
+  if (open && !shouldRender) {
+    setShouldRender(true);
+  }
 
   useEffect(() => {
-    if (open) {
-      setIsRendered(true);
-    } else {
-      // 200ms exit transition + 20ms buffer before unmounting
+    if (!open && shouldRender) {
+      // 200ms slide-out animation + 20ms buffer before unmounting from DOM
       const timer = window.setTimeout(() => {
-        setIsRendered(false);
+        setShouldRender(false);
       }, 220);
       return () => window.clearTimeout(timer);
     }
-  }, [open]);
+  }, [open, shouldRender]);
 
   useEffect(() => {
     if (!open) return;
@@ -67,8 +70,7 @@ export function DashboardProfilePanel({
     };
   }, [onOpenChange, open]);
 
-  const isVisible = open || isRendered;
-  if (!isVisible) return null;
+  if (!shouldRender && !open) return null;
 
   const state = open ? 'open' : 'closed';
 
