@@ -199,7 +199,12 @@ class BuyerService {
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');
-                await Order.linkGuestOrderToBuyer(client, buyer.id, checkoutToken);
+                const linkedOrders = await Order.linkGuestOrderToBuyer(client, buyer.id, checkoutToken, normalizedEmail);
+                if (!linkedOrders || linkedOrders.length === 0) {
+                    const notFoundErr = new Error('Guest order not found or does not match this account.');
+                    notFoundErr.statusCode = 404;
+                    throw notFoundErr;
+                }
                 await client.query('COMMIT');
                 const token = signToken(existingUser.id, 'buyer');
                 return { token, buyer };
@@ -231,7 +236,12 @@ class BuyerService {
                     termsAccepted: true
                 }, client);
 
-                await Order.linkGuestOrderToBuyer(client, buyer.id, checkoutToken);
+                const linkedOrders = await Order.linkGuestOrderToBuyer(client, buyer.id, checkoutToken, normalizedEmail);
+                if (!linkedOrders || linkedOrders.length === 0) {
+                    const notFoundErr = new Error('Guest order not found or does not match this account.');
+                    notFoundErr.statusCode = 404;
+                    throw notFoundErr;
+                }
                 await client.query('COMMIT');
 
                 const token = signToken(newUser.id, 'buyer');

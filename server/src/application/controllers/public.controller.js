@@ -539,8 +539,8 @@ export function createCancelPendingPublicOrder({
       });
     }
 
-    // Verify token ownership
-    if (order.client_checkout_token && !timingSafeEqualString(order.client_checkout_token, clientToken)) {
+    // Verify token ownership: order must have a client checkout token and it must match the caller's token
+    if (!order.client_checkout_token || !timingSafeEqualString(order.client_checkout_token, clientToken)) {
       return res.status(403).json({
         status: 'error',
         message: 'Unauthorized: client token does not match order.'

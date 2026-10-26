@@ -262,6 +262,27 @@ describe('getOrderLiveEta — ownership & fallbacks', () => {
       (e) => e.statusCode === 403
     );
   });
+
+  test('user whose account user.id collides with order.buyer_id but does not own buyer profile is refused (403)', async (t) => {
+    let f; t.after(() => cleanupInTransit(f || {}));
+    f = await seedInTransit();
+    const imposterUser = {
+      id: f.order.buyer_id,
+      userId: f.order.buyer_id,
+      buyerId: 999999,
+      buyerProfileId: 999999,
+      sellerId: 888888,
+      userType: 'seller',
+    };
+    await assert.rejects(
+      () => LogisticsEtaService.getOrderLiveEta({
+        orderId: f.order.id,
+        user: imposterUser,
+        clientCheckoutToken: null
+      }),
+      (e) => e.statusCode === 403
+    );
+  });
 });
 
 describe('getOrderLiveEta controller endpoint', () => {

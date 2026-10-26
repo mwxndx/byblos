@@ -172,4 +172,52 @@ describe('Guest Checkout Order Claiming & Account Linking', () => {
       throw e;
     }
   });
+
+  test('Security: BuyerService.claimGuestOrder rejects claiming an order with mismatched email', async () => {
+    const aliceEmail = `alice-${Date.now()}@byblos.test`;
+    const eveEmail = `eve-${Date.now()}@byblos.test`;
+    const aliceToken = `alice-token-${Date.now()}`;
+    const orderNumber = `BYB-ALICE-GUEST-${Date.now()}`;
+
+    const sellerRes = await pool.query('SELECT id FROM sellers LIMIT 1');
+    const sellerId = sellerRes.rows[0].id;
+
+    // Create an unlinked guest order belonging to Alice
+    const orderRes = await pool.query(
+      `INSERT INTO product_orders (
+         order_number, buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,
+         status, payment_status, client_checkout_token, buyer_email
+       ) VALUES (
+         $1, NULL, $2, 600, 30, 570,
+         'PAID', 'completed', $3, $4
+       ) RETURNING id`,
+      [orderNumber, sellerId, aliceToken, aliceEmail]
+    );
+    const orderId = orderRes.rows[0].id;
+
+    try {
+      // Eve attempts to claim Alice's order using Alice's token
+      await assert.rejects(
+        async () => {
+          await BuyerService.claimGuestOrder({
+            email: eveEmail,
+            password: 'EvePassword123!',
+            checkoutToken: aliceToken
+          });
+        },
+        (err) => {
+          assert.strictEqual(err.statusCode, 404);
+          assert.match(err.message, /order not found or does not match/i);
+          return true;
+        }
+      );
+
+      // Verify order is still not claimed by Eve
+      const check = await pool.query('SELECT buyer_id FROM product_orders WHERE id = $1', [orderId]);
+      assert.strictEqual(check.rows[0].buyer_id, null);
+    } finally {
+      await pool.query('DELETE FROM product_orders WHERE id = $1', [orderId]).catch(() => {});
+      await pool.query('DELETE FROM users WHERE LOWER(email) = $1', [eveEmail.toLowerCase()]).catch(() => {});
+    }
+  });
 });

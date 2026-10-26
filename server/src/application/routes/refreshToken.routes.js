@@ -9,13 +9,13 @@ const router = express.Router();
 router.post('/refresh-token', authLimiter, refreshToken);
 
 // POST /api/auth/revoke-token — Revoke active/previous JWT sessions on server (e.g. during role-switch)
-router.post('/revoke-token', async (req, res) => {
+router.post('/revoke-token', authLimiter, async (req, res) => {
   const tokens = [];
   if (req.body?.token && typeof req.body.token === 'string') {
     tokens.push(req.body.token);
   }
   if (Array.isArray(req.body?.tokens)) {
-    for (const t of req.body.tokens) {
+    for (const t of req.body.tokens.slice(0, 10)) {
       if (t && typeof t === 'string') tokens.push(t);
     }
   }

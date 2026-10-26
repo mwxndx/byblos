@@ -54,4 +54,32 @@ describe('public order cancellation payment verification', () => {
       message: 'We could not verify the payment status. Your order remains unchanged while verification is retried.',
     });
   });
+
+  test('rejects cancellation with 403 when order has null or missing client_checkout_token', async () => {
+    const handler = createCancelPendingPublicOrder({
+      orderStatusRepository: {
+        async findStatusByIdentifier() {
+          return {
+            id: 43,
+            status: 'PAYMENT_PENDING',
+            client_checkout_token: null,
+            provider_reference: 'paystack-ref',
+          };
+        },
+      },
+    });
+    const response = createResponse();
+
+    await handler({
+      params: { id: 'BYB-43' },
+      body: { clientCheckoutToken: 'any-token' },
+      query: {},
+    }, response);
+
+    assert.equal(response.statusCode, 403);
+    assert.deepEqual(response.body, {
+      status: 'error',
+      message: 'Unauthorized: client token does not match order.',
+    });
+  });
 });

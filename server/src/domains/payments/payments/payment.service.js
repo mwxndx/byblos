@@ -300,17 +300,31 @@ export class PaymentService {
         }
     }
 
-    static async checkPaymentStatus(identifier) {
+    static async checkPaymentStatus(identifier, { allowNumericId = false } = {}) {
         const client = await pool.connect();
         try {
-            const res = await client.query(
-                'SELECT * FROM payments WHERE id = $1 OR reference = $2 OR provider_reference = $1 LIMIT 1',
-                [identifier, identifier]
-            );
+            const trimmed = String(identifier || '').trim();
+            if (!trimmed) return null;
+
+            const isNumeric = /^\d+$/.test(trimmed);
+            if (isNumeric && !allowNumericId) {
+                return null;
+            }
+
+            const query = isNumeric
+                ? 'SELECT * FROM payments WHERE id = $1 OR invoice_id = $2 OR provider_reference = $2 OR api_ref = $2 LIMIT 1'
+                : 'SELECT * FROM payments WHERE invoice_id = $1 OR provider_reference = $1 OR api_ref = $1 LIMIT 1';
+            const params = isNumeric ? [Number(trimmed), trimmed] : [trimmed];
+
+            const res = await client.query(query, params);
             return res.rows[0] || null;
         } finally {
             client.release();
         }
+    }
+
+    async checkPaymentStatus(identifier, options) {
+        return PaymentService.checkPaymentStatus(identifier, options);
     }
 
     static async _updatePaymentOnSuccess(client, paymentId, providerData) {

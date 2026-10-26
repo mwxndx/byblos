@@ -318,6 +318,35 @@ describe('Refresh-token lifecycle across all six roles', () => {
     assert.match(body.message, /Refresh token is required/i);
   });
 
+  test('POST /api/auth/refresh-token rejects refresh when user is deactivated or seller is suspended even within grace window', async () => {
+    const account = await createTestAccount('seller');
+    const loginRes = await fetch(`${baseUrl}/api/sellers/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: account.email, password: account.password })
+    });
+    const loginBody = await loginRes.json();
+    const token = loginBody.data.refreshToken;
+
+    const firstRefresh = await fetch(`${baseUrl}/api/auth/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: token })
+    });
+    assert.equal(firstRefresh.status, 200);
+
+    // Suspend the seller account
+    await pool.query("UPDATE sellers SET status = 'suspended' WHERE user_id = $1", [account.id]);
+
+    // Second request with same token within grace window must be rejected
+    const secondRefresh = await fetch(`${baseUrl}/api/auth/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken: token })
+    });
+    assert.notEqual(secondRefresh.status, 200, 'grace cache must not return tokens for suspended account');
+  });
+
   test('findAdminAuthProfile excludes sensitive fields (SEC-02 data minimization)', async () => {
     const admin = await createTestAccount('admin');
 

@@ -173,7 +173,8 @@ class PaymentController {
   async checkStatus(req, res) {
     try {
       const { paymentId } = req.params;
-      const result = await paymentService.checkPaymentStatus(paymentId);
+      const isAdmin = req.user?.role === 'admin';
+      const result = await paymentService.checkPaymentStatus(paymentId, { allowNumericId: isAdmin });
       // This endpoint is PUBLIC (guest checkout polls it). Never return the full
       // payment row — that leaks buyer PII (email/phone/receipts/raw provider
       // payload). Expose only a minimal, non-sensitive status projection.

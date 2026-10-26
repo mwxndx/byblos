@@ -668,11 +668,26 @@ class Order {
    * Link all guest orders (identified by client_checkout_token) to a buyer after
    * they claim their order post-payment. Runs inside the provided transaction client.
    */
-  static async linkGuestOrderToBuyer(client, buyerId, clientCheckoutToken) {
-    const { rows } = await client.query(
-      `UPDATE product_orders SET buyer_id = $1, updated_at = NOW() WHERE client_checkout_token = $2 AND (buyer_id IS NULL OR buyer_id = $1) RETURNING id`,
-      [buyerId, clientCheckoutToken]
-    );
+  /**
+   * Link all guest orders (identified by client_checkout_token) to a buyer after
+   * they claim their order post-payment. Runs inside the provided transaction client.
+   * Optionally verifies and matches buyer_email to prevent unauthorized claim takeover.
+   */
+  static async linkGuestOrderToBuyer(client, buyerId, clientCheckoutToken, buyerEmail = null) {
+    let query = `
+      UPDATE product_orders
+      SET buyer_id = $1,
+          buyer_email = COALESCE(buyer_email, $3),
+          updated_at = NOW()
+      WHERE client_checkout_token = $2
+        AND (buyer_id IS NULL OR buyer_id = $1)
+    `;
+    const params = [buyerId, clientCheckoutToken, buyerEmail];
+    if (buyerEmail) {
+      query += ` AND (buyer_email IS NULL OR LOWER(TRIM(buyer_email)) = LOWER(TRIM($3)))`;
+    }
+    query += ` RETURNING id`;
+    const { rows } = await client.query(query, params);
     return rows;
   }
 }

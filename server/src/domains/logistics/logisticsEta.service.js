@@ -230,20 +230,18 @@ export class LogisticsEtaService {
     const order = orderRows[0];
 
     // 2. Validate tenant ownership
-    const isBuyer = user && (
-      String(order.buyer_id) === String(user.buyerId)
-      || String(order.buyer_id) === String(user.buyerProfileId)
-      || String(order.buyer_id) === String(user.profileId)
-      || String(order.buyer_id) === String(user.profile_id)
-      || String(order.buyer_id) === String(user.id)
-    );
-    const isSeller = user && (
-      String(order.seller_id) === String(user.sellerId)
-      || String(order.seller_id) === String(user.sellerProfileId)
-      || String(order.seller_id) === String(user.profileId)
-      || String(order.seller_id) === String(user.profile_id)
-      || String(order.seller_id) === String(user.id)
-    );
+    const isBuyer = Boolean(user && (
+      (user.buyerId && String(order.buyer_id) === String(user.buyerId))
+      || (user.buyerProfileId && String(order.buyer_id) === String(user.buyerProfileId))
+      || (user.userType === 'buyer' && user.profileId && String(order.buyer_id) === String(user.profileId))
+      || (user.userType === 'buyer' && user.profile_id && String(order.buyer_id) === String(user.profile_id))
+    ));
+    const isSeller = Boolean(user && (
+      (user.sellerId && String(order.seller_id) === String(user.sellerId))
+      || (user.sellerProfileId && String(order.seller_id) === String(user.sellerProfileId))
+      || (user.userType === 'seller' && user.profileId && String(order.seller_id) === String(user.profileId))
+      || (user.userType === 'seller' && user.profile_id && String(order.seller_id) === String(user.profile_id))
+    ));
     const isAdmin = user && ['admin', 'logistics'].includes(user.role || user.userType);
     const isTokenAuthorized = Boolean(
       clientCheckoutToken

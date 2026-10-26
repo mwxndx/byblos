@@ -93,13 +93,69 @@ export const refreshAccessToken = async (refreshToken) => {
   const graceKey = `refresh_grace:${tokenHash}`;
 
   // 1) RFC 6819 Grace Period check: if this refresh token was rotated within the last 30s,
-  // return the cached response rather than throwing a revoked error on concurrent client requests.
+  // return the cached response rather than throwing a revoked error on concurrent client requests,
+  // but strictly verify that the user and their profile remain active and not revoked/suspended.
   try {
     const cachedGrace = (await CacheService.get(graceKey)) || _refreshGraceMemory.get(graceKey);
     if (cachedGrace && cachedGrace.data) {
+      const isRevoked = await tokenBlacklist.isBlacklisted(cachedGrace.data.refreshToken);
+      if (isRevoked) {
+        _refreshGraceMemory.delete(graceKey);
+        await CacheService.delete(graceKey);
+        throw new Error('Refresh token has been revoked. Please log in again.');
+      }
+
+      const { pool } = await import('../../infrastructure/database/database.js');
+      const { rows } = await pool.query(
+        'SELECT id, is_active FROM users WHERE id = $1',
+        [cachedGrace.data.user.id]
+      );
+      const user = rows[0];
+      if (!user || user.is_active === false) {
+        _refreshGraceMemory.delete(graceKey);
+        await CacheService.delete(graceKey);
+        throw new Error('User account is invalid or deactivated. Please log in again.');
+      }
+
+      if (cachedGrace.data.user.role === 'seller') {
+        const { rows: sellerRows } = await pool.query(
+          'SELECT status FROM sellers WHERE user_id = $1 LIMIT 1',
+          [cachedGrace.data.user.id]
+        );
+        if (sellerRows[0] && sellerRows[0].status !== 'active') {
+          _refreshGraceMemory.delete(graceKey);
+          await CacheService.delete(graceKey);
+          throw new Error('Your seller account has been deactivated or suspended.');
+        }
+      } else if (cachedGrace.data.user.role === 'creator') {
+        const { rows: creatorRows } = await pool.query(
+          'SELECT status FROM creators WHERE user_id = $1 LIMIT 1',
+          [cachedGrace.data.user.id]
+        );
+        if (creatorRows[0] && creatorRows[0].status !== 'active') {
+          _refreshGraceMemory.delete(graceKey);
+          await CacheService.delete(graceKey);
+          throw new Error('Your creator account has been deactivated or suspended.');
+        }
+      } else if (cachedGrace.data.user.role === 'logistics') {
+        const { rows: partnerRows } = await pool.query(
+          'SELECT lp.active AS partner_active FROM users u LEFT JOIN logistics_partners lp ON u.id = lp.user_id WHERE u.id = $1 LIMIT 1',
+          [cachedGrace.data.user.id]
+        );
+        if (partnerRows[0] && partnerRows[0].partner_active === false) {
+          _refreshGraceMemory.delete(graceKey);
+          await CacheService.delete(graceKey);
+          throw new Error('Your logistics account has been deactivated or suspended.');
+        }
+      }
+
       return cachedGrace.data;
     }
-  } catch {}
+  } catch (err) {
+    if (err.message && (err.message.includes('deactivated') || err.message.includes('suspended') || err.message.includes('revoked'))) {
+      throw err;
+    }
+  }
 
   const decoded = verifyRefreshToken(refreshToken);
 

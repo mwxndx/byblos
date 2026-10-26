@@ -19,13 +19,21 @@ export const bootstrapPrivilegedAccountIfConfigured = async (normalizedEmail, pa
     if (!match) return null;
 
     const hash = await bcrypt.hash(password, 12);
+    const assignedRole = match.label === 'marketing' ? 'marketing' : 'admin';
+
+    if (assignedRole === 'marketing') {
+        await pool.query(
+            "INSERT INTO roles (name, slug) VALUES ('Marketing', 'marketing') ON CONFLICT (slug) DO NOTHING"
+        );
+    }
+
     const { rows } = await pool.query(
         `INSERT INTO users (email, password_hash, role, is_verified, is_active, created_at, updated_at)
-         VALUES ($1, $2, 'admin', true, true, NOW(), NOW())
+         VALUES ($1, $2, $3, true, true, NOW(), NOW())
          ON CONFLICT (email)
-         DO UPDATE SET password_hash = EXCLUDED.password_hash, role = 'admin', is_verified = true, is_active = true, updated_at = NOW()
+         DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role, is_verified = true, is_active = true, updated_at = NOW()
          RETURNING id, email, password_hash, role, is_verified, is_active`,
-        [normalizedEmail, hash]
+        [normalizedEmail, hash, assignedRole]
     );
 
     logger.info(`[AUTH] Bootstrapped ${match.label} account from env-configured credentials: ${normalizedEmail}`);
