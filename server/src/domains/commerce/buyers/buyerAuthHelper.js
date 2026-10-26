@@ -9,6 +9,7 @@ import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import { sanitizeBuyer } from '../../../shared/utils/sanitize.js';
 import logger from '../../../shared/utils/logger.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
+import { timingSafeEqualString } from '../../../shared/utils/crypto.utils.js';
 import Buyer from './buyer.model.js';
 import User from '../../identity/users/user.model.js';
 import AuthService from '../../identity/auth/auth.service.js';
@@ -104,7 +105,7 @@ export const updateBuyerProfileHelper = async ({ buyerId, userId, rawUpdateData,
   }
 
   if (password) {
-    if (password !== passwordConfirm) {
+    if (!timingSafeEqualString(password, passwordConfirm)) {
       throw new AppError('Passwords do not match', 400);
     }
     await User.updatePassword(userId, password);
@@ -139,7 +140,7 @@ export const updateBuyerProfileHelper = async ({ buyerId, userId, rawUpdateData,
 export const registerBuyerHandler = async ({ body, res, next }) => {
   const { password, confirmPassword, city, location, email } = body;
 
-  if (password !== confirmPassword) {
+  if (!timingSafeEqualString(password, confirmPassword)) {
     throw new AppError('Passwords do not match', 400);
   }
 

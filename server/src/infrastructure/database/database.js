@@ -40,12 +40,30 @@ if (hasIndividualVars) {
   dbConfig.connectionString = process.env.DATABASE_URL;
 }
 
+/**
+ * Resolves SSL configuration for Postgres pool.
+ * In production, TLS certificates must be verified by default (`rejectUnauthorized: true`)
+ * unless explicitly disabled (`DB_SSL_REJECT_UNAUTHORIZED='false'`).
+ *
+ * @param {Record<string, string | undefined>} [env=process.env]
+ * @returns {false | { rejectUnauthorized: boolean, ca: string | undefined }}
+ */
+export const resolveDbSslConfig = (env = process.env) => {
+  if (env.DB_SSL === 'false') return false;
+  if (env.NODE_ENV !== 'production') return false;
+
+  const rejectUnauthorized = env.DB_SSL_REJECT_UNAUTHORIZED !== 'false';
+  const ca = env.DB_SSL_CA ? env.DB_SSL_CA.replace(/\\n/g, '\n') : undefined;
+
+  return {
+    rejectUnauthorized,
+    ca,
+  };
+};
+
 // SSL is required in production and for Render/Heroku/AWS Postgres.
 // Supports DB_SSL_REJECT_UNAUTHORIZED and DB_SSL_CA overrides for certificate trust verification.
-dbConfig.ssl = process.env.DB_SSL === 'false' ? false : (process.env.NODE_ENV === 'production' ? {
-  rejectUnauthorized: process.env.DB_SSL_REJECT_UNAUTHORIZED === 'true',
-  ca: process.env.DB_SSL_CA ? process.env.DB_SSL_CA.replace(/\\n/g, '\n') : undefined,
-} : false);
+dbConfig.ssl = resolveDbSslConfig(process.env);
 
 // Fail-fast safety guard when running in test mode
 if (process.env.NODE_ENV === 'test') {

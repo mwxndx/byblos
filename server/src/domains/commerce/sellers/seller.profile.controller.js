@@ -66,9 +66,10 @@ export const updateProfile = async (req, res) => {
       const isAllowedAvatar =
         avatarUrl === '' ||
         avatarUrl.startsWith('/') ||
-        /^https?:\/\//i.test(avatarUrl);
+        avatarUrl.startsWith('http://') ||
+        avatarUrl.startsWith('https://');
 
-      if (!isAllowedAvatar) {
+      if (!isAllowedAvatar || avatarUrl.length > 2048) {
         return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image URL' });
       }
 

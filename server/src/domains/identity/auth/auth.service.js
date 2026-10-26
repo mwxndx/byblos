@@ -22,7 +22,8 @@ import {
 
 // FIXED BUG-AUTH-02: cost factor must match bcrypt.hash(password, 12) used in user.model.js
 // Regenerate with: node -e "const b=require('bcrypt');b.hash('__timing_dummy__',12).then(console.log)"
-const TIMING_DUMMY_HASH = '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TgxO7dCVS0VxMhUv8E1Y2d6PJHRW';
+// nosemgrep: generic.secrets.security.detected-bcrypt-hash.detected-bcrypt-hash
+const TIMING_DUMMY_HASH = process.env.TIMING_DUMMY_HASH || '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TgxO7dCVS0VxMhUv8E1Y2d6PJHRW';
 
 class AuthService {
     /**
