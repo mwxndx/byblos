@@ -112,18 +112,9 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             }}
         >
             {/* Top ~66%: business photo in circular frame */}
-            <div className="relative flex h-[66%] w-full items-center justify-center overflow-hidden p-3" style={{ background: palette.avatarGradient }}>
-                {hasAvatar && (
-                    <img
-                        src={getImageUrl(avatarUrl)}
-                        alt=""
-                        aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-25 blur-sm scale-110"
-                        loading="lazy"
-                    />
-                )}
+            <div className="relative flex h-[66%] w-full items-center justify-center overflow-hidden p-3 bg-zinc-900/60">
                 <div
-                    className="relative z-10 flex aspect-square h-full max-h-[88%] items-center justify-center overflow-hidden rounded-full border-2 bg-black/40 shadow-lg backdrop-blur-sm transition-transform duration-200 group-hover:scale-105"
+                    className="relative z-10 flex aspect-square h-full max-h-[88%] items-center justify-center overflow-hidden rounded-full border-2 bg-black shadow-lg transition-transform duration-200 group-hover:scale-105"
                     style={{ borderColor: palette.border }}
                 >
                     {hasAvatar ? (

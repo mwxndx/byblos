@@ -121,24 +121,15 @@ export function ShopProductCard({
         )}
       >
         {/* Image — full width, flush to the top. */}
-        <div className="relative aspect-square w-full overflow-hidden bg-black/10 select-none flex items-center justify-center">
+        <div className="relative aspect-square w-full overflow-hidden bg-black/5 dark:bg-black/20 select-none flex items-center justify-center">
           {image ? (
-            <>
-              <img
-                src={image}
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover opacity-25 blur-sm scale-110"
-                loading="lazy"
-              />
-              <img
-                src={image}
-                alt={product.name}
-                className="pointer-events-none relative z-0 h-full w-full object-contain"
-                loading="lazy"
-                onContextMenu={(e) => e.preventDefault()}
-              />
-            </>
+            <img
+              src={image}
+              alt={product.name}
+              className="pointer-events-none relative z-0 h-full w-full object-contain"
+              loading="lazy"
+              onContextMenu={(e) => e.preventDefault()}
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center opacity-40"><Package className="h-8 w-8" /></div>
           )}

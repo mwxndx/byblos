@@ -49,4 +49,20 @@ describe('SellerBrandCard — Business Profile Photo Circular Frame', () => {
     expect(circularFrame).toHaveClass('aspect-square');
     expect(circularFrame?.querySelector('svg')).toBeInTheDocument();
   });
+
+  it('does not render blurred ambient image in the background and uses clean card color', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <SellerBrandCard seller={mockSeller} />
+      </MemoryRouter>
+    );
+
+    // No blurred ambient background img element
+    const blurredImgs = container.querySelectorAll('.blur-sm, .blur-md');
+    expect(blurredImgs.length).toBe(0);
+
+    // Top section uses clean card color
+    const topSection = container.querySelector('.h-\\[66\\%\\]');
+    expect(topSection).toHaveClass('bg-zinc-900/60');
+  });
 });
