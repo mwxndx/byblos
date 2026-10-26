@@ -61,4 +61,32 @@ describe('DashboardProfilePanel', () => {
     expect(trigger).toHaveFocus();
     trigger.remove();
   });
+
+  it('preserves underlying dashboard content and renders a delineated slide-over drawer on desktop', () => {
+    const onOpenChange = vi.fn();
+    render(
+      <div className="relative h-[800px] w-[1200px]">
+        <div data-testid="dashboard-content">
+          <h1>Main Dashboard Metrics</h1>
+          <p>Sales, orders, and charts</p>
+        </div>
+        <DashboardProfilePanel open onOpenChange={onOpenChange} title="Profile">
+          <div>Profile Settings Content</div>
+        </DashboardProfilePanel>
+      </div>,
+    );
+
+    // Dashboard content remains mounted and visible in DOM alongside the panel
+    const dashboardContent = screen.getByTestId('dashboard-content');
+    expect(dashboardContent).toBeInTheDocument();
+    expect(screen.getByText('Main Dashboard Metrics')).toBeInTheDocument();
+
+    // Profile panel container has the translucent backdrop class for desktop overlay visibility
+    const panelHost = screen.getByTestId('dashboard-profile-panel');
+    expect(panelHost).toHaveClass('dashboard-profile-backdrop', 'absolute', 'inset-x-0', 'top-0');
+
+    // Drawer aside has crisp border boundary and elevation
+    const drawerAside = screen.getByRole('complementary', { name: 'Profile' });
+    expect(drawerAside).toHaveClass('border-l', 'border-separator', 'max-w-md');
+  });
 });

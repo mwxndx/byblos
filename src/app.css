@@ -1062,13 +1062,26 @@ button.btn-white:hover,
     border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Dark bg utilities → light surface in light mode */
-[data-theme="light"] .dashboard-layout [class*="bg-black"],
-[data-theme="light"] .dashboard-layout [class*="bg-gray-800"],
-[data-theme="light"] .dashboard-layout [class*="bg-gray-900"],
-[data-theme="light"] .dashboard-layout [class*="bg-zinc-"],
+/* Dark bg utilities → light surface in light mode (preserve transparent backdrops and overlays) */
+[data-theme="light"] .dashboard-layout [class*="bg-black"]:not([class*="bg-black/"]):not(.dashboard-profile-backdrop):not([data-testid="dashboard-profile-panel"]),
+[data-theme="light"] .dashboard-layout [class*="bg-gray-800"]:not([class*="bg-gray-800/"]),
+[data-theme="light"] .dashboard-layout [class*="bg-gray-900"]:not([class*="bg-gray-900/"]),
+[data-theme="light"] .dashboard-layout [class*="bg-zinc-"]:not([class*="bg-zinc-950/"]):not([class*="bg-zinc-900/"]):not([class*="bg-zinc-800/"]),
 [data-theme="light"] .dashboard-layout [class*="bg-white/["] {
     background-color: #ffffff !important;
+}
+
+/* Dashboard Profile Panel Backdrop: ensure translucent overlay so dashboard remains visible on desktop */
+.dashboard-profile-backdrop,
+[data-testid="dashboard-profile-panel"] {
+    background-color: rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+[data-theme="light"] .dashboard-profile-backdrop,
+[data-theme="light"] [data-testid="dashboard-profile-panel"] {
+    background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 [data-theme="light"] .dashboard-layout [class*="border-white"],

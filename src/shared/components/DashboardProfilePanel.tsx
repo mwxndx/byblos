@@ -52,14 +52,14 @@ export function DashboardProfilePanel({
 
   return (
     <div
-      className="absolute inset-x-0 top-0 z-40 flex justify-end overflow-hidden bg-black/45"
+      className="dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 flex justify-end overflow-hidden animate-in fade-in-0 duration-200"
       style={{ bottom: bottomInset }}
       data-testid="dashboard-profile-panel"
     >
       <button
         type="button"
         aria-label={`Close ${title}`}
-        className="absolute inset-0 cursor-default"
+        className="absolute inset-0 cursor-default focus:outline-none"
         onClick={() => onOpenChange(false)}
       />
       <aside
@@ -68,7 +68,7 @@ export function DashboardProfilePanel({
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'relative z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-2xl',
+          'relative z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-2xl border-l border-separator animate-in slide-in-from-right duration-250 ease-out',
           className,
         )}
       >
