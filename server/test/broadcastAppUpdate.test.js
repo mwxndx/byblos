@@ -57,7 +57,7 @@ describe('NotificationService.broadcastAppUpdate — FCM push delivery and token
     };
 
     const result = await NotificationService.broadcastAppUpdate({
-      minVersionCode: 72,
+      minVersionCode: 73,
       title: 'Update Available',
       body: 'Please update Byblos',
     });
@@ -109,7 +109,7 @@ describe('NotificationService.broadcastAppUpdate — FCM push delivery and token
     };
 
     const result = await NotificationService.broadcastAppUpdate({
-      minVersionCode: 72,
+      minVersionCode: 73,
     });
 
     assert.equal(result.targeted, 1);
@@ -166,7 +166,7 @@ describe('NotificationService.broadcastAppUpdate — FCM push delivery and token
       return originalQuery.call(pool, queryText, values);
     };
 
-    const result = await NotificationService.broadcastAppUpdate({ minVersionCode: 72 });
+    const result = await NotificationService.broadcastAppUpdate({ minVersionCode: 73 });
 
     assert.equal(result.targeted, 3);
     assert.equal(result.sent, 1, 'Only the token-ok should be counted as sent');

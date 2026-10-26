@@ -22,8 +22,8 @@ interface AdminBroadcastModalProps {
 }
 
 export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProps) {
-  const [minVersionCode, setMinVersionCode] = useState<number>(72);
-  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.72');
+  const [minVersionCode, setMinVersionCode] = useState<number>(73);
+  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.73');
   const [body, setBody] = useState<string>(
     'A new version of Byblos is available. Please update now to continue using all features.'
   );
@@ -35,8 +35,8 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
 
   const handleReset = () => {
     setResult(null);
-    setMinVersionCode(72);
-    setTitle('Update Available: Byblos 1.0.72');
+    setMinVersionCode(73);
+    setTitle('Update Available: Byblos 1.0.73');
     setBody('A new version of Byblos is available. Please update now to continue using all features.');
     setStoreUrl('');
   };
@@ -167,7 +167,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isSubmitting}
                 className="h-10 text-sm bg-fill border-separator rounded-xl"
-                placeholder="Update Available: Byblos 1.0.72"
+                placeholder="Update Available: Byblos 1.0.73"
                 required
               />
             </div>

@@ -628,9 +628,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '72', 10);
-  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '72', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.72';
+  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
+  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '73', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.73';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
