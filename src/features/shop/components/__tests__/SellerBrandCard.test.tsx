@@ -8,7 +8,7 @@ vi.mock('@/features/shop/hooks/useShopQueries', () => ({
   useKnockSellerMutation: () => ({ mutate: vi.fn() }),
 }));
 
-describe('SellerBrandCard — Business Profile Photo Circular Frame', () => {
+describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
   const mockSeller: ApiPublicSeller = {
     id: 'seller-1',
     shopName: 'Amani Styles',
@@ -19,25 +19,39 @@ describe('SellerBrandCard — Business Profile Photo Circular Frame', () => {
     theme: 'default',
   };
 
-  it('renders business profile photo inside a circular frame with rounded-full and overflow-hidden', () => {
+  it('renders shop name as bold with increased font size (+3px: 15px/17px)', () => {
     render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
       </MemoryRouter>
     );
 
-    const businessImg = screen.getByAltText('Amani Styles business photo');
-    expect(businessImg).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { level: 3, name: 'Amani Styles' });
+    expect(heading).toBeInTheDocument();
+    expect(heading).toHaveClass('font-bold');
+    expect(heading).not.toHaveClass('font-normal');
+    expect(heading.className).toMatch(/text-\[15px\]/);
+  });
 
-    // The image parent must be a circular frame
+  it('removes extra background shape so the card is a single unified shape without top section background split', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <SellerBrandCard seller={mockSeller} />
+      </MemoryRouter>
+    );
+
+    // No extra split background container dividing the card
+    expect(container.querySelector('.bg-zinc-900\\/60')).not.toBeInTheDocument();
+    expect(container.querySelector('.h-\\[66\\%\\]')).not.toBeInTheDocument();
+
+    // The business profile photo is still housed in a circular frame
+    const businessImg = screen.getByAltText('Amani Styles business photo');
     const circularFrame = businessImg.parentElement;
-    expect(circularFrame).toBeInTheDocument();
     expect(circularFrame).toHaveClass('rounded-full');
-    expect(circularFrame).toHaveClass('overflow-hidden');
     expect(circularFrame).toHaveClass('aspect-square');
   });
 
-  it('renders store fallback icon inside a circular frame when no avatar exists', () => {
+  it('renders store fallback icon in circular frame when avatar is empty', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
@@ -48,21 +62,5 @@ describe('SellerBrandCard — Business Profile Photo Circular Frame', () => {
     expect(circularFrame).toBeInTheDocument();
     expect(circularFrame).toHaveClass('aspect-square');
     expect(circularFrame?.querySelector('svg')).toBeInTheDocument();
-  });
-
-  it('does not render blurred ambient image in the background and uses clean card color', () => {
-    const { container } = render(
-      <MemoryRouter>
-        <SellerBrandCard seller={mockSeller} />
-      </MemoryRouter>
-    );
-
-    // No blurred ambient background img element
-    const blurredImgs = container.querySelectorAll('.blur-sm, .blur-md');
-    expect(blurredImgs.length).toBe(0);
-
-    // Top section uses clean card color
-    const topSection = container.querySelector('.h-\\[66\\%\\]');
-    expect(topSection).toHaveClass('bg-zinc-900/60');
   });
 });

@@ -98,7 +98,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <article
             className={cn(
-                'group relative flex aspect-[4/5] cursor-pointer flex-col overflow-hidden rounded-2xl border bg-black shadow-sm transition-colors duration-200 hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70',
+                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border bg-black p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -111,10 +111,10 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                 boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 24px ${palette.accentSoft}`,
             }}
         >
-            {/* Top ~66%: business photo in circular frame */}
-            <div className="relative flex h-[66%] w-full items-center justify-center overflow-hidden p-3 bg-zinc-900/60">
+            {/* Center circular business profile photo directly on the card without extra split background shape */}
+            <div className="flex flex-1 items-center justify-center py-1">
                 <div
-                    className="relative z-10 flex aspect-square h-full max-h-[88%] items-center justify-center overflow-hidden rounded-full border-2 bg-black shadow-lg transition-transform duration-200 group-hover:scale-105"
+                    className="flex aspect-square h-20 w-20 sm:h-24 sm:w-24 items-center justify-center overflow-hidden rounded-full border-2 bg-black shadow-lg transition-transform duration-200 group-hover:scale-105"
                     style={{ borderColor: palette.border }}
                 >
                     {hasAvatar ? (
@@ -133,9 +133,9 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                 </div>
             </div>
 
-            {/* Bottom section: shop name clearly placed above Instagram + TikTok + Location row */}
-            <div className="flex min-h-0 flex-1 flex-col items-start justify-between px-2.5 py-2">
-                <h3 className="w-full truncate text-xs font-normal tracking-tight text-white sm:text-sm" title={shopName}>
+            {/* Shop name placed slightly above, bold, +3px font size (15px / 17px) */}
+            <div className="flex min-h-0 flex-col items-start gap-1 sm:gap-1.5 pt-1">
+                <h3 className="w-full truncate text-[15px] sm:text-[17px] font-bold tracking-tight text-white" title={shopName}>
                     {shopName}
                 </h3>
 
