@@ -1,4 +1,5 @@
 import { pool } from '../../../infrastructure/database/database.js';
+import { normalizePaymentPurpose } from './paymentPurpose.policy.js';
 
 const PAYMENT_UPDATABLE_FIELDS = new Set([
   'status', 'metadata', 'provider_reference', 'api_ref',
@@ -14,6 +15,11 @@ class Payment {
    * Insert a new payment record
    */
   static async insert(client, data) {
+    if (data?.metadata && typeof data.metadata === 'object') {
+      if (data.metadata.payment_purpose) {
+        data.metadata.payment_purpose = normalizePaymentPurpose(data.metadata.payment_purpose) || data.metadata.payment_purpose;
+      }
+    }
     const fields = Object.keys(data);
     const placeholders = fields.map((f, i) => `$${i + 1}${ENUM_CASTS[f] || ''}`).join(', ');
     const query = `

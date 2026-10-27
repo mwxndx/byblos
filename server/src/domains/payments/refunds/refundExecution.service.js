@@ -1,6 +1,7 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import * as refundRequestRepository from '../../orders/repositories/refundRequest.repository.js';
 import settlementService from '../../orders/escrow/settlement.service.js';
+import refundAccountingService from './refundAccounting.service.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import logger from '../../../shared/utils/logger.js';
@@ -37,6 +38,18 @@ class RefundExecutionService {
     autoApproved = false,
     auditMeta = {}
   }) {
+    // Strict locking hierarchy: Lock product_orders FOR UPDATE first (if order-linked),
+    // then lock refund_requests FOR UPDATE second. This eliminates deadlocks with concurrent
+    // order cancellations, deadline expirations, and settlement reversals.
+    const preCheck = await client.query('SELECT order_id FROM refund_requests WHERE id = $1', [refundRequestId]);
+    if (preCheck.rows.length === 0) {
+      throw new AppError('Refund request not found', 404);
+    }
+    const linkedOrderId = preCheck.rows[0].order_id;
+    if (linkedOrderId) {
+      await client.query('SELECT id FROM product_orders WHERE id = $1 FOR UPDATE', [linkedOrderId]);
+    }
+
     const lockedRequest = await refundRequestRepository.findByIdForUpdate(refundRequestId, client);
     if (!lockedRequest) {
       throw new AppError('Refund request not found', 404);
@@ -65,16 +78,42 @@ class RefundExecutionService {
 
     const completedNotes = adminNotes || (autoApproved ? 'Auto-approved by refund policy' : 'Refund authorized by admin');
 
-    // 1. Credit buyer's refund balance
-    await client.query(
-      `UPDATE buyers
-       SET refunds = COALESCE(refunds, 0) + $1,
-           updated_at = NOW()
-       WHERE id = $2`,
-      [effectiveRefundAmount, lockedRequest.buyer_id]
-    );
+    // 1. Authoritative financial validation against captured payments and balance
+    let accounting = null;
+    if (lockedRequest.order_id) {
+      accounting = await refundAccountingService.validateRefundEligibility(
+        client,
+        lockedRequest.order_id,
+        effectiveRefundAmount,
+        { excludeRequestId: refundRequestId }
+      );
+    }
 
-    // 2. Mark refund request as completed and record credit details
+    // 2. Credit buyer's refund balance (registered buyer or lookup via order email)
+    if (lockedRequest.buyer_id) {
+      await client.query(
+        `UPDATE buyers
+         SET refunds = COALESCE(refunds, 0) + $1,
+             updated_at = NOW()
+         WHERE id = $2`,
+        [effectiveRefundAmount, lockedRequest.buyer_id]
+      );
+    } else if (accounting?.order?.buyer_email) {
+      const { rowCount } = await client.query(
+        `UPDATE buyers
+         SET refunds = COALESCE(refunds, 0) + $1,
+             updated_at = NOW()
+         WHERE LOWER(email) = LOWER($2)`,
+        [effectiveRefundAmount, accounting.order.buyer_email]
+      );
+      if (rowCount === 0) {
+        logger.info(
+          `[REFUND] Guest order #${lockedRequest.order_id} refund of ${effectiveRefundAmount} recorded for unregistered email ${accounting.order.buyer_email}`
+        );
+      }
+    }
+
+    // 3. Mark refund request as completed and record credit details
     const creditDetails = {
       credited_to_buyer: true,
       credited_amount: effectiveRefundAmount,
@@ -90,124 +129,111 @@ class RefundExecutionService {
     await client.query(
       `UPDATE refund_requests
        SET status = 'completed',
-           admin_notes = $1,
-           processed_by = $2,
-           payment_details = COALESCE(payment_details, '{}'::jsonb) || $3::jsonb,
+           amount = $1,
+           admin_notes = $2,
+           processed_by = $3,
+           payment_details = COALESCE(payment_details, '{}'::jsonb) || $4::jsonb,
            processed_at = NOW(),
            updated_at = NOW()
-       WHERE id = $4`,
-      [completedNotes, processedBy, JSON.stringify(creditDetails), refundRequestId]
+       WHERE id = $5`,
+      [effectiveRefundAmount, completedNotes, processedBy, JSON.stringify(creditDetails), refundRequestId]
     );
 
-    // 3. Update order status and reverse seller settlement & creator earnings if associated with an order
+    // 4. Update order status and reverse seller settlement & creator earnings if associated with an order
     let isOrderPartial = false;
-    if (lockedRequest.order_id) {
-      const { rows: orderRows } = await client.query(
-        `SELECT id, total_amount, status, payment_status, metadata
-         FROM product_orders
-         WHERE id = $1
-         FOR UPDATE`,
-        [lockedRequest.order_id]
-      );
-
-      if (orderRows.length > 0) {
-        const order = orderRows[0];
-        const orderTotal = Number.parseFloat(order.total_amount || 0);
-        let orderMeta = typeof order.metadata === 'string'
-          ? (() => { try { return JSON.parse(order.metadata); } catch { return {}; } })()
-          : (order.metadata || {});
-
-        const priorRefunded = Number.parseFloat(orderMeta?.refund_summary?.total_refunded || 0);
-        const remainingBalance = Math.max(0, Math.round((orderTotal - priorRefunded) * 100) / 100);
-
-        if (effectiveRefundAmount > remainingBalance) {
-          throw new AppError(
-            `Refund amount (${effectiveRefundAmount}) exceeds remaining order balance (${remainingBalance})`,
-            400
-          );
+    if (lockedRequest.order_id && accounting) {
+      const order = accounting.order;
+      const orderTotal = refundAccountingService.roundMoney(order.total_amount || 0);
+      let orderMeta = {};
+      if (order.metadata) {
+        try {
+          orderMeta = typeof order.metadata === 'string' ? JSON.parse(order.metadata) : order.metadata;
+        } catch {
+          orderMeta = {};
         }
+      }
 
-        const newTotalRefunded = Math.round((priorRefunded + effectiveRefundAmount) * 100) / 100;
-        const isOrderFullyRefunded = newTotalRefunded >= orderTotal;
-        isOrderPartial = !isOrderFullyRefunded;
+      const newTotalRefunded = refundAccountingService.roundMoney(accounting.completedRefunds + effectiveRefundAmount);
+      const isOrderFullyRefunded = newTotalRefunded >= accounting.capturedAmount;
+      isOrderPartial = !isOrderFullyRefunded;
 
-        const refundItem = {
-          refund_request_id: refundRequestId,
-          amount: effectiveRefundAmount,
-          admin_id: processedBy,
-          admin_notes: completedNotes,
-          auto_approved: autoApproved,
-          execution_source: executionSource,
-          completed_at: new Date().toISOString()
-        };
+      const refundItem = {
+        refund_request_id: refundRequestId,
+        amount: effectiveRefundAmount,
+        admin_id: processedBy,
+        admin_notes: completedNotes,
+        auto_approved: autoApproved,
+        execution_source: executionSource,
+        completed_at: new Date().toISOString()
+      };
 
-        const priorHistory = Array.isArray(orderMeta?.refund_summary?.history)
-          ? orderMeta.refund_summary.history
-          : [];
+      const priorHistory = Array.isArray(orderMeta?.refund_summary?.history)
+        ? orderMeta.refund_summary.history
+        : [];
 
-        const refundSummary = {
-          total_refunded: newTotalRefunded,
-          refund_status: isOrderFullyRefunded ? 'FULLY_REFUNDED' : 'PARTIALLY_REFUNDED',
-          history: [...priorHistory, refundItem],
-          updated_at: new Date().toISOString()
-        };
+      const refundSummary = {
+        total_refunded: newTotalRefunded,
+        refund_status: isOrderFullyRefunded ? 'FULLY_REFUNDED' : 'PARTIALLY_REFUNDED',
+        history: [...priorHistory, refundItem],
+        updated_at: new Date().toISOString()
+      };
 
-        const updatedOrderMeta = {
-          ...orderMeta,
-          refund_summary: refundSummary,
-          refund_completed: isOrderFullyRefunded ? refundItem : (orderMeta.refund_completed || refundItem)
-        };
+      const updatedOrderMeta = {
+        ...orderMeta,
+        refund_summary: refundSummary,
+        refund_completed: isOrderFullyRefunded ? refundItem : (orderMeta.refund_completed || refundItem),
+        refund_credited: isOrderFullyRefunded ? true : orderMeta.refund_credited
+      };
 
-        if (isOrderFullyRefunded) {
-          try {
-            await client.query(
-              `UPDATE product_orders
-               SET status = 'REFUNDED'::order_status,
-                   payment_status = 'cancelled'::payment_status,
-                   metadata = $2::jsonb,
-                   updated_at = NOW()
-               WHERE id = $1`,
-              [lockedRequest.order_id, JSON.stringify(updatedOrderMeta)]
-            );
-          } catch (orderErr) {
-            logger.warn(
-              `[REFUND] Order ${lockedRequest.order_id} full status update failed, retrying minimal update:`,
-              orderErr.message
-            );
-            await client.query(
-              `UPDATE product_orders
-               SET status = 'REFUNDED'::order_status,
-                   updated_at = NOW()
-               WHERE id = $1`,
-              [lockedRequest.order_id]
-            );
-          }
-        } else {
-          // Partial refund: Preserve active operational status (COMPLETED, DELIVERED, etc.)
+      if (isOrderFullyRefunded) {
+        try {
           await client.query(
             `UPDATE product_orders
-             SET metadata = $2::jsonb,
+             SET status = 'REFUNDED'::order_status,
+                 payment_status = 'cancelled'::payment_status,
+                 metadata = $2::jsonb,
                  updated_at = NOW()
              WHERE id = $1`,
             [lockedRequest.order_id, JSON.stringify(updatedOrderMeta)]
           );
+        } catch (orderErr) {
+          logger.warn(
+            `[REFUND] Order ${lockedRequest.order_id} full status update failed, retrying minimal update:`,
+            orderErr.message
+          );
+          await client.query(
+            `UPDATE product_orders
+             SET status = 'REFUNDED'::order_status,
+                 updated_at = NOW()
+             WHERE id = $1`,
+            [lockedRequest.order_id]
+          );
         }
-
-        await settlementService.reverseOrderSettlementForRefund(
-          client,
-          lockedRequest.order_id,
-          executionSource,
-          effectiveRefundAmount,
-          orderTotal
-        );
-        await settlementService.reverseCreatorEarningsForRefund(
-          client,
-          lockedRequest.order_id,
-          executionSource,
-          effectiveRefundAmount,
-          orderTotal
+      } else {
+        // Partial refund: Preserve active operational status (COMPLETED, DELIVERED, etc.)
+        await client.query(
+          `UPDATE product_orders
+           SET metadata = $2::jsonb,
+               updated_at = NOW()
+           WHERE id = $1`,
+          [lockedRequest.order_id, JSON.stringify(updatedOrderMeta)]
         );
       }
+
+      await settlementService.reverseOrderSettlementForRefund(
+        client,
+        lockedRequest.order_id,
+        executionSource,
+        effectiveRefundAmount,
+        orderTotal
+      );
+      await settlementService.reverseCreatorEarningsForRefund(
+        client,
+        lockedRequest.order_id,
+        executionSource,
+        effectiveRefundAmount,
+        orderTotal
+      );
     }
 
     return {
@@ -244,9 +270,13 @@ class RefundExecutionService {
     reason,
     source = 'auto_policy_engine'
   }) {
-    const numAmount = Number.parseFloat(amount);
+    const numAmount = refundAccountingService.roundMoney(amount);
     if (!Number.isFinite(numAmount) || numAmount <= 0) {
       throw new AppError('Invalid auto-refund amount', 400);
+    }
+
+    if (orderId) {
+      await refundAccountingService.validateRefundEligibility(client, orderId, numAmount);
     }
 
     const initialDetails = {

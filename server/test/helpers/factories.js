@@ -160,12 +160,12 @@ export async function cleanupProduct(productId) {
   await pool.query('DELETE FROM products WHERE id = $1', [productId]);
 }
 
-export async function createPayment({ orderId, amount, status = 'completed' }) {
+export async function createPayment({ orderId, amount, status = 'completed', metadata = {} }) {
   const { rows } = await pool.query(
     `INSERT INTO payments (invoice_id, amount, status, order_id, metadata)
      VALUES ($1, $2, $3::payment_status, $4, $5::jsonb)
      RETURNING *`,
-    [unique('INV-'), amount, status, orderId, JSON.stringify({ order_id: orderId })]
+    [unique('INV-'), amount, status, orderId, JSON.stringify({ order_id: orderId, ...metadata })]
   );
   return rows[0];
 }

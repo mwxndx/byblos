@@ -158,48 +158,7 @@ class AuthService {
                     }
                 }
                 if (profile?.id) {
-                    const linked = await pool.query(
-                        `UPDATE product_orders 
-                         SET buyer_id = $1 
-                         WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL
-                         RETURNING id, status, payment_status, total_amount, metadata`,
-                        [profile.id, normalizedEmail]
-                    );
-                    if (linked.rowCount > 0) {
-                        logger.info('[AUTH] Linked guest orders on buyer login', {
-                            buyerId: profile.id,
-                            linkedOrders: linked.rowCount
-                        });
-
-                        let uncreditedRefund = 0;
-                        const ordersToMarkCredited = [];
-                        for (const ord of linked.rows) {
-                            const isCancelledPaid = String(ord.status).toUpperCase() === 'CANCELLED' && ord.payment_status === 'completed';
-                            const uncreditedAmt = Number.parseFloat(ord.metadata?.uncredited_refund_amount || 0);
-                            const alreadyCredited = ord.metadata?.refund_credited === true;
-                            if (!alreadyCredited && (isCancelledPaid || uncreditedAmt > 0)) {
-                                uncreditedRefund += (uncreditedAmt > 0 ? uncreditedAmt : Number.parseFloat(ord.total_amount || 0));
-                                ordersToMarkCredited.push(ord.id);
-                            }
-                        }
-                        if (uncreditedRefund > 0) {
-                            await pool.query(
-                                `UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2`,
-                                [uncreditedRefund, profile.id]
-                            );
-                            await pool.query(
-                                `UPDATE product_orders 
-                                 SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
-                                 WHERE id = ANY($1)`,
-                                [ordersToMarkCredited]
-                            );
-                            logger.info('[AUTH] Credited pending guest refunds on buyer login', {
-                                buyerId: profile.id,
-                                amount: uncreditedRefund,
-                                orders: ordersToMarkCredited
-                            });
-                        }
-                    }
+                    await AuthService.linkGuestOrdersAndCreditRefunds(profile.id, normalizedEmail);
                 }
                 break;
             case 'admin':
@@ -491,51 +450,8 @@ class AuthService {
                 profile = await Buyer.create(profileData, client);
 
                 // --- LATE BINDING OF ORDERS ---
-                // Search for any orders made with this email while it was pending and associate them
-                // This ensures checkout flow continues seamlessly for unregistered buyers
-                const linkResult = await client.query(
-                    `UPDATE product_orders 
-                     SET buyer_id = $1 
-                     WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL
-                     RETURNING id, status, payment_status, total_amount, metadata`,
-                    [profile.id, pending.email.toLowerCase()]
-                );
-
-                if (linkResult.rowCount > 0) {
-                    logger.info('[AUTH] Linked previous guest orders for new buyer', {
-                        buyerId: profile.id,
-                        linkedOrders: linkResult.rowCount
-                    });
-
-                    let uncreditedRefund = 0;
-                    const ordersToMarkCredited = [];
-                    for (const ord of linkResult.rows) {
-                        const isCancelledPaid = String(ord.status).toUpperCase() === 'CANCELLED' && ord.payment_status === 'completed';
-                        const uncreditedAmt = Number.parseFloat(ord.metadata?.uncredited_refund_amount || 0);
-                        const alreadyCredited = ord.metadata?.refund_credited === true;
-                        if (!alreadyCredited && (isCancelledPaid || uncreditedAmt > 0)) {
-                            uncreditedRefund += (uncreditedAmt > 0 ? uncreditedAmt : Number.parseFloat(ord.total_amount || 0));
-                            ordersToMarkCredited.push(ord.id);
-                        }
-                    }
-                    if (uncreditedRefund > 0) {
-                        await client.query(
-                            `UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2`,
-                            [uncreditedRefund, profile.id]
-                        );
-                        await client.query(
-                            `UPDATE product_orders 
-                             SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
-                             WHERE id = ANY($1)`,
-                            [ordersToMarkCredited]
-                        );
-                        logger.info('[AUTH] Credited pending guest refunds on buyer email verification', {
-                            buyerId: profile.id,
-                            amount: uncreditedRefund,
-                            orders: ordersToMarkCredited
-                        });
-                    }
-                }
+                // Atomically link guest orders and credit any uncredited refunds
+                await AuthService.linkGuestOrdersAndCreditRefunds(profile.id, pending.email, client);
             }
 
             // c. Delete from pending
@@ -550,6 +466,106 @@ class AuthService {
             throw new Error('An error occurred during account creation. Please try again.');
         } finally {
             client.release();
+        }
+    }
+
+    /**
+     * Unifies linking of prior guest orders and safely credits any outstanding uncredited refunds.
+     * Uses row locking and updates refund_requests and metadata atomically.
+     *
+     * @param {number|string} buyerId
+     * @param {string} buyerEmail
+     * @param {import('pg').PoolClient} [txClient]
+     * @returns {Promise<{ linkedCount: number, creditedAmount: number }>}
+     */
+    static async linkGuestOrdersAndCreditRefunds(buyerId, buyerEmail, txClient = null) {
+        const client = txClient || await pool.connect();
+        const shouldManageTx = !txClient;
+
+        try {
+            if (shouldManageTx) await client.query('BEGIN');
+
+            const normalizedEmail = String(buyerEmail || '').trim().toLowerCase();
+            if (!normalizedEmail) {
+                if (shouldManageTx) await client.query('COMMIT');
+                return { linkedCount: 0, creditedAmount: 0 };
+            }
+
+            const linkResult = await client.query(
+                `UPDATE product_orders 
+                 SET buyer_id = $1 
+                 WHERE LOWER(buyer_email) = $2 AND buyer_id IS NULL
+                 RETURNING id, status, payment_status, total_amount, metadata`,
+                [buyerId, normalizedEmail]
+            );
+
+            if (linkResult.rowCount === 0) {
+                if (shouldManageTx) await client.query('COMMIT');
+                return { linkedCount: 0, creditedAmount: 0 };
+            }
+
+            const linkedOrderIds = linkResult.rows.map(o => o.id);
+            logger.info('[AUTH] Linking guest orders for buyer', {
+                buyerId,
+                linkedOrders: linkResult.rowCount,
+                orderIds: linkedOrderIds
+            });
+
+            // Backfill buyer_id onto existing refund_requests for these orders
+            await client.query(
+                `UPDATE refund_requests 
+                 SET buyer_id = $1 
+                 WHERE order_id = ANY($2) AND buyer_id IS NULL`,
+                [buyerId, linkedOrderIds]
+            );
+
+            let uncreditedRefund = 0;
+            const ordersToMarkCredited = [];
+            for (const ord of linkResult.rows) {
+                const isCancelledPaid = String(ord.status).toUpperCase() === 'CANCELLED' && ['completed', 'paid', 'cancelled'].includes(String(ord.payment_status).toLowerCase());
+                const uncreditedAmt = Number.parseFloat(ord.metadata?.uncredited_refund_amount || 0);
+                const alreadyCredited = ord.metadata?.refund_credited === true;
+                if (!alreadyCredited && (uncreditedAmt > 0 || isCancelledPaid)) {
+                    const amt = uncreditedAmt > 0 ? uncreditedAmt : Number.parseFloat(ord.total_amount || 0);
+                    uncreditedRefund += amt;
+                    ordersToMarkCredited.push(ord.id);
+                }
+            }
+
+            uncreditedRefund = Math.round(uncreditedRefund * 100) / 100;
+
+            if (uncreditedRefund > 0 && ordersToMarkCredited.length > 0) {
+                await client.query(
+                    `UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2`,
+                    [uncreditedRefund, buyerId]
+                );
+                await client.query(
+                    `UPDATE product_orders 
+                     SET metadata = (COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb) - 'uncredited_refund_amount'
+                     WHERE id = ANY($1)`,
+                    [ordersToMarkCredited]
+                );
+                await client.query(
+                    `UPDATE refund_requests
+                     SET payment_details = COALESCE(payment_details, '{}'::jsonb) || '{"credited_to_buyer": true}'::jsonb
+                     WHERE order_id = ANY($1) AND status = 'completed'`,
+                    [ordersToMarkCredited]
+                );
+                logger.info('[AUTH] Credited pending guest refunds on buyer account linking', {
+                    buyerId,
+                    amount: uncreditedRefund,
+                    orders: ordersToMarkCredited
+                });
+            }
+
+            if (shouldManageTx) await client.query('COMMIT');
+            return { linkedCount: linkResult.rowCount, creditedAmount: uncreditedRefund };
+        } catch (err) {
+            if (shouldManageTx) await client.query('ROLLBACK').catch(() => {});
+            logger.error('[AUTH] Failed to link guest orders and credit refunds:', err.message);
+            throw err;
+        } finally {
+            if (shouldManageTx) client.release();
         }
     }
 

@@ -28,6 +28,7 @@ import { resolveFulfillmentType } from '../../../shared/utils/fulfillment.js';
 import LogisticsQuoteService from '../../logistics/logisticsQuote.service.js';
 import LogisticsRequestService from '../../logistics/logisticsRequest.service.js';
 import { OrderStatus, OrderType } from '../../../shared/constants/enums.js';
+import { PaymentPurpose } from './paymentPurpose.policy.js';
 import { deriveOrderFinancials, roundMoney, PLATFORM_COLLECTION_FEE } from './checkoutPricing.js';
 import {
   MAX_BAG_ITEMS,
@@ -355,6 +356,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
       api_ref: apiRef,
       metadata: {
         order_id: order.id,
+        payment_purpose: PaymentPurpose.ORDER_CHECKOUT,
         api_ref: apiRef,
         order_number: order.order_number,
         product_id: headProduct.id,

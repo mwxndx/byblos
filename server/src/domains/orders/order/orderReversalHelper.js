@@ -2,6 +2,7 @@ import logger from '../../../shared/utils/logger.js';
 import { OrderStatus, OrderType } from '../../../shared/constants/enums.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import InventoryReservationService from '../../commerce/products/inventoryReservation.service.js';
+import refundAccountingService from '../../payments/refunds/refundAccounting.service.js';
 
 export const executeExceptionalReversalHelper = async ({
   pool,
@@ -42,57 +43,87 @@ export const executeExceptionalReversalHelper = async ({
     }
 
     const previousStatus = order.status;
-    const refundAmount = Number.parseFloat(order.total_amount || 0);
+    const accounting = await refundAccountingService.getOrderRefundAccounting(client, orderId);
+    const refundAmount = accounting.remainingBalanceBeforePending;
 
-    // 1. Buyer Refund: Credit buyer refund balance if order was paid or completed
+    // 1. Buyer Refund: Credit buyer refund balance if order has captured refundable balance
     let buyerRefundResult = null;
-    if (order.payment_status === 'completed' || ['PAID', 'COMPLETED', 'FULFILLING', 'DELIVERED', 'READY_FOR_BUYER'].includes(order.status)) {
-      if (refundAmount > 0) {
-        if (order.buyer_id) {
+    if (accounting.capturedAmount > 0 && refundAmount > 0) {
+      let buyerRefunded = false;
+      if (order.buyer_id) {
+        await client.query(
+          `UPDATE buyers 
+           SET refunds = COALESCE(refunds, 0) + $1,
+               updated_at = NOW()
+           WHERE id = $2`,
+          [refundAmount, order.buyer_id]
+        );
+        buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: order.buyer_id };
+        buyerRefunded = true;
+      } else if (order.buyer_email) {
+        const { rows: bRows } = await client.query(
+          `UPDATE buyers 
+           SET refunds = COALESCE(refunds, 0) + $1,
+               updated_at = NOW()
+           WHERE LOWER(email) = LOWER($2)
+           RETURNING id`,
+          [refundAmount, order.buyer_email]
+        );
+        if (bRows.length > 0) {
+          buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: bRows[0].id };
+          buyerRefunded = true;
+        } else {
           await client.query(
-            `UPDATE buyers 
-             SET refunds = COALESCE(refunds, 0) + $1,
-                 updated_at = NOW()
-             WHERE id = $2`,
-            [refundAmount, order.buyer_id]
+            `UPDATE product_orders
+             SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
+             WHERE id = $1`,
+            [orderId, refundAmount]
           );
-          buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: order.buyer_id };
-        } else if (order.buyer_email) {
-          const { rows: bRows } = await client.query(
-            `UPDATE buyers 
-             SET refunds = COALESCE(refunds, 0) + $1,
-                 updated_at = NOW()
-             WHERE LOWER(email) = LOWER($2)
-             RETURNING id`,
-            [refundAmount, order.buyer_email]
-          );
-          if (bRows.length > 0) {
-            buyerRefundResult = { refunded: true, amount: refundAmount, buyer_id: bRows[0].id };
-          } else {
-            await client.query(
-              `UPDATE product_orders
-               SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
-               WHERE id = $1`,
-              [orderId, refundAmount]
-            );
-            buyerRefundResult = { refunded: false, pending_account_creation: true, amount: refundAmount };
-          }
+          buyerRefundResult = { refunded: false, pending_account_creation: true, amount: refundAmount };
         }
       }
+
+      // Authoritative ledger entry in refund_requests
+      const creditDetails = {
+        credited_to_buyer: buyerRefunded,
+        credited_amount: refundAmount,
+        execution_source: 'admin_exceptional_reversal',
+        admin_id: adminUser?.id || null,
+        reason: reason.trim(),
+        credited_at: new Date().toISOString()
+      };
+
+      await client.query(
+        `INSERT INTO refund_requests (
+           buyer_id, order_id, amount, status, notes, admin_notes, payment_method, payment_details, requested_at, processed_at
+         ) VALUES ($1, $2, $3, 'completed', $4, $5, 'wallet', $6::jsonb, NOW(), NOW())`,
+        [
+          order.buyer_id || null,
+          orderId,
+          refundAmount,
+          reason.trim(),
+          `Admin exceptional reversal by ${adminUser?.email || adminUser?.id || 'admin'}: ${notes || reason}`,
+          JSON.stringify(creditDetails)
+        ]
+      );
     }
 
     // 2. Seller Settlement Reversal
     const sellerReversalResult = await settlementService.reverseOrderSettlementForRefund(
       client,
       orderId,
-      'admin_exceptional_reversal'
+      'admin_exceptional_reversal',
+      refundAmount,
+      accounting.capturedAmount
     );
 
     // 3. Creator Commission & Referral Reversal (with Deficit Protection)
     const creatorReversalResult = await settlementService.reverseCreatorEarningsForRefund(
       client,
       orderId,
-      'admin_exceptional_reversal'
+      'admin_exceptional_reversal',
+      refundAmount,
+      accounting.capturedAmount
     );
 
     // 4. Release slots / reservations if applicable
@@ -110,6 +141,16 @@ export const executeExceptionalReversalHelper = async ({
         logger.warn(`[ExceptionalReversal] Inventory release skipped or not needed for Order ${orderId}:`, invErr.message);
       }
     }
+
+    // Invalidate any open pending or manual-review refund requests on this reversed order
+    await client.query(
+      `UPDATE refund_requests
+       SET status = 'rejected',
+           admin_notes = 'Auto-rejected: order reversed by admin',
+           updated_at = NOW()
+       WHERE order_id = $1 AND status IN ('pending', 'manual_review')`,
+      [orderId]
+    );
 
     // 5. Update Order Status to REFUNDED with audit metadata
     const reversalAudit = {

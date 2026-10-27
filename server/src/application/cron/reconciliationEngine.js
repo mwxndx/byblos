@@ -283,11 +283,19 @@ class ReconciliationEngine {
         const { rows: uncreditedRefunds } = await pool.query(
             `SELECT rr.id, rr.buyer_id, rr.order_id, rr.amount
              FROM refund_requests rr
+             LEFT JOIN product_orders po ON rr.order_id = po.id
              WHERE rr.status = 'completed'
                AND (
                  rr.payment_details IS NULL
                  OR rr.payment_details->>'credited_to_buyer' IS NULL
                  OR rr.payment_details->>'credited_to_buyer' != 'true'
+               )
+               AND (
+                 rr.buyer_id IS NOT NULL
+                 OR EXISTS (
+                   SELECT 1 FROM buyers b 
+                   WHERE LOWER(b.email) = LOWER(po.buyer_email)
+                 )
                )
              ORDER BY rr.id ASC
              LIMIT 50`
@@ -303,14 +311,22 @@ class ReconciliationEngine {
                 await client.query('BEGIN');
 
                 const { rows: [locked] } = await client.query(
-                    `SELECT id, buyer_id, order_id, amount, status, payment_details
-                     FROM refund_requests
-                     WHERE id = $1
-                       AND status = 'completed'
+                    `SELECT rr.id, rr.buyer_id, rr.order_id, rr.amount, rr.status, rr.payment_details
+                     FROM refund_requests rr
+                     LEFT JOIN product_orders po ON rr.order_id = po.id
+                     WHERE rr.id = $1
+                       AND rr.status = 'completed'
                        AND (
-                         payment_details IS NULL
-                         OR payment_details->>'credited_to_buyer' IS NULL
-                         OR payment_details->>'credited_to_buyer' != 'true'
+                         rr.payment_details IS NULL
+                         OR rr.payment_details->>'credited_to_buyer' IS NULL
+                         OR rr.payment_details->>'credited_to_buyer' != 'true'
+                       )
+                       AND (
+                         rr.buyer_id IS NOT NULL
+                         OR EXISTS (
+                           SELECT 1 FROM buyers b 
+                           WHERE LOWER(b.email) = LOWER(po.buyer_email)
+                         )
                        )
                      FOR UPDATE SKIP LOCKED`,
                     [refund.id]
@@ -329,13 +345,37 @@ class ReconciliationEngine {
                 }
 
                 // 1. Atomically credit the buyer's refund balance
-                await client.query(
-                    `UPDATE buyers
-                     SET refunds = COALESCE(refunds, 0) + $1,
-                         updated_at = NOW()
-                     WHERE id = $2`,
-                    [refundAmount, locked.buyer_id]
-                );
+                let credited = false;
+                if (locked.buyer_id) {
+                    await client.query(
+                        `UPDATE buyers
+                         SET refunds = COALESCE(refunds, 0) + $1,
+                             updated_at = NOW()
+                         WHERE id = $2`,
+                        [refundAmount, locked.buyer_id]
+                    );
+                    credited = true;
+                } else if (locked.order_id) {
+                    const { rows: oRows } = await client.query('SELECT buyer_id, buyer_email FROM product_orders WHERE id = $1', [locked.order_id]);
+                    if (oRows[0]?.buyer_id) {
+                        await client.query('UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2', [refundAmount, oRows[0].buyer_id]);
+                        await client.query('UPDATE refund_requests SET buyer_id = $1 WHERE id = $2', [oRows[0].buyer_id, locked.id]);
+                        credited = true;
+                    } else if (oRows[0]?.buyer_email) {
+                        const { rows: bRows } = await client.query('SELECT id FROM buyers WHERE LOWER(email) = LOWER($1)', [oRows[0].buyer_email]);
+                        if (bRows.length > 0) {
+                            await client.query('UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2', [refundAmount, bRows[0].id]);
+                            await client.query('UPDATE refund_requests SET buyer_id = $1 WHERE id = $2', [bRows[0].id, locked.id]);
+                            credited = true;
+                        }
+                    }
+                }
+
+                if (!credited) {
+                    logger.warn(`[RECON] Refund ${locked.id} has no registered buyer to credit; awaiting registration.`);
+                    await client.query('ROLLBACK');
+                    continue;
+                }
 
                 // 2. Mark as credited in payment_details
                 const creditMetadata = {

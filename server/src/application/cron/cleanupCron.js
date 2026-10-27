@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import cron from 'node-cron';
-import { pool } from '../../infrastructure/database/database.js';
+import { pool, withTransaction } from '../../infrastructure/database/database.js';
 import logger from '../../shared/utils/logger.js';
 import InventoryReservationService from '../../domains/commerce/products/inventoryReservation.service.js';
 
 /**
  * Auto-release inventory for unpaid abandoned orders (payment_status='pending')
- * older than 15 minutes, cancelling each one.
+ * older than 15 minutes, cancelling each one and failing its associated pending payment.
  *
  * The cancel UPDATE is guarded by `payment_status = 'pending'` and inventory is
  * released ONLY when that UPDATE actually cancelled the order (rowCount > 0). This
@@ -17,6 +17,8 @@ import InventoryReservationService from '../../domains/commerce/products/invento
  *    never be wrongly failed and stripped of inventory; and
  *  - idempotent under multi-instance: two workers cannot both cancel/release the
  *    same order — the loser's guarded UPDATE matches zero rows and is skipped.
+ *  - consistent: any pending payment records tied to the cancelled order are also
+ *    transitioned to 'failed', preventing lingering pending rows and wasteful polling.
  *
  * @param {import('pg').PoolClient|import('pg').Pool} [client]
  * @returns {Promise<{ scanned: number, cancelled: number }>}
@@ -31,20 +33,41 @@ export async function releaseExpiredUnpaidReservations(client = pool) {
     let cancelled = 0;
     for (const order of expiredOrders) {
         try {
-            const { rowCount } = await client.query(
-                // Canonical order status is the UPPERCASE order_status vocabulary
-                // ('CANCELLED'); payment_status uses the lowercase set ('failed').
-                `UPDATE product_orders
-                 SET status = 'CANCELLED', payment_status = 'failed', updated_at = NOW()
-                 WHERE id = $1 AND payment_status = 'pending'`,
-                [order.id]
-            );
-            // Order was paid (or handled by another worker) between SELECT and now — skip.
-            if (rowCount === 0) continue;
+            const executeCancellation = async (txClient) => {
+                const { rowCount } = await txClient.query(
+                    // Canonical order status is the UPPERCASE order_status vocabulary
+                    // ('CANCELLED'); payment_status uses the lowercase set ('failed').
+                    `UPDATE product_orders
+                     SET status = 'CANCELLED', payment_status = 'failed', updated_at = NOW()
+                     WHERE id = $1 AND payment_status = 'pending'`,
+                    [order.id]
+                );
+                // Order was paid (or handled by another worker) between SELECT and now — skip.
+                if (rowCount === 0) return false;
 
-            await InventoryReservationService.releaseOrderInventory(client, order.id);
-            cancelled += 1;
-            logger.info(`[INVENTORY_TTL] Auto-released inventory for unpaid abandoned order ${order.id}`);
+                // DEF-04 FIX: Transition associated pending payment records to 'failed'
+                await txClient.query(
+                    `UPDATE payments
+                     SET status = 'failed'::payment_status,
+                         metadata = COALESCE(metadata, '{}'::jsonb) || '{"cancelled_by_cleanup": true, "cancellation_reason": "reservation_ttl_expired"}'::jsonb,
+                         updated_at = NOW()
+                     WHERE (order_id = $1 OR invoice_id = $1::text OR metadata->>'order_id' = $1::text)
+                       AND status = 'pending'::payment_status`,
+                    [order.id]
+                );
+
+                await InventoryReservationService.releaseOrderInventory(txClient, order.id);
+                return true;
+            };
+
+            const didCancel = (client === pool)
+                ? await withTransaction(executeCancellation)
+                : await executeCancellation(client);
+
+            if (didCancel) {
+                cancelled += 1;
+                logger.info(`[INVENTORY_TTL] Auto-released inventory and marked pending payment failed for unpaid abandoned order ${order.id}`);
+            }
         } catch (err) {
             logger.error(`[INVENTORY_TTL] Failed releasing order ${order.id}:`, err.message);
         }

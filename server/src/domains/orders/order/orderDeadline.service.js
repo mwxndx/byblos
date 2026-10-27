@@ -6,6 +6,7 @@ import logger from '../../../shared/utils/logger.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import { releaseOrderReservations } from '../utils/reservationRelease.js';
 import settlementService from '../escrow/settlement.service.js';
+import refundAccountingService from '../../payments/refunds/refundAccounting.service.js';
 
 class OrderDeadlineService {
     /**
@@ -442,43 +443,106 @@ class OrderDeadlineService {
                         ]
                     );
 
-                    const refundAmount = Number.parseFloat(lockedOrder.total_amount || 0);
-                    let buyerRefunded = false;
-                    if (lockedOrder.buyer_id) {
-                        await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedOrder.buyer_id]);
-                        await client.query(
-                            `UPDATE buyers
-                             SET refunds = COALESCE(refunds, 0) + $1,
-                                 updated_at = NOW()
-                             WHERE id = $2`,
-                            [refundAmount, lockedOrder.buyer_id]
-                        );
-                        buyerRefunded = true;
-                    } else if (lockedOrder.buyer_email) {
-                        const { rows: bRows } = await client.query(
-                            `UPDATE buyers
-                             SET refunds = COALESCE(refunds, 0) + $1,
-                                 updated_at = NOW()
-                             WHERE LOWER(email) = LOWER($2)
-                             RETURNING id`,
-                            [refundAmount, lockedOrder.buyer_email]
-                        );
-                        if (bRows.length > 0) buyerRefunded = true;
-                    }
+                    const accounting = await refundAccountingService.getOrderRefundAccounting(client, lockedOrder.id);
+                    const refundableAmount = accounting.remainingBalanceBeforePending;
 
-                    if (!buyerRefunded && refundAmount > 0) {
+                    if (accounting.capturedAmount > 0 && refundableAmount > 0) {
+                        let buyerRefunded = false;
+                        if (lockedOrder.buyer_id) {
+                            await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedOrder.buyer_id]);
+                            await client.query(
+                                `UPDATE buyers
+                                 SET refunds = COALESCE(refunds, 0) + $1,
+                                     updated_at = NOW()
+                                 WHERE id = $2`,
+                                [refundableAmount, lockedOrder.buyer_id]
+                            );
+                            buyerRefunded = true;
+                        } else if (lockedOrder.buyer_email) {
+                            const { rows: bRows } = await client.query(
+                                `UPDATE buyers
+                                 SET refunds = COALESCE(refunds, 0) + $1,
+                                     updated_at = NOW()
+                                 WHERE LOWER(email) = LOWER($2)
+                                 RETURNING id`,
+                                [refundableAmount, lockedOrder.buyer_email]
+                            );
+                            if (bRows.length > 0) buyerRefunded = true;
+                        }
+
+                        const creditDetails = {
+                            credited_to_buyer: buyerRefunded,
+                            credited_amount: refundableAmount,
+                            execution_source: 'custom_production_deadline_expired',
+                            reason,
+                            credited_at: new Date().toISOString()
+                        };
+
                         await client.query(
-                            `UPDATE product_orders
-                             SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
-                             WHERE id = $1`,
-                            [lockedOrder.id, refundAmount]
+                            `INSERT INTO refund_requests (
+                               buyer_id, order_id, amount, status, notes, admin_notes, payment_method, payment_details, requested_at, processed_at
+                             ) VALUES ($1, $2, $3, 'completed', $4, 'Custom production deadline auto-refund', 'wallet', $5::jsonb, NOW(), NOW())`,
+                            [
+                                lockedOrder.buyer_id || null,
+                                lockedOrder.id,
+                                refundableAmount,
+                                reason,
+                                JSON.stringify(creditDetails)
+                            ]
                         );
-                    } else {
+
+                        const newTotalRefunded = refundAccountingService.roundMoney(accounting.completedRefunds + refundableAmount);
+                        const refundItem = {
+                            amount: refundableAmount,
+                            reason,
+                            execution_source: 'custom_production_deadline_expired',
+                            completed_at: new Date().toISOString()
+                        };
+
+                        let orderMeta = {};
+                        if (lockedOrder.metadata) {
+                            try {
+                                orderMeta = typeof lockedOrder.metadata === 'string' ? JSON.parse(lockedOrder.metadata) : lockedOrder.metadata;
+                            } catch {
+                                orderMeta = {};
+                            }
+                        }
+
+                        const priorHistory = Array.isArray(orderMeta?.refund_summary?.history)
+                            ? orderMeta.refund_summary.history
+                            : [];
+
+                        const refundSummary = {
+                            total_refunded: newTotalRefunded,
+                            refund_status: 'FULLY_REFUNDED',
+                            history: [...priorHistory, refundItem],
+                            updated_at: new Date().toISOString()
+                        };
+
+                        const metaUpdate = {
+                            refund_summary: refundSummary,
+                            refund_credited: buyerRefunded ? true : false
+                        };
+
+                        if (!buyerRefunded) {
+                            metaUpdate.uncredited_refund_amount = refundableAmount;
+                        }
+
+                        // Invalidate any open pending or manual-review refund requests on this cancelled order
+                        await client.query(
+                            `UPDATE refund_requests
+                             SET status = 'rejected',
+                                 admin_notes = 'Auto-rejected: order cancelled on custom production deadline',
+                                 updated_at = NOW()
+                             WHERE order_id = $1 AND status IN ('pending', 'manual_review')`,
+                            [lockedOrder.id]
+                        );
+
                         await client.query(
                             `UPDATE product_orders
-                             SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
+                             SET metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
                              WHERE id = $1`,
-                            [lockedOrder.id]
+                            [lockedOrder.id, JSON.stringify(metaUpdate)]
                         );
                     }
 
@@ -540,7 +604,7 @@ class OrderDeadlineService {
             await client.query('BEGIN');
 
             const { rows: lockedOrders } = await client.query(
-                `SELECT id, order_number, buyer_id, total_amount, status, auto_cancelled_reason
+                `SELECT id, order_number, buyer_id, total_amount, status, auto_cancelled_reason, metadata
                  FROM product_orders
                  WHERE id = $1
                    AND auto_cancelled_reason IS NULL
@@ -568,49 +632,124 @@ class OrderDeadlineService {
                 [reason, lockedOrder.id]
             );
 
-            const refundAmount = Number.parseFloat(lockedOrder.total_amount || 0);
-            let buyerRefunded = false;
-            if (lockedOrder.buyer_id) {
-                await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedOrder.buyer_id]);
-                await client.query(
-                    `UPDATE buyers 
-                     SET refunds = COALESCE(refunds, 0) + $1,
-                         updated_at = NOW()
-                     WHERE id = $2`,
-                    [refundAmount, lockedOrder.buyer_id]
-                );
-                buyerRefunded = true;
-            } else if (lockedOrder.buyer_email) {
-                const { rows: bRows } = await client.query(
-                    `UPDATE buyers 
-                     SET refunds = COALESCE(refunds, 0) + $1,
-                         updated_at = NOW()
-                     WHERE LOWER(email) = LOWER($2)
-                     RETURNING id`,
-                    [refundAmount, lockedOrder.buyer_email]
-                );
-                if (bRows.length > 0) buyerRefunded = true;
-            }
+            const accounting = await refundAccountingService.getOrderRefundAccounting(client, lockedOrder.id);
+            const refundableAmount = accounting.remainingBalanceBeforePending;
 
-            if (!buyerRefunded && refundAmount > 0) {
+            if (accounting.capturedAmount > 0 && refundableAmount > 0) {
+                let buyerRefunded = false;
+                if (lockedOrder.buyer_id) {
+                    await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedOrder.buyer_id]);
+                    await client.query(
+                        `UPDATE buyers 
+                         SET refunds = COALESCE(refunds, 0) + $1,
+                             updated_at = NOW()
+                         WHERE id = $2`,
+                        [refundableAmount, lockedOrder.buyer_id]
+                    );
+                    buyerRefunded = true;
+                } else if (lockedOrder.buyer_email) {
+                    const { rows: bRows } = await client.query(
+                        `UPDATE buyers 
+                         SET refunds = COALESCE(refunds, 0) + $1,
+                             updated_at = NOW()
+                         WHERE LOWER(email) = LOWER($2)
+                         RETURNING id`,
+                        [refundableAmount, lockedOrder.buyer_email]
+                    );
+                    if (bRows.length > 0) buyerRefunded = true;
+                }
+
+                const creditDetails = {
+                    credited_to_buyer: buyerRefunded,
+                    credited_amount: refundableAmount,
+                    execution_source: 'deadline_timeout_cancellation',
+                    reason,
+                    credited_at: new Date().toISOString()
+                };
+
                 await client.query(
-                    `UPDATE product_orders
-                     SET metadata = COALESCE(metadata, '{}'::jsonb) || jsonb_build_object('uncredited_refund_amount', $2::numeric)
-                     WHERE id = $1`,
-                    [lockedOrder.id, refundAmount]
+                    `INSERT INTO refund_requests (
+                       buyer_id, order_id, amount, status, notes, admin_notes, payment_method, payment_details, requested_at, processed_at
+                     ) VALUES ($1, $2, $3, 'completed', $4, 'Order deadline timeout auto-refund', 'wallet', $5::jsonb, NOW(), NOW())`,
+                    [
+                        lockedOrder.buyer_id || null,
+                        lockedOrder.id,
+                        refundableAmount,
+                        reason,
+                        JSON.stringify(creditDetails)
+                    ]
                 );
-            } else {
+
+                const newTotalRefunded = refundAccountingService.roundMoney(accounting.completedRefunds + refundableAmount);
+                const refundItem = {
+                    amount: refundableAmount,
+                    reason,
+                    execution_source: 'deadline_timeout_cancellation',
+                    completed_at: new Date().toISOString()
+                };
+
+                let orderMeta = {};
+                if (lockedOrder.metadata) {
+                    try {
+                        orderMeta = typeof lockedOrder.metadata === 'string' ? JSON.parse(lockedOrder.metadata) : lockedOrder.metadata;
+                    } catch {
+                        orderMeta = {};
+                    }
+                }
+
+                const priorHistory = Array.isArray(orderMeta?.refund_summary?.history)
+                    ? orderMeta.refund_summary.history
+                    : [];
+
+                const refundSummary = {
+                    total_refunded: newTotalRefunded,
+                    refund_status: 'FULLY_REFUNDED',
+                    history: [...priorHistory, refundItem],
+                    updated_at: new Date().toISOString()
+                };
+
+                const metaUpdate = {
+                    refund_summary: refundSummary,
+                    refund_credited: buyerRefunded ? true : false
+                };
+
+                if (!buyerRefunded) {
+                    metaUpdate.uncredited_refund_amount = refundableAmount;
+                }
+
+                // Invalidate any open pending or manual-review refund requests on this cancelled order
                 await client.query(
-                    `UPDATE product_orders
-                     SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"refund_credited": true}'::jsonb
-                     WHERE id = $1`,
+                    `UPDATE refund_requests
+                     SET status = 'rejected',
+                         admin_notes = 'Auto-rejected: order cancelled on deadline timeout',
+                         updated_at = NOW()
+                     WHERE order_id = $1 AND status IN ('pending', 'manual_review')`,
                     [lockedOrder.id]
                 );
-            }
 
-            // Reverse any escrow settlement hold or creator earnings attached to this cancelled order
-            await settlementService.reverseOrderSettlementForRefund(client, lockedOrder.id, 'deadline_timeout_cancellation');
-            await settlementService.reverseCreatorEarningsForRefund(client, lockedOrder.id, 'deadline_timeout_cancellation');
+                await client.query(
+                    `UPDATE product_orders
+                     SET metadata = COALESCE(metadata, '{}'::jsonb) || $2::jsonb
+                     WHERE id = $1`,
+                    [lockedOrder.id, JSON.stringify(metaUpdate)]
+                );
+
+                // Reverse any escrow settlement hold or creator earnings attached to this cancelled order
+                await settlementService.reverseOrderSettlementForRefund(
+                    client,
+                    lockedOrder.id,
+                    'deadline_timeout_cancellation',
+                    refundableAmount,
+                    accounting.capturedAmount
+                );
+                await settlementService.reverseCreatorEarningsForRefund(
+                    client,
+                    lockedOrder.id,
+                    'deadline_timeout_cancellation',
+                    refundableAmount,
+                    accounting.capturedAmount
+                );
+            }
 
             await client.query('COMMIT');
 

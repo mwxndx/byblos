@@ -49,7 +49,7 @@ const SELECT_WITH_BUYER = `
     b.refunds as buyer_current_refunds,
     po.order_number
   FROM refund_requests rr
-  JOIN buyers b ON rr.buyer_id = b.id
+  LEFT JOIN buyers b ON rr.buyer_id = b.id
   LEFT JOIN product_orders po ON rr.order_id = po.id
 `;
 
