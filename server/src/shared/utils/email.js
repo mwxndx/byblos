@@ -92,7 +92,20 @@ const readTemplate = async (templateName, data) => {
   return ejs.render(template, data);
 };
 
+// Validate recipient email address format before sending to prevent SMTP injection or addressparser ReDoS
+const SAFE_EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+
+export const isValidEmailRecipient = (to) => {
+  if (!to) return false;
+  const list = Array.isArray(to) ? to : [to];
+  return list.every(addr => typeof addr === 'string' && addr.length <= 254 && !/[\r\n;]/.test(addr) && SAFE_EMAIL_REGEX.test(addr.trim()));
+};
+
 export const sendEmail = async (options) => {
+  if (!isValidEmailRecipient(options.to)) {
+    logger.warn('[EMAIL] Rejected invalid or malformed email recipient format', { to: options.to });
+    throw new Error('Invalid email recipient address format.');
+  }
   const fromName = process.env.EMAIL_FROM_NAME || process.env.APP_NAME || 'Byblos';
   const fromEmail = process.env.EMAIL_FROM_EMAIL || process.env.EMAIL_FROM || 'no-reply@byblosafrica.site';
   const fromAddress = `"${fromName}" <${fromEmail}>`;

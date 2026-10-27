@@ -57,7 +57,7 @@ export function clearAuthCookies(res) {
   };
   res.cookie('jwt', '', { ...base, path: '/' });
   res.cookie('token', '', { ...base, path: '/' });
-  // Refresh cookie is scoped to the refresh route — clear it on the same path.
+  res.cookie('refreshToken', '', { ...base, path: '/' });
   res.cookie('refreshToken', '', { ...base, path: '/api/auth/refresh-token' });
 }
 

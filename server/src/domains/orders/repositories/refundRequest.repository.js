@@ -145,7 +145,7 @@ export async function findHeaderById(id) {
   const sql = `
     SELECT rr.status, rr.buyer_id, rr.amount, b.full_name, b.whatsapp_number
     FROM refund_requests rr
-    JOIN buyers b ON b.id = rr.buyer_id
+    LEFT JOIN buyers b ON b.id = rr.buyer_id
     WHERE rr.id = $1
   `;
   const { rows } = await query(sql, [id]);

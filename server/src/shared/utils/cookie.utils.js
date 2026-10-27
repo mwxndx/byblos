@@ -40,7 +40,7 @@ const setRefreshTokenCookie = (res, refreshToken) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
-        path: '/api/auth/refresh-token',
+        path: '/',
         maxAge: getRefreshTokenMaxAgeMs(),
         domain: process.env.COOKIE_DOMAIN || undefined
     });

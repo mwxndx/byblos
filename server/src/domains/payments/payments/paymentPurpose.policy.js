@@ -36,26 +36,48 @@ export function normalizePaymentPurpose(purpose) {
 /**
  * Extracts normalized payment purpose from a payment row's metadata.
  * Inspects both `payment_purpose` and legacy `logistics_payment_type`.
+ * Fails closed by returning sentinel values ('malformed_metadata', 'invalid_metadata', 'invalid_purpose')
+ * when metadata is corrupted or non-conforming, so isPaymentPurposeRefundable can alert and fail closed.
+ * Only genuine absent metadata (null/undefined/empty object) returns null (representing supported legacy checkout rows).
  * @param {object|string|null} metadata
  * @returns {string|null}
  */
 export function extractPaymentPurpose(metadata) {
-  if (!metadata) return null;
+  if (metadata === null || metadata === undefined) return null;
+
   let parsed = metadata;
   if (typeof metadata === 'string') {
+    const trimmed = metadata.trim();
+    if (trimmed.length === 0) return null;
     try {
-      parsed = JSON.parse(metadata);
+      parsed = JSON.parse(trimmed);
     } catch {
-      return null;
+      return 'malformed_metadata';
     }
   }
-  if (!parsed || typeof parsed !== 'object') return null;
 
-  return (
-    normalizePaymentPurpose(parsed.payment_purpose) ||
-    normalizePaymentPurpose(parsed.logistics_payment_type) ||
-    null
-  );
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    return 'invalid_metadata';
+  }
+
+  // Check if payment_purpose was explicitly provided
+  if ('payment_purpose' in parsed) {
+    if (typeof parsed.payment_purpose !== 'string' || !parsed.payment_purpose.trim()) {
+      return 'invalid_purpose';
+    }
+    return normalizePaymentPurpose(parsed.payment_purpose);
+  }
+
+  // Check legacy logistics_payment_type
+  if ('logistics_payment_type' in parsed) {
+    if (typeof parsed.logistics_payment_type !== 'string' || !parsed.logistics_payment_type.trim()) {
+      return 'invalid_purpose';
+    }
+    return normalizePaymentPurpose(parsed.logistics_payment_type);
+  }
+
+  // Object without purpose fields (supported legacy records e.g. {} or { source: 'web' })
+  return null;
 }
 
 /**

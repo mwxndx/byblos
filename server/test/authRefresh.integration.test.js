@@ -166,7 +166,7 @@ describe('Refresh-token lifecycle across all six roles', () => {
       const refreshCookieHeader = raw.find((h) => h.startsWith('refreshToken='));
       assert.ok(refreshCookieHeader, 'refreshToken cookie header found');
       assert.match(refreshCookieHeader, /HttpOnly/i);
-      assert.match(refreshCookieHeader, /Path=\/api\/auth\/refresh-token/i);
+      assert.match(refreshCookieHeader, /Path=\//i);
       assert.match(refreshCookieHeader, /SameSite=Lax/i);
     });
 
@@ -190,7 +190,7 @@ describe('Refresh-token lifecycle across all six roles', () => {
           'Authorization': `Bearer ${accessToken}`,
           'Cookie': `jwt=${cookies.jwt || ''}; refreshToken=${cookies.refreshToken || ''}`
         },
-        body: JSON.stringify({ refreshToken })
+        body: JSON.stringify({})
       });
 
       assert.equal(logoutRes.status, 200, `logout failed for ${role}`);
@@ -345,6 +345,53 @@ describe('Refresh-token lifecycle across all six roles', () => {
       body: JSON.stringify({ refreshToken: token })
     });
     assert.notEqual(secondRefresh.status, 200, 'grace cache must not return tokens for suspended account');
+  });
+
+  test('SEC-02: Web browser logout without request body blacklists refreshToken via cookie and terminates refresh capability', async () => {
+    const account = await createTestAccount('buyer');
+
+    const loginRes = await fetch(`${baseUrl}/api/buyers/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: account.email, password: account.password })
+    });
+    const loginBody = await loginRes.json();
+    const accessToken = loginBody.data?.token;
+    const refreshToken = loginBody.data?.refreshToken;
+    const { cookies } = parseCookies(loginRes);
+
+    assert.ok(cookies.refreshToken, 'Expected refreshToken cookie on login');
+
+    // Web browser clicks logout: sends cookie matching path '/', NO body
+    const logoutRes = await fetch(`${baseUrl}/api/buyers/logout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+        'Cookie': `jwt=${cookies.jwt || ''}; refreshToken=${cookies.refreshToken || ''}`
+      },
+      body: JSON.stringify({})
+    });
+
+    assert.equal(logoutRes.status, 200);
+
+    // Refresh token must be blacklisted
+    const isBlacklisted = await tokenBlacklist.isBlacklisted(refreshToken);
+    assert.equal(isBlacklisted, true, 'refreshToken must be blacklisted after web logout');
+
+    // Subsequent refresh attempts with the blacklisted token must return 401
+    const refreshRes = await fetch(`${baseUrl}/api/auth/refresh-token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken })
+    });
+
+    assert.equal(refreshRes.status, 401);
+    const refreshBody = await refreshRes.json();
+    assert.ok(
+      refreshBody.message?.includes('revoked') || refreshBody.error?.includes('revoked'),
+      'Expected revocation message'
+    );
   });
 
   test('findAdminAuthProfile excludes sensitive fields (SEC-02 data minimization)', async () => {

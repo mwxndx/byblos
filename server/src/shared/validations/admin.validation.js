@@ -40,3 +40,9 @@ export const resolveFlaggedCreatorEarning = z.object({
   notes: s
 }).passthrough();
 
+
+export const retryFulfillmentJob = z.object({ id: id }).passthrough();
+export const cancelAndRefundDeadLetter = z.object({
+  id: id,
+  reason: z.string().min(3).optional()
+}).passthrough();

@@ -65,6 +65,7 @@ class ReconciliationEngine {
             await this.handleExpiredReservations();
             await this.handleStuckPayments();
             await this.handleMissingFulfillmentJobs();
+            await this.handleDeadLetterFulfillmentJobs();
             await this.handleUnreleasedCompletedOrders();
             await this.handleCompletedRefunds();
             await this.handleOverdueRefundRequests();
@@ -211,6 +212,56 @@ class ReconciliationEngine {
     /**
      * Ensure every PAID order has a fulfillment job.
      */
+        /**
+     * Scan for dead-letter fulfillment jobs (status = 'FAILED' and attempts >= max_attempts)
+     * where the order is still stuck in 'PAID'.
+     * Transitions order to 'MANUAL_REVIEW' and ensures a high-severity system_issue is recorded.
+     */
+    static async handleDeadLetterFulfillmentJobs() {
+        const query = `
+            SELECT fj.id as job_id, fj.order_id, fj.attempts, fj.max_attempts, fj.error_message
+            FROM fulfillment_jobs fj
+            JOIN product_orders po ON po.id = fj.order_id
+            WHERE fj.status = 'FAILED'
+              AND fj.attempts >= fj.max_attempts
+              AND po.status = 'PAID'
+            LIMIT 50
+            FOR UPDATE OF po SKIP LOCKED
+        `;
+        const { rows: deadLetterJobs } = await pool.query(query);
+
+        for (const job of deadLetterJobs) {
+            logger.warn(`[RECON] Found dead-letter fulfillment job ${job.job_id} for order ${job.order_id}. Transitioning order to MANUAL_REVIEW.`);
+            const client = await pool.connect();
+            try {
+                await client.query('BEGIN');
+                await client.query(
+                    `UPDATE product_orders SET status = 'MANUAL_REVIEW', updated_at = NOW() WHERE id = $1 AND status = 'PAID'`,
+                    [job.order_id]
+                );
+                // Ensure system issue exists
+                const { rows: existingIssue } = await client.query(
+                    `SELECT id FROM system_issues WHERE order_id = $1 AND issue_type = 'FULFILLMENT_FAILURE' AND resolved = FALSE`,
+                    [job.order_id]
+                );
+                if (existingIssue.length === 0) {
+                    await client.query(
+                        `INSERT INTO system_issues (order_id, issue_type, severity, resolved, details)
+                         VALUES ($1, 'FULFILLMENT_FAILURE', 'HIGH', FALSE, $2)`,
+                        [job.order_id, JSON.stringify({ error: job.error_message, job_id: job.job_id, attempts: job.attempts, source: 'reconciliation' })]
+                    );
+                }
+                await client.query('COMMIT');
+            } catch (err) {
+                await client.query('ROLLBACK').catch(() => {});
+                logger.error(`[RECON] Failed to transition dead-letter order ${job.order_id} to MANUAL_REVIEW:`, err.message);
+            } finally {
+                client.release();
+            }
+        }
+        return deadLetterJobs.length;
+    }
+
     static async handleMissingFulfillmentJobs() {
         const query = `
             SELECT id FROM product_orders
@@ -328,7 +379,7 @@ class ReconciliationEngine {
                            WHERE LOWER(b.email) = LOWER(po.buyer_email)
                          )
                        )
-                     FOR UPDATE SKIP LOCKED`,
+                     FOR UPDATE OF rr SKIP LOCKED`,
                     [refund.id]
                 );
 
@@ -427,7 +478,7 @@ class ReconciliationEngine {
                 logger.info(`[RECON] Successfully credited ${refundAmount} to buyer ${locked.buyer_id} for completed refund request ${locked.id}`);
             } catch (err) {
                 await client.query('ROLLBACK').catch(() => {});
-                logger.error(`[RECON] Failed reconciling completed refund ${refund.id}:`, err.message);
+                logger.error(`[RECON] Failed reconciling completed refund ${refund.id}: ${err.stack || err.message}`);
             } finally {
                 client.release();
             }

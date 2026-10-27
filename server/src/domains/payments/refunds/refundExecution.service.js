@@ -90,6 +90,7 @@ class RefundExecutionService {
     }
 
     // 2. Credit buyer's refund balance (registered buyer or lookup via order email)
+    let buyerRefunded = false;
     if (lockedRequest.buyer_id) {
       await client.query(
         `UPDATE buyers
@@ -98,6 +99,7 @@ class RefundExecutionService {
          WHERE id = $2`,
         [effectiveRefundAmount, lockedRequest.buyer_id]
       );
+      buyerRefunded = true;
     } else if (accounting?.order?.buyer_email) {
       const { rowCount } = await client.query(
         `UPDATE buyers
@@ -106,7 +108,9 @@ class RefundExecutionService {
          WHERE LOWER(email) = LOWER($2)`,
         [effectiveRefundAmount, accounting.order.buyer_email]
       );
-      if (rowCount === 0) {
+      if (rowCount > 0) {
+        buyerRefunded = true;
+      } else {
         logger.info(
           `[REFUND] Guest order #${lockedRequest.order_id} refund of ${effectiveRefundAmount} recorded for unregistered email ${accounting.order.buyer_email}`
         );
@@ -115,7 +119,7 @@ class RefundExecutionService {
 
     // 3. Mark refund request as completed and record credit details
     const creditDetails = {
-      credited_to_buyer: true,
+      credited_to_buyer: buyerRefunded,
       credited_amount: effectiveRefundAmount,
       requested_amount: requestedAmount,
       is_partial_approval: effectiveRefundAmount < requestedAmount,
@@ -182,8 +186,12 @@ class RefundExecutionService {
         ...orderMeta,
         refund_summary: refundSummary,
         refund_completed: isOrderFullyRefunded ? refundItem : (orderMeta.refund_completed || refundItem),
-        refund_credited: isOrderFullyRefunded ? true : orderMeta.refund_credited
+        refund_credited: buyerRefunded ? true : false
       };
+
+      if (!buyerRefunded) {
+        updatedOrderMeta.uncredited_refund_amount = effectiveRefundAmount;
+      }
 
       if (isOrderFullyRefunded) {
         try {

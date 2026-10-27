@@ -89,6 +89,11 @@ export const verifyRefreshToken = (token) => {
  * @returns {Object} New access token and user info
  */
 export const refreshAccessToken = async (refreshToken) => {
+  // SECURITY (SEC-02): Check blacklist immediately before any grace-period replay or rotation
+  const isIncomingRevoked = await tokenBlacklist.isBlacklisted(refreshToken);
+  if (isIncomingRevoked) {
+    throw new Error('Refresh token has been revoked. Please log in again.');
+  }
   const tokenHash = crypto.createHash('sha256').update(String(refreshToken)).digest('hex');
   const graceKey = `refresh_grace:${tokenHash}`;
 

@@ -67,7 +67,7 @@ const TRANSITIONS = {
 
     [OrderStatus.REFUND_PENDING]: [OrderStatus.REFUNDED],
     [OrderStatus.REFUNDED]: [],   // Terminal state
-    [OrderStatus.MANUAL_REVIEW]: [OrderStatus.REFUND_PENDING, OrderStatus.COMPLETED, OrderStatus.CANCELLED],
+    [OrderStatus.MANUAL_REVIEW]: [OrderStatus.PAID, OrderStatus.REFUND_PENDING, OrderStatus.COMPLETED, OrderStatus.CANCELLED],
     [OrderStatus.COMPENSATION_REQUIRED]: [OrderStatus.REFUND_PENDING, OrderStatus.COMPLETED]
 };
 

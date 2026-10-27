@@ -10,6 +10,7 @@ import { pool } from '../../../infrastructure/database/database.js';
 import PendingRegistration from '../../../shared/utils/pendingRegistration.model.js';
 import ReferralService from '../../growth/referrals/referral.service.js';
 import ProfileProvisioningService from '../users/profileProvisioning.service.js';
+import refundAccountingService from '../../payments/refunds/refundAccounting.service.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import {
     bootstrapPrivilegedAccountIfConfigured,
@@ -519,22 +520,68 @@ class AuthService {
                 [buyerId, linkedOrderIds]
             );
 
+            // Fetch refund requests state for linked orders to calculate authoritative uncredited balances
+            const { rows: rrRows } = await client.query(
+                `SELECT 
+                   order_id,
+                   COALESCE(SUM(CASE WHEN payment_details->>'credited_to_buyer' = 'true' THEN amount ELSE 0 END), 0) as already_credited,
+                   COALESCE(SUM(CASE WHEN status = 'completed' AND (payment_details IS NULL OR payment_details->>'credited_to_buyer' IS NULL OR payment_details->>'credited_to_buyer' != 'true') THEN amount ELSE 0 END), 0) as uncredited
+                 FROM refund_requests
+                 WHERE order_id = ANY($1)
+                 GROUP BY order_id`,
+                [linkedOrderIds]
+            );
+
+            const rrMap = new Map();
+            for (const r of rrRows) {
+                rrMap.set(r.order_id, {
+                    already_credited: Number.parseFloat(r.already_credited) || 0,
+                    uncredited: Number.parseFloat(r.uncredited) || 0
+                });
+            }
+
             let uncreditedRefund = 0;
             const ordersToMarkCredited = [];
             for (const ord of linkResult.rows) {
-                const isCancelledPaid = String(ord.status).toUpperCase() === 'CANCELLED' && ['completed', 'paid', 'cancelled'].includes(String(ord.payment_status).toLowerCase());
+                // Authoritative captured payment check: An unpaid order can NEVER produce refund credits
+                const capturedAmount = await refundAccountingService.getCapturedPaymentAmount(client, ord.id, ord);
+                if (capturedAmount <= 0) {
+                    continue;
+                }
+
+                const rrInfo = rrMap.get(ord.id) || { already_credited: 0, uncredited: 0 };
+                const alreadyCreditedRR = rrInfo.already_credited;
+                const uncreditedRR = rrInfo.uncredited;
+                const alreadyCreditedMeta = ord.metadata?.refund_credited === true;
                 const uncreditedAmt = Number.parseFloat(ord.metadata?.uncredited_refund_amount || 0);
-                const alreadyCredited = ord.metadata?.refund_credited === true;
-                if (!alreadyCredited && (uncreditedAmt > 0 || isCancelledPaid)) {
-                    const amt = uncreditedAmt > 0 ? uncreditedAmt : Number.parseFloat(ord.total_amount || 0);
-                    uncreditedRefund += amt;
+                const maxRefundable = Math.max(0, refundAccountingService.roundMoney(capturedAmount - alreadyCreditedRR));
+
+                if (maxRefundable <= 0) {
+                    continue;
+                }
+
+                let eligibleAmount = 0;
+                if (!alreadyCreditedMeta && uncreditedAmt > 0) {
+                    eligibleAmount = Math.min(uncreditedAmt, maxRefundable);
+                } else if (uncreditedRR > 0) {
+                    eligibleAmount = Math.min(uncreditedRR, maxRefundable);
+                } else if (!alreadyCreditedMeta && ['CANCELLED', 'REFUNDED'].includes(String(ord.status).toUpperCase()) && ['completed', 'paid'].includes(String(ord.payment_status).toLowerCase())) {
+                    eligibleAmount = maxRefundable;
+                }
+
+                eligibleAmount = refundAccountingService.roundMoney(eligibleAmount);
+                if (eligibleAmount > 0) {
+                    uncreditedRefund += eligibleAmount;
                     ordersToMarkCredited.push(ord.id);
                 }
             }
 
-            uncreditedRefund = Math.round(uncreditedRefund * 100) / 100;
+            uncreditedRefund = refundAccountingService.roundMoney(uncreditedRefund);
 
             if (uncreditedRefund > 0 && ordersToMarkCredited.length > 0) {
+                // Lock the buyer row to prevent concurrent balance update race conditions
+                await client.query('SELECT id, refunds FROM buyers WHERE id = $1 FOR UPDATE', [buyerId]);
+
                 await client.query(
                     `UPDATE buyers SET refunds = COALESCE(refunds, 0) + $1, updated_at = NOW() WHERE id = $2`,
                     [uncreditedRefund, buyerId]

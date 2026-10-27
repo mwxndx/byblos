@@ -1,3 +1,4 @@
+import FulfillmentQueueService from '../../orders/fulfillment/fulfillmentQueue.service.js';
 import NotificationService from '../../communication/notifications/notification.service.js';
 import { promisify } from 'util';
 import dotenv from 'dotenv';
@@ -681,6 +682,55 @@ const broadcastAppUpdate = async (req, res, next) => {
   }
 };
 
+
+const getDeadLetterJobs = async (req, res, next) => {
+  try {
+    const limit = Number.parseInt(req.query.limit, 10) || 50;
+    const offset = Number.parseInt(req.query.offset, 10) || 0;
+    const jobs = await FulfillmentQueueService.getDeadLetterJobs({ limit, offset });
+    res.status(200).json({
+      status: 'success',
+      data: { jobs, count: jobs.length }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const retryFulfillmentJob = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const operatorId = req.user?.id || 'admin';
+    const job = await FulfillmentQueueService.retryFailedJob(id, { operatorId });
+    res.status(200).json({
+      status: 'success',
+      message: 'Fulfillment job retried successfully',
+      data: { job }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const cancelAndRefundDeadLetter = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const operatorId = req.user?.id || 'admin';
+    const result = await FulfillmentQueueService.cancelAndRefundDeadLetter(id, {
+      reason,
+      operatorId
+    });
+    res.status(200).json({
+      status: 'success',
+      message: 'Dead-letter order cancelled and refunded successfully',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   adminLogin,
   getPaymentProviderBalances,
@@ -709,5 +759,8 @@ export {
   listFlaggedCreatorEarnings,
   resolveFlaggedCreatorEarning,
   getMe,
-  broadcastAppUpdate
+  broadcastAppUpdate,
+  getDeadLetterJobs,
+  retryFulfillmentJob,
+  cancelAndRefundDeadLetter
 };

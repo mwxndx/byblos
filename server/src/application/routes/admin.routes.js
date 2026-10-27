@@ -86,6 +86,12 @@ router.post('/logistics/requests/:requestId/disputes/resolve', validate(V.resolv
 // Exceptional Order Reversal (Admin safety valve)
 router.post('/orders/:id/exceptional-reversal', validate(V.exceptionalOrderReversal), adminController.exceptionalOrderReversal);
 
+
+// Dead-letter fulfillment management
+router.get('/fulfillment/dead-letters', adminController.getDeadLetterJobs);
+router.post('/fulfillment/jobs/:id/retry', validate(V.retryFulfillmentJob), adminController.retryFulfillmentJob);
+router.post('/fulfillment/orders/:id/cancel-refund', validate(V.cancelAndRefundDeadLetter), adminController.cancelAndRefundDeadLetter);
+
 // Android release broadcast notification
 router.post('/broadcast-app-update', adminController.broadcastAppUpdate);
 router.post('/broadcast-update', adminController.broadcastAppUpdate);
