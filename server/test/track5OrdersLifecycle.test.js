@@ -57,6 +57,9 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
     if (testOrderIds.length > 0) {
       await pool.query('DELETE FROM order_items WHERE order_id = ANY($1)', [testOrderIds]);
       await pool.query('DELETE FROM payouts WHERE order_id = ANY($1)', [testOrderIds]);
+      // refund_requests references buyers with ON DELETE RESTRICT
+      await pool.query('DELETE FROM refund_requests WHERE order_id = ANY($1)', [testOrderIds]);
+      await pool.query('DELETE FROM refund_requests WHERE buyer_id = $1', [testBuyerId]);
       await pool.query('DELETE FROM product_orders WHERE id = ANY($1)', [testOrderIds]);
     }
     if (testProductId) {
@@ -66,6 +69,7 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
       await pool.query('DELETE FROM sellers WHERE id = $1', [testSellerId]);
     }
     if (testBuyerId) {
+      await pool.query('DELETE FROM refund_requests WHERE buyer_id = $1', [testBuyerId]);
       await pool.query('DELETE FROM buyers WHERE id = $1', [testBuyerId]);
     }
     if (testUserId) {
@@ -86,7 +90,7 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
 
     // Test safeJson functionality
     assert.deepEqual(safeJson(null), {});
-    assert.deepEqual(safeJson('{"test": true}'), { test: true });
+    assert.deepEqual(safeJson('{\"test\": true}'), { test: true });
     assert.deepEqual(safeJson('malformed'), {});
   });
 
@@ -96,17 +100,12 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
       await client.query('BEGIN');
       const token = `tok-${crypto.randomUUID()}`;
       const orderRes = await client.query(
-        `INSERT INTO product_orders (
-          buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,
-          status, payment_status, order_type, client_checkout_token
-        ) VALUES ($1, $2, 1000, 50, 950, 'RESERVED', 'pending', 'PHYSICAL', $3)
-        RETURNING id`,
+        `INSERT INTO product_orders (\n          buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,\n          status, payment_status, order_type, client_checkout_token\n        ) VALUES ($1, $2, 1000, 50, 950, 'RESERVED', 'pending', 'PHYSICAL', $3)\n        RETURNING id`,
         [testBuyerId, testSellerId, token]
       );
       const orderId = orderRes.rows[0].id;
       testOrderIds.push(orderId);
 
-      // Call releaseOrderReservations
       const res = await releaseOrderReservations(client, orderId);
       assert.ok(res);
       assert.equal(typeof res.releasedInventory, 'number');
@@ -119,18 +118,12 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
   });
 
   test('Action 5.2: OrderStatusGuard validates PAID -> CANCELLED, DELIVERY_PENDING -> CANCELLED, and DELIVERY_COMPLETE', () => {
-    // 1. PAID -> CANCELLED allowed
     assert.equal(assertValidTransition(OrderStatus.PAID, OrderStatus.CANCELLED, 'test-order-1'), true);
-
-    // 2. DELIVERY_PENDING -> CANCELLED allowed (for deadline timeouts)
     assert.equal(assertValidTransition(OrderStatus.DELIVERY_PENDING, OrderStatus.CANCELLED, 'test-order-2'), true);
-
-    // 3. DELIVERY_COMPLETE transitions
     assert.equal(assertValidTransition(OrderStatus.DELIVERY_COMPLETE, OrderStatus.COMPLETED, 'test-order-3'), true);
     assert.equal(assertValidTransition(OrderStatus.DELIVERY_COMPLETE, OrderStatus.CANCELLED, 'test-order-4'), true);
     assert.equal(assertValidTransition(OrderStatus.DELIVERY_COMPLETE, OrderStatus.REFUND_PENDING, 'test-order-5'), true);
 
-    // 4. Illegal jumps are strictly blocked
     assert.throws(
       () => assertValidTransition(OrderStatus.COMPLETED, OrderStatus.CANCELLED, 'test-order-6'),
       /Illegal state transition/i
@@ -146,25 +139,18 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
   });
 
   test('Action 5.3: OrderCancellationService strictly validates state transitions and blocks terminal orders', async () => {
-    // 1. Create a PAID order
     const token = `tok-${crypto.randomUUID()}`;
     const orderRes = await pool.query(
-      `INSERT INTO product_orders (
-        buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,
-        status, payment_status, order_type, client_checkout_token
-      ) VALUES ($1, $2, 1000, 50, 950, 'PAID', 'completed', 'PHYSICAL', $3)
-      RETURNING id`,
+      `INSERT INTO product_orders (\n        buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,\n        status, payment_status, order_type, client_checkout_token\n      ) VALUES ($1, $2, 1000, 50, 950, 'PAID', 'completed', 'PHYSICAL', $3)\n      RETURNING id`,
       [testBuyerId, testSellerId, token]
     );
     const orderId = orderRes.rows[0].id;
     testOrderIds.push(orderId);
 
-    // Cancellation should succeed
     const cancelled = await OrderCancellationService.cancelOrder(orderId, 'Buyer changed mind');
     assert.ok(cancelled);
     assert.equal(cancelled.status, OrderStatus.CANCELLED);
 
-    // Re-cancelling must be rejected
     await assert.rejects(
       async () => OrderCancellationService.cancelOrder(orderId, 'Duplicate cancel'),
       /already cancelled/i
@@ -172,37 +158,26 @@ describe('Track 5: Orders, Checkout & Fulfillment Lifecycle Domain Hardening', (
   });
 
   test('Action 5.4: orderDeadlineService reverses escrow settlement on auto-cancellation', async () => {
-    // Create an unfulfilled delivery order that reached deadline
-    const pastDeadline = new Date(Date.now() - 3600 * 1000); // 1 hour ago
+    const pastDeadline = new Date(Date.now() - 3600 * 1000);
     const token = `tok-${crypto.randomUUID()}`;
     const orderRes = await pool.query(
-      `INSERT INTO product_orders (
-        buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,
-        status, payment_status, order_type, seller_dropoff_deadline, client_checkout_token
-      ) VALUES ($1, $2, 1200, 60, 1140, 'DELIVERY_PENDING', 'completed', 'PHYSICAL', $3, $4)
-      RETURNING id`,
+      `INSERT INTO product_orders (\n        buyer_id, seller_id, total_amount, platform_fee_amount, seller_payout_amount,\n        status, payment_status, order_type, seller_dropoff_deadline, client_checkout_token\n      ) VALUES ($1, $2, 1200, 60, 1140, 'DELIVERY_PENDING', 'completed', 'PHYSICAL', $3, $4)\n      RETURNING id`,
       [testBuyerId, testSellerId, pastDeadline, token]
     );
     const orderId = orderRes.rows[0].id;
     testOrderIds.push(orderId);
 
-    // Create an escrow settlement row in payouts
     await pool.query(
-      `INSERT INTO payouts (
-        order_id, seller_id, amount, platform_fee, status, settlement_status
-      ) VALUES ($1, $2, 1140, 60, 'pending', 'pending_settlement')`,
+      `INSERT INTO payouts (\n        order_id, seller_id, amount, platform_fee, status, settlement_status\n      ) VALUES ($1, $2, 1140, 60, 'pending', 'pending_settlement')`,
       [orderId, testSellerId]
     );
 
-    // Execute cancelOrderAndRefund
     const dummyOrder = { id: orderId, order_number: `ORD-${orderId}`, total_amount: 1200, buyer_id: testBuyerId };
     await orderDeadlineService.cancelOrderAndRefund(dummyOrder, 'Seller dropoff deadline expired');
 
-    // Verify order was marked CANCELLED
     const { rows: oRows } = await pool.query('SELECT status, payment_status FROM product_orders WHERE id = $1', [orderId]);
     assert.equal(oRows[0].status, OrderStatus.CANCELLED);
 
-    // Verify escrow settlement in payouts was reversed!
     const { rows: pRows } = await pool.query('SELECT settlement_status FROM payouts WHERE order_id = $1', [orderId]);
     assert.equal(pRows[0].settlement_status, 'refunded_before_settlement');
   });
