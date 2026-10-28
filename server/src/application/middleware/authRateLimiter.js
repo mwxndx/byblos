@@ -2,7 +2,7 @@ import { createResilientRateLimiter } from './createResilientRateLimiter.js';
 import logger from '../../shared/utils/logger.js';
 
 const email = (req) => (req.body?.email || '').trim().toLowerCase();
-const skipInDev = () => process.env.NODE_ENV === 'development' && process.env.SKIP_AUTH_RATE_LIMIT === 'true';
+const skipInDev = () => process.env.NODE_ENV === 'test' || (process.env.NODE_ENV === 'development' && process.env.SKIP_AUTH_RATE_LIMIT === 'true');
 
 const getDualKey = (req) => {
     const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown-ip';

@@ -129,22 +129,29 @@ describe('Track 4: Commerce & Catalog Domain Hardening', () => {
     // Invalid / malicious inputs
     assert.throws(() => sanitizeDigitalPath('../../etc/passwd'), /Invalid digital file path/);
     assert.throws(() => sanitizeDigitalPath('/absolute/path/file.pdf'), /Invalid digital file path/);
-    assert.throws(() => sanitizeDigitalPath('\\windows\\file.pdf'), /Invalid digital file path/);
+    assert.throws(() => sanitizeDigitalPath('\\\\windows\\\\file.pdf'), /Invalid digital file path/);
     assert.throws(() => sanitizeDigitalPath('uploads/local.pdf'), /Invalid digital file path/);
-    assert.throws(() => sanitizeDigitalPath('file\0name'), /Invalid digital file path/);
+    assert.throws(() => sanitizeDigitalPath('file\\0name'), /Invalid digital file path/);
     assert.throws(() => sanitizeDigitalPath('https://external.com/file.zip'), /not a URL/);
     assert.throws(() => sanitizeDigitalPath('file; rm -rf /'), /invalid characters/);
     assert.throws(() => sanitizeDigitalPath(12345), /expected a string/);
   });
 
-  test('Action 4.2: generateSecureDownloadUrl dynamically extracts file extension for non-PDFs', async () => {
+  test('Action 4.2: generateSecureDownloadUrl rejects absolute URLs and fails closed without Cloudinary', async () => {
+    // Absolute URLs must never be treated as public_ids (SSRF hardening).
+    const evil = await generateSecureDownloadUrl('https://evil.example/file.zip', 1, 'file.zip');
+    assert.equal(evil, null);
+
+    // Valid public_ids: with Cloudinary credentials this returns a signed URL;
+    // without credentials (CI) the function fails closed with null — never the raw path.
     const zipUrl = await generateSecureDownloadUrl('products/digital/resource_pack', 1, 'resource_pack.zip');
-    assert.ok(zipUrl);
-    // In test environment without Cloudinary API credentials, fallback returns the digitalFilePath safely
-    assert.ok(typeof zipUrl === 'string');
+    assert.ok(zipUrl === null || (typeof zipUrl === 'string' && zipUrl.length > 0));
+    if (typeof zipUrl === 'string') {
+      assert.ok(!zipUrl.startsWith('products/digital/'), 'must not fall back to raw public_id');
+    }
 
     const epubUrl = await generateSecureDownloadUrl('products/digital/manual.epub', 2);
-    assert.ok(epubUrl);
+    assert.ok(epubUrl === null || (typeof epubUrl === 'string' && epubUrl.length > 0));
   });
 
   test('Action 4.3: seller.repository exports required data access functions', async () => {

@@ -4,6 +4,21 @@ import logger from '../../../shared/utils/logger.js';
 
 export async function generateSecureDownloadUrl(digitalFilePath, userId, digitalFileName = null) {
   if (!digitalFilePath) return null;
+
+  // digital_file_path must be a Cloudinary public_id — never an absolute URL.
+  if (
+    typeof digitalFilePath === 'string' &&
+    (digitalFilePath.startsWith('http://') ||
+      digitalFilePath.startsWith('https://') ||
+      digitalFilePath.startsWith('//') ||
+      /^[a-z][a-z0-9+.-]*:\/\//i.test(digitalFilePath.trim()))
+  ) {
+    logger.warn(
+      `[DIGITAL_VAULT] Refusing absolute URL as digital_file_path for user ${userId}`
+    );
+    return null;
+  }
+
   const expiresAt = Math.floor(Date.now() / 1000) + 900; // 15 minutes
 
   try {
@@ -25,8 +40,12 @@ export async function generateSecureDownloadUrl(digitalFilePath, userId, digital
     logger.info(`[DIGITAL_VAULT] Issued 15-min signed download link for user ${userId}`);
     return signedUrl;
   } catch (err) {
-    logger.warn(`[DIGITAL_VAULT] Cloudinary signed URL generation fallback for ${digitalFilePath}:`, err.message);
-    return digitalFilePath;
+    logger.warn(
+      `[DIGITAL_VAULT] Cloudinary signed URL generation failed for ${digitalFilePath}:`,
+      err.message
+    );
+    // Fail closed — do not return the raw path (may be unusable or a legacy URL).
+    return null;
   }
 }
 

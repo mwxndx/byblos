@@ -364,10 +364,9 @@ describe('AuthService.login — admin/marketing self-bootstrap from env credenti
     try {
       const result = await AuthService.login(email, PASSWORD, 'marketing');
       assert.ok(result, 'expected a successful login result');
-      // seed-marketing-admin.js also writes role='admin' -- the marketing
-      // grant comes from AuthService's existing admin<->marketing cross-role
-      // case, not from this column, so the bootstrapped row must match that.
-      assert.equal(result.crossRole, true);
+      // Bootstrap creates role='marketing' directly (not admin+crossRole).
+      assert.equal(result.user.role, 'marketing');
+      assert.equal(result.user.email, email);
       createdUserIds.push(result.user.id);
     } finally {
       restoreEnv();

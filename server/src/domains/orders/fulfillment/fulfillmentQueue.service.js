@@ -226,7 +226,9 @@ class FulfillmentQueueService {
         try {
             await client.query('BEGIN');
             const { rows: jobs } = await client.query(
-                'SELECT * FROM fulfillment_jobs WHERE id = $1 FOR UPDATE',
+                `SELECT id, order_id, attempts, max_attempts, status, error_message,
+                        last_attempt_at, created_at, updated_at
+                 FROM fulfillment_jobs WHERE id = $1 FOR UPDATE`,
                 [jobId]
             );
             if (jobs.length === 0) {

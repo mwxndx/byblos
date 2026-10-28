@@ -44,7 +44,8 @@ test('Commerce Domain SQL Column Pruning Contract', async (t) => {
         assert.ok(content.includes('track_inventory'), 'Expected track_inventory in product.model.js projection');
         assert.ok(content.includes('quantity'), 'Expected quantity in product.model.js projection');
         assert.ok(content.includes('service_options'), 'Expected service_options in product.model.js projection');
-        assert.ok(!content.includes('category,'), 'Expected no category column in product.model.js projection');
+        // digital_category is intentional; reject a bare "category" column only.
+        assert.ok(!/(?<![a-z_])category\s*,/i.test(content), 'Expected no bare category column in product.model.js projection');
     });
 
     await t.test('buyer.service.js queries retain authentication properties', () => {
