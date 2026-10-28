@@ -7,38 +7,66 @@ import CacheService from './cache.service.js';
 const _refreshGraceMemory = new Map();
 const REFRESH_GRACE_WINDOW_SECONDS = 30;
 
-const getRefreshSecrets = () => {
-  const secrets = [process.env.JWT_REFRESH_SECRET, process.env.JWT_SECRET].filter(Boolean);
-  if (secrets.length === 0) {
-    throw new Error('JWT_REFRESH_SECRET or JWT_SECRET must be configured');
+// Periodic cleanup of expired entries in memory map
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, val] of _refreshGraceMemory.entries()) {
+    if (val.expiresAt < now) _refreshGraceMemory.delete(key);
   }
-  return secrets;
-};
+}, 60 * 1000).unref();
 
-export const generateRefreshToken = (userId, role) => {
+/**
+ * Generate a refresh token (longer-lived, uses JWT_REFRESH_SECRET)
+ * Includes unique jti (RFC 7519) to ensure token uniqueness even within the same second.
+ * @param {string|number} id - User ID
+ * @param {string} role - User role
+ * @returns {string} Refresh token
+ */
+export const generateRefreshToken = (id, role = 'buyer') => {
   const secret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
-  if (!secret) throw new Error('JWT_REFRESH_SECRET or JWT_SECRET must be configured');
+  if (!secret) {
+    throw new Error('JWT_REFRESH_SECRET (or JWT_SECRET fallback) is not defined');
+  }
+
   return jwt.sign(
-    { id: userId, role, type: 'refresh' },
+    { id, role, type: 'refresh', jti: crypto.randomUUID() },
     secret,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '90d' }
+    { algorithm: 'HS256', expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '90d' }
   );
 };
 
+/**
+ * Verify a refresh token with zero-downtime secret rotation support
+ * @param {string} token - Refresh token
+ * @returns {Object} Decoded token
+ */
 export const verifyRefreshToken = (token) => {
-  const secrets = getRefreshSecrets();
-  let lastError;
-  for (const s of secrets) {
+  const secret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_REFRESH_SECRET (or JWT_SECRET fallback) is not defined');
+  }
+
+  const previousSecrets = (process.env.JWT_REFRESH_PREVIOUS_SECRETS || process.env.JWT_PREVIOUS_SECRETS || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const secretsToTry = [secret, ...previousSecrets];
+  let lastError = null;
+
+  for (const s of secretsToTry) {
     try {
       const decoded = jwt.verify(token, s);
+
       if (decoded.type !== 'refresh') {
-        throw new Error('Invalid refresh token type');
+        throw new Error('Invalid token type');
       }
+
       return decoded;
     } catch (error) {
       lastError = error;
       if (error.name === 'TokenExpiredError') {
-        continue;
+        throw new Error('Refresh token has expired. Please log in again.');
       }
       if (error.name === 'JsonWebTokenError') {
         continue;
@@ -64,12 +92,13 @@ export const refreshAccessToken = async (refreshToken) => {
   const tokenHash = crypto.createHash('sha256').update(String(refreshToken)).digest('hex');
   const graceKey = `refresh_grace:${tokenHash}`;
 
-  // 1) RFC 6819 Grace Period FIRST: concurrent clients may still present the
-  // pre-rotation token within the window. Rotation blacklists the old token, so
-  // blacklist must not run before grace replay. Logout still wins: it blacklists
-  // without writing a grace entry, so those tokens fall through and are rejected.
+  // 1) RFC 6819 Grace Period FIRST. Rotation blacklists the old token, so concurrent
+  // clients presenting it within the window must hit grace before the blacklist.
+  // Prefer in-memory grace (same-process concurrent refresh) over CacheService, which
+  // can return a truthy empty value and skip the memory fallback.
+  // Logout still wins: it blacklists without writing a grace entry.
   try {
-    const cachedGrace = (await CacheService.get(graceKey)) || _refreshGraceMemory.get(graceKey);
+    const cachedGrace = _refreshGraceMemory.get(graceKey) || (await CacheService.get(graceKey));
     if (cachedGrace && cachedGrace.data) {
       const isRevoked = await tokenBlacklist.isBlacklisted(cachedGrace.data.refreshToken);
       if (isRevoked) {
@@ -187,14 +216,16 @@ export const refreshAccessToken = async (refreshToken) => {
   // Blacklist the consumed refresh token (token rotation: old token is invalidated)
   await tokenBlacklist.addToken(refreshToken, decoded.exp);
 
-  const accessSecret = process.env.JWT_SECRET;
-  if (!accessSecret) throw new Error('JWT_SECRET must be configured');
+  // Access token always uses JWT_SECRET — separate from refresh secret
   const accessToken = jwt.sign(
     { id: decoded.id, role: decoded.role, email: user.email },
-    accessSecret,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+    process.env.JWT_SECRET,
+    { algorithm: 'HS256', expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
   );
 
+  // Rolling refresh: mint a brand-new refresh token on every refresh so a user
+  // who keeps opening the app never has to log in again — the window slides
+  // forward each time instead of expiring a fixed period after first login.
   const newRefreshToken = generateRefreshToken(decoded.id, decoded.role);
 
   const result = {
@@ -203,29 +234,18 @@ export const refreshAccessToken = async (refreshToken) => {
     user: {
       id: decoded.id,
       role: decoded.role,
-      email: user.email,
-    },
+      email: user.email
+    }
   };
 
   // Cache in RFC 6819 grace period cache (30 seconds)
   try {
     await CacheService.set(graceKey, { data: result }, REFRESH_GRACE_WINDOW_SECONDS);
-  } catch (_) { /* ignore cache write failures */ }
+  } catch {}
   _refreshGraceMemory.set(graceKey, {
     data: result,
-    expiresAt: Date.now() + REFRESH_GRACE_WINDOW_SECONDS * 1000,
+    expiresAt: Date.now() + REFRESH_GRACE_WINDOW_SECONDS * 1000
   });
 
-  // Opportunistic cleanup of expired in-memory grace entries
-  for (const [k, v] of _refreshGraceMemory.entries()) {
-    if (v.expiresAt && v.expiresAt < Date.now()) _refreshGraceMemory.delete(k);
-  }
-
   return result;
-};
-
-export default {
-  generateRefreshToken,
-  verifyRefreshToken,
-  refreshAccessToken,
 };
