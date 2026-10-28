@@ -1,12 +1,13 @@
 /**
  * SSRF guard for digital-product downloads.
  *
- * `digital_file_path` is seller-controlled and is meant to hold a Cloudinary
- * public_id, but legacy rows (and getDigitalAssetUrls' http(s) passthrough) can
- * yield a full URL. The download endpoint fetches that URL server-side and
- * follows redirects, so every URL it is about to fetch — the candidate and any
- * redirect Location — must be restricted to Cloudinary. Anything else (internal
- * hosts, cloud metadata, localhost) is refused.
+ * `digital_file_path` is seller-controlled and must hold a Cloudinary public_id.
+ * Write-path sanitization rejects absolute URLs, and getDigitalAssetUrls fails
+ * closed (returns no candidates) if one is still present. The download endpoint
+ * still fetches candidate URLs server-side and may follow redirects, so every
+ * URL about to be fetched — the candidate and any redirect Location — is
+ * restricted to Cloudinary. Anything else (internal hosts, cloud metadata,
+ * localhost) is refused.
  */
 export function isCloudinaryAssetUrl(candidate) {
   try {
