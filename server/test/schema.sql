@@ -112,6 +112,7 @@ CREATE TYPE public.order_status AS ENUM (
 -- Name: order_type; Type: TYPE; Schema: public; Owner: -
 --
 
+
 CREATE TYPE public.order_type AS ENUM (
     'PHYSICAL',
     'SERVICE',
@@ -6132,6 +6133,9 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (110, '20260926130000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (111, '20261010120000_drop_redundant_checkout_token_index', '2026-10-10 12:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (112, '20261023130000_make_buyers_mobile_payment_nullable', '2026-10-23 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (113, '20261024022500_add_digital_category_to_products', '2026-10-24 02:25:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (114, '20261024131500_default_and_backfill_buyers_city', '2026-10-24 13:15:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (115, '20261025233000_sync_deleted_buyer_status', '2026-10-25 23:30:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (116, '20261027200000_make_refund_requests_buyer_id_nullable', '2026-10-27 20:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
