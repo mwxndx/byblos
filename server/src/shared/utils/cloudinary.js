@@ -58,9 +58,28 @@ export const deleteFromCloudinary = async (publicId, resourceType = 'image') => 
 };
 
 /**
+ * True when value looks like an absolute URL (scheme or protocol-relative).
+ * digital_file_path must be a Cloudinary public_id only — never a fetchable URL.
+ */
+const looksLikeAbsoluteUrl = (value) => {
+  if (typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  return (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('//') ||
+    /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)
+  );
+};
+
+/**
  * Generate candidate download URLs for a Cloudinary asset.
  * Tries the direct secure CDN upload URL (where uploadToCloudinary saves raw assets),
  * followed by image and authenticated URL variants.
+ *
+ * Full http(s) values are rejected (not passed through). Write-path sanitization
+ * already blocks storing URLs; this fails closed for any legacy/out-of-band rows
+ * so they never become server-side fetch candidates (SSRF defense-in-depth).
  *
  * @param {string} publicId - The Cloudinary public_id of the asset.
  * @param {number} [expiresInSeconds=300] - URL validity window in seconds.
@@ -68,8 +87,11 @@ export const deleteFromCloudinary = async (publicId, resourceType = 'image') => 
  */
 export const getDigitalAssetUrls = (publicId, expiresInSeconds = 300) => {
   if (!publicId) return [];
-  if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
-    return [publicId];
+  if (looksLikeAbsoluteUrl(publicId)) {
+    console.warn(
+      '[CLOUDINARY] Refusing absolute URL as digital asset public_id; expected Cloudinary public_id only'
+    );
+    return [];
   }
 
   const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
@@ -87,8 +109,11 @@ export const getDigitalAssetUrls = (publicId, expiresInSeconds = 300) => {
 
 export const generateSignedDownloadUrl = (publicId, expiresInSeconds = 300, resourceType = 'raw') => {
   if (!publicId) return '';
-  if (publicId.startsWith('http://') || publicId.startsWith('https://')) {
-    return publicId;
+  if (looksLikeAbsoluteUrl(publicId)) {
+    console.warn(
+      '[CLOUDINARY] Refusing absolute URL in generateSignedDownloadUrl; expected Cloudinary public_id only'
+    );
+    return '';
   }
   return cloudinary.url(publicId, {
     resource_type: resourceType,
