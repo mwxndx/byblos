@@ -91,7 +91,8 @@ class OrderDeadlineService {
                     );
                     processedCount++;
                 } catch (orderErr) {
-                    logger.error(`Error auto-cancelling order ${order.order_number || order.id} on expired seller deadline:`, orderErr.message);
+                    const message = orderErr instanceof Error ? orderErr.message : String(orderErr);
+                    logger.error(`Error auto-cancelling order ${order.order_number || order.id} on expired seller deadline:`, message);
                 }
             }
 
@@ -135,7 +136,8 @@ class OrderDeadlineService {
                     );
                     processedCount++;
                 } catch (orderErr) {
-                    logger.error(`Error auto-cancelling order ${order.order_number || order.id} on expired buyer deadline:`, orderErr.message);
+                    const message = orderErr instanceof Error ? orderErr.message : String(orderErr);
+                    logger.error(`Error auto-cancelling order ${order.order_number || order.id} on expired buyer deadline:`, message);
                 }
             }
 
@@ -207,7 +209,8 @@ class OrderDeadlineService {
                     const completed = await OrderService.autoCompleteAfterHandoffTimeout(order.id, 'buyer_confirmation_timeout_48h');
                     if (completed) processedCount++;
                 } catch (orderErr) {
-                    logger.error(`Error auto-completing order ${order.order_number || order.id} after handoff timeout:`, orderErr.message);
+                    const message = orderErr instanceof Error ? orderErr.message : String(orderErr);
+                    logger.error(`Error auto-completing order ${order.order_number || order.id} after handoff timeout:`, message);
                 }
             }
             return { processedCount, orders: rows.map((o) => o.order_number) };
