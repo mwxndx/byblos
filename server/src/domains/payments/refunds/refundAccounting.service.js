@@ -101,7 +101,9 @@ export async function getCapturedPaymentAmount(client, orderId, orderRow = null)
  *   pendingRefunds: number,
  *   totalAllocated: number,
  *   availableBalance: number,
- *   isLegacyCredited: boolean
+ *   remainingBalanceBeforePending: number,
+ *   isLegacyCredited: boolean,
+ *   isFullyRefunded: boolean
  * }>}
  */
 export async function getOrderRefundAccounting(client, orderId, { excludeRequestId = null } = {}) {
