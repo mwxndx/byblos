@@ -818,7 +818,8 @@ class OrderDeadlineService {
      *   buyerDeadlines: {processedCount: number, orders: any[]},
      *   customProductionReminders: {processedCount: number, orders: any[]},
      *   customProductionDeadlines: {processedCount: number, orders: any[]},
-     *   servicePayments: {processedCount: number, orders: any[]}
+     *   servicePayments: {processedCount: number, orders: any[]},
+     *   handoffConfirmations: {processedCount: number, orders: any[]}
      * }>}
      */
     async runAllChecks() {
@@ -830,7 +831,8 @@ class OrderDeadlineService {
          *  buyerDeadlines: {processedCount: number, orders: any[]},
          *  customProductionReminders: {processedCount: number, orders: any[]},
          *  customProductionDeadlines: {processedCount: number, orders: any[]},
-         *  servicePayments: {processedCount: number, orders: any[]}
+         *  servicePayments: {processedCount: number, orders: any[]},
+         *  handoffConfirmations: {processedCount: number, orders: any[]}
          * }} */
         const results = {
             reservations: { processedCount: 0, orders: [] },
