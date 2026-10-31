@@ -61,6 +61,7 @@ const LandingHome = () => (
 
       {/* Right side on desktop (centered on mobile): Byblos logo and three buttons */}
       <main className="my-auto flex w-full lg:w-1/2 flex-col items-center justify-center text-center p-4 lg:p-8">
+        <h1 className="sr-only">Byblos - The safer way to buy from businesses on social media</h1>
         <div className="flex w-full max-w-xs flex-col items-center text-center">
           {/* Logo increased by 30% (144px * 1.30 = 187px) */}
           <div className="mb-8 flex items-center justify-center">

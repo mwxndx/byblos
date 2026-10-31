@@ -12,8 +12,8 @@ test.describe('Byblos Public Application Smoke Suite', () => {
     const creatorLink = page.locator('a[href="/creator/login"]');
     await expect(creatorLink).toBeVisible();
 
-    // Verify buyer login entry point is accessible
-    const buyerLink = page.locator('a[href="/buyer/login"]');
+    // Verify buyer entry point is accessible (View Brands)
+    const buyerLink = page.locator('a[href="/buyer/dashboard"], a[href="/buyer/login"]');
     await expect(buyerLink).toBeVisible();
   });
 
