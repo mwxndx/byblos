@@ -124,7 +124,7 @@ class OrderCancellationService {
           const updatedMetadata = {
             ...orderMeta,
             refund_summary: refundSummary,
-            refund_credited: buyerRefunded ? true : false
+            refund_credited: Boolean(buyerRefunded)
           };
 
           if (!buyerRefunded) {

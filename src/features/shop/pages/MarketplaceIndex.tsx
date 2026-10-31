@@ -11,7 +11,7 @@ export const isPwaStandalone = (): boolean => {
   if (typeof window === 'undefined') return false;
   return Boolean(
     (window.navigator as unknown as { standalone?: boolean })?.standalone ||
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+    window.matchMedia?.('(display-mode: standalone)').matches
   );
 };
 

@@ -6,7 +6,7 @@ import type { Theme } from '@/features/seller/api';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { ThemeSelector } from '../../ThemeSelector';
-import { getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
+
 import type { SellerSettingsFormData } from '../types';
 import { SectionHeader, SocialInput } from './settingsTab.parts';
 import { SettingsLocationSection } from './SettingsLocationSection';
@@ -64,8 +64,7 @@ export function SettingsTab({
 }: SettingsTabProps) {
   const [isEditingContacts, setIsEditingContacts] = useState(false);
   const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const previewShopUsername = getShopUsername(formData.shopName);
-  const previewShopUrl = getShopUrl(sellerProfile?.slug || formData.shopName);
+
   const { theme, setTheme } = useThemeScope('seller');
 
   const contactsHeaderAction = isEditingContacts ? (

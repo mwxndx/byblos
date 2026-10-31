@@ -31,7 +31,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies
+# Install production dependencies (Note: docker:S6505 lifecycle scripts permitted for native bcrypt build)
 RUN npm ci --omit=dev
 
 # Copy source code
@@ -51,7 +51,7 @@ RUN mkdir -p uploads && chmod +x docker-entrypoint.sh && chown -R node:node /app
 USER node
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=20s \
-    CMD wget -qO- http://localhost:${PORT:-3000}/api/health || exit 1
+    CMD wget -qO- "http://localhost:${PORT:-3000}/api/health" || exit 1
 
 # Run pending migrations, then exec into the server -- see docker-entrypoint.sh
 # for why this lives here (Render's actual production service runs on the

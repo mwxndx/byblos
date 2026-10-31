@@ -9,11 +9,11 @@
 
 import 'dotenv/config';
 import NotificationService from '../src/domains/communication/notifications/notification.service.js';
-import logger from '../src/shared/utils/logger.js';
+
 import { pool } from '../src/infrastructure/database/database.js';
 
 async function main() {
-    const minVersionCode = parseInt(process.argv[2] || process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
+    const minVersionCode = Number.parseInt(process.argv[2] || process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
     const title = process.argv[3] || '🚀 New Byblos Update Available';
     const body = process.argv[4] || "We've released important updates. Tap to download the latest version from Google Play.";
 
@@ -32,8 +32,17 @@ async function main() {
         console.error('[Broadcast] Failed to send update broadcast:', err);
         process.exitCode = 1;
     } finally {
-        await pool.end().catch(() => {});
+        try {
+            await pool.end();
+        } catch {
+            // Ignored on shutdown
+        }
     }
 }
 
-main();
+try {
+    await main();
+} catch (err) {
+    console.error('[Broadcast] Unhandled error:', err);
+    process.exit(1);
+}

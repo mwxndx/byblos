@@ -53,7 +53,7 @@ export function NotificationList({
   scrollClassName = 'max-h-[390px]',
   className,
   role,
-}: NotificationListProps) {
+}: Readonly<NotificationListProps>) {
   const { notifications, unreadCount, isLoading, markAllRead } = useNotifications(variant, true, role);
 
   return (

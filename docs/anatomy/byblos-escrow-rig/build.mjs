@@ -4,13 +4,8 @@ import { fileURLToPath } from "node:url";
 import * as k from "../../../.agents/skills/anatomy/kit/iso-kit.mjs";
 import { kitScript } from "../../../.agents/skills/anatomy/scripts/inline-kit.mjs";
 import {
-  DEPOSIT_TOTAL,
-  SHARES,
-  AMOUNTS,
   ESCROW_TRAVEL,
-  GATE_TRAVEL,
-  LEVER_ANGLE,
-  evaluateRig
+  GATE_TRAVEL
 } from "./model.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -165,7 +160,8 @@ function structure() {
 }
 
 // Helper for vertical graduation scale marks
-function verticalGraduation(cx, cy, z0, z1, step, every, lengths, projection) {
+function verticalGraduation(cx, cy, z0, z1, step, every, config) {
+  const { lengths = [1.4, 2.8], projection = P } = Array.isArray(config) ? { lengths: config, projection: arguments[7] } : config;
   const minor = [];
   const major = [];
   const count = Math.round((z1 - z0) / step);
@@ -195,7 +191,7 @@ function receivers() {
     // Top collar
     out.push(S(k.cylinder(x, y, r + 1.2, zBase + 2.5 + REC_H, 2.5, P, 32), { tone: "mid" }));
     // Vertical graduation ticks
-    const ticks = verticalGraduation(x + r, y, zBase + 4, zBase + REC_H, 3.5, 4, [1.4, 2.8], P);
+    const ticks = verticalGraduation(x + r, y, zBase + 4, zBase + REC_H, 3.5, 4, { lengths: [1.4, 2.8], projection: P });
     out.push(L(ticks.minor, { tone: "lo" }), L(ticks.major, { tone: "mid" }));
     // Label plate on cylinder face
     out.push(k.faceTextSvg(k.topMatrix([x, y + r + 3.5], zBase + 1, P, "x"), "SELLER 85%", { size: 2.2, tone: "hi", anchor: "middle" }));
@@ -209,7 +205,7 @@ function receivers() {
     out.push(S(k.cylinder(x, y, r + 1.8, zBase, 2.5, P, 30), { tone: "mid" }));
     out.push(S(k.cylinder(x, y, r, zBase + 2.5, REC_H, P, 32, 0.4), { tone: "hi", crease: "lo" }));
     out.push(S(k.cylinder(x, y, r + 1, zBase + 2.5 + REC_H, 2.5, P, 30), { tone: "mid" }));
-    const ticks = verticalGraduation(x + r, y, zBase + 4, zBase + REC_H, 4, 3, [1.2, 2.4], P);
+    const ticks = verticalGraduation(x + r, y, zBase + 4, zBase + REC_H, 4, 3, { lengths: [1.2, 2.4], projection: P });
     out.push(L(ticks.minor, { tone: "lo" }), L(ticks.major, { tone: "mid" }));
     // Drain valve petcock at base
     out.push(S(k.cylinder(x, y + r + 2, 1.8, zBase + 5, 4, P, 16), { tone: "lo" }));
@@ -224,7 +220,7 @@ function receivers() {
     out.push(S(k.cylinder(x, y, r + 1.5, zBase, 2.5, P, 24), { tone: "mid" }));
     out.push(S(k.cylinder(x, y, r, zBase + 2.5, REC_H, P, 28, 0.3), { tone: "hi", crease: "lo" }));
     out.push(S(k.cylinder(x, y, r + 0.8, zBase + 2.5 + REC_H, 2.5, P, 24), { tone: "mid" }));
-    const ticks = verticalGraduation(x + r, y, zBase + 4, zBase + REC_H, 4, 2, [1.0, 2.0], P);
+    const ticks = verticalGraduation(x + r, y, zBase + 4, zBase + REC_H, 4, 2, { lengths: [1.0, 2.0], projection: P });
     out.push(L(ticks.minor, { tone: "lo" }), L(ticks.major, { tone: "mid" }));
     out.push(k.faceTextSvg(k.topMatrix([x, y + r + 3.5], zBase + 1, P, "x"), "FEE 5%", { size: 2.0, tone: "lo", anchor: "middle" }));
   }
@@ -235,7 +231,7 @@ function receivers() {
 // 4. Distribution Manifold & Branch Conduits
 function manifold() {
   const out = [];
-  const [mx, my] = [0, -15];
+  const my = -15;
   const mz = 68;
 
   // Central 3-way splitter manifold block
@@ -287,7 +283,7 @@ function escrowStatic() {
   out.push(S(k.cylinder(x, y, ESCROW_R, ESCROW_Z0, ESCROW_H, P, 40, 0.4), { tone: "hi", crease: "lo" }));
 
   // Vertical graduation rule strip on cylinder side
-  const ticks = verticalGraduation(x + ESCROW_R, y, ESCROW_Z0 + 4, ESCROW_Z1 - 4, 4, 5, [1.5, 3.2], P);
+  const ticks = verticalGraduation(x + ESCROW_R, y, ESCROW_Z0 + 4, ESCROW_Z1 - 4, 4, 5, { lengths: [1.5, 3.2], projection: P });
   out.push(L(ticks.minor, { tone: "lo" }), L(ticks.major, { tone: "mid" }));
   out.push(k.faceTextSvg(k.topMatrix([x + ESCROW_R + 4, y + 2], ESCROW_Z1 - 6, P, "x"), "10,000 KES", { size: 2.2, tone: "lo", anchor: "start" }));
   out.push(k.faceTextSvg(k.topMatrix([x + ESCROW_R + 4, y + 2], ESCROW_Z0 + 6, P, "x"), "0 KES", { size: 2.2, tone: "lo", anchor: "start" }));
@@ -484,7 +480,6 @@ function draw() {
   needle.setAttribute("d", needleAt(s));
 
   // Numerical & Status updates
-  const escrowVal = Math.round(10000 * (1 - s));
   const sellerVal = Math.round(8500 * s);
   const courierVal = Math.round(1000 * s);
   const commVal = Math.round(500 * s);

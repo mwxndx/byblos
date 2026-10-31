@@ -1,5 +1,5 @@
 import logger from '../../shared/utils/logger.js';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 /**
  * Simple CSRF Alternative

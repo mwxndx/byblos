@@ -119,7 +119,7 @@ export const hasServiceCoordinates = (
   return (
     lat !== null && lng !== null &&
     Number.isFinite(lat) && Number.isFinite(lng) &&
-    !(lat === 0 && lng === 0)
+    (lat !== 0 || lng !== 0)
   );
 };
 
@@ -153,7 +153,7 @@ export const validateStep2 = (formData: AddProductFormData): FormErrors => {
   const errors: FormErrors = {};
   if (!formData.description.trim()) errors.description = 'Add a short description.';
 
-  const price = parseFloat(formData.price || '0');
+  const price = Number.parseFloat(formData.price || '0');
   if (!Number.isFinite(price) || price < MIN_PRICE) {
     errors.price = `Minimum price is KES ${MIN_PRICE}.`;
   }
@@ -210,7 +210,7 @@ export const buildProductData = (
   const isDigital = formData.product_type === 'digital';
   return {
     name: formData.name,
-    price: parseFloat(formData.price || '0'),
+    price: Number.parseFloat(formData.price || '0'),
     description: formData.description,
     image_url: formData.image_url,
     images,

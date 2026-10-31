@@ -348,4 +348,8 @@ async function main() {
   await pool.end();
 }
 
-main().catch(() => process.exit(1));
+try {
+  await main();
+} catch {
+  process.exit(1);
+}

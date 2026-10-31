@@ -1,6 +1,6 @@
 import FulfillmentQueueService from '../../orders/fulfillment/fulfillmentQueue.service.js';
 import NotificationService from '../../communication/notifications/notification.service.js';
-import { promisify } from 'util';
+
 import dotenv from 'dotenv';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import AdminService from './admin.service.js';
@@ -10,13 +10,13 @@ import * as buyerRepository from '../../commerce/buyers/buyer.repository.js';
 import * as adminProductRepository from '../../commerce/repositories/adminProduct.repository.js';
 import * as adminMetricsRepository from '../../growth/repositories/adminMetrics.repository.js';
 import * as withdrawalRequestRepository from '../../payments/withdrawals/withdrawalRequest.repository.js';
-import * as sellerRepository from '../../commerce/sellers/seller.repository.js';
+
 import payoutService from '../../payments/payouts/payout.service.js';
 import { PaymentService } from '../../payments/payments/payment.service.js';
 import logger from '../../../shared/utils/logger.js';
-import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
+import eventBus from '../../../application/events/eventBus.js';
 import LogisticsDashboardService from '../../logistics/logisticsDashboard.service.js';
-import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
+
 import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';
 import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import OrderService from '../../orders/order/OrderService.js';
@@ -39,7 +39,7 @@ const adminLogin = async (req, res, next) => {
 
     const authResult = await AuthService.login(email, password, 'admin');
 
-    if (!authResult || !authResult.user) {
+    if (!authResult?.user) {
       return next(new AppError('Invalid email or password', 401));
     }
 
@@ -453,7 +453,7 @@ const getAllWithdrawalRequests = async (req, res, next) => {
       pagination: buildPaginationMeta({ rows, page, limit, offset }),
       data: rows.map(r => ({
         id: r.id,
-        amount: parseFloat(r.amount),
+        amount: Number.parseFloat(r.amount),
         mpesaNumber: r.mpesa_number,
         mpesaName: r.mpesa_name,
         status: r.status,
@@ -462,7 +462,7 @@ const getAllWithdrawalRequests = async (req, res, next) => {
         entityName: r.entity_name,
         entityEmail: r.entity_email,
         entityPhone: r.entity_phone,
-        currentBalance: parseFloat(r.current_balance || 0),
+        currentBalance: Number.parseFloat(r.current_balance || 0),
         sellerId: r.seller_id,
         creatorId: r.creator_id,
         buyerId: r.buyer_id,

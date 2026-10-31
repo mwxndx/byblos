@@ -7,7 +7,7 @@ interface ShopLocationPickerProps {
     onLocationChange: (address: string, coordinates: LocationCoordinates | null) => void;
 }
 
-export default function ShopLocationPicker({ initialAddress = '', initialCoordinates = null, onLocationChange }: ShopLocationPickerProps) {
+export default function ShopLocationPicker({ initialAddress = '', initialCoordinates = null, onLocationChange }: Readonly<ShopLocationPickerProps>) {
     return (
         <LocationPicker
             initialAddress={initialAddress}

@@ -54,4 +54,9 @@ async function checkEvents() {
   }
 }
 
-checkEvents();
+try {
+  await checkEvents();
+} catch (err) {
+  console.error('Unhandled error in checkEvents:', err);
+  process.exit(1);
+}

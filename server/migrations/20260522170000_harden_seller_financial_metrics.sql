@@ -7,7 +7,8 @@ ALTER TABLE sellers
 UPDATE sellers
 SET balance = COALESCE(balance, 0),
     net_revenue = COALESCE(net_revenue, 0),
-    total_sales = COALESCE(total_sales, 0);
+    total_sales = COALESCE(total_sales, 0)
+WHERE TRUE;
 
 ALTER TABLE sellers
     ALTER COLUMN balance SET DEFAULT 0,

@@ -23,6 +23,7 @@ async function checkEnumValues() {
       );
       console.log('payment_method values:', paymentMethodResult.rows[0]?.values || 'Not found');
     } catch (e) {
+      // Ignored: payment_method enum may not exist in pristine database
       console.log('payment_method enum does not exist yet');
     }
     

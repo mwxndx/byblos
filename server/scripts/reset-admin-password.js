@@ -116,4 +116,7 @@ async function resetAdminPassword() {
     }
 }
 
-resetAdminPassword();
+resetAdminPassword().catch((err) => {
+    console.error('Unhandled error in resetAdminPassword:', err);
+    process.exit(1);
+});

@@ -81,15 +81,16 @@ class CacheService {
             do {
                 const [nextCursor, keys] = await this.redis.scan(cursor, 'MATCH', pattern, 'COUNT', 1000);
                 cursor = nextCursor;
-                if (keys && keys.length > 0) allKeys.push(...keys);
+                if (keys?.length > 0) allKeys.push(...keys);
             } while (cursor !== '0');
 
             if (allKeys.length > 0) {
-                // Delete in chunks of 500
+                // Delete chunks in parallel
+                const chunks = [];
                 for (let i = 0; i < allKeys.length; i += 500) {
-                    const chunk = allKeys.slice(i, i + 500);
-                    await this.redis.del(chunk);
+                    chunks.push(allKeys.slice(i, i + 500));
                 }
+                await Promise.all(chunks.map(chunk => this.redis.del(chunk)));
             }
             return true;
         } catch (error) {

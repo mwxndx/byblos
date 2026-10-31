@@ -18,7 +18,7 @@ interface MembershipGateProps {
   enabled: boolean;
 }
 
-export function MembershipGate({ enabled }: MembershipGateProps) {
+export function MembershipGate({ enabled }: Readonly<MembershipGateProps>) {
   const { data, isLoading } = useMembership(enabled);
   const joinMutation = useJoinMembership();
   const { toast } = useToast();

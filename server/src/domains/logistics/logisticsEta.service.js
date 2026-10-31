@@ -87,7 +87,7 @@ export class LogisticsEtaService {
     const lat = Number(latitude);
     const lng = Number(longitude);
     const safeAccuracy = accuracy !== null ? Number(accuracy) : null;
-    const safeSpeed = speed !== null ? Number(speed) : null;
+
     const clientTimestamp = Number(timestamp) || Date.now();
 
     // 1. Validate coordinates

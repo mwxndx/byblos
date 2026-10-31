@@ -14,12 +14,130 @@ export interface OrderInstructionResult {
     color: 'blue' | 'amber' | 'green' | 'red';
 }
 
+const STATUS_COLORS: Record<string, 'blue' | 'amber' | 'green' | 'red'> = {
+    PENDING: 'blue',
+    RESERVED: 'blue',
+    PAYMENT_PENDING: 'blue',
+    PAID: 'blue',
+    PROCESSING: 'blue',
+    AWAITING_SELLER_ACTION: 'amber',
+    FULFILLING: 'amber',
+    READY_FOR_BUYER: 'amber',
+    SERVICE_PENDING: 'amber',
+    DELIVERY_PENDING: 'amber',
+    COLLECTION_PENDING: 'amber',
+    DELIVERY_COMPLETE: 'amber',
+    COMPLETED: 'green',
+    CANCELLED: 'red',
+    FAILED: 'red',
+};
+
+function getBuyerInstructionText(
+    status: string,
+    flags: { isDigital: boolean; isCourier: boolean; isShopPickup: boolean; isService: boolean }
+): string | null {
+    const { isDigital, isCourier, isShopPickup, isService } = flags;
+    switch (status) {
+        case 'PENDING':
+            if (isDigital) return 'Your download will be available once payment confirms.';
+            if (isCourier) return 'Waiting for the seller to choose Mzigo Ego drop-off or pickup.';
+            if (isShopPickup) return 'Seller is preparing your item for shop pickup.';
+            return 'Waiting for seller to confirm your booking.';
+        case 'RESERVED':
+            return 'Slot reserved. Complete payment to confirm.';
+        case 'PAYMENT_PENDING':
+            return 'Waiting for payment confirmation.';
+        case 'PAID':
+            return 'Payment confirmed. Waiting for seller action.';
+        case 'AWAITING_SELLER_ACTION':
+            if (isService) return 'Waiting for seller to confirm your booking.';
+            if (isCourier) return 'Seller will choose Mzigo Ego drop-off or request Mzigo pickup.';
+            return 'Seller is preparing your order.';
+        case 'FULFILLING':
+            if (isService) return 'Booking confirmed. After the service is complete, mark it completed to release funds.';
+            if (isCourier) return 'Mzigo Ego is handling the package securely and checking it against the order.';
+            return 'Seller is preparing your pickup.';
+        case 'READY_FOR_BUYER':
+            if (isService) return 'Service delivered. Mark it completed to release funds.';
+            if (isShopPickup) return 'Ready! Visit the shop to collect your order, then confirm receipt.';
+            return `Ready at Mzigo Ego. Collect at ${COURIER_LOCATION}, then confirm receipt.`;
+        case 'PROCESSING':
+            return isService ? 'Seller is preparing for your appointment.' : 'Seller is packing your order.';
+        case 'SERVICE_PENDING':
+            return 'Booking confirmed. Be at your location at the scheduled time.';
+        case 'DELIVERY_PENDING':
+            return isCourier ? 'Mzigo Ego is handling your package securely and checking it before delivery.' : 'Your order is being delivered.';
+        case 'COLLECTION_PENDING':
+            return isShopPickup ? 'Ready! Visit the shop to collect your order.' : `Arrived at Mzigo Ego. Collect at ${COURIER_LOCATION}.`;
+        case 'DELIVERY_COMPLETE':
+            return `Your order is at Mzigo Ego. Collect at ${COURIER_LOCATION}.`;
+        case 'COMPLETED':
+            return 'Order complete. Thank you for shopping with Byblos!';
+        case 'CANCELLED':
+            return 'Order cancelled. Any refund has been added to your balance.';
+        case 'FAILED':
+            return 'Payment was not completed. No charges made.';
+        default:
+            return null;
+    }
+}
+
+function getSellerInstructionText(
+    status: string,
+    flags: { isCourier: boolean; isShopPickup: boolean; isService: boolean }
+): string | null {
+    const { isCourier, isShopPickup, isService } = flags;
+    switch (status) {
+        case 'PENDING':
+            if (isCourier) return 'Choose Mzigo Ego drop-off or request Mzigo pickup for this package.';
+            if (isShopPickup) return 'Prepare item for buyer collection.';
+            if (isService) return 'New booking! Confirm the appointment.';
+            return 'New order received.';
+        case 'RESERVED':
+        case 'PAYMENT_PENDING':
+            return 'Awaiting payment confirmation from buyer.';
+        case 'PAID':
+            return 'Payment confirmed. Choose the next action.';
+        case 'AWAITING_SELLER_ACTION':
+            if (isService) return 'Confirm this booking to proceed.';
+            if (isCourier) return 'Choose Mzigo Ego drop-off or request Mzigo pickup.';
+            return 'Prepare item for buyer collection.';
+        case 'FULFILLING':
+            if (isService) return 'Deliver the service as scheduled. The buyer will mark it completed to release funds.';
+            if (isCourier) return 'Complete your selected Mzigo handoff. Mzigo Ego will secure and check the package against the order.';
+            return 'Prepare item for buyer collection.';
+        case 'READY_FOR_BUYER':
+            if (isService) return 'Buyer has been asked to mark the service completed.';
+            return 'Buyer has been notified. Complete handover when they arrive.';
+        case 'PROCESSING':
+            return 'Update status when item is ready for delivery/collection.';
+        case 'SERVICE_PENDING':
+            return 'Confirm this booking in your dashboard to proceed.';
+        case 'DELIVERY_PENDING':
+            return isCourier ? 'Mzigo Ego has received the package and started logistics tracking.' : 'Order is being delivered to buyer.';
+        case 'COLLECTION_PENDING':
+            return isShopPickup ? 'Item is ready. Hand over to buyer when they arrive.' : 'Item is at Mzigo Ego. Buyer has been notified.';
+        case 'DELIVERY_COMPLETE':
+            return 'Waiting for buyer to collect from Mzigo Ego.';
+        case 'COMPLETED':
+            return 'Order complete and paid out.';
+        case 'CANCELLED':
+            return 'Order was cancelled.';
+        case 'FAILED':
+            return 'Payment failed.';
+        default:
+            return null;
+    }
+}
+
 export const getOrderInstruction = ({
     status,
     userRole,
     orderType = 'PHYSICAL',
     fulfillmentType,
 }: OrderInstructionConfig): OrderInstructionResult | null => {
+    const color = STATUS_COLORS[status];
+    if (!color) return null;
 
     const isPhysical = orderType === 'PHYSICAL';
     const isService = orderType === 'SERVICE';
@@ -27,44 +145,10 @@ export const getOrderInstruction = ({
     const isShopPickup = fulfillmentType === 'BUYER_TO_SELLER';
     const isCourier = isPhysical && !isShopPickup;
 
-    const instructions: Record<string, Record<string, OrderInstructionResult>> = {
-        buyer: {
-            PENDING: { text: isDigital ? 'Your download will be available once payment confirms.' : isCourier ? 'Waiting for the seller to choose Mzigo Ego drop-off or pickup.' : isShopPickup ? 'Seller is preparing your item for shop pickup.' : 'Waiting for seller to confirm your booking.', color: 'blue' },
-            RESERVED: { text: 'Slot reserved. Complete payment to confirm.', color: 'blue' },
-            PAYMENT_PENDING: { text: 'Waiting for payment confirmation.', color: 'blue' },
-            PAID: { text: 'Payment confirmed. Waiting for seller action.', color: 'blue' },
-            AWAITING_SELLER_ACTION: { text: isService ? 'Waiting for seller to confirm your booking.' : isCourier ? 'Seller will choose Mzigo Ego drop-off or request Mzigo pickup.' : 'Seller is preparing your order.', color: 'amber' },
-            FULFILLING: { text: isService ? 'Booking confirmed. After the service is complete, mark it completed to release funds.' : isCourier ? 'Mzigo Ego is handling the package securely and checking it against the order.' : 'Seller is preparing your pickup.', color: 'amber' },
-            READY_FOR_BUYER: { text: isService ? 'Service delivered. Mark it completed to release funds.' : isShopPickup ? 'Ready! Visit the shop to collect your order, then confirm receipt.' : `Ready at Mzigo Ego. Collect at ${COURIER_LOCATION}, then confirm receipt.`, color: 'amber' },
-            PROCESSING: { text: isService ? 'Seller is preparing for your appointment.' : 'Seller is packing your order.', color: 'blue' },
-            SERVICE_PENDING: { text: 'Booking confirmed. Be at your location at the scheduled time.', color: 'amber' },
-            DELIVERY_PENDING: { text: isCourier ? 'Mzigo Ego is handling your package securely and checking it before delivery.' : 'Your order is being delivered.', color: 'amber' },
-            COLLECTION_PENDING: { text: isShopPickup ? 'Ready! Visit the shop to collect your order.' : `Arrived at Mzigo Ego. Collect at ${COURIER_LOCATION}.`, color: 'amber' },
-            DELIVERY_COMPLETE: { text: `Your order is at Mzigo Ego. Collect at ${COURIER_LOCATION}.`, color: 'amber' },
-            COMPLETED: { text: 'Order complete. Thank you for shopping with Byblos!', color: 'green' },
-            CANCELLED: { text: 'Order cancelled. Any refund has been added to your balance.', color: 'red' },
-            FAILED: { text: 'Payment was not completed. No charges made.', color: 'red' },
-        },
-        seller: {
-            PENDING: { text: isCourier ? 'Choose Mzigo Ego drop-off or request Mzigo pickup for this package.' : isShopPickup ? 'Prepare item for buyer collection.' : isService ? 'New booking! Confirm the appointment.' : 'New order received.', color: 'blue' },
-            RESERVED: { text: 'Awaiting payment confirmation from buyer.', color: 'blue' },
-            PAYMENT_PENDING: { text: 'Awaiting payment confirmation from buyer.', color: 'blue' },
-            PAID: { text: 'Payment confirmed. Choose the next action.', color: 'blue' },
-            AWAITING_SELLER_ACTION: { text: isService ? 'Confirm this booking to proceed.' : isCourier ? 'Choose Mzigo Ego drop-off or request Mzigo pickup.' : 'Prepare item for buyer collection.', color: 'amber' },
-            FULFILLING: { text: isService ? 'Deliver the service as scheduled. The buyer will mark it completed to release funds.' : isCourier ? 'Complete your selected Mzigo handoff. Mzigo Ego will secure and check the package against the order.' : 'Prepare item for buyer collection.', color: 'amber' },
-            READY_FOR_BUYER: { text: isService ? 'Buyer has been asked to mark the service completed.' : 'Buyer has been notified. Complete handover when they arrive.', color: 'amber' },
-            PROCESSING: { text: 'Update status when item is ready for delivery/collection.', color: 'blue' },
-            SERVICE_PENDING: { text: 'Confirm this booking in your dashboard to proceed.', color: 'amber' },
-            DELIVERY_PENDING: { text: isCourier ? 'Mzigo Ego has received the package and started logistics tracking.' : 'Order is being delivered to buyer.', color: 'amber' },
-            COLLECTION_PENDING: { text: isShopPickup ? 'Item is ready. Hand over to buyer when they arrive.' : 'Item is at Mzigo Ego. Buyer has been notified.', color: 'amber' },
-            DELIVERY_COMPLETE: { text: 'Waiting for buyer to collect from Mzigo Ego.', color: 'amber' },
-            COMPLETED: { text: 'Order complete. Funds released to your wallet.', color: 'green' },
-            CANCELLED: { text: 'Order cancelled. Inventory has been restored.', color: 'red' },
-            FAILED: { text: 'Payment failed. No funds were collected.', color: 'red' },
-        },
-    };
+    const text = userRole === 'buyer'
+        ? getBuyerInstructionText(status, { isDigital, isCourier, isShopPickup, isService })
+        : getSellerInstructionText(status, { isCourier, isShopPickup, isService });
 
-    return instructions[userRole]?.[status] ?? null;
+    if (!text) return null;
+    return { text, color };
 };
-
-

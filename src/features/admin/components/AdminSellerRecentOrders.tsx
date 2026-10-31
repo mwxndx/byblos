@@ -7,7 +7,7 @@ interface AdminSellerRecentOrdersProps {
   recentOrders: SellerDetail['recentOrders'];
 }
 
-export function AdminSellerRecentOrders({ recentOrders }: AdminSellerRecentOrdersProps) {
+export function AdminSellerRecentOrders({ recentOrders }: Readonly<AdminSellerRecentOrdersProps>) {
   return (
                           <Card className="bg-white/[0.02] border border-separator rounded-card overflow-hidden shadow-2xl">
                             <div className="p-6 md:p-8 border-b border-separator flex justify-between items-center bg-white/[0.02]">

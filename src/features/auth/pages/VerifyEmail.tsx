@@ -72,7 +72,7 @@ const VerifyEmail = () => {
             }
         };
 
-        verify();
+        void verify().catch(() => {});
     }, [token, email, type]);
 
     const [resending, setResending] = useState(false);

@@ -1,5 +1,5 @@
 import logger from '../../../shared/utils/logger.js';
-import { toCents, roundMoney } from './escrowMoney.utils.js';
+
 import {
     reverseOrderSettlementForRefundHelper,
     reverseCreatorEarningsForRefundHelper
@@ -73,7 +73,8 @@ class SettlementService {
         );
 
         let promoted = 0;
-        for (const payout of payouts) {
+        // Sequential processing intentional: updates seller balances under FOR UPDATE SKIP LOCKED
+        for (const payout of payouts) { // NOSONAR: javascript:S9382
             const amount = Number.parseFloat(payout.amount || 0);
             if (!Number.isFinite(amount) || amount <= 0) {
                 await client.query(

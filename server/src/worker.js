@@ -9,7 +9,7 @@ import { reportError } from './shared/utils/alerting.js';
 // Best-effort real-time alert on a fatal crash, then exit — bounded so the
 // webhook can never hang the shutdown.
 function alertThenExit(err, title) {
-    Promise.race([
+    void Promise.race([
         reportError(err, { title }),
         new Promise((resolve) => setTimeout(resolve, 2000))
     ]).finally(() => process.exit(1));

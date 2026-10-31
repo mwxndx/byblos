@@ -18,7 +18,7 @@ const stop = (e: MouseEvent) => e.stopPropagation();
  * renders as a disabled (greyed, non-clickable) logo rather than an empty gap —
  * used by the seller shop card and the shop hero.
  */
-export function SocialButtons({ instagramHref, tiktokHref, shopName = 'Shop', size = 'md', className }: SocialButtonsProps) {
+export function SocialButtons({ instagramHref, tiktokHref, shopName = 'Shop', size = 'md', className }: Readonly<SocialButtonsProps>) {
   const dim = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5';
   const pad = size === 'sm' ? 'p-1.5' : 'p-2';
   const base = 'inline-flex items-center justify-center rounded-full border shadow-sm transition-all';

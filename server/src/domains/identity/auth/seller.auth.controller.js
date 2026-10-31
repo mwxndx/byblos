@@ -19,9 +19,6 @@ const sendTokenResponse = (data, statusCode, res, message) => {
   const refreshToken = user?.id ? generateRefreshToken(user.id, 'seller') : undefined;
   setRefreshTokenCookie(res, refreshToken);
 
-  const registrationMessage = statusCode === 201
-    ? 'Account created! Please verify your email before listing products.'
-    : message;
 
   // Ensure is_verified is attached for sanitization (Task 10 fix)
   if (user && profile) {

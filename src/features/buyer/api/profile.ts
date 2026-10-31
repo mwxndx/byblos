@@ -21,7 +21,26 @@ export interface Buyer {
 }
 
 export const transformBuyer = (data: unknown): Buyer => {
-  const buyerData = data as Record<string, unknown>;
+  const buyerData = data as {
+      id?: number | string;
+      name?: string;
+      fullName?: string;
+      full_name?: string;
+      email?: string;
+      mobilePayment?: string;
+      whatsappNumber?: string;
+      city?: string;
+      location?: string;
+      hasLocation?: boolean;
+      hasEmail?: boolean;
+      ordersCount?: number | string;
+      totalSpent?: number | string;
+      createdAt?: string;
+      created_at?: string;
+      user_id?: number | string;
+      is_verified?: boolean;
+      [key: string]: unknown;
+    };
   return {
     id: Number(buyerData.id),
     fullName: String(buyerData.name || buyerData.fullName || buyerData.full_name || ''),

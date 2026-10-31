@@ -12,7 +12,7 @@ export interface VerifyEmailModalProps {
   role: 'buyer' | 'seller' | 'creator';
 }
 
-export function VerifyEmailModal({ isOpen, onClose, email, role }: VerifyEmailModalProps) {
+export function VerifyEmailModal({ isOpen, onClose, email, role }: Readonly<VerifyEmailModalProps>) {
   const { toast } = useToast();
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);

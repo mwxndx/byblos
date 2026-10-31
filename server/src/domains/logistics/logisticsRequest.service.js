@@ -24,7 +24,7 @@ function locationPayload(location = {}) {
 }
 
 function ensureQuote(quote) {
-    if (!quote || quote.legType !== 'delivery' || quote.payer !== 'buyer') {
+    if (quote?.legType !== 'delivery' || quote?.payer !== 'buyer') {
         throw new Error('A buyer delivery quote is required before creating a delivery leg');
     }
 
@@ -34,7 +34,7 @@ function ensureQuote(quote) {
 }
 
 function ensurePickupQuote(quote) {
-    if (!quote || quote.legType !== 'pickup' || quote.payer !== 'seller') {
+    if (quote?.legType !== 'pickup' || quote?.payer !== 'seller') {
         throw new Error('A seller pickup quote is required before creating a pickup leg');
     }
 

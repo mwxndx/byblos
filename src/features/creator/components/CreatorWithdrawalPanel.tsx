@@ -1,3 +1,32 @@
+const TONE_CLASSES: Record<string, string> = {
+  success: 'text-sys-green',
+  danger: 'text-sys-red',
+  review: 'text-sys-orange',
+};
+
+function getWithdrawalButtonContent(params: {
+  withdrawing: boolean;
+  isClearing: boolean;
+  availableBalance: number;
+  formattedClearingDate: string;
+  totalBalance: number;
+}) {
+  const { withdrawing, isClearing, availableBalance, formattedClearingDate, totalBalance } = params;
+  if (withdrawing) {
+    return <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing…</>;
+  }
+  if (isClearing && availableBalance < MIN_WITHDRAWAL_AMOUNT) {
+    return `Clearing (Available ${formattedClearingDate})`;
+  }
+  if (availableBalance >= MIN_WITHDRAWAL_AMOUNT) {
+    return 'Withdraw to M-Pesa';
+  }
+  if (totalBalance > 0) {
+    return `Min withdrawal KSh ${MIN_WITHDRAWAL_AMOUNT}`;
+  }
+  return 'No balance available';
+}
+
 import { useState } from 'react';
 import { Clock, Info, Loader2, Wallet } from '@/shared/ui/icons';
 import { toast } from 'sonner';
@@ -27,7 +56,7 @@ interface CreatorWithdrawalPanelProps {
   withdrawals: WithdrawalRow[];
 }
 
-export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: CreatorWithdrawalPanelProps) {
+export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Readonly<CreatorWithdrawalPanelProps>) {
   const [withdrawing, setWithdrawing] = useState(false);
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const withdrawalMutation = useCreatorWithdrawalMutation();
@@ -200,30 +229,20 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Crea
           disabled={withdrawing || requestedAmount < MIN_WITHDRAWAL_AMOUNT || !hasEnoughBalance || availableBalance < MIN_WITHDRAWAL_AMOUNT}
           className="h-11 w-full"
         >
-          {withdrawing ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Processing…</>
-          ) : isClearing && availableBalance < MIN_WITHDRAWAL_AMOUNT ? (
-            `Clearing (Available ${formattedClearingDate})`
-          ) : availableBalance >= MIN_WITHDRAWAL_AMOUNT ? (
-            'Withdraw to M-Pesa'
-          ) : totalBalance > 0 ? (
-            `Min withdrawal KSh ${MIN_WITHDRAWAL_AMOUNT}`
-          ) : (
-            'No balance available'
-          )}
+          {getWithdrawalButtonContent({
+            withdrawing,
+            isClearing,
+            availableBalance,
+            formattedClearingDate,
+            totalBalance,
+          })}
         </Button>
       </div>
 
       <div className="mt-4 space-y-2">
         {(withdrawals || []).slice(0, 3).map((item) => {
           const tone = getWithdrawalStatusTone(item.status);
-          const toneClass = tone === 'success'
-            ? 'text-sys-green'
-            : tone === 'danger'
-              ? 'text-sys-red'
-              : tone === 'review'
-                ? 'text-sys-orange'
-                : 'text-brand-text';
+          const toneClass = TONE_CLASSES[tone] ?? 'text-brand-text';
           return (
             <div key={item.id} className="rounded-control border border-separator bg-surface-2 p-3 text-xs text-label">
               <div className="flex justify-between gap-3 font-medium">

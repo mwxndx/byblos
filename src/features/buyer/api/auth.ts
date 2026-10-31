@@ -65,7 +65,7 @@ export async function login(credentials: { email: string; password: string; acce
     throw new Error('Unable to connect to server. Please try again.');
   }
 
-  const body = responseBody as Record<string, unknown>;
+  const body = responseBody as { status?: string; message?: string; error?: string; [key: string]: unknown };
 
   if (body.status === 'error' || body.status === 'fail') {
     throw new Error(String(body.message || body.error || 'Login failed'));
@@ -203,7 +203,7 @@ export async function checkBuyerByPhone(phone: string): Promise<{
       { phone }
     );
 
-    if (!response.data || response.data.status !== 'success') {
+    if (response.data?.status !== 'success') {
       throw new Error('Failed to check buyer information');
     }
     return response.data.data;

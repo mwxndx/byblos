@@ -14,7 +14,7 @@ export interface NotificationBellProps {
   iconStyle?: React.CSSProperties;
 }
 
-export function NotificationBell({ variant = 'default', triggerClassName, role, iconClassName, iconStyle }: NotificationBellProps) {
+export function NotificationBell({ variant = 'default', triggerClassName, role, iconClassName, iconStyle }: Readonly<NotificationBellProps>) {
   const { unreadCount } = useNotifications(variant, true, role);
 
   return (

@@ -1,3 +1,10 @@
+function stripTrailingSlash(url) {
+  if (!url) return '';
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return url.slice(0, end);
+}
+
 // Byblos load test (k6). Exercises the read-heavy PUBLIC hot paths at scale.
 // It deliberately does NOT touch payment initiation (real money) or authed
 // endpoints. Run against a STAGING deploy, never production.
@@ -11,7 +18,7 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-const BASE = (__ENV.BASE_URL || 'http://localhost:10000').replace(/\/+$/, '');
+const BASE = stripTrailingSlash(__ENV.BASE_URL || 'http://localhost:10000');
 const ORDER_NUMBER = __ENV.ORDER_NUMBER || '';
 const PEAK = Number(__ENV.PEAK_RPS || 500);
 

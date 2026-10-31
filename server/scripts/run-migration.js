@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 require('dotenv').config();
 
 const pool = new Pool({
@@ -32,4 +32,9 @@ async function runMigration() {
   }
 }
 
-runMigration();
+try {
+  await runMigration();
+} catch (err) {
+  console.error('Unhandled error in runMigration:', err);
+  process.exit(1);
+}

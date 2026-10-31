@@ -121,8 +121,16 @@ const AUTHENTICATED_DASHBOARD_ROOTS = [
 /**
  * Checks if a pathname represents an authenticated dashboard root.
  */
+function trimTrailingSlashes(path: string): string {
+  let end = path.length;
+  while (end > 1 && path.charCodeAt(end - 1) === 47 /* '/' */) {
+    end--;
+  }
+  return path.slice(0, end) || '/';
+}
+
 export function isAuthenticatedDashboardRoot(pathname: string): boolean {
-  const cleanPath = pathname.replace(/\/+$/, '') || '/';
+  const cleanPath = trimTrailingSlashes(pathname);
   return AUTHENTICATED_DASHBOARD_ROOTS.includes(cleanPath);
 }
 
@@ -130,7 +138,7 @@ export function isAuthenticatedDashboardRoot(pathname: string): boolean {
  * Checks if a pathname is a buyer sub-screen / detail screen with a parent.
  */
 function handleBuyerRouteBack(pathname: string): boolean {
-  const cleanPath = pathname.replace(/\/+$/, '') || '/';
+  const cleanPath = trimTrailingSlashes(pathname);
 
   // Buyer shop page detail -> return to buyer dashboard
   if (cleanPath.startsWith('/buyer/shop/')) {

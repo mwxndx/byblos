@@ -42,8 +42,10 @@ export default function CreatorLogin() {
     // searched the whole document and could grab the wrong field if another
     // form on the page happened to share that name/type.
     const formData = new FormData(event.currentTarget);
-    const targetEmail = (String(formData.get('email') || '').trim()) || email.trim();
-    const targetPassword = (String(formData.get('password') || '').trim()) || password.trim();
+    const emailEntry = formData.get('email');
+    const passwordEntry = formData.get('password');
+    const targetEmail = (typeof emailEntry === 'string' ? emailEntry.trim() : '') || email.trim();
+    const targetPassword = (typeof passwordEntry === 'string' ? passwordEntry.trim() : '') || password.trim();
 
     if (!targetEmail || !targetPassword) {
       return;

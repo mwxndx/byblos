@@ -47,7 +47,9 @@ export function BagSheet() {
     }
 
     if (checkout.hasRegisteredPaymentNumber && !showPhoneFallback) {
-      checkout.initiateDirectPayment(undefined, phoneCheck.buildDeliveryPayload());
+      void checkout.initiateDirectPayment(undefined, phoneCheck.buildDeliveryPayload()).catch((err) => {
+        console.error('[BagSheet] Payment initialization failed:', err);
+      });
     } else {
       phoneCheck.handleSubmit(e);
     }

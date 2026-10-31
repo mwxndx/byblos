@@ -1,6 +1,6 @@
 import axios from 'axios';
 import crypto from 'node:crypto';
-import https from 'https';
+import https from 'node:https';
 import logger from '../../shared/utils/logger.js';
 import {
     normalizePaystackTransferPayload,
@@ -152,7 +152,7 @@ class PaystackTransferClient {
             .toLowerCase()
             .replace(/[^a-z0-9_-]+/g, '-')
             .replace(/-+/g, '-')
-            .replace(/^[-_]+|[-_]+$/g, '');
+            .replace(/^[-_]+/, '').replace(/[-_]+$/, '');
 
         if (normalized.length >= 16 && normalized.length <= 50) {
             return normalized;
@@ -161,7 +161,9 @@ class PaystackTransferClient {
         const suffix = crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16);
         const base = normalized || 'byblos-transfer';
         const maxBaseLength = 50 - suffix.length - 1;
-        normalized = `${base.slice(0, maxBaseLength).replace(/[-_]+$/g, '')}-${suffix}`;
+        const trimmedBase = base.slice(0, maxBaseLength);
+        const cleanBase = (trimmedBase.endsWith('-') || trimmedBase.endsWith('_')) ? trimmedBase.replace(/[-_]+$/, '') : trimmedBase;
+        normalized = `${cleanBase}-${suffix}`;
 
         if (normalized.length < 16) {
             return `byblos-transfer-${suffix}`.slice(0, 50);

@@ -6,7 +6,7 @@ export interface SectionTitleProps {
   subtitle?: React.ReactNode;
 }
 
-export function SectionTitle({ title, children, subtitle }: SectionTitleProps) {
+export function SectionTitle({ title, children, subtitle }: Readonly<SectionTitleProps>) {
   const content = title || children;
   return (
     <div className="mb-4 sm:mb-6 pt-1 sm:pt-2">

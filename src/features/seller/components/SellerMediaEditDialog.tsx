@@ -25,7 +25,7 @@ const previewSrc = (url?: string | null) => {
   return url.startsWith('blob:') || url.startsWith('data:') ? url : getImageUrl(url);
 };
 
-export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackInitial }: SellerMediaEditDialogProps) {
+export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackInitial }: Readonly<SellerMediaEditDialogProps>) {
   const photoMutation = useUploadBusinessPhotoMutation();
   const [busy, setBusy] = useState<null | 'photo'>(null);
 
@@ -115,7 +115,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
                     accept="image/*"
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     disabled={busy === 'photo'}
-                    onChange={(e) => { const f = e.target.files?.[0] || null; e.target.value = ''; runUpload(f, 5, (b) => photoMutation.mutateAsync(b), 'Business photo'); }}
+                    onChange={(e) => { const f = e.target.files?.[0] || null; e.target.value = ''; void runUpload(f, 5, (b) => photoMutation.mutateAsync(b), 'Business photo'); }}
                   />
                   {busy === 'photo' ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="mr-1.5 h-3.5 w-3.5" />}
                   Upload
@@ -126,7 +126,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
                     variant="outline"
                     className="h-8 border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
                     disabled={busy === 'photo'}
-                    onClick={() => runRemove((b) => photoMutation.mutateAsync(b), 'Business photo')}
+                    onClick={() => { void runRemove((b) => photoMutation.mutateAsync(b), 'Business photo'); }}
                   >
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Remove
                   </Button>

@@ -1,8 +1,7 @@
-import { cn } from "./cn";
+export { cn } from "./cn";
 import { isNativeApp } from "@/infrastructure/navigation/mobileApp";
 import { DEFAULT_MAP_CENTER } from "@/infrastructure/location/location";
 
-export { cn };
 
 // Module-level static cache for Intl.NumberFormat instance (10x faster execution)
 const currencyFormatter = new Intl.NumberFormat('en-KE', {
@@ -25,7 +24,7 @@ export function formatCurrency(amount: number | string | null | undefined, curre
     // Try to extract a numeric value from common object structures
     const obj = amount as Record<string, unknown>;
     const numericValue = obj.value || obj.amount || obj.price || obj.total || 0;
-    if (typeof numericValue === 'number' && !isNaN(numericValue)) {
+    if (typeof numericValue === 'number' && !Number.isNaN(numericValue)) {
       amount = numericValue;
     } else {
       return `${prefix} 0`;
@@ -39,10 +38,10 @@ export function formatCurrency(amount: number | string | null | undefined, curre
   const numericStr = amountStr.replace(/[^0-9.-]+/g, '');
 
   // Parse to number
-  const numericAmount = parseFloat(numericStr);
+  const numericAmount = Number.parseFloat(numericStr);
 
   // Check if parsing was successful
-  if (isNaN(numericAmount)) {
+  if (Number.isNaN(numericAmount)) {
     return `${prefix} 0`;
   }
 
@@ -55,9 +54,9 @@ export function formatCurrency(amount: number | string | null | undefined, curre
       return formatted.replace(/Ksh/i, 'KSh');
     }
     return `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-  } catch (error) {
-    const fallback = `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-    return fallback;
+  } catch {
+    // Fallback to manual locale string formatting if Intl.NumberFormat fails
+    return `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   }
 }
 
@@ -76,18 +75,18 @@ export function formatDate(dateInput: string | Date, format: 'full' | 'date' | '
       const parsedDate = new Date(dateInput);
 
       // If the date is invalid, try parsing with Date.parse
-      if (isNaN(parsedDate.getTime())) {
+      if (Number.isNaN(parsedDate.getTime())) {
         const timestamp = Date.parse(dateInput);
-        if (!isNaN(timestamp)) {
+        if (!Number.isNaN(timestamp)) {
           date = new Date(timestamp);
         } else {
-          throw new Error(`Invalid date string: ${dateInput}`);
+          throw new TypeError(`Invalid date string: ${dateInput}`);
         }
       } else {
         date = parsedDate;
       }
     } else {
-      throw new Error(`Invalid date format: ${typeof dateInput}`);
+      throw new TypeError(`Invalid date format: ${typeof dateInput}`);
     }
 
     // Format based on requested format
@@ -171,7 +170,7 @@ export function isSellerShopless(input: unknown): boolean {
   const lng = Number(lngValue);
 
   // 3. Validate coordinates (must be non-zero numbers and not the Nairobi sentinel)
-  const hasCoords = !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+  const hasCoords = !Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0;
 
   // 4. Check for Nairobi sentinel (the default placeholder)
   const isDefaultNairobi = hasCoords && (

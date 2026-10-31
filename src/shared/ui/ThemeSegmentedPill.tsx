@@ -35,7 +35,7 @@ function resolveTheme(value: AppTheme): ExplicitTheme {
  * wire `value` / `onChange` to a scope via `useThemeScope`; ThemeManager remains
  * the single source of truth.
  */
-export function ThemeSegmentedPill({ value, onChange, showLabels = true, className }: ThemeSegmentedPillProps) {
+export function ThemeSegmentedPill({ value, onChange, showLabels = true, className }: Readonly<ThemeSegmentedPillProps>) {
   const resolved = resolveTheme(value);
   const Icon = resolved === 'dark' ? Moon : Sun;
 

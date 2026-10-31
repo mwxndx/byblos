@@ -81,7 +81,7 @@ export async function addToWishlist(product: { id: string }): Promise<boolean> {
   } catch (error) {
     const err = error as ApiError;
     if (err.response?.status === 409) {
-      const errorMessage = (err.response?.data as Record<string, unknown> | undefined)?.message || 'Product already in wishlist';
+      const errorMessage = (err.response?.data as { message?: string } | undefined)?.message || 'Product already in wishlist';
       const typedErr = new Error(String(errorMessage)) as Error & { code?: string };
       typedErr.code = 'DUPLICATE_WISHLIST_ITEM';
       throw typedErr;

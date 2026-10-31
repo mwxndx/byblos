@@ -99,7 +99,8 @@ class ReconciliationEngine {
 
         logger.info(`[RECON] Found ${expiredOrders.length} expired reservations. Processing individually.`);
 
-        for (const order of expiredOrders) {
+        // Sequential processing intentional: acquires per-order transaction and advisory lock to prevent deadlocks
+        for (const order of expiredOrders) { // NOSONAR: javascript:S9382
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');
@@ -166,7 +167,8 @@ class ReconciliationEngine {
         `;
         const { rows: stuckOrders } = await pool.query(stuckQuery);
 
-        for (const order of stuckOrders) {
+        // Sequential processing intentional: per-order FOR UPDATE SKIP LOCKED transaction
+        for (const order of stuckOrders) { // NOSONAR: javascript:S9382
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');
@@ -230,7 +232,8 @@ class ReconciliationEngine {
         `;
         const { rows: deadLetterJobs } = await pool.query(query);
 
-        for (const job of deadLetterJobs) {
+        // Sequential processing intentional: isolates dead-letter transition per order
+        for (const job of deadLetterJobs) { // NOSONAR: javascript:S9382
             logger.warn(`[RECON] Found dead-letter fulfillment job ${job.job_id} for order ${job.order_id}. Transitioning order to MANUAL_REVIEW.`);
             const client = await pool.connect();
             try {
@@ -272,7 +275,8 @@ class ReconciliationEngine {
         `;
         const { rows: missingOrders } = await pool.query(query);
 
-        for (const order of missingOrders) {
+        // Sequential processing intentional: re-enqueues jobs with per-order telemetry
+        for (const order of missingOrders) { // NOSONAR: javascript:S9382
             logger.info(`[RECON] Re-enqueuing missing fulfillment job for order ${order.id}.`);
             await FulfillmentQueueService.enqueue(null, order.id);
         }
@@ -298,7 +302,8 @@ class ReconciliationEngine {
 
         logger.info(`[RECON] Found ${unreleasedOrders.length} COMPLETED orders missing escrow payout release.`);
 
-        for (const order of unreleasedOrders) {
+        // Sequential processing intentional: locks order row and releases escrow deposit atomically
+        for (const order of unreleasedOrders) { // NOSONAR: javascript:S9382
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');
@@ -311,7 +316,7 @@ class ReconciliationEngine {
                      FOR UPDATE`,
                     [order.id]
                 );
-                if (lockedOrder && lockedOrder.status === 'COMPLETED') {
+                if (lockedOrder?.status === 'COMPLETED') {
                     const releaseResult = await escrowManager.releaseFunds(client, lockedOrder, 'ReconciliationWorker');
                     logger.info(`[RECON] Escrow recovery executed for Order ${order.id}:`, releaseResult);
                 }
@@ -356,7 +361,8 @@ class ReconciliationEngine {
 
         logger.info(`[RECON] Found ${uncreditedRefunds.length} completed refund(s) missing wallet credit reconciliation.`);
 
-        for (const refund of uncreditedRefunds) {
+        // Sequential processing intentional: reconciles buyer wallet credit within isolated transaction
+        for (const refund of uncreditedRefunds) { // NOSONAR: javascript:S9382
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');
@@ -505,7 +511,8 @@ class ReconciliationEngine {
 
         logger.warn(`[RECON] Found ${overdueRequests.length} overdue refund requests exceeding 48h SLA. Escalating.`);
 
-        for (const req of overdueRequests) {
+        // Sequential processing intentional: escalates overdue refund request under row lock
+        for (const req of overdueRequests) { // NOSONAR: javascript:S9382
             const client = await pool.connect();
             try {
                 await client.query('BEGIN');

@@ -14,6 +14,7 @@ const REGISTRATION_STORAGE_KEY = 'byblosNativePushRegistration';
 let listenersReady = false;
 let pendingRole: AppNotificationRole | null = null;
 let pendingRequestConfig: AxiosRequestConfig | undefined;
+let isRegisteringNativePush = false;
 let registrationPromise: Promise<void> | null = null;
 
 async function getAppVersion() {
@@ -141,7 +142,7 @@ function ensurePushListeners() {
       try {
         window.location.href = storeUrl;
       } catch {
-        window.open('https://play.google.com/store/apps/details?id=space.bybloshq.app', '_system');
+        window.open('https://play.google.com/store/apps/details?id=space.bybloshq.app', '_system', 'noopener,noreferrer');
       }
       return;
     }
@@ -166,13 +167,16 @@ export async function registerNativePushNotifications(
     void registerWebPush(role, requestConfig);
     return;
   }
-  if (registrationPromise) return registrationPromise;
+  if (isRegisteringNativePush && registrationPromise) {
+    return await registrationPromise;
+  }
 
+  isRegisteringNativePush = true;
   pendingRole = role;
   pendingRequestConfig = requestConfig;
   ensurePushListeners();
 
-  registrationPromise = (async () => {
+  const currentPromise = (async () => {
     try {
       const permission = await PushNotifications.requestPermissions();
       if (permission.receive !== 'granted') return;
@@ -184,12 +188,14 @@ export async function registerNativePushNotifications(
       });
     } catch (err) {
       console.warn('[MobileNotifications] Push registration exception', err);
+    } finally {
+      isRegisteringNativePush = false;
+      registrationPromise = null;
     }
-  })().finally(() => {
-    registrationPromise = null;
-  });
+  })();
 
-  return registrationPromise;
+  registrationPromise = currentPromise;
+  return await currentPromise;
 }
 
 export async function unregisterNativePushNotifications(

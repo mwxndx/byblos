@@ -5,14 +5,16 @@ import { buildApiBaseUrl } from '../http/apiBaseUrl';
 let csrfTokenCache: string | null = null;
 let lastFetchedAt: number = 0;
 let csrfFetchPromise: Promise<string | null> | null = null;
+let hasActiveCsrfFetch = false;
 const CSRF_TTL = 10 * 60 * 1000; // 10 minutes
 
 export const getFreshCsrfToken = async (): Promise<string | null> => {
-  if (csrfFetchPromise) {
-    return csrfFetchPromise;
+  if (hasActiveCsrfFetch && csrfFetchPromise) {
+    return await csrfFetchPromise;
   }
 
-  csrfFetchPromise = (async () => {
+  hasActiveCsrfFetch = true;
+  const currentPromise = (async () => {
     try {
       const baseURL = buildApiBaseUrl();
       const response = await axios.get(`${baseURL}/public/csrf-token`, { withCredentials: true });
@@ -31,11 +33,13 @@ export const getFreshCsrfToken = async (): Promise<string | null> => {
       console.error('Failed to fetch CSRF token:', error);
       return null;
     } finally {
+      hasActiveCsrfFetch = false;
       csrfFetchPromise = null;
     }
   })();
 
-  return csrfFetchPromise;
+  csrfFetchPromise = currentPromise;
+  return await currentPromise;
 };
 
 export const getCachedCsrfToken = (): string | null => csrfTokenCache;
@@ -50,9 +54,9 @@ export class WebAuthStrategy implements AuthStrategy {
 
   constructor(private storageAdapter: StorageAdapter) {}
 
-  async getAuthHeaders(): Promise<Record<string, string>> {
+  getAuthHeaders(): Promise<Record<string, string>> {
     // Web strategy relies on HttpOnly jwt cookie; no Authorization Bearer header sent on Web.
-    return {};
+    return Promise.resolve({});
   }
 
   async getCsrfHeader(): Promise<Record<string, string>> {

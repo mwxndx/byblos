@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'node:url';
 import logger from '../../shared/utils/logger.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
 
@@ -34,12 +34,12 @@ class ImageService {
      */
     async base64ToFile(base64String, prefix = 'img') {
         try {
-            if (!base64String || !base64String.startsWith('data:image')) {
+            if (!base64String?.startsWith('data:image')) {
                 return base64String;
             }
 
             const matches = base64String.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=\s]+)$/);
-            if (!matches || matches.length !== 3) {
+            if (matches?.length !== 3) {
                 throw new AppError('Invalid base64 image string', 400);
             }
 

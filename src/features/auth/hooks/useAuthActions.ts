@@ -159,7 +159,7 @@ export function useAuthActions({
   }, [markAuthChecked, setIsLoading, setUser, queryClient]);
 
   const loginAdmin = useCallback(async (email: string, password: string) => {
-    return login(email, password, 'admin');
+    return await login(email, password, 'admin');
   }, [login]);
 
   const logout = useCallback(async () => {

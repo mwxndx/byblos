@@ -41,7 +41,7 @@ const STACK_LINES = 6;
 // PII terms (phone/email/mpesa/msisdn) match as substrings so camelCase keys
 // like `buyerEmail`/`buyerPhone` are caught; short, false-positive-prone tokens
 // (pan/pin/cvv/otp — cf. "expand", "shipping") stay word-bounded.
-const REDACT_KEY_RE = /(pass(word)?|secret|token|api[-_]?key|authoriz|bearer|cookie|creditcard|card[-_]?number|\bcvv\b|\bpan\b|\bpin\b|\botp\b|mpesa|msisdn|phone|email)/i;
+const REDACT_KEY_RE = /pass|secret|token|api_?key|authoriz|bearer|cookie|creditcard|card_?number|\b(?:cvv|pan|pin|otp)\b|mpesa|msisdn|phone|email/i;
 const REDACTED = '[redacted]';
 
 const recentAlerts = new Map(); // fingerprint -> last-sent epoch ms

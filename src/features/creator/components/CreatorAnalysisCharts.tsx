@@ -21,7 +21,7 @@ const tooltipStyle = {
   borderRadius: 12,
 };
 
-export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeriod, setAnalysisPeriod }: CreatorAnalysisChartsProps) {
+export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeriod, setAnalysisPeriod }: Readonly<CreatorAnalysisChartsProps>) {
   const [selectedBusiness, setSelectedBusiness] = useState<string>('all');
 
   const periods = useMemo(() => analysis.map((r) => String(r.period ?? r.month ?? '')), [analysis]);

@@ -27,7 +27,7 @@ export const marketingLogin = async (req, res, next) => {
 
     const authResult = await AuthService.login(email, password, 'marketing')
 
-    if (!authResult || !authResult.user) {
+    if (!authResult?.user) {
       return next(new AppError('Invalid credentials', 401))
     }
 

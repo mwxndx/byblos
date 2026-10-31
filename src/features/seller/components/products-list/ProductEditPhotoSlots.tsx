@@ -12,7 +12,7 @@ export function ProductEditPhotoSlots({
   formData,
   onImageChange,
   onRemoveImage,
-}: ProductEditPhotoSlotsProps) {
+}: Readonly<ProductEditPhotoSlotsProps>) {
   const allPreviews = [formData.imagePreview, ...formData.extraPreviews];
   const activeCount = allPreviews.filter(Boolean).length;
 

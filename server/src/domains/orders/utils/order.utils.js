@@ -94,8 +94,8 @@ function crawlLocation(body, metadata = {}, user = null, loggedInBuyer = null) {
         const parsedLat = Number.parseFloat(rawLat);
         const parsedLng = Number.parseFloat(rawLng);
 
-        const isValidLat = !isNaN(parsedLat) && parsedLat !== 0;
-        const isValidLng = !isNaN(parsedLng) && parsedLng !== 0;
+        const isValidLat = !Number.isNaN(parsedLat) && parsedLat !== 0;
+        const isValidLng = !Number.isNaN(parsedLng) && parsedLng !== 0;
 
         if (isValidLat) result.lat = parsedLat;
         if (isValidLng) result.lng = parsedLng;

@@ -7,12 +7,33 @@ export async function getCreators(params: AdminListParams = {}): Promise<Paginat
   const response = await api.get('/admin/creators', { params: toRequestParams(params) });
   const creatorsData: unknown[] = Array.isArray(response.data.data) ? response.data.data : [];
   const items = creatorsData.map((raw) => {
-    const creator = raw as Record<string, unknown>;
+    const creator = raw as {
+      id?: string | number;
+      user_id?: string | number;
+      name?: string;
+      first_name?: string;
+      last_name?: string;
+      email?: string;
+      mpesa_number?: string;
+      whatsapp_number?: string;
+      balance?: number | string;
+      total_sales?: number | string;
+      total_earnings?: number | string;
+      total_referral_earnings?: number | string;
+      total_income?: number | string;
+      linked_shops?: number | string;
+      link_clicks?: number | string;
+      pending_requests?: number | string;
+      status?: string;
+      created_at?: string;
+      createdAt?: string;
+      [key: string]: unknown;
+    };
     return {
       ...creator,
       id: String(creator.id || ''),
       user_id: creator.user_id ? String(creator.user_id) : '',
-      name: creator.name || `${creator.first_name || ''} ${creator.last_name || ''}`.trim() || 'Unnamed Creator',
+      name: creator.name || [creator.first_name, creator.last_name].filter(Boolean).join(' ') || 'Unnamed Creator',
       email: String(creator.email || ''),
       mpesaNumber: String(creator.mpesa_number || ''),
       whatsappNumber: String(creator.whatsapp_number || ''),

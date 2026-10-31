@@ -5,7 +5,7 @@ import type { ApiWithdrawalRequest } from '@/shared/types/api/withdrawal';
 import { formatKes, getWithdrawalStatusLabel } from './withdrawalsTab.utils';
 import { getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 
-export function WithdrawalHistoryCard({ request }: { request: ApiWithdrawalRequest }) {
+export function WithdrawalHistoryCard({ request }: Readonly<{ request: ApiWithdrawalRequest }>) {
   return (
     <Card key={request.id} className="group transition-all duration-300 bg-white border border-slate-200 text-slate-900 dark:bg-surface-1 dark:border-separator dark:text-white shadow-sm">
                 <CardContent className="p-3 sm:p-5 lg:p-6">

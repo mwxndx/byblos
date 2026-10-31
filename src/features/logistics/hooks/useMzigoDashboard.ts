@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { logisticsQueryKeys } from '@/features/logistics/api/queryKeys';
@@ -60,9 +60,8 @@ export function useMzigoDashboard() {
       queryClient.invalidateQueries({ queryKey: logisticsQueryKeys.all });
     },
     onError: (error: unknown) => {
-      const errObj = error as Record<string, unknown>;
-      const response = errObj.response as Record<string, unknown> | undefined;
-      const data = response?.data as Record<string, unknown> | undefined;
+      const errObj = error as { message?: string; response?: { data?: { message?: string } } };
+      const data = errObj.response?.data;
       toast.error('Status update failed', {
         description: String(data?.message || errObj.message || 'Mzigo status was not updated.'),
       });
@@ -72,16 +71,22 @@ export function useMzigoDashboard() {
     },
   });
 
+  const handleLogout = useCallback(async () => {
+    authLogout();
+    await clearLogisticsSession();
+    navigate('/mzigo/login', { replace: true });
+  }, [authLogout, navigate]);
+
   useEffect(() => {
     if (partnerQuery.isError || requestsQuery.isError) {
       const partnerErr = partnerQuery.error as unknown as Record<string, unknown> | null;
       const requestsErr = requestsQuery.error as unknown as Record<string, unknown> | null;
       const status = (partnerErr?.response as Record<string, unknown>)?.status || (requestsErr?.response as Record<string, unknown>)?.status;
       if (status === 401 || status === 403) {
-        handleLogout();
+        void handleLogout().catch(() => {});
       }
     }
-  }, [navigate, partnerQuery.error, partnerQuery.isError, requestsQuery.error, requestsQuery.isError]);
+  }, [handleLogout, partnerQuery.error, partnerQuery.isError, requestsQuery.error, requestsQuery.isError]);
 
   const partner = partnerQuery.data || (globalUser?.profile as unknown as LogisticsPartner | null) || getStoredLogisticsPartner();
   const dashboard = requestsQuery.data;
@@ -105,11 +110,6 @@ export function useMzigoDashboard() {
     ...grouped.hubDropoff,
   ].filter((request) => request.isOverdue).length;
 
-  const handleLogout = async () => {
-    await authLogout();
-    await clearLogisticsSession();
-    navigate('/mzigo/login', { replace: true });
-  };
 
   const handleStatusUpdate = (
     requestId: number,

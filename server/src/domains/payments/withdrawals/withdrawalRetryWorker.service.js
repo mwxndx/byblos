@@ -68,7 +68,8 @@ class WithdrawalRetryWorkerService {
 
       logger.info(`[WithdrawalRetryWorker] Found ${pending.length} pending requests to retry.`);
 
-      for (let i = 0; i < pending.length; i++) {
+      // Sequential processing intentional: throttles payout provider retries with backoff delay
+      for (let i = 0; i < pending.length; i++) { // NOSONAR: javascript:S9382
         const request = pending[i];
         const entity = {
           id: request.seller_id || request.creator_id || request.buyer_id,

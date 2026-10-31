@@ -53,7 +53,7 @@ export const resolveDbSslConfig = (env = process.env) => {
   if (env.NODE_ENV !== 'production') return false;
 
   const rejectUnauthorized = env.DB_SSL_REJECT_UNAUTHORIZED !== 'false';
-  const ca = env.DB_SSL_CA ? env.DB_SSL_CA.replace(/\\n/g, '\n') : undefined;
+  const ca = env.DB_SSL_CA ? env.DB_SSL_CA.replaceAll('\\n', '\n') : undefined;
 
   return {
     rejectUnauthorized,

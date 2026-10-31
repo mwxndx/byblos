@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { existsSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { generateHtml, pages, SITE_URL } from '../../../../scripts/prerender-public-pages.mjs';
 
 describe('Public Pages Static Pre-rendering (SSG)', () => {

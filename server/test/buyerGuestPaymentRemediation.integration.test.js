@@ -1,4 +1,4 @@
-import { test, describe, after } from 'node:test';
+import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import bcrypt from 'bcrypt';
 import { pool } from '../src/infrastructure/database/database.js';
@@ -13,7 +13,7 @@ describe('Buyer & Guest Payment Remediations Integration Tests', () => {
   const createdOrderIds = [];
   const testPassword = 'Password123!';
 
-  test('setup test fixtures', async () => {
+  before(async () => {
     sellerUser = await createUser({ role: 'seller' });
     seller = await createSeller({ userId: sellerUser.id });
 
@@ -37,20 +37,6 @@ describe('Buyer & Guest Payment Remediations Integration Tests', () => {
       digitalFilePath: 'digital_products/sample_ebook.pdf',
       digitalFileName: 'sample_ebook.pdf'
     });
-  });
-
-  after(async () => {
-    for (const orderId of createdOrderIds) {
-      await pool.query('DELETE FROM digital_access WHERE order_id = $1', [orderId]).catch(() => {});
-      await pool.query('DELETE FROM order_items WHERE order_id = $1', [orderId]).catch(() => {});
-      await pool.query('DELETE FROM payments WHERE order_id = $1', [orderId]).catch(() => {});
-      await pool.query('DELETE FROM product_orders WHERE id = $1', [orderId]).catch(() => {});
-    }
-    if (digitalProd) await cleanupProduct(digitalProd.id);
-    if (buyer) await cleanupBuyer(buyer.id);
-    if (buyerUser) await cleanupUser(buyerUser.id);
-    if (seller) await cleanupSeller(seller.id);
-    if (sellerUser) await cleanupUser(sellerUser.id);
   });
 
   test('1. Guest with client_checkout_token can access completed digital item even when buyer_id is NULL', async () => {
@@ -246,6 +232,12 @@ describe('Buyer & Guest Payment Remediations Integration Tests', () => {
     const order = orderRows[0];
     createdOrderIds.push(order.id);
 
+    await pool.query(
+      `INSERT INTO payments (order_id, invoice_id, amount, status, payment_method, provider_reference, email, metadata, created_at, updated_at)
+       VALUES ($1, $2, 600, 'completed', 'paystack', $3, $4, '{"purpose": "buyer_order"}'::jsonb, NOW(), NOW())`,
+      [order.id, `INV-${Date.now()}`, `pay-cancel-${Date.now()}`, unregEmail]
+    );
+
     // Cancel order via OrderCancellationService
     const { default: OrderCancellationService } = await import('../src/domains/orders/order/orderCancellation.service.js');
     await OrderCancellationService.cancelOrder(order.id, 'out_of_stock');
@@ -289,6 +281,7 @@ describe('Buyer & Guest Payment Remediations Integration Tests', () => {
     assert.equal(reloadedOrderRows[0].buyer_id, newBuyer.id, 'Order buyer_id should be linked');
     assert.equal(reloadedOrderRows[0].metadata?.refund_credited, true, 'Order should be marked refund_credited');
 
+    await pool.query('DELETE FROM refund_requests WHERE buyer_id = $1 OR order_id = $2', [newBuyer.id, order.id]).catch(() => {});
     await cleanupBuyer(newBuyer.id);
     await cleanupUser(newBuyerUser.id);
   });
@@ -366,5 +359,19 @@ describe('Buyer & Guest Payment Remediations Integration Tests', () => {
     assert.equal(details.buyer_name, 'Guest Customer', 'buyer_name should fall back to order.buyer_name');
     assert.equal(details.buyer_email, 'guest-customer@test.local', 'buyer_email should fall back to order.buyer_email');
     assert.equal(details.buyer_mobile_payment, '0799887766', 'buyer_mobile_payment should fall back to order.buyer_mobile_payment');
+  });
+
+  after(async () => {
+    for (const orderId of createdOrderIds) {
+      await pool.query('DELETE FROM digital_access WHERE order_id = $1', [orderId]).catch(() => {});
+      await pool.query('DELETE FROM order_items WHERE order_id = $1', [orderId]).catch(() => {});
+      await pool.query('DELETE FROM payments WHERE order_id = $1', [orderId]).catch(() => {});
+      await pool.query('DELETE FROM product_orders WHERE id = $1', [orderId]).catch(() => {});
+    }
+    if (digitalProd) await cleanupProduct(digitalProd.id);
+    if (buyer) await cleanupBuyer(buyer.id);
+    if (buyerUser) await cleanupUser(buyerUser.id);
+    if (seller) await cleanupSeller(seller.id);
+    if (sellerUser) await cleanupUser(sellerUser.id);
   });
 });

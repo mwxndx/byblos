@@ -35,7 +35,7 @@ export function BuyerInfoModal({
   theme = 'default',
   phoneNumber,
   initialData
-}: BuyerInfoModalProps) {
+}: Readonly<BuyerInfoModalProps>) {
   const {
     buyerInfo,
     setBuyerInfo,

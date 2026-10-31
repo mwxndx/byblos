@@ -99,7 +99,7 @@ export const refreshAccessToken = async (refreshToken) => {
   // Logout still wins: it blacklists without writing a grace entry.
   try {
     const cachedGrace = _refreshGraceMemory.get(graceKey) || (await CacheService.get(graceKey));
-    if (cachedGrace && cachedGrace.data) {
+    if (cachedGrace?.data) {
       const isRevoked = await tokenBlacklist.isBlacklisted(cachedGrace.data.refreshToken);
       if (isRevoked) {
         _refreshGraceMemory.delete(graceKey);
@@ -144,7 +144,7 @@ export const refreshAccessToken = async (refreshToken) => {
           'SELECT lp.active AS partner_active FROM users u LEFT JOIN logistics_partners lp ON u.id = lp.user_id WHERE u.id = $1 LIMIT 1',
           [cachedGrace.data.user.id]
         );
-        if (partnerRows[0] && partnerRows[0].partner_active === false) {
+        if (partnerRows[0]?.partner_active === false) {
           _refreshGraceMemory.delete(graceKey);
           await CacheService.delete(graceKey);
           throw new Error('Your logistics account has been deactivated or suspended.');

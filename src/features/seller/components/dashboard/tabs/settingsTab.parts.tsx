@@ -2,7 +2,7 @@ import { Trash2 } from '@/shared/ui/icons';
 import { Input } from '@/shared/ui/input';
 import { socialUrl } from '@/shared/utils/socialLinks';
 
-export function SectionHeader({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
+export function SectionHeader({ title, description, action }: Readonly<{ title: string; description: string; action?: React.ReactNode }>) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
@@ -30,7 +30,7 @@ interface SocialInputProps {
   value: string;
 }
 
-export function SocialInput({ displayValue, kind, iconPath, isEditing, label, onChange, onRemove, placeholder, value }: SocialInputProps) {
+export function SocialInput({ displayValue, kind, iconPath, isEditing, label, onChange, onRemove, placeholder, value }: Readonly<SocialInputProps>) {
   // Previously rendered `href={displayValue}` -- the raw stored value --
   // directly, with no scheme validation. Unlike the identical data
   // rendered elsewhere in the app (CreatorsTab.tsx routes the same kind of

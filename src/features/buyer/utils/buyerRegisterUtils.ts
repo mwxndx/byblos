@@ -1,4 +1,4 @@
-import { checkPasswordStrength } from '@/features/auth/utils/authValidation';
+
 
 export interface BuyerRegisterFormData {
   firstName: string;
@@ -13,4 +13,4 @@ export interface BuyerRegisterFormData {
 }
 
 // Password strength checker function re-exported from canonical authValidation
-export { checkPasswordStrength };
+export { checkPasswordStrength } from '@/features/auth/utils/authValidation';

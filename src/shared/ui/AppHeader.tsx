@@ -27,7 +27,7 @@ interface AppHeaderProps {
  * Each role only supplies its own content through the `left` / `center` /
  * `right` slots and keeps its own text styling on those nodes.
  */
-export function AppHeader({ left, center, right, className }: AppHeaderProps) {
+export function AppHeader({ left, center, right, className }: Readonly<AppHeaderProps>) {
   return (
     <header
       className={cn(

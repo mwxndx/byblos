@@ -11,7 +11,7 @@ setInterval(() => {
 
 export function getCachedAuth(token) {
   const cached = _authCache.get(token);
-  if (cached && cached.expiresAt > Date.now()) {
+  if (cached?.expiresAt > Date.now()) {
     return cached.user;
   }
   return null;

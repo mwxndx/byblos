@@ -13,7 +13,7 @@ interface SellerForgotPasswordDialogProps {
   isSending: boolean;
 }
 
-export function SellerForgotPasswordDialog({ open, onOpenChange, email, onEmailChange, onSubmit, isSending }: SellerForgotPasswordDialogProps) {
+export function SellerForgotPasswordDialog({ open, onOpenChange, email, onEmailChange, onSubmit, isSending }: Readonly<SellerForgotPasswordDialogProps>) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent

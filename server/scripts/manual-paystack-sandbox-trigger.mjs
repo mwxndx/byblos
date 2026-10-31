@@ -99,7 +99,9 @@ async function main() {
   await pool.end();
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   console.error('[TRIGGER] Failed:', error);
   process.exit(1);
-});
+}

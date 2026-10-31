@@ -88,7 +88,7 @@ export function useSellerWithdrawals({ balance, enabled = true, toast }: UseSell
       return;
     }
 
-    const amount = parseFloat(withdrawalForm.amount);
+    const amount = Number.parseFloat(withdrawalForm.amount);
     if (amount < MIN_WITHDRAWAL_AMOUNT) {
       toast({
         title: 'Error',

@@ -1,3 +1,10 @@
+function stripTrailingSlash(url) {
+  if (!url) return '';
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return url.slice(0, end);
+}
+
 // @ts-nocheck
 'use strict';
 
@@ -36,7 +43,7 @@ class ReferralService {
      * @returns {string}
      */
     static getReferralLink(referralCode) {
-        const base = (process.env.FRONTEND_URL || 'https://byblos.co.ke').replace(/\/+$/, '');
+        const base = stripTrailingSlash(process.env.FRONTEND_URL || 'https://byblos.co.ke');
         return `${base}/join?ref=${encodeURIComponent(String(referralCode || '').trim().toUpperCase())}`;
     }
 

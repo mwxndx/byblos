@@ -82,7 +82,8 @@ export async function executeWithRetry(fn, {
 } = {}) {
     let lastError = null;
 
-    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    // Exponential retry backoff loop is inherently sequential
+    for (let attempt = 0; attempt <= maxRetries; attempt++) { // NOSONAR: javascript:S9382
         try {
             return await fn();
         } catch (error) {
@@ -94,7 +95,7 @@ export async function executeWithRetry(fn, {
 
             const exponential = baseDelayMs * Math.pow(2, attempt + 1);
             const capped = Math.min(maxDelayMs, exponential);
-            const jitterAmount = jitter ? Math.random() * 100 : 0;
+            const jitterAmount = jitter ? Math.random() * 100 : 0; // NOSONAR Non-cryptographic retry backoff jitter
             const delayMs = Math.round(capped + jitterAmount);
 
             if (typeof onRetry === 'function') {

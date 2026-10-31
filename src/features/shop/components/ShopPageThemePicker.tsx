@@ -25,7 +25,7 @@ interface ShopPageThemePickerProps {
  * Clean icon-only theme dropdown for the shop page: displays Sun/Moon icon with
  * a simple dropdown to switch between light and dark modes without 'D' and 'L' text.
  */
-export function ShopPageThemePicker({ theme, onThemeChange }: ShopPageThemePickerProps) {
+export function ShopPageThemePicker({ theme, onThemeChange }: Readonly<ShopPageThemePickerProps>) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const resolved = resolveShopTheme(theme);

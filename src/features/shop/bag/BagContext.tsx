@@ -47,7 +47,7 @@ const BagContext = createContext<BagContextValue | null>(null);
  * Holds up to MAX_BAG_PRODUCTS distinct products (quantities can grow beyond that).
  * Session-scoped per shopSlug so page refreshes and login redirects preserve the cart.
  */
-export function BagProvider({ seedProduct, shopSlug, children }: { seedProduct?: Product | null; shopSlug?: string; children: ReactNode }) {
+export function BagProvider({ seedProduct, shopSlug, children }: Readonly<{ seedProduct?: Product | null; shopSlug?: string; children: ReactNode }>) {
   const [items, setItems] = useState<BagLine[]>(() => {
     if (typeof window === 'undefined' || !shopSlug) return [];
     try {

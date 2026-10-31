@@ -4,10 +4,10 @@ import { AppError } from '../../../shared/utils/errorHandler.js';
 import payoutService from '../payouts/payout.service.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import Fees from '../../../shared/config/fees.js';
-import PayoutCallbackStateMachineService, {
-    providerPayloadIndicatesSuccess,
-    providerPayloadIndicatesFailure
-} from '../payouts/payoutCallbackStateMachine.service.js';
+import PayoutCallbackStateMachineService from '../payouts/payoutCallbackStateMachine.service.js';
+
+
+
 import WithdrawalRetryWorkerService from './withdrawalRetryWorker.service.js';
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
 import {
@@ -73,6 +73,99 @@ function getEntityPhone(entity = {}) {
  * 7. Paystack sends webhook to /api/webhooks/paystack
  *    - callback.controller handles final status update
  */
+function _getEntityLockQuery(entityType) {
+    if (entityType === 'buyer_refund') {
+        return `SELECT id,
+                      refunds AS balance,
+                      refund_withdrawal_reserved_balance AS withdrawal_reserved_balance,
+                      full_name,
+                      mobile_payment,
+                      whatsapp_number,
+                      NULL::text AS mpesa_number,
+                      'buyer_refund' AS entity_type
+               FROM buyers
+               WHERE id = $1
+               FOR UPDATE`;
+    }
+    if (entityType === 'creator') {
+        return `SELECT id, balance, withdrawal_reserved_balance,
+                      CONCAT_WS(' ', first_name, last_name) AS full_name,
+                      mpesa_number,
+                      whatsapp_number,
+                      'creator' AS entity_type
+               FROM creators
+               WHERE id = $1 AND status = 'active'
+               FOR UPDATE`;
+    }
+    return `SELECT id, balance, pending_settlement_balance, withdrawal_reserved_balance,
+                  full_name,
+                  whatsapp_number,
+                  NULL::text AS mpesa_number,
+                  'seller' AS entity_type
+           FROM sellers
+           WHERE id = $1
+           FOR UPDATE`;
+}
+
+function _getPayoutPhone(entityType, entity, mpesaNumber) {
+    if (entityType === 'creator') return entity.mpesa_number;
+    if (entityType === 'buyer_refund') {
+        return mpesaNumber?.trim() || entity.mobile_payment || entity.whatsapp_number;
+    }
+    return mpesaNumber;
+}
+
+function _getNormalizedPayoutName(entityType, entity, mpesaName) {
+    if (entityType === 'creator') return getEntityLabel(entity);
+    if (entityType === 'buyer_refund') {
+        return mpesaName?.trim() || getEntityLabel(entity);
+    }
+    return mpesaName.trim();
+}
+
+function _getEntityIdColumn(entityType) {
+    if (entityType === 'buyer_refund') return 'buyer_id';
+    if (entityType === 'creator') return 'creator_id';
+    return 'seller_id';
+}
+
+function _getInsufficientBalanceMessage(availableBalance, deductionAmount, clearingBalance, entityType) {
+    let reasonMessage = 'Some earnings may already be reserved for another withdrawal.';
+    if (clearingBalance > 0) {
+        reasonMessage = `KES ${clearingBalance.toLocaleString()} is still clearing under the standard T+2 holding period.`;
+    } else if (entityType === 'seller') {
+        reasonMessage = 'Recent sales may still be preparing for withdrawal.';
+    } else if (entityType === 'buyer_refund') {
+        reasonMessage = 'Some refund funds may already be reserved for another withdrawal.';
+    }
+
+    return `Insufficient balance. Available: KES ${availableBalance.toLocaleString()}, ` +
+           `Required: KES ${deductionAmount.toLocaleString()} including withdrawal charge. ` +
+           reasonMessage;
+}
+
+function _getReserveSql(entityType) {
+    if (entityType === 'buyer_refund') {
+        return `UPDATE buyers
+               SET refunds = refunds - $1,
+                   refund_withdrawal_reserved_balance = COALESCE(refund_withdrawal_reserved_balance, 0) + $1,
+                   updated_at = NOW()
+               WHERE id = $2`;
+    }
+    if (entityType === 'creator') {
+        return `UPDATE creators
+               SET balance = balance - $1,
+                   withdrawal_reserved_balance = COALESCE(withdrawal_reserved_balance, 0) + $1,
+                   updated_at = NOW()
+               WHERE id = $2`;
+    }
+    return `UPDATE sellers
+             SET balance = balance - $1,
+                 withdrawal_reserved_balance = COALESCE(withdrawal_reserved_balance, 0) + $1,
+                 updated_at = NOW()
+             WHERE id = $2`;
+}
+
 class WithdrawalService {
     async startPayoutProviderAttempt(request, entity, amount, phone) {
         const client = await pool.connect();
@@ -331,6 +424,8 @@ class WithdrawalService {
      * @param {string}  params.entityType  - 'seller' | 'creator' | 'buyer_refund'
      * @returns {Promise<Object>} withdrawal_requests row
      */
+    
+
     async createWithdrawalRequest({ entityId, entityType, amount, mpesaNumber, mpesaName, idempotencyKey }) {
 
         // --- Phase 1: Validate inputs before touching DB ---
@@ -358,35 +453,7 @@ class WithdrawalService {
             await client.query('BEGIN');
 
             // Lock entity row and fetch current balance
-            const entityQuery = entityType === 'buyer_refund'
-                ? `SELECT id,
-                          refunds AS balance,
-                          refund_withdrawal_reserved_balance AS withdrawal_reserved_balance,
-                          full_name,
-                          mobile_payment,
-                          whatsapp_number,
-                          NULL::text AS mpesa_number,
-                          'buyer_refund' AS entity_type
-                   FROM buyers
-                   WHERE id = $1
-                   FOR UPDATE`
-                : entityType === 'creator'
-                ? `SELECT id, balance, withdrawal_reserved_balance,
-                          CONCAT_WS(' ', first_name, last_name) AS full_name,
-                          mpesa_number,
-                          whatsapp_number,
-                          'creator' AS entity_type
-                   FROM creators
-                   WHERE id = $1 AND status = 'active'
-                   FOR UPDATE`
-                : `SELECT id, balance, pending_settlement_balance, withdrawal_reserved_balance,
-                          full_name,
-                          whatsapp_number,
-                          NULL::text AS mpesa_number,
-                          'seller' AS entity_type
-                   FROM sellers
-                   WHERE id = $1
-                   FOR UPDATE`;
+            const entityQuery = _getEntityLockQuery(entityType);
             const { rows } = await client.query(entityQuery, [entityId]);
             const entityRow = rows[0];
 
@@ -395,17 +462,9 @@ class WithdrawalService {
             }
 
             entity = entityRow;
-            const payoutPhone = entityType === 'creator'
-                ? entity.mpesa_number
-                : entityType === 'buyer_refund'
-                    ? (mpesaNumber?.trim() || entity.mobile_payment || entity.whatsapp_number)
-                    : mpesaNumber;
+            const payoutPhone = _getPayoutPhone(entityType, entity, mpesaNumber);
             normalizedPhone = payoutService.normalizePhoneForPayout(payoutPhone);
-            const normalizedName = entityType === 'creator'
-                ? getEntityLabel(entity)
-                : entityType === 'buyer_refund'
-                    ? (mpesaName?.trim() || getEntityLabel(entity))
-                : mpesaName.trim();
+            const normalizedName = _getNormalizedPayoutName(entityType, entity, mpesaName);
 
             // Client-supplied payout destination check. Sellers have no stored
             // verified M-Pesa number, and buyer refunds accept a per-request
@@ -438,7 +497,7 @@ class WithdrawalService {
                 `SELECT id, amount, seller_id, creator_id, buyer_id, mpesa_number, mpesa_name, status, idempotency_key,
                         provider_reference, metadata, created_at
                  FROM withdrawal_requests
-                 WHERE ${entityType === 'buyer_refund' ? 'buyer_id' : entityType === 'creator' ? 'creator_id' : 'seller_id'} = $1
+                 WHERE ${_getEntityIdColumn(entityType)} = $1
                    AND idempotency_key = $2
                  FOR UPDATE`,
                 [entityId, normalizedIdempotencyKey]
@@ -480,38 +539,11 @@ class WithdrawalService {
             const availableBalance = Math.max(0, currentBalance - clearingBalance);
 
             if (deductionAmount > availableBalance) {
-                throw new AppError(
-                    `Insufficient balance. Available: KES ${availableBalance.toLocaleString()}, ` +
-                    `Required: KES ${deductionAmount.toLocaleString()} including withdrawal charge. ` +
-                    (clearingBalance > 0
-                        ? `KES ${clearingBalance.toLocaleString()} is still clearing under the standard T+2 holding period.`
-                        : entityType === 'seller'
-                            ? 'Recent sales may still be preparing for withdrawal.'
-                            : entityType === 'buyer_refund'
-                                ? 'Some refund funds may already be reserved for another withdrawal.'
-                                : 'Some earnings may already be reserved for another withdrawal.'),
-                    400
-                );
+                throw new AppError(_getInsufficientBalanceMessage(availableBalance, deductionAmount, clearingBalance, entityType), 400);
             }
 
             // Reserve available funds while Paystack processes the transfer.
-            const reserveSql = entityType === 'buyer_refund'
-                ? `UPDATE buyers
-                   SET refunds = refunds - $1,
-                       refund_withdrawal_reserved_balance = COALESCE(refund_withdrawal_reserved_balance, 0) + $1,
-                       updated_at = NOW()
-                   WHERE id = $2`
-                : entityType === 'creator'
-                ? `UPDATE creators
-                   SET balance = balance - $1,
-                       withdrawal_reserved_balance = COALESCE(withdrawal_reserved_balance, 0) + $1,
-                       updated_at = NOW()
-                   WHERE id = $2`
-                : `UPDATE sellers
-                 SET balance = balance - $1,
-                     withdrawal_reserved_balance = COALESCE(withdrawal_reserved_balance, 0) + $1,
-                     updated_at = NOW()
-                 WHERE id = $2`;
+            const reserveSql = _getReserveSql(entityType);
             await client.query(reserveSql, [deductionAmount, entityId]);
 
             const insertResult = await client.query(

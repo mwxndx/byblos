@@ -8,15 +8,17 @@ interface ProductEditPhysicalOptionsProps {
   onFormDataChange: (data: ProductEditFormData) => void;
 }
 
-export function ProductEditPhysicalOptions({ formData, onFormDataChange }: ProductEditPhysicalOptionsProps) {
+export function ProductEditPhysicalOptions({ formData, onFormDataChange }: Readonly<ProductEditPhysicalOptionsProps>) {
   return (
                 <div className="rounded-xl seller-card-soft p-3 space-y-3">
-                  <label className="flex items-center justify-between gap-3 cursor-pointer">
+                  <label htmlFor="pe-custom-product" className="flex items-center justify-between gap-3 cursor-pointer">
                     <span>
                       <span className="block text-slate-900 dark:text-white text-xs font-semibold">Custom product</span>
                       <span className="block text-[10px] text-slate-500 dark:text-white/60 font-medium">Require buyer instructions and show production time.</span>
                     </span>
                     <input
+                      id="pe-custom-product"
+                      aria-label="Custom product"
                       type="checkbox"
                       checked={formData.is_custom_product}
                       onChange={(event) => onFormDataChange({ ...formData, is_custom_product: event.target.checked, is_imported_product: event.target.checked ? false : formData.is_imported_product })}
@@ -24,12 +26,14 @@ export function ProductEditPhysicalOptions({ formData, onFormDataChange }: Produ
                     />
                   </label>
 
-                  <label className="flex items-center justify-between gap-3 border-t border-slate-200 dark:border-separator pt-3 cursor-pointer">
+                  <label htmlFor="pe-imported-product" className="flex items-center justify-between gap-3 border-t border-slate-200 dark:border-separator pt-3 cursor-pointer">
                     <span>
                       <span className="block text-slate-900 dark:text-white text-xs font-semibold">Imported / pre-order item</span>
                       <span className="block text-[10px] text-slate-500 dark:text-white/60 font-medium">Show buyers when the item is expected to be ready.</span>
                     </span>
                     <input
+                      id="pe-imported-product"
+                      aria-label="Imported / pre-order item"
                       type="checkbox"
                       checked={formData.is_imported_product}
                       onChange={(event) => onFormDataChange({ ...formData, is_imported_product: event.target.checked, is_custom_product: event.target.checked ? false : formData.is_custom_product })}

@@ -14,7 +14,7 @@ export default function MarketingLogin() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        getFreshCsrfToken();
+        void getFreshCsrfToken().catch(() => {});
     }, []);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

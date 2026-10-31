@@ -29,6 +29,27 @@ interface BuyerOrderCardProps {
   onDownload: (order: ApiOrder) => void;
 }
 
+
+function deriveBuyerOrderProductType(order: ApiOrder, isService: boolean, isDigital: boolean): string {
+  if (order.order_type) return order.order_type;
+  if (order.orderType) return order.orderType;
+  if (isService) return 'SERVICE';
+  if (isDigital) return 'DIGITAL';
+  return order.items[0]?.productType || 'PHYSICAL';
+}
+
+function getBuyerOrderCardBorder(isService: boolean, isDigital: boolean): string {
+  if (isService) return 'border-purple-400/45';
+  if (isDigital) return 'border-red-400/45';
+  return 'border-white/15';
+}
+
+function getBuyerOrderItemClass(isService: boolean, isDigital: boolean): string {
+  if (isService) return 'bg-purple-500/10 border-purple-400/25';
+  if (isDigital) return 'bg-red-500/10 border-red-400/25';
+  return 'bg-white/8 border-white/12';
+}
+
 export function BuyerOrderCard({
   order,
   downloadingOrderId,
@@ -36,7 +57,7 @@ export function BuyerOrderCard({
   onViewDetails,
   onConfirmReceipt,
   onDownload,
-}: BuyerOrderCardProps) {
+}: Readonly<BuyerOrderCardProps>) {
   const mainItem = order.items.find(item => item.imageUrl) || order.items[0];
   const mainImage = mainItem?.imageUrl ? getImageUrl(mainItem.imageUrl) : null;
   const isService = isServiceOrder(order);
@@ -45,7 +66,7 @@ export function BuyerOrderCard({
   // already check it first, so deriving productType from them keeps this in
   // sync instead of re-guessing from the first item's own (often-unset)
   // productType field.
-  const productType = order.order_type || order.orderType || (isService ? 'SERVICE' : isDigital ? 'DIGITAL' : order.items[0]?.productType || 'PHYSICAL');
+  const productType = deriveBuyerOrderProductType(order, isService, isDigital);
   const canConfirmReceipt = canConfirmOrderReceipt(order);
   const buyerServiceCharge = getBuyerServiceCharge(order);
   const instruction = getOrderInstruction({
@@ -56,11 +77,11 @@ export function BuyerOrderCard({
   });
   const cardClasses = [
     'overflow-hidden transition-all duration-300 bg-black border shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40',
-    isService ? 'border-purple-400/45' : isDigital ? 'border-red-400/45' : 'border-white/15'
+    getBuyerOrderCardBorder(isService, isDigital)
   ].join(' ');
   const itemClasses = [
     'flex items-center justify-between gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg border transition-colors',
-    isService ? 'bg-purple-500/10 border-purple-400/25' : isDigital ? 'bg-red-500/10 border-red-400/25' : 'bg-white/8 border-white/12'
+    getBuyerOrderItemClass(isService, isDigital)
   ].join(' ');
 
   const [expanded, setExpanded] = useState(false);
@@ -161,7 +182,7 @@ export function BuyerOrderCard({
 
         <div className="p-4 sm:p-6 space-y-2 sm:space-y-3">
           {order.items.slice(0, 2).map((item, idx) => (
-            <div key={idx} className={itemClasses}>
+            <div key={item.id ?? `${item.name}-${idx}`} className={itemClasses}>
               <div className="flex-1 min-w-0">
                 <p className="text-sm sm:text-base font-semibold text-label truncate">{item.name}</p>
                 <p className="text-xs text-label-2">Qty {item.quantity || 1}</p>

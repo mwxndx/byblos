@@ -111,7 +111,7 @@ export function WithdrawalsTab({
               {formatKes(pendingSettlementBalance)}
             </p>
           </div>
-          <div className="mt-1 text-[9px] sm:text-[10px] font-semibold text-slate-400 dark:text-white/40 min-w-0" title={`Next: ${nextSettlementDate}${nextSettlementTime ? ` at ${nextSettlementTime}` : ''}`}>
+          <div className="mt-1 text-[9px] sm:text-[10px] font-semibold text-slate-400 dark:text-white/40 min-w-0" title={`Next: ${nextSettlementDate}${nextSettlementTime ? ' at ' + nextSettlementTime : ''}`}>
             <p className="truncate">Next: {nextSettlementDate}</p>
             {nextSettlementTime && (
               <p className="truncate text-slate-500 dark:text-white/60 font-medium">at {nextSettlementTime}</p>

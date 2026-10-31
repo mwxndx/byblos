@@ -20,7 +20,8 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');
-  const [extraFiles, setExtraFiles] = useState<File[]>([]);
+  const [, setExtraFiles] = useState<File[]>([]);
+
   const [extraPreviews, setExtraPreviews] = useState<string[]>([]);
   const [formData, setFormData] = useState<AddProductFormData>({ ...formDataDefaults });
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -110,8 +111,8 @@ export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; 
           file: formData.digital_file,
           category: formData.digital_category,
           onProgress: setUploadProgress,
-        }) as Record<string, unknown>;
-        digital.path = String(res.filePath);
+        }) as { filePath?: string; fileName?: string; size?: number | string };
+        digital.path = String(res.filePath || '');
         digital.name = String(res.fileName);
         digital.size = Number(res.size);
       }

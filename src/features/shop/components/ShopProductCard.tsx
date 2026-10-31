@@ -35,7 +35,7 @@ export function ShopProductCard({
   isWishlisted,
   onToggleWishlist,
   isReadOnly = false,
-}: ShopProductCardProps) {
+}: Readonly<ShopProductCardProps>) {
   const [showDescription, setShowDescription] = useState(false);
   const [showImages, setShowImages] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -321,9 +321,9 @@ export function ShopProductCard({
                   className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-2 pointer-events-auto"
                   style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
                 >
-                  {productImages.map((_, idx) => (
+                  {productImages.map((imgUrl, idx) => (
                     <button
-                      key={idx}
+                      key={`dot-${product.id}-${imgUrl || idx}`}
                       type="button"
                       aria-label={`Go to image ${idx + 1}`}
                       onClick={(e) => {

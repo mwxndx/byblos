@@ -9,7 +9,7 @@ import { ShopProductCard } from './ShopProductCard';
  * adds the product (spec §19), and an in-bag product shows the remove (x) control.
  * Services are added to the bag too, then booked in the bag checkout.
  */
-export function ShopBagProductCard({ product, isReadOnly = false }: { product: Product; isReadOnly?: boolean }) {
+export function ShopBagProductCard({ product, isReadOnly = false }: Readonly<{ product: Product; isReadOnly?: boolean }>) {
   const bag = useBag();
   const { isSold } = getProductFlags(product as unknown as ProductWithApiFields);
   const inBag = !isReadOnly && bag.hasProduct(product.id);

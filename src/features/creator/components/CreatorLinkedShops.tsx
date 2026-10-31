@@ -12,7 +12,7 @@ interface CreatorLinkedShopsProps {
   maxPromotions: number;
 }
 
-export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, maxPromotions }: CreatorLinkedShopsProps) {
+export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, maxPromotions }: Readonly<CreatorLinkedShopsProps>) {
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">

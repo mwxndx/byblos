@@ -55,7 +55,8 @@ export async function searchProducts(query: string, filters: Record<string, unkn
     }
 
     return productsData.map(transformProduct);
-  } catch (error) {
+  } catch {
+    // Graceful degradation: return empty array when search query fails
     return [];
   }
 }

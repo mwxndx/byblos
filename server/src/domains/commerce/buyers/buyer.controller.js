@@ -1,6 +1,6 @@
 import BuyerService from './buyer.service.js';
 import Buyer from './buyer.model.js';
-import User from '../../identity/users/user.model.js';
+
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import { sanitizeBuyer, sanitizeWithdrawalRequest } from '../../../shared/utils/sanitize.js';
 import { sanitizeOrder } from '../../../shared/utils/orderSanitizer.js';
@@ -12,15 +12,15 @@ import { generateRefreshToken } from '../../../shared/utils/refreshToken.js';
 import tokenBlacklist from '../../identity/tokens/tokenBlacklist.service.js';
 import { revokeSessionTokens, clearAuthCookies, invalidateUserSessions } from '../../../shared/utils/sessionRevocation.js';
 import OrderModel from "../../orders/order/order.model.js";
-import { OrderStatus } from "../../../shared/constants/enums.js";
+
 import WithdrawalService from '../../payments/withdrawals/withdrawal.service.js';
-import { pool } from '../../../infrastructure/database/database.js';
-import { addBusinessDays } from '../../orders/escrow/settlement.service.js';
-import Fees from '../../../shared/config/fees.js';
+
+
+
 
 import {
   createSendToken,
-  autoProvisionBuyerProfile,
+
   updateBuyerProfileHelper,
   registerBuyerHandler,
   handleLoginError,
@@ -210,7 +210,7 @@ const normalizePhoneNumber = (phone) => {
   if (!phone) return null;
 
   // Remove all spaces, dashes, and parentheses
-  let normalized = phone.replace(/[\s\-\(\)]/g, '');
+  let normalized = phone.replace(/[\s\-()]/g, '');
 
   // Remove leading + if present
   if (normalized.startsWith('+')) {

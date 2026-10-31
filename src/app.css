@@ -20,9 +20,9 @@ body,
     width: 100%;
     height: 100%;
     overflow-x: hidden;
-    overscroll-behavior: none !important;
-    overscroll-behavior-y: none !important;
-    overscroll-behavior-x: none !important;
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
     background: #000000;
     /* SF Pro on Apple (via -apple-system) → Inter on web/Android. -apple-system
        is ignored on Android/Windows so Inter is used there, not Roboto. */
@@ -85,9 +85,9 @@ body.android-native {
 
 /* Fixed bottom navigation bars: solid themed background, zero bottom gap */
 nav.fixed.bottom-0 {
-    bottom: 0 !important;
-    margin-bottom: 0 !important;
-    background-color: var(--byblos-bg) !important;
+    bottom: 0;
+    margin-bottom: 0;
+    background-color: var(--byblos-bg);
 }
 .mt-safe-top {
     margin-top: var(--sat) !important;
@@ -516,9 +516,9 @@ nav.fixed.bottom-0 {
 .admin-light-dashboard,
 .marketing-light-dashboard,
 main {
-    overscroll-behavior: none !important;
-    overscroll-behavior-y: none !important;
-    overscroll-behavior-x: none !important;
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
 }
 
 .dashboard-layout {
@@ -610,12 +610,12 @@ body.dashboard-active .seller-tab-selected {
 
 .admin-light-dashboard thead,
 .marketing-light-dashboard thead {
-    background: #141414 !important;
+    background: #141414;
 }
 
 .admin-light-dashboard tbody,
 .marketing-light-dashboard tbody {
-    background: #0a0a0a !important;
+    background: #0a0a0a;
 }
 .admin-light-dashboard input,
 .marketing-light-dashboard input {
@@ -810,7 +810,6 @@ button.btn-white,
 .auth-page button.btn-white,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
     background-color: #ffffff !important;
-    background: #ffffff !important;
     color: #000000 !important;
     border-color: #e2e8f0 !important;
 }
@@ -821,7 +820,6 @@ button.btn-white:hover,
 .auth-page button.btn-white:hover,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
     background-color: #f1f5f9 !important;
-    background: #f1f5f9 !important;
     color: #000000 !important;
 }
 
@@ -1234,46 +1232,46 @@ button.btn-white:hover,
     --label: #f5f5f7;
     --label-2: #a1a1a8;
     --label-3: #8e8e93;
-    background: #000000 !important;
-    color: #f8fafc !important;
+    background: #000000;
+    color: #f8fafc;
 }
 
 .shop-page-root[data-shop-theme="dark"] .shop-products-card {
-    background: #000000 !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
-    box-shadow: var(--shadow-card) !important;
+    background: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: var(--shadow-card);
 }
 
 .shop-page-root[data-shop-theme="dark"] input[type="text"] {
-    background-color: #000000 !important;
-    color: #f8fafc !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+    background-color: #000000;
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .shop-page-root[data-shop-theme="dark"] input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.45) !important;
+    color: rgba(255, 255, 255, 0.45);
 }
 
 /* ── Product Card Elevation Rules ────────────────────────────────────────── */
 .product-card-item {
     transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
                 box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                border-color 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .shop-page-root[data-shop-theme="dark"] .product-card-item {
-    background-color: #000000 !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
-    box-shadow: var(--shadow-card) !important;
+    background-color: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    box-shadow: var(--shadow-card);
 }
 
 .shop-page-root[data-shop-theme="dark"] .product-card-item:hover {
-    transform: translateY(-6px) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
+    transform: translateY(-6px);
+    border-color: rgba(255, 255, 255, 0.25);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15),
                 0 24px 50px -12px rgba(0, 0, 0, 0.98),
-                0 0 28px -4px rgba(var(--theme-accent-rgb, 245, 158, 11), 0.35) !important;
+                0 0 28px -4px rgba(var(--theme-accent-rgb, 245, 158, 11), 0.35);
 }
 
 .shop-page-root[data-shop-theme="light"] {
@@ -1287,38 +1285,38 @@ button.btn-white:hover,
     --label: #1d1d1f;
     --label-2: #6e6e73;
     --label-3: #a0a0a6;
-    background: #ffffff !important;
-    color: #0f0f0e !important;
+    background: #ffffff;
+    color: #0f0f0e;
 }
 
 .shop-page-root[data-shop-theme="light"] .shop-products-card {
-    background: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: var(--shadow-card) !important;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-card);
 }
 
 .shop-page-root[data-shop-theme="light"] input[type="text"] {
-    background-color: #ffffff !important;
-    color: #0f0f0e !important;
-    border-color: rgba(0, 0, 0, 0.12) !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    background-color: #ffffff;
+    color: #0f0f0e;
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .shop-page-root[data-shop-theme="light"] input[type="text"]::placeholder {
-    color: #94a3b8 !important;
+    color: #94a3b8;
 }
 
 .shop-page-root[data-shop-theme="light"] .product-card-item {
-    background-color: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: var(--shadow-card) !important;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-card);
 }
 
 .shop-page-root[data-shop-theme="light"] .product-card-item:hover {
-    transform: translateY(-6px) !important;
-    border-color: rgba(0, 0, 0, 0.18) !important;
+    transform: translateY(-6px);
+    border-color: rgba(0, 0, 0, 0.18);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-                0 24px 48px -10px rgba(15, 23, 42, 0.14) !important;
+                0 24px 48px -10px rgba(15, 23, 42, 0.14);
 }
 
 /* ── Universal Theme Switch Transition ───────────────────────────────────── */

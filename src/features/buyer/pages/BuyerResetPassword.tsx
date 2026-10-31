@@ -141,8 +141,8 @@ export function BuyerResetPassword() {
                                             { label: "1 Number", met: strength.hasNumber },
                                             { label: "1 Special", met: strength.hasSpecial },
                                             { label: "Upper/Lower", met: strength.hasUpper && strength.hasLower },
-                                        ].map((req, index) => (
-                                            <div key={index} className="flex items-center space-x-2">
+                                        ].map((req) => (
+                                            <div key={req.label} className="flex items-center space-x-2">
                                                 {req.met ? (
                                                     <div className="bg-green-500/20 p-0.5 rounded-full">
                                                         <Check className="h-2.5 w-2.5 text-green-600 dark:text-green-400" />

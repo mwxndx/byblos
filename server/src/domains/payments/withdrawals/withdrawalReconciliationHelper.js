@@ -34,7 +34,8 @@ export async function reconcileStuckWithdrawalsHelper(withdrawalServiceInstance,
 
     logger.info(`[WithdrawalService] Found ${stuck.length} stuck request(s)`);
 
-    for (const request of stuck) {
+    // Sequential processing intentional: respects payment provider rate limits
+    for (const request of stuck) { // NOSONAR: javascript:S9382
         try {
             if (!request.provider_reference) {
                 logger.warn(`[WithdrawalService] Request ${request.id} has no provider_reference. Marking needs_review.`);

@@ -120,12 +120,12 @@ export const protect = async (req, res, next) => {
       // outage means explicit token revocations aren't honored, so alert on it
       // rather than only logging. reportAlert dedupes (60s), safe on this path.
       logger.warn(`[AUTH][Request ID: ${req.id || 'N/A'}] Token blacklist check failed (Redis unavailable):`, blacklistErr.message);
-      reportAlert({
+      void reportAlert({
         level: 'warn',
         title: 'Token blacklist check failing open',
         message: `Auth token blacklist lookup errored (${blacklistErr.message}); requests are being allowed through without revocation enforcement. Check Redis.`,
         context: { requestId: req.id || null }
-      });
+      }).catch(() => {});
     }
 
     // 2) Verify token
@@ -142,7 +142,7 @@ export const protect = async (req, res, next) => {
     // Cache lookup (skip for admin — always verify fresh)
     if (userType !== 'admin') {
       const cached = _authCache.get(token);
-      if (cached && cached.expiresAt > Date.now()) {
+      if (cached?.expiresAt > Date.now()) {
         // SECURITY FIX (FIX-11): Even on cache hit, re-check that the account is still
         // allowed. The cached record can be up to AUTH_CACHE_TTL_MS stale, so mirror the
         // fresh-path auth queries exactly via isCachedAccountRevoked — this now catches

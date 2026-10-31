@@ -1,3 +1,4 @@
+import logger from '../../shared/utils/logger.js';
 import cacheService from '../../shared/utils/cache.service.js';
 import paymentService from '../../domains/payments/payments/payment.service.js';
 import CorePaymentService from '../../domains/payments/payments/CorePaymentService.js';
@@ -117,8 +118,8 @@ async function syncPendingPaymentFromProvider(row) {
 export const getProducts = async (req, res) => {
   try {
     const { aesthetic, city, location, page = 1, limit = 20 } = req.query;
-    const pageNum = Math.max(1, parseInt(page, 10));
-    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+    const pageNum = Math.max(1, Number.parseInt(page, 10));
+    const limitNum = Math.min(50, Math.max(1, Number.parseInt(limit, 10)));
     const offset = (pageNum - 1) * limitNum;
 
     // 1. Generate Cache Key based on filters and pagination
@@ -287,15 +288,15 @@ export const getSellerPublicInfo = async (req, res) => {
 // Get all active sellers with wishlist count
 export const getSellers = async (req, res) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page || '1', 10) || 1);
-    const pageSize = Math.min(50, Math.max(1, parseInt(req.query.limit || req.query.pageSize || '24', 10) || 24));
+    const page = Math.max(1, Number.parseInt(req.query.page || '1', 10) || 1);
+    const pageSize = Math.min(50, Math.max(1, Number.parseInt(req.query.limit || req.query.pageSize || '24', 10) || 24));
     const offset = (page - 1) * pageSize;
     const cacheKey = `public:sellers:list:${page}:${pageSize}`;
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) return res.status(200).json(cachedData);
 
     const rows = await sellerRepository.findActiveWithStats({ limit: pageSize, offset });
-    const total = parseInt(rows[0]?.total_count || '0', 10);
+    const total = Number.parseInt(rows[0]?.total_count || '0', 10);
 
     const sellers = rows.map(row => ({
       id: row.id,
@@ -310,9 +311,9 @@ export const getSellers = async (req, res) => {
       longitude: row.longitude,
       instagramLink: row.instagramLink || null,
       tiktokLink: row.tiktokLink || null,
-      totalWishlistCount: parseInt(row.total_wishlist_count, 10) || 0,
-      wishlistCount: parseInt(row.total_wishlist_count, 10) || 0,
-      knockCount: parseInt(row.knock_count, 10) || 0,
+      totalWishlistCount: Number.parseInt(row.total_wishlist_count, 10) || 0,
+      wishlistCount: Number.parseInt(row.total_wishlist_count, 10) || 0,
+      knockCount: Number.parseInt(row.knock_count, 10) || 0,
       createdAt: row.created_at
     }));
 
@@ -501,7 +502,10 @@ export const getOrderStatus = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(`Error fetching status for order ${req.params.id}:`, error);
+    logger.error('Error fetching order status', {
+      orderId: String(req.params.id || '').replaceAll('\r', '').replaceAll('\n', ''),
+      error: error.message
+    });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch order status'
@@ -628,8 +632,8 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = parseInt(process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
-  const latestAndroidVersionCode = parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '73', 10);
+  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
+  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '73', 10);
   const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.73';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';

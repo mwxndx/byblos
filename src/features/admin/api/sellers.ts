@@ -10,7 +10,17 @@ export async function getSellers(params: AdminListParams = {}): Promise<Paginate
   const response = await api.get('/admin/sellers', { params: toRequestParams(params) });
   const sellersData: unknown[] = Array.isArray(response.data.data) ? response.data.data : [];
   const items = sellersData.map((raw) => {
-    const seller = raw as Record<string, unknown>;
+    const seller = raw as {
+      id?: string | number;
+      name?: string;
+      full_name?: string;
+      phone?: string;
+      whatsapp_number?: string;
+      created_at?: string;
+      createdAt?: string;
+      user_id?: string | number;
+      [key: string]: unknown;
+    };
     return {
       ...seller,
       id: String(seller.id || ''),
@@ -34,7 +44,7 @@ export async function getSellerById(id: string) {
     name: seller.name || seller.full_name || 'Unnamed Seller',
     phone: seller.phone || seller.whatsapp_number || '',
     createdAt: seller.created_at || seller.createdAt || new Date().toISOString(),
-    recentOrders: (seller.recentOrders || []).map((o: Record<string, unknown>) => ({
+    recentOrders: (seller.recentOrders || []).map((o: { id?: string | number; [key: string]: unknown }) => ({
       ...o,
       id: String(o.id || '')
     }))

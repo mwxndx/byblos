@@ -4,8 +4,8 @@ ALTER TABLE buyers ALTER COLUMN location SET DEFAULT 'Nairobi';
 
 UPDATE buyers
 SET city = 'Nairobi'
-WHERE city IS NULL OR TRIM(city) = '' OR city = 'Unknown City';
+WHERE city IS NULL OR LENGTH(TRIM(city)) = 0 OR city = 'Unknown City';
 
 UPDATE buyers
 SET location = 'Nairobi'
-WHERE location IS NULL OR TRIM(location) = '';
+WHERE location IS NULL OR LENGTH(TRIM(location)) = 0;

@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const root = process.cwd();
 
@@ -23,7 +23,7 @@ const importRe = /from\s+['"]([^'"]+)['"]/g;
 
 const files = walk(root);
 const graph = {};
-const allRels = new Set(files.map(f => path.relative(root, f).replace(/\\/g, '/')));
+const allRels = new Set(files.map(f => path.relative(root, f).replaceAll('\\', '/')));
 
 function resolveImport(fromFile, importPath) {
   if (!importPath.startsWith('.')) return null;
@@ -31,15 +31,15 @@ function resolveImport(fromFile, importPath) {
   const candidates = [base, base + '.ts', base + '.tsx', base + '.js', base + '.jsx',
     path.join(base, 'index.ts'), path.join(base, 'index.tsx'), path.join(base, 'index.js')];
   for (const c of candidates) {
-    const rel = path.relative(root, c).replace(/\\/g, '/');
+    const rel = path.relative(root, c).replaceAll('\\', '/');
     if (allRels.has(rel)) return rel;
   }
-  return path.relative(root, base).replace(/\\/g, '/');
+  return path.relative(root, base).replaceAll('\\', '/');
 }
 
 // Build raw import graph
 for (const f of files) {
-  const rel = path.relative(root, f).replace(/\\/g, '/');
+  const rel = path.relative(root, f).replaceAll('\\', '/');
   const content = fs.readFileSync(f, 'utf8');
   const imports = new Set();
   let m;
@@ -102,7 +102,7 @@ function classify(rel) {
 
 // Build semantic nodes
 const nodes = files.map(f => {
-  const rel = path.relative(root, f).replace(/\\/g, '/');
+  const rel = path.relative(root, f).replaceAll('\\', '/');
   const stat = fs.statSync(f);
   return {
     id: rel,

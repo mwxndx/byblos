@@ -30,7 +30,7 @@ interface SellerDashboardTabsProps {
 // Fixed bottom navigation, styled identically to the buyer bottom nav
 // (BuyerBottomNav): plain icons with a colour-only active state, a dot for
 // unread orders and a count pill for pending creators.
-export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreatorsCount = 0, onSelectTab }: SellerDashboardTabsProps) {
+export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreatorsCount = 0, onSelectTab }: Readonly<SellerDashboardTabsProps>) {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"

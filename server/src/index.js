@@ -1,5 +1,5 @@
 import express from 'express';
-import http from 'http';
+import http from 'node:http';
 import dotenv from 'dotenv';
 import logger from './shared/utils/logger.js';
 import { validateEnvironment } from './shared/config/validateEnv.js';
@@ -10,7 +10,7 @@ import { reportError } from './shared/utils/alerting.js';
 // we never hang the shutdown waiting on the webhook — the process still exits
 // promptly even if the alert can't be delivered.
 function alertThenExit(err, title) {
-  Promise.race([
+  void Promise.race([
     reportError(err, { title }),
     new Promise((resolve) => setTimeout(resolve, 2000))
   ]).finally(() => process.exit(1));
@@ -122,7 +122,9 @@ async function startServer() {
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
-startServer().catch(err => {
+try {
+  await startServer();
+} catch (err) {
   logger.error('❌ Failed to start server:', err);
   alertThenExit(err, 'Server failed to start (fatal)');
-});
+}

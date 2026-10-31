@@ -83,7 +83,7 @@ export function acquireScreenSecurity(lockId: string): () => void {
   activeLocks.add(lockId);
 
   if (!wasActive) {
-    syncNativeScreenSecurity(true);
+    void syncNativeScreenSecurity(true);
   }
 
   return () => {
@@ -97,7 +97,7 @@ export function acquireScreenSecurity(lockId: string): () => void {
 export function releaseScreenSecurity(lockId: string): void {
   const existed = activeLocks.delete(lockId);
   if (existed && activeLocks.size === 0) {
-    syncNativeScreenSecurity(false);
+    void syncNativeScreenSecurity(false);
   }
 }
 

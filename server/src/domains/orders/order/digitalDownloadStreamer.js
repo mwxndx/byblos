@@ -92,13 +92,19 @@ export function streamCandidateUrls({ candidateUrls, digitalFilePath, cleanFileN
 
             // If redirected (301/302/307/308), follow redirect safely
             if ([301, 302, 307, 308].includes(streamRes.statusCode) && streamRes.headers.location) {
-                const redirectUrl = streamRes.headers.location;
-                if (!isCloudinaryAssetUrl(redirectUrl)) {
+                const redirectLocation = streamRes.headers.location;
+                let parsedRedirectUrl;
+                try {
+                    parsedRedirectUrl = new URL(redirectLocation);
+                } catch {
+                    return tryStream(index + 1);
+                }
+                if (!['https:', 'http:'].includes(parsedRedirectUrl.protocol) || !isCloudinaryAssetUrl(parsedRedirectUrl.href)) {
                     logger.warn(`[DOWNLOAD] Refusing non-Cloudinary redirect for ${digitalFilePath}, trying next...`);
                     return tryStream(index + 1);
                 }
-                const redirRequester = redirectUrl.startsWith('https:') ? https : http;
-                return redirRequester.get(redirectUrl, (redirRes) => {
+                const redirRequester = parsedRedirectUrl.protocol === 'https:' ? https : http;
+                return redirRequester.get(parsedRedirectUrl, (redirRes) => { // NOSONAR jssecurity:S5144 - strict URL protocol and Cloudinary host allowlist validated
                     if (redirRes.statusCode === 200) {
                         res.setHeader('Content-Type', mimeType);
                         res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(cleanFileName)}"`);

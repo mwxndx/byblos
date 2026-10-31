@@ -23,11 +23,11 @@ import { pool } from '../../../infrastructure/database/database.js';
 import crypto from 'node:crypto';
 import logger from '../../../shared/utils/logger.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
-import FulfillmentQueueService from '../../orders/fulfillment/fulfillmentQueue.service.js';
+
 import { getProviderPayloadData, normalizeProviderReference } from '../../../shared/utils/providerReference.js';
 import { normalizeProviderAmount, normalizeProviderPaymentStatus } from '../../../shared/utils/paymentStatusNormalizer.js';
 import { normalizePaystackChargePayload } from '../../../shared/utils/paystackPaymentNormalizer.js';
-import { releaseOrderReservations } from '../../../shared/utils/reservationRelease.js';
+
 import { PaymentStatus } from '../../../shared/constants/enums.js';
 import withdrawalService from '../withdrawals/withdrawal.service.js';
 import {
@@ -39,8 +39,8 @@ import {
     handleLatePaymentCompensation,
     handlePaidOrderTransition,
     handleFailedOrderTransition,
-    resolveCustomProductionPatch,
-    PAID_TERMINAL_ORDER_STATUSES,
+
+
     CANNOT_FULFILL_ORDER_STATUSES,
     FULFILLABLE_ORDER_STATUSES
 } from './paymentOrderCompletionHelper.js';

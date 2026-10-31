@@ -1,13 +1,11 @@
-import { sanitizeOrder } from './orderSanitizer.js';
-
 // Retained re-export for backward-compatibility with external system contract checks
-export { sanitizeOrder };
+export { sanitizeOrder } from './orderSanitizer.js';
 
 // Helper to strictly pick keys
 const pick = (obj, keys) => {
     if (!obj) return null;
     return keys.reduce((acc, key) => {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (Object.hasOwn(obj, key)) {
             acc[key] = obj[key];
         }
         return acc;
@@ -215,7 +213,7 @@ export const sanitizeWithdrawalRequest = (request) => {
         processedBy: reqObj.processedBy || reqObj.processed_by || null,
         providerReference: reqObj.providerReference || reqObj.provider_reference || null,
         mpesaReceipt: reqObj.mpesaReceipt || reqObj.mpesa_receipt || metadata.mpesa_receipt || null,
-        failureReason: reqObj.failureReason || reqObj.failure_reason || metadata.api_error || metadata.remarks || (metadata.paystack_callback && metadata.paystack_callback.remarks) || null,
+        failureReason: reqObj.failureReason || reqObj.failure_reason || metadata.api_error || metadata.remarks || metadata.paystack_callback?.remarks || null,
         message: reqObj.message // Helper message if we added one
         // Removed: raw_response, internal IDs
     };

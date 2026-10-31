@@ -24,7 +24,7 @@ import trackingRoutes from './tracking.routes.js';
 import creatorRoutes from './creator.routes.js';
 import locationRoutes from './location.routes.js';
 import notificationRoutes from './notification.routes.js';
-import { protect } from '../middleware/auth.js';
+
 
 const router = express.Router();
 

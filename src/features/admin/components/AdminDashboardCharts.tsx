@@ -148,7 +148,7 @@ export const ProductStatusChart = ({ data }: { data: Record<string, unknown>[] }
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell key={`cell-${String(entry.name ?? index)}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip
@@ -165,7 +165,7 @@ export const ProductStatusChart = ({ data }: { data: Record<string, unknown>[] }
   </ChartContainer>
 );
 
-export const GeoDistributionChart = ({ data }: { data: Record<string, unknown>[] }) => {
+export const GeoDistributionChart = ({ data }: { data: Array<{ name?: string; [key: string]: unknown }> }) => {
   const chartData = (data || []).filter(item => {
     const name = String(item?.name || '').trim().toLowerCase();
     return name && name !== 'nairobi' && name !== 'unknown' && name !== 'unknown city';
@@ -217,8 +217,8 @@ export const CategoryDistributionChart = ({ data }: { data: Record<string, unkno
             paddingAngle={5}
             dataKey="value"
           >
-            {data.map((_entry, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {data.map((entry, index) => (
+              <Cell key={`cell-${String(entry.name ?? index)}`} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip

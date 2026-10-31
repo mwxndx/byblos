@@ -47,7 +47,7 @@ interface AdminSellerDetailModalProps {
   inspectionSessionId: string;
 }
 
-export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatDate, inspectionSessionId }: AdminSellerDetailModalProps) {
+export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatDate, inspectionSessionId }: Readonly<AdminSellerDetailModalProps>) {
   useModalBackDismiss(Boolean(seller), onClose);
 
   if (!seller) return null;
@@ -117,10 +117,10 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                   { label: 'Full Legal Name', value: seller.name, icon: <User className="h-3.5 w-3.5" /> },
                                   { label: 'Email Protocol', value: seller.email, icon: <Mail className="h-3.5 w-3.5" /> },
                                   { label: 'Secure Line', value: seller.phone, icon: <Activity className="h-3.5 w-3.5" /> },
-                                  { label: 'Operating Hub', value: `${seller.city}${seller.location ? `, ${seller.location}` : ''}`, icon: <MapPin className="h-3.5 w-3.5" /> },
-                                  { label: 'Merchant Balance', value: `KSh ${parseFloat(String(seller.balance || 0)).toLocaleString()}`, highlight: true, icon: <DollarSign className="h-3.5 w-3.5" /> }
-                                ].map((item, i) => (
-                                  <div key={i} className="flex justify-between items-center py-2 border-b border-separator last:border-0 group/item">
+                                  { label: 'Operating Hub', value: [seller.city, seller.location].filter(Boolean).join(', ') || 'N/A', icon: <MapPin className="h-3.5 w-3.5" /> },
+                                  { label: 'Merchant Balance', value: `KSh ${Number.parseFloat(String(seller.balance || 0)).toLocaleString()}`, highlight: true, icon: <DollarSign className="h-3.5 w-3.5" /> }
+                                ].map((item) => (
+                                  <div key={item.label} className="flex justify-between items-center py-2 border-b border-separator last:border-0 group/item">
                                     <span className="text-label-3 text-[10px] font-semibold uppercase tracking-widest flex items-center gap-2">
                                       <span className="opacity-40 group-hover/item:opacity-100 transition-opacity">{item.icon}</span>
                                       {item.label}
@@ -159,13 +159,13 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                     { link: seller.instagram_link, icon: <Instagram className="h-5 w-5" />, color: 'hover:text-pink-500', label: 'Instagram' },
                                     { link: seller.facebook_link, icon: <Facebook className="h-5 w-5" />, color: 'hover:text-blue-600', label: 'Facebook' },
                                     { link: seller.tiktok_link, icon: <Music2 className="h-5 w-5" />, color: 'hover:text-white', label: 'TikTok' }
-                                  ].map((social, i) => (
+                                  ].map((social) => (
                                     <a
-                                      key={i}
+                                      key={social.label}
                                       href={social.link ? (social.link.startsWith('http') ? social.link : `https://${social.link}`) : '#'}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className={`h-12 rounded-xl bg-fill border border-separator flex items-center justify-center transition-all ${social.link ? `text-label-2 ${social.color} hover:bg-white/10` : 'text-gray-700 cursor-not-allowed opacity-30 hover:bg-transparent'}`}
+                                      className={`h-12 rounded-xl bg-fill border border-separator flex items-center justify-center transition-all ${social.link ? 'text-label-2 ' + social.color + ' hover:bg-white/10' : 'text-gray-700 cursor-not-allowed opacity-30 hover:bg-transparent'}`}
                                       title={social.label}
                                     >
                                       {social.icon}
@@ -225,8 +225,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                                 { label: 'Platform Revenue', value: seller.metrics?.totalCommission, color: 'text-yellow-400', icon: <Percent className="h-4 w-4" /> },
                                 { label: 'Merchant Net', value: seller.metrics?.netSales, color: 'text-blue-400', icon: <TrendingUp className="h-4 w-4" /> },
                                 { label: 'Order Chain', value: seller.metrics?.totalOrders, color: 'text-purple-400', icon: <ShoppingCart className="h-4 w-4" />, noCurrency: true }
-                              ].map((met, i) => (
-                                <div key={i} className="bg-white/[0.03] border border-separator rounded-3xl p-5 hover:bg-white/[0.05] transition-all group/met">
+                              ].map((met) => (
+                                <div key={met.label} className="bg-white/[0.03] border border-separator rounded-3xl p-5 hover:bg-white/[0.05] transition-all group/met">
                                   <div className={`h-8 w-8 rounded-xl bg-fill flex items-center justify-center ${met.color} mb-3 shadow-inner group-hover/met:scale-110 transition-transform`}>{met.icon}</div>
                                   <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest">{met.label}</p>
                                   <p className={`text-xl font-semibold mt-1 ${met.color}`}>

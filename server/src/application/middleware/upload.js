@@ -1,8 +1,7 @@
 import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import fs from 'fs';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -50,7 +49,7 @@ const upload = multer({
 const cleanupTempFiles = (req, res, next) => {
   // Clean up any temporary files after response is sent
   res.on('finish', () => {
-    if (req.file && req.file.path && req.file.path.startsWith(tempDir)) {
+    if (req.file?.path?.startsWith(tempDir)) {
       fs.unlink(req.file.path, (err) => {
         if (err) console.error('Error cleaning up temp file:', err);
       });

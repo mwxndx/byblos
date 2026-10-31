@@ -109,28 +109,41 @@ export async function cleanOrphanedTempFiles(maxAgeMs = 60 * 60 * 1000, customDi
     let freedBytes = 0;
     const now = Date.now();
 
-    for (const dir of existingDirs) {
+    const pruneTempFile = async (filePath) => {
+        try {
+            const stats = await fs.promises.stat(filePath);
+            const ageMs = now - stats.mtimeMs;
+            if (ageMs > maxAgeMs) {
+                await fs.promises.unlink(filePath);
+                return { deleted: 1, bytes: stats.size };
+            }
+        } catch (fileErr) {
+            logger.warn(`[CLEANUP] Could not stat/unlink temp file ${filePath}:`, fileErr.message);
+        }
+        return { deleted: 0, bytes: 0 };
+    };
+
+    const pruneDirectory = async (dir) => {
+        let dirDeleted = 0;
+        let dirBytes = 0;
         try {
             const entries = await fs.promises.readdir(dir, { withFileTypes: true });
-            for (const entry of entries) {
-                if (!entry.isFile()) continue;
-                const filePath = path.join(dir, entry.name);
-                try {
-                    const stats = await fs.promises.stat(filePath);
-                    const ageMs = now - stats.mtimeMs;
-                    if (ageMs > maxAgeMs) {
-                        await fs.promises.unlink(filePath);
-                        deletedFiles += 1;
-                        freedBytes += stats.size;
-                    }
-                } catch (fileErr) {
-                    // File might have been concurrently deleted or locked
-                    logger.warn(`[CLEANUP] Could not stat/unlink temp file ${filePath}:`, fileErr.message);
-                }
+            const filePaths = entries.filter(e => e.isFile()).map(e => path.join(dir, e.name));
+            const results = await Promise.all(filePaths.map(pruneTempFile));
+            for (const r of results) {
+                dirDeleted += r.deleted;
+                dirBytes += r.bytes;
             }
         } catch (dirErr) {
             logger.warn(`[CLEANUP] Failed to read temp directory ${dir}:`, dirErr.message);
         }
+        return { deleted: dirDeleted, bytes: dirBytes };
+    };
+
+    const dirResults = await Promise.all(existingDirs.map(pruneDirectory));
+    for (const r of dirResults) {
+        deletedFiles += r.deleted;
+        freedBytes += r.bytes;
     }
 
     if (deletedFiles > 0) {

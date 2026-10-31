@@ -34,7 +34,7 @@ export function useTermsScrollSpy(isOpen: boolean, initialSection: string) {
   const handleContentScroll = useCallback((container: HTMLElement) => {
     for (const s of TERMS_SECTIONS) {
       const el = document.getElementById(`section-${s.id}`);
-      if (el && el.offsetTop - container.scrollTop < 200) {
+      if ((el?.offsetTop ?? Infinity) - container.scrollTop < 200) {
         setActiveSection(s.id);
       }
     }

@@ -85,7 +85,7 @@ export const safeLazy = <T extends ComponentType<unknown>>(
                 const now = Date.now();
 
                 // Only auto-reload if we haven't reloaded in the last 10 seconds
-                if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+                if (!lastReload || now - Number.parseInt(lastReload, 10) > 10000) {
                     setSafeSessionItem('last_chunk_reload', now.toString());
                     console.warn('[safeLazy] Chunk loading failed. Refreshing web page...');
                     if (typeof window !== 'undefined' && window.location) {

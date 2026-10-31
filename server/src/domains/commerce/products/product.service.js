@@ -1,5 +1,5 @@
 import { DIGITAL_CATEGORIES, detectDigitalCategory } from '../../../application/middleware/digitalUpload.js';
-import path from 'path';
+import path from 'node:path';
 import ProductModel from './product.model.js';
 import logger from '../../../shared/utils/logger.js';
 import { pool } from '../../../infrastructure/database/database.js';
@@ -63,7 +63,7 @@ class ProductService {
         }
 
         if (product_type === 'service') {
-            if (!service_options || !service_options.availability_days) {
+            if (!service_options?.availability_days) {
                 throw new Error('Availability days are required for services');
             }
             await assertServiceShopLocation(pool, sellerId);

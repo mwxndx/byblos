@@ -1,3 +1,11 @@
+function getProgressBarColor(state: string, isDeliveredOrCompleted: boolean, riderMoving: boolean): string {
+  if (state === 'attention') return 'bg-red-500';
+  if (state === 'delayed') return 'bg-amber-500';
+  if (isDeliveredOrCompleted) return 'bg-emerald-500';
+  if (riderMoving) return 'bg-gradient-to-r from-yellow-500 via-amber-300 to-yellow-400 animate-pulse';
+  return 'bg-yellow-500 dark:bg-yellow-400';
+}
+
 import { Clock } from '@/shared/ui/icons';
 import { cn } from '@/shared/utils/formatting';
 import type { UseOrderTrackingStateResult } from './useOrderTrackingState';
@@ -9,7 +17,7 @@ interface OrderTrackingHeadlineProps {
   state: UseOrderTrackingStateResult;
 }
 
-export function OrderTrackingHeadline({ order, state }: OrderTrackingHeadlineProps) {
+export function OrderTrackingHeadline({ order, state }: Readonly<OrderTrackingHeadlineProps>) {
   const { isSeller, isDoorDelivery, isPickup, isDigital, journey, liveEta, etaSource, dynamicProgressPercent, riderMoving } = state;
   const deliveryLeg = order.logistics?.deliveryLeg;
   const logistics = order.logistics;
@@ -35,15 +43,7 @@ export function OrderTrackingHeadline({ order, state }: OrderTrackingHeadlinePro
         <div
           className={cn(
             'h-1.5 rounded-full transition-all duration-500',
-            journey.state === 'attention'
-              ? 'bg-red-500'
-              : journey.state === 'delayed'
-                ? 'bg-amber-500'
-                : journey.isDelivered || order.status === 'COMPLETED'
-                  ? 'bg-emerald-500'
-                  : riderMoving
-                    ? 'bg-gradient-to-r from-yellow-500 via-amber-300 to-yellow-400 animate-pulse'
-                    : 'bg-yellow-500 dark:bg-yellow-400'
+            getProgressBarColor(journey.state, journey.isDelivered || order.status === 'COMPLETED', riderMoving)
           )}
           style={{ width: `${Math.min(100, Math.max(8, dynamicProgressPercent))}%` }}
         />

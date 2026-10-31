@@ -34,7 +34,7 @@ export async function recordFraudEvent(event) {
             ]
         );
 
-        reportAlert({
+        void reportAlert({
             level: 'error',
             title: `Payment fraud event: ${event.eventType}`,
             message: `A ${event.eventType} fraud event was recorded on a payment.`,
@@ -46,6 +46,8 @@ export async function recordFraudEvent(event) {
                 expectedAmount: event.expectedAmount ?? null,
                 providerAmount: event.providerAmount ?? null
             }
+        }).catch((err) => {
+            logger.warn('[CorePaymentService] reportAlert failed:', err?.message);
         });
     } catch (error) {
         logger.error('[CorePaymentService] Failed to persist fraud event', {

@@ -10,7 +10,7 @@ const query = (text, params) => pool.query(text, params);
 
 export const createSeller = async (sellerData, externalClient = null) => {
   const { fullName, shopName, email, whatsappNumber, city, location, physicalAddress, latitude, longitude, userId = null, termsAccepted = false } = sellerData;
-  const slug = shopName ? String(shopName).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : null;
+  const slug = shopName ? String(shopName).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').replace(/-+$/, '') : null;
 
   const result = await (externalClient || pool).query(
     `INSERT INTO sellers (full_name, shop_name, slug, email, whatsapp_number, city, location, physical_address, latitude, longitude, user_id, terms_accepted, terms_accepted_at)
@@ -86,8 +86,8 @@ export const findSellerByShopName = async (shopName) => {
 
   logger.debug('Executing findSellerByShopName query', { shopName: rawInput.replace(/[\n\r]/g, '') });
 
-  const slugified = rawInput.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  const unslugified = rawInput.replace(/-/g, ' ');
+  const slugified = rawInput.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+  const unslugified = rawInput.replaceAll('-', ' ');
 
   const queryText = `
     SELECT 
@@ -196,7 +196,7 @@ export const updateSeller = async (id, updates) => {
   // sync at registration. Allowing a profile PATCH to change sellers.email alone
   // desynced it from users.email. Email changes must go through a verified auth
   // flow that updates both, not this profile-update path.
-  const { fullName, shopName, whatsappNumber, password, city, location, theme, instagramLink, instagram_link, tiktokLink, tiktok_link, facebookLink, facebook_link, creatorCommissionRate, creator_commission_rate } = updates || {};
+  const { fullName, shopName, whatsappNumber, city, location, theme, instagramLink, instagram_link, tiktokLink, tiktok_link, facebookLink, facebook_link, creatorCommissionRate, creator_commission_rate } = updates || {};
   const updatesList = [];
   const values = [id];
   let paramCount = 1;
@@ -292,9 +292,9 @@ export const updateSeller = async (id, updates) => {
   }
 
   // Handle physical shop fields. If no physical address, coordinates MUST be null (not Nairobi sentinel)
-  const hasShop = !!updates.physicalAddress;
-  const lat = hasShop ? parseFloat(updates.latitude || 0) : null;
-  const lng = hasShop ? parseFloat(updates.longitude || 0) : null;
+
+
+
 
   // Handle physical address update
   if (updates.physicalAddress !== undefined) {

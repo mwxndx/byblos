@@ -73,7 +73,7 @@ export function useServiceBooking(
 
             // PRE-FILL logic for coordinates (Mobile Services / Home Service)
             if (isShopless || initialBuyerLocation?.lat) {
-                if (initialBuyerLocation && initialBuyerLocation.lat && initialBuyerLocation.lng) {
+                if (initialBuyerLocation?.lat && initialBuyerLocation?.lng) {
                     setBuyerLocation(initialBuyerLocation);
                     setCustomLocation(initialBuyerLocation.address || '');
                 } else {
@@ -96,8 +96,8 @@ export function useServiceBooking(
     useEffect(() => {
         if (serviceOptions.start_time && serviceOptions.end_time) {
             const slots: string[] = [];
-            const start = parseInt(serviceOptions.start_time.split(':')[0]);
-            const end = parseInt(serviceOptions.end_time.split(':')[0]);
+            const start = Number.parseInt(serviceOptions.start_time.split(':')[0]);
+            const end = Number.parseInt(serviceOptions.end_time.split(':')[0]);
 
             for (let i = start; i < end; i++) {
                 const hour = i.toString().padStart(2, '0');

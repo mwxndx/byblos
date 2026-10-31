@@ -18,18 +18,22 @@ interface LocationMapViewProps {
 // entry chunk that ships on every page view. LocationPicker.tsx lazy-loads
 // this via React.lazy + Suspense; its own search UI stays immediately
 // available while the map loads in behind it.
-export default function LocationMapView({ center, markerPosition, watchKey, onMapClick }: LocationMapViewProps) {
+export default function LocationMapView({ center, markerPosition, watchKey, onMapClick }: Readonly<LocationMapViewProps>) {
     const [tileUrls, setTileUrls] = useState<string[]>(() => getMapTileUrls());
     const [tileUrlIndex, setTileUrlIndex] = useState(0);
 
     useEffect(() => {
         let isMounted = true;
-        getLocationConfig().then((config) => {
-            if (isMounted && config.cartoApiKey) {
-                setTileUrls(getMapTileUrls(config.cartoApiKey));
-                setTileUrlIndex(0);
-            }
-        });
+        getLocationConfig()
+            .then((config) => {
+                if (isMounted && config.cartoApiKey) {
+                    setTileUrls(getMapTileUrls(config.cartoApiKey));
+                    setTileUrlIndex(0);
+                }
+            })
+            .catch((err) => {
+                console.warn('[LocationMapView] Failed to get map config:', err);
+            });
         return () => {
             isMounted = false;
         };

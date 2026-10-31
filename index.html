@@ -57,20 +57,20 @@
         var pref = localStorage.getItem(key);
         if (!pref) pref = localStorage.getItem('byblos-app-theme') || localStorage.getItem('byblos-theme-default') || 'system';
 
-        var isDark = true;
-        if (isStandalone) {
+        var isDark;
+        if (isStandalone || pref === 'dark') {
           // Standalone PWA cold launch is locked dark to match startup splash
           isDark = true;
         } else if (pref === 'light') {
           isDark = false;
-        } else if (pref === 'dark') {
-          isDark = true;
         } else if (window.matchMedia) {
-          isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          isDark = Boolean(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        } else {
+          isDark = true;
         }
 
         var resolved = isDark ? 'dark' : 'light';
-        doc.setAttribute('data-theme', resolved);
+        doc.dataset.theme = resolved;
         if (isDark) {
           doc.classList.add('dark');
           doc.classList.remove('light');
@@ -86,7 +86,9 @@
         if (metaLight) metaLight.setAttribute('content', isDark ? '#000000' : '#f5f4f0');
         var statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
         if (statusMeta) statusMeta.setAttribute('content', 'black-translucent');
-      } catch (e) {}
+      } catch (e) {
+        // Ignored: LocalStorage or theme-color metadata not accessible in restricted context
+      }
     })();
   </script>
   <style>
@@ -105,8 +107,8 @@
     html.light:not(.native-app):not(.capacitor-native):not(.pwa-standalone),
     html.light:not(.native-app):not(.capacitor-native):not(.pwa-standalone) body,
     html.light:not(.native-app):not(.capacitor-native):not(.pwa-standalone) #root {
-      background-color: #f5f4f0 !important;
-      color: #0f0f0e !important;
+      background-color: #f5f4f0;
+      color: #0f0f0e;
     }
     html[data-theme="dark"],
     html[data-theme="dark"] body,
@@ -114,8 +116,8 @@
     html.dark,
     html.dark body,
     html.dark #root {
-      background-color: #000000 !important;
-      color: #f5f5f5 !important;
+      background-color: #000000;
+      color: #f5f5f5;
     }
 
     /* Pre-React initial splash screen */
@@ -157,16 +159,21 @@
       }
       html[data-theme="light"]:not(.native-app):not(.capacitor-native):not(.pwa-standalone) #initial-splash .splash-logo-dark,
       html.light:not(.native-app):not(.capacitor-native):not(.pwa-standalone) #initial-splash .splash-logo-dark {
-        display: none !important;
+        display: none;
       }
       html[data-theme="light"]:not(.native-app):not(.capacitor-native):not(.pwa-standalone) #initial-splash .splash-logo-light,
       html.light:not(.native-app):not(.capacitor-native):not(.pwa-standalone) #initial-splash .splash-logo-light {
-        display: block !important;
+        display: block;
       }
     }
 
     /* Standalone PWA and native app cold launch: strictly locked to pure black (#000000) */
     html.pwa-standalone #initial-splash,
+    html.native-app #initial-splash,
+    html.capacitor-native #initial-splash {
+      background-color: #000000 !important;
+    }
+
     @media (display-mode: standalone) {
       #initial-splash {
         background-color: #000000 !important;
@@ -177,10 +184,6 @@
       #initial-splash .splash-logo-light {
         display: none !important;
       }
-    }
-    html.native-app #initial-splash,
-    html.capacitor-native #initial-splash {
-      background-color: #000000 !important;
     }
   </style>
 

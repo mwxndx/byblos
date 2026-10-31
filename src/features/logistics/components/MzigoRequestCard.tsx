@@ -6,7 +6,7 @@ import { deadlineText, formatCurrency, formatDate, statusLabel, validateHandover
 import { courierActions, deriveJourney, requestHasDoorDelivery, requestNextStop, routeLink } from '../utils/mzigoJourney';
 import { MzigoJourneyStepper } from './MzigoJourneyStepper';
 
-function CallButton({ name, phone }: { name: string; phone?: string | null }) {
+function CallButton({ name, phone }: Readonly<{ name: string; phone?: string | null }>) {
   if (!phone) {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-separator bg-white/[0.03] px-3 py-1.5 text-xs text-label-2">
@@ -33,14 +33,14 @@ export function RequestCard({
   onStatusUpdate,
   updatingStatusKey,
   readOnly = false,
-}: {
+}: Readonly<{
   request: LogisticsRequestCard;
   tone: string;
   now: number;
   onStatusUpdate: (requestId: number, legType: LogisticsLegType, status: LogisticsStatusUpdate, verificationCode?: string | null) => void;
   updatingStatusKey?: string | null;
   readOnly?: boolean;
-}) {
+}>) {
   const [expanded, setExpanded] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
 

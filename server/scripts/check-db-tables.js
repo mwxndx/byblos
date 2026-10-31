@@ -7,7 +7,7 @@ async function checkTables() {
   try {
     console.log('Checking database tables...');
     
-    for (const table of requiredTables) {
+    await Promise.all(requiredTables.map(async (table) => {
       try {
         const result = await client.query(
           `SELECT EXISTS (
@@ -22,7 +22,6 @@ async function checkTables() {
         console.log(`Table ${table}: ${exists ? '✅ Exists' : '❌ Missing'}`);
         
         if (exists) {
-          // Get table columns
           const columnsResult = await client.query(
             `SELECT column_name, data_type 
              FROM information_schema.columns 
@@ -38,13 +37,13 @@ async function checkTables() {
       } catch (error) {
         console.error(`Error checking table ${table}:`, error.message);
       }
-    }
+    }));
     
     // Check for sample data
     console.log('\nChecking for sample data...');
     const tablesWithData = ['products', 'orders', 'order_items'];
     
-    for (const table of tablesWithData) {
+    await Promise.all(tablesWithData.map(async (table) => {
       try {
         const countResult = await client.query(
           `SELECT COUNT(*) as count FROM ${table}`
@@ -53,7 +52,7 @@ async function checkTables() {
       } catch (error) {
         console.error(`Error counting rows in ${table}:`, error.message);
       }
-    }
+    }));
     
   } catch (error) {
     console.error('Database connection error:', error);

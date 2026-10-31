@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { useToast } from '@/shared/hooks/use-toast';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useGlobalAuth } from '@/features/auth/contexts';
@@ -10,7 +10,7 @@ export function useBuyerRegister() {
   const { register, isLoading, user: authUser } = useGlobalAuth();
   const { toast } = useToast();
   const registerBuyer = (data: import('@/features/auth/types/authTypes').BuyerRegistrationData) => register(data, 'buyer');
-  const navigate = useNavigate();
+
   const resendVerificationMutation = useBuyerResendVerificationMutation();
 
   const [formData, setFormData] = useState<BuyerRegisterFormData>({

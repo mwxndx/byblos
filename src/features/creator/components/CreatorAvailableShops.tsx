@@ -9,6 +9,59 @@ import { useRequestCollaborationMutation } from '../hooks/mutations/useRequestCo
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { AvailableShop } from '../api/marketplace';
 
+
+function ShopActionButton({
+  shop,
+  isRequesting,
+  onRequest,
+}: Readonly<{
+  shop: AvailableShop;
+  isRequesting: boolean;
+  onRequest: (shop: AvailableShop) => void;
+}>) {
+  if (shop.collaborationStatus === 'active') {
+    return (
+      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-green)_14%,transparent)] px-3 text-xs font-medium text-sys-green">
+        <Check className="h-3.5 w-3.5" />
+        Promoting
+      </span>
+    );
+  }
+  if (shop.collaborationStatus === 'pending') {
+    return (
+      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_14%,transparent)] px-3 text-xs font-medium text-sys-orange">
+        <Clock className="h-3.5 w-3.5" />
+        Pending
+      </span>
+    );
+  }
+  if (shop.collaborationStatus === 'denied') {
+    return (
+      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-slate-100 dark:bg-white/10 px-3 text-xs font-medium text-slate-500 dark:text-white/50 cursor-not-allowed">
+        <X className="h-3.5 w-3.5" />
+        Declined
+      </span>
+    );
+  }
+  return (
+    <Button
+      type="button"
+      onClick={() => onRequest(shop)}
+      disabled={isRequesting}
+      className="h-9 px-3.5 text-xs"
+    >
+      {isRequesting ? (
+        <>
+          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          Requesting…
+        </>
+      ) : (
+        'Request Link'
+      )}
+    </Button>
+  );
+}
+
 export function CreatorAvailableShops() {
   const { data: shops = [], isLoading, refetch } = useAvailableShopsQuery();
   const requestMutation = useRequestCollaborationMutation();
@@ -49,11 +102,12 @@ export function CreatorAvailableShops() {
         )}
       </div>
 
-      {isLoading ? (
+      {isLoading && (
         <div className="flex min-h-[160px] items-center justify-center">
           <Loader2 className="h-6 w-6 animate-spin text-brand-text" />
         </div>
-      ) : shops.length === 0 ? (
+      )}
+      {!isLoading && shops.length === 0 && (
         <div className="rounded-card border border-separator bg-surface-1 p-8 text-center">
           <Store className="mx-auto mb-2 h-10 w-10 text-label-3" />
           <p className="text-sm font-medium text-label">No shops currently listed</p>
@@ -61,7 +115,8 @@ export function CreatorAvailableShops() {
             Check back soon. When sellers list their stores in the Creator Marketplace, they will appear here.
           </p>
         </div>
-      ) : (
+      )}
+      {!isLoading && shops.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shops.map((shop) => {
             const commissionPercent = (shop.creatorCommissionRate * 100).toFixed(1).replace(/\.0$/, '');

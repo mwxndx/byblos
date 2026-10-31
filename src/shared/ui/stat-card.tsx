@@ -30,6 +30,19 @@ const colorClasses: Record<StatCardColor, string> = {
   gray: "border-separator bg-surface-1",
 };
 
+function formatStatValue(value: string | number, prefix: string, suffix: string): string {
+  if (typeof value !== 'number') {
+    return `${prefix}${value}${suffix}`;
+  }
+  if (value >= 1_000_000) {
+    return `${prefix}${(value / 1_000_000).toFixed(1)}M${suffix}`;
+  }
+  if (value >= 1_000) {
+    return `${prefix}${(value / 1_000).toFixed(1)}K${suffix}`;
+  }
+  return `${prefix}${value.toLocaleString()}${suffix}`;
+}
+
 export function StatCard({
   title,
   value,
@@ -48,15 +61,9 @@ export function StatCard({
   subtitleClassName,
   layout = 'side-icon',
   ...props
-}: StatCardProps) {
+}: Readonly<StatCardProps>) {
   const displaySubtitle = subtitle || sub;
-  const formattedValue = typeof value === 'number'
-    ? (value >= 1_000_000
-      ? `${prefix}${(value / 1_000_000).toFixed(1)}M${suffix}`
-      : value >= 1_000
-        ? `${prefix}${(value / 1_000).toFixed(1)}K${suffix}`
-        : `${prefix}${value.toLocaleString()}${suffix}`)
-    : `${prefix}${value}${suffix}`;
+  const formattedValue = formatStatValue(value, prefix, suffix);
 
   const numTrend = trend != null ? Number(trend) : null;
   const isPositiveTrend = numTrend != null && numTrend >= 0;

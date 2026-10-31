@@ -55,7 +55,7 @@ function migrationIncludes(pattern) {
 }
 
 function routeMounted(prefix, routeName) {
-  return matches('server/src/application/routes/index.js', new RegExp(`router\\.use\\('${prefix}',\\s*${routeName}\\)`));
+  return matches('server/src/application/routes/index.js', new RegExp(String.raw`router\.use\('${prefix}',\s*${routeName}\)`));
 }
 
 function report() {

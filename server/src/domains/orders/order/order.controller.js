@@ -13,8 +13,8 @@ import OrderService from './OrderService.js';
 import Order from './order.model.js';
 import logger from '../../../shared/utils/logger.js';
 import { sanitizeOrder } from '../../../shared/utils/orderSanitizer.js';
-import paymentService from '../../payments/payments/payment.service.js';
-import OrderHubDropoffService from './orderHubDropoff.service.js';
+
+
 import LogisticsEtaService from '../../logistics/logisticsEta.service.js';
 import { fulfillDigitalDownload } from './digitalDownloadStreamer.js';
 
@@ -37,8 +37,8 @@ export const getSellerOrders = async (req, res) => {
         const { page, limit, status } = req.query;
 
         const result = await Order.findBySellerId(sellerId, {
-            page: parseInt(page) || 1,
-            limit: parseInt(limit) || 10,
+            page: Number.parseInt(page) || 1,
+            limit: Number.parseInt(limit) || 10,
             status
         });
 
@@ -70,7 +70,7 @@ export const createOrder = async (req, res) => {
 export const getOrderById = async (req, res) => {
     try {
         const { id } = req.params;
-        const userId = req.user.id;
+
         const userType = req.user.userType || req.user.role;
 
         const order = await Order.findById(id);
@@ -224,8 +224,8 @@ export const getUserOrders = async (req, res) => {
         const { page, limit, status } = req.query;
 
         const result = await Order.findByBuyerId(buyerId, {
-            page: parseInt(page) || 1,
-            limit: parseInt(limit) || 10,
+            page: Number.parseInt(page) || 1,
+            limit: Number.parseInt(limit) || 10,
             status
         });
 
@@ -408,8 +408,8 @@ export const locationPreview = async (req, res) => {
         res.status(200).json({
             status: 'success',
             data: {
-                latitude: parseFloat(latitude),
-                longitude: parseFloat(longitude),
+                latitude: Number.parseFloat(latitude),
+                longitude: Number.parseFloat(longitude),
                 fullAddress: fullAddress || 'Address not provided',
                 mapUrl: `https://www.google.com/maps?q=${latitude},${longitude}`
             }

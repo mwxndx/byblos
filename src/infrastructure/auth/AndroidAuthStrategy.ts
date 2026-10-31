@@ -32,9 +32,9 @@ export class AndroidAuthStrategy implements AuthStrategy {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  async getCsrfHeader(): Promise<Record<string, string>> {
+  getCsrfHeader(): Promise<Record<string, string>> {
     // Native Android apps operate via Bearer tokens in device storage and are exempt from CSRF
-    return {};
+    return Promise.resolve({});
   }
 
   async handleUnauthorized(role?: AppRole): Promise<boolean> {

@@ -15,7 +15,7 @@ interface SellerProfileHeroProps {
  * circular accent frame with a pencil edit overlay, a "Shop link" action, the
  * shop name, and bio — a compact centered stack, no banner card.
  */
-export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink, canEdit }: SellerProfileHeroProps) {
+export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink, canEdit }: Readonly<SellerProfileHeroProps>) {
   const [isEditingMedia, setIsEditingMedia] = useState(false);
   const shopName = sellerProfile?.shopName?.trim() || 'Your shop';
   const avatar = sellerProfile?.avatarUrl;

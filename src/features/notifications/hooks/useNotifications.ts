@@ -92,7 +92,7 @@ export function useNotifications(variant: NotificationVariant = 'default', enabl
   useEffect(() => {
     let removeListener: (() => void) | undefined;
     let cancelled = false;
-    (async () => {
+    void (async () => {
       try {
         const { isNativeApp } = await import('@/infrastructure/navigation/mobileApp');
         if (!isNativeApp()) return;

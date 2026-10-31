@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,4 +63,9 @@ async function seedAdmin() {
     }
 }
 
-seedAdmin();
+try {
+    await seedAdmin();
+} catch (err) {
+    console.error('Unhandled error in seedAdmin:', err);
+    process.exit(1);
+}

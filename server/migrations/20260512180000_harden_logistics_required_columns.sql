@@ -21,7 +21,8 @@ SET
     active = COALESCE(active, TRUE),
     metadata = COALESCE(metadata, '{}'::jsonb),
     created_at = COALESCE(created_at, NOW()),
-    updated_at = COALESCE(updated_at, NOW());
+    updated_at = COALESCE(updated_at, NOW())
+WHERE TRUE;
 
 CREATE UNIQUE INDEX IF NOT EXISTS logistics_partners_slug_unique
     ON logistics_partners(slug);
@@ -70,7 +71,8 @@ SET
     service_level = COALESCE(NULLIF(service_level, ''), 'standard'),
     metadata = COALESCE(metadata, '{}'::jsonb),
     created_at = COALESCE(created_at, NOW()),
-    updated_at = COALESCE(updated_at, NOW());
+    updated_at = COALESCE(updated_at, NOW())
+WHERE TRUE;
 
 DO $$
 BEGIN
@@ -128,7 +130,8 @@ SET
     fee_currency = COALESCE(NULLIF(fee_currency, ''), 'KES'),
     metadata = COALESCE(metadata, '{}'::jsonb),
     created_at = COALESCE(created_at, NOW()),
-    updated_at = COALESCE(updated_at, NOW());
+    updated_at = COALESCE(updated_at, NOW())
+WHERE TRUE;
 
 DO $$
 BEGIN
@@ -186,7 +189,8 @@ SET
     status = COALESCE(NULLIF(status, ''), 'pending'),
     source = COALESCE(NULLIF(source, ''), 'system'),
     metadata = COALESCE(metadata, '{}'::jsonb),
-    created_at = COALESCE(created_at, NOW());
+    created_at = COALESCE(created_at, NOW())
+WHERE TRUE;
 
 DO $$
 BEGIN
@@ -228,7 +232,8 @@ UPDATE logistics_tracking_links
 SET
     active = COALESCE(active, TRUE),
     created_at = COALESCE(created_at, NOW()),
-    updated_at = COALESCE(updated_at, NOW());
+    updated_at = COALESCE(updated_at, NOW())
+WHERE TRUE;
 
 DO $$
 BEGIN

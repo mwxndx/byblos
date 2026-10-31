@@ -93,7 +93,7 @@ describe('Cold Launch & Splash Screen Verification (Android & iOS PWA)', () => {
 
       // Verify no duplicate fallback link tags
       const fallbackMatches = indexHtmlContent.match(/<link\s+rel="apple-touch-startup-image"\s+href="\/apple-splash-dark\.png">/g);
-      expect(fallbackMatches?.length).toBe(1);
+      expect(fallbackMatches).toHaveLength(1);
     });
 
     it('covers all modern iPhone resolutions with exact pixel dimensions', () => {

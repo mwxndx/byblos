@@ -74,7 +74,7 @@ describe('MarketplaceIndex (Simplified Landing Page with Doodles)', () => {
     expect(buttonGroup).toBeInTheDocument();
 
     const links = buttonGroup ? Array.from(buttonGroup.querySelectorAll('a')) : [];
-    expect(links.length).toBe(3);
+    expect(links).toHaveLength(3);
     expect(links[0]).toHaveAttribute('href', '/buyer/dashboard');
     expect(links[1]).toHaveAttribute('href', '/seller/register');
     expect(links[2]).toHaveAttribute('href', '/creator/login');

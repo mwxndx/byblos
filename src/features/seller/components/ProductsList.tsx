@@ -17,7 +17,7 @@ interface ProductsListProps {
   onRefresh?: () => void;
 }
 
-export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: ProductsListProps) {
+export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: Readonly<ProductsListProps>) {
   const {
     deletingId,
     updatingId,

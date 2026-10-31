@@ -71,7 +71,7 @@ export function useAuthRevalidation({
   useEffect(() => {
     if (!pathname || isPublicRoute(pathname) || isExcludedFromRestoration(pathname)) return;
 
-    storage.set(LAST_NATIVE_PATH_KEY, pathname);
+    void storage.set(LAST_NATIVE_PATH_KEY, pathname);
   }, [pathname]);
 
   const checkAuth = useCallback(async (force = false) => {
@@ -80,7 +80,7 @@ export function useAuthRevalidation({
     const currentRole = getRoleFromRoute(pathname);
     const isStale = Date.now() - lastCheckRef.current > AUTH_REVALIDATION_TTL_MS;
 
-    if (!force && user && user.role === currentRole && user.isAuthenticated && !isStale) {
+    if (!force && user?.role === currentRole && user?.isAuthenticated && !isStale) {
       setIsLoading(false);
       setInitializing(false);
       return;
@@ -99,7 +99,7 @@ export function useAuthRevalidation({
     }
 
     const isAlreadyAuthenticatedForRole = Boolean(
-      user && user.role === currentRole && user.isAuthenticated
+      user?.role === currentRole && user?.isAuthenticated
     );
 
     authCheckInProgress.current = true;
@@ -205,7 +205,7 @@ export function useAuthRevalidation({
   // last active sub-page (or dashboard default) so the user is not forced to log in again.
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    void (async () => {
       const bootPath = pathname;
       if (getRoleFromRoute(bootPath) || !isPublicRoute(bootPath)) return;
       if (['/reset-password', '/forgot-password', '/payment', '/checkout'].some((p) => bootPath.includes(p))) return;

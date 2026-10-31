@@ -57,7 +57,7 @@ describe('Admin Table & Queue Pagination Logic', () => {
 
     // Page 1
     const p1 = paginateList(mockRequests, 1, PAGE_SIZE);
-    expect(p1.paginatedItems.length).toBe(15);
+    expect(p1.paginatedItems).toHaveLength(15);
     expect(p1.paginatedItems[0].id).toBe(1);
     expect(p1.paginatedItems[14].id).toBe(15);
     expect(p1.pagination.hasMore).toBe(true);
@@ -65,14 +65,14 @@ describe('Admin Table & Queue Pagination Logic', () => {
 
     // Page 2
     const p2 = paginateList(mockRequests, 2, PAGE_SIZE);
-    expect(p2.paginatedItems.length).toBe(15);
+    expect(p2.paginatedItems).toHaveLength(15);
     expect(p2.paginatedItems[0].id).toBe(16);
     expect(p2.paginatedItems[14].id).toBe(30);
     expect(p2.pagination.hasMore).toBe(true);
 
     // Page 3 (remainder)
     const p3 = paginateList(mockRequests, 3, PAGE_SIZE);
-    expect(p3.paginatedItems.length).toBe(5);
+    expect(p3.paginatedItems).toHaveLength(5);
     expect(p3.paginatedItems[0].id).toBe(31);
     expect(p3.paginatedItems[4].id).toBe(35);
     expect(p3.pagination.hasMore).toBe(false);
@@ -83,15 +83,15 @@ describe('Admin Table & Queue Pagination Logic', () => {
     const PAGE_SIZE = 12;
 
     const p1 = paginateList(mockRefunds, 1, PAGE_SIZE);
-    expect(p1.paginatedItems.length).toBe(12);
+    expect(p1.paginatedItems).toHaveLength(12);
     expect(p1.pagination.hasMore).toBe(true);
 
     const p2 = paginateList(mockRefunds, 2, PAGE_SIZE);
-    expect(p2.paginatedItems.length).toBe(12);
+    expect(p2.paginatedItems).toHaveLength(12);
     expect(p2.pagination.hasMore).toBe(true);
 
     const p3 = paginateList(mockRefunds, 3, PAGE_SIZE);
-    expect(p3.paginatedItems.length).toBe(1);
+    expect(p3.paginatedItems).toHaveLength(1);
     expect(p3.pagination.hasMore).toBe(false);
   });
 
@@ -99,6 +99,6 @@ describe('Admin Table & Queue Pagination Logic', () => {
     const mockItems = Array.from({ length: 10 }, (_, i) => ({ id: i }));
     const result = paginateList(mockItems, 999, 10);
     expect(result.pagination.page).toBe(1);
-    expect(result.paginatedItems.length).toBe(10);
+    expect(result.paginatedItems).toHaveLength(10);
   });
 });

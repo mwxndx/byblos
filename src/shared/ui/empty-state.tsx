@@ -23,7 +23,7 @@ export function EmptyState({
   className,
   compact = false,
   headingLevel = 3,
-}: EmptyStateProps) {
+}: Readonly<EmptyStateProps>) {
   const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
   return (
     <div

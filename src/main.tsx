@@ -15,7 +15,7 @@ if (!isNativeApp() && typeof window !== 'undefined') {
     event.preventDefault?.();
     const lastReload = getSafeSessionItem('last_chunk_reload');
     const now = Date.now();
-    if (!lastReload || now - parseInt(lastReload, 10) > 10000) {
+    if (!lastReload || now - Number.parseInt(lastReload, 10) > 10000) {
       setSafeSessionItem('last_chunk_reload', now.toString());
       console.warn('[Vite] Preload error detected. Refreshing page for latest deployment chunks...');
       window.location.reload();

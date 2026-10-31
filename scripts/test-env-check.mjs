@@ -59,7 +59,8 @@ async function runAudit() {
   let dockerDaemonOk = false;
   let composeVersion = 'Not detected';
   try {
-    const stdout = execSync('docker compose version', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    // NOSONAR: javascript:S4036 - Safe test environment diagnostics check using system docker command
+    const stdout = execSync('docker compose version', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env } });
     dockerCliOk = true;
     composeVersion = stdout.trim();
   } catch {
@@ -68,7 +69,8 @@ async function runAudit() {
   check('Docker', 'Docker Compose CLI available', dockerCliOk, composeVersion);
 
   try {
-    execSync('docker info', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    // NOSONAR: javascript:S4036 - Safe test environment diagnostics check using system docker command
+    execSync('docker info', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], env: { ...process.env } });
     dockerDaemonOk = true;
   } catch {
     dockerDaemonOk = false;
@@ -197,7 +199,8 @@ async function runAudit() {
       passedCount++;
     }
     const tag = `[${c.area}]`.padEnd(16);
-    console.log(`${symbol}  ${tag} ${c.name}${c.details ? ` (${c.details})` : ''}`);
+    const detailSuffix = c.details ? ` (${c.details})` : '';
+    console.log(`${symbol}  ${tag} ${c.name}${detailSuffix}`);
   }
 
   console.log('\n-----------------------------------------------------------------');

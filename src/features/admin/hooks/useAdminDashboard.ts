@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+
 import { useGlobalAuth, type UserRole } from '@/features/auth/contexts';
 import { getDashboardPath } from '@/features/auth/utils/authRouting';
 import { format } from 'date-fns';
@@ -46,7 +46,7 @@ export function useAdminDashboard() {
   const buyersList = usePaginatedAdminList();
   const withdrawalsList = usePaginatedAdminList();
   const [isInitialized, setIsInitialized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const inspectionSessionId = useMemo(() => {
     const bytes = new Uint32Array(2);
     globalThis.crypto?.getRandomValues?.(bytes);
@@ -138,7 +138,7 @@ export function useAdminDashboard() {
     withdrawalsQuery.data?.pagination,
   ]);
 
-  const queryClient = useQueryClient();
+
 
   // Tracks the last set of failed sections we already toasted about, so the
   // warning fires once per distinct failure (not on every unrelated
@@ -384,9 +384,10 @@ export function useAdminDashboard() {
     if (!dateString) return 'N/A';
     try {
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'N/A';
+      if (Number.isNaN(date.getTime())) return 'N/A';
       return format(date, formatStr);
-    } catch (error) {
+    } catch {
+      // Fallback: return placeholder when date string cannot be parsed
       return 'N/A';
     }
   };
@@ -440,7 +441,8 @@ export function useAdminDashboard() {
       const response = await getSellerByIdMutation.mutateAsync(sellerId);
       if (latestSellerRequestIdRef.current !== sellerId) return;
       setSelectedSeller(response);
-    } catch (error) {
+    } catch {
+      // Graceful degradation: inform user if seller fetch fails
       if (latestSellerRequestIdRef.current !== sellerId) return;
       toast.error('Failed to load seller details');
     } finally {
@@ -465,7 +467,8 @@ export function useAdminDashboard() {
       const response = await getBuyerByIdMutation.mutateAsync(buyerId);
       if (latestBuyerRequestIdRef.current !== buyerId) return;
       setSelectedBuyer(response);
-    } catch (error) {
+    } catch {
+      // Graceful degradation: inform user if buyer fetch fails
       if (latestBuyerRequestIdRef.current !== buyerId) return;
       toast.error('Failed to load buyer details');
     } finally {

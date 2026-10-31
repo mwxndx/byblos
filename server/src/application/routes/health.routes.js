@@ -118,6 +118,7 @@ router.get(['/ready', '/readiness'], async (req, res) => {
       paystack,
     });
   } catch (error) {
+    // Service degradation: report unavailable dependency status
     const [redis, paystack] = await Promise.all([checkRedis(), checkPaystack()]);
     res.status(503).json({
       status: 'not_ready',

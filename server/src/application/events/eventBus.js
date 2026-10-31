@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events';
 import crypto from 'node:crypto';
 import logger from '../../shared/utils/logger.js';
-import { AppEvents, CriticalEvents } from './eventTypes.js';
+import { CriticalEvents } from './eventTypes.js';
 import EventOutboxRepository from './outboxRepository.js';
 import EventDispatcher from './eventDispatcher.js';
 import RecipientDelivery from './recipientDelivery.js';
@@ -59,7 +59,9 @@ class AppEventBus extends EventEmitter {
         logger.info('[EventBus] Emitting event', { event, eventId, listeners: listeners.length });
 
         setImmediate(() => {
-            this.processClaimedEvent(event, eventId, payload, null, args.slice(1));
+            void this.processClaimedEvent(event, eventId, payload, null, args.slice(1)).catch((err) => {
+                logger.error('[EventBus] Unhandled error in processClaimedEvent:', { event, eventId, error: err?.message });
+            });
         });
 
         return listeners.length > 0;
@@ -189,5 +191,5 @@ class AppEventBus extends EventEmitter {
     }
 }
 
-export { AppEvents };
+export { AppEvents } from './eventTypes.js';
 export default new AppEventBus();

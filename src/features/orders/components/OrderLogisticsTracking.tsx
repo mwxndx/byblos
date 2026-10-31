@@ -18,7 +18,7 @@ export function OrderLogisticsTracking({
   view,
   isPhysical = true,
   formatCurrency,
-}: OrderLogisticsTrackingProps) {
+}: Readonly<OrderLogisticsTrackingProps>) {
   const [isOpen, setIsOpen] = useState(true);
   const state = useOrderTrackingState(order, view, isPhysical);
 

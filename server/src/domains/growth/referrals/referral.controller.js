@@ -55,7 +55,7 @@ export const generateCode = async (req, res, next) => {
 
         if (!sellerRow) return next(new AppError('Seller not found', 404));
 
-        const { referral_code, total_sales } = sellerRow;
+        const { referral_code } = sellerRow;
 
         // Let the service handle the business logic (sales lock, code generation, etc.)
         // the generateReferralCode method will throw if rules are not met.

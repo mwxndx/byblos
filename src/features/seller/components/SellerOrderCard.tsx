@@ -23,7 +23,7 @@ interface SellerOrderCardProps {
   onCancel: (orderId: string) => void;
 }
 
-export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReadyForPickup, onRequestPickup, onSelectHubDropoff, onMarkServiceReady, onConfirmBooking, onCancel }: SellerOrderCardProps) {
+export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReadyForPickup, onRequestPickup, onSelectHubDropoff, onMarkServiceReady, onConfirmBooking, onCancel }: Readonly<SellerOrderCardProps>) {
                             const [expanded, setExpanded] = useState(false);
                             const firstItem = order.items?.[0];
                             const itemCount = order.items?.length || 0;
@@ -37,7 +37,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                             const isPaid = ['success', 'completed', 'paid'].includes(order.paymentStatus?.toLowerCase() || '');
                             const effectiveFulfillmentType = getEffectiveFulfillmentType(order);
                             const isPhysicalOnline = isPhysicalOrder && effectiveFulfillmentType === 'COURIER';
-                            const sellerHandoff = (order.metadata?.seller_handoff || {}) as Record<string, unknown>;
+                            const sellerHandoff = (order.metadata?.seller_handoff || {}) as { status?: string; [key: string]: unknown };
                             const pickupTracking = order.logistics?.pickupLeg;
                             const pickupIsActive = !!pickupTracking && !['failed', 'cancelled'].includes(String(pickupTracking.status || '').toLowerCase());
                             const handoffStatus = String(sellerHandoff.status || '').toLowerCase();
@@ -206,7 +206,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                                 <p className="text-purple-200 text-xs font-medium mb-1">Date & Time</p>
                                                                 <p className="font-semibold text-label">
                                                                     {order.metadata.booking_date ? formatDate(order.metadata.booking_date as string) : 'N/A'}
-                                                                    {order.metadata.booking_time && <span className="text-label-2 font-normal"> at {String(order.metadata.booking_time)}</span>}
+                                                                    {order.metadata.booking_time && <span className="text-label-2 font-normal"> at {String((order.metadata as Record<string, string>).booking_time)}</span>}
                                                                 </p>
                                                             </div>
                                                             <div className="bg-black/60 p-2 rounded border border-purple-400/20">
@@ -227,7 +227,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                                             )}
                                                                         </div>
                                                                     ) : (
-                                                                        <p>{String(order.metadata.service_location || 'Not specified')}</p>
+                                                                        <p>{String((order.metadata as Record<string, string>).service_location || 'Not specified')}</p>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -236,7 +236,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                                             <div className="mt-3 bg-black/60 p-2 rounded border border-purple-400/20">
                                                                 <p className="text-purple-200 text-xs font-medium mb-1">Special Requirements</p>
                                                                 <p className="text-sm text-label break-words">
-                                                                    {String(order.metadata.service_requirements || '')}
+                                                                    {String((order.metadata as Record<string, string>).service_requirements || '')}
                                                                 </p>
                                                             </div>
                                                         )}

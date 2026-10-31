@@ -10,7 +10,7 @@
  *   4. Order Cancellation & Settlement Reversal (Refund wallet crediting, idempotency, finality guards)
  *   5. Refund Execution & Financial Invariants (Atomic execution, balance credit, double-refund prevention)
  */
-import { test, describe, after } from 'node:test';
+import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { pool } from '../../src/infrastructure/database/database.js';
@@ -64,7 +64,7 @@ describe('GATE 2: Order Lifecycle Business Journey', () => {
   let sellerUser, seller, buyerUser, buyer;
   let physicalProd, digitalProd;
 
-  test('Setup: seed seller, buyer, physical and digital products', async () => {
+  before(async () => {
     sellerUser = await createUser({ role: 'seller' });
     createdUserIds.push(sellerUser.id);
     seller = await createSeller({ userId: sellerUser.id, shopName: 'Gate2 Atelier' });

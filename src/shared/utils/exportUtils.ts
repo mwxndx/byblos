@@ -9,7 +9,7 @@ type WithdrawalRequest = ApiWithdrawalRequest;
  * Sanitize a cell value to prevent CSV Formula Injection
  */
 const sanitizeCell = (value: unknown): string => {
-    const str = '' + value;
+    const str = value == null ? '' : (typeof value === 'object' ? JSON.stringify(value) : String(value));
     // If the value starts with a symbol that could be interpreted as a formula
     // (=, +, -, @), prepend a single quote to neutralize it
     if (str.length > 0 && ['=', '+', '-', '@'].includes(str[0])) {

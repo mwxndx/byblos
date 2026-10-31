@@ -1,4 +1,3 @@
-import { adminApiInstance } from './instance';
 import { login, getMe } from './auth';
 import { getDashboardStats, broadcastAppUpdate } from './dashboard';
 import { getAnalytics, getMonthlyMetrics } from './analytics';
@@ -52,4 +51,3 @@ export const adminApi = {
 };
 
 export default adminApi;
-export { adminApiInstance };

@@ -1,9 +1,16 @@
+function stripTrailingSlash(url) {
+  if (!url) return '';
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return url.slice(0, end);
+}
+
 import { Resend } from 'resend';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import fs from 'fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import fs from 'node:fs';
 import ejs from 'ejs';
 import logger from './logger.js';
 
@@ -38,7 +45,7 @@ const createTransporter = () => {
     return null;
   }
 
-  const port = parseInt(config.port, 10);
+  const port = Number.parseInt(config.port, 10);
   const secure = process.env.EMAIL_SECURE === 'true' || port === 465;
 
   return nodemailer.createTransport({
@@ -64,9 +71,27 @@ const createTransporter = () => {
 
 let transporter = null;
 
+// Whitelisted email template names to prevent dynamic template injection
+const ALLOWED_TEMPLATES = new Set([
+  'verify-email',
+  'reset-password',
+  'welcome-buyer',
+  'welcome-seller',
+  'order-confirmation',
+  'order-shipped',
+  'order-delivered',
+  'order-cancelled',
+  'payout-processed',
+  'creator-invite',
+  'creator-shop-request'
+]);
+
 // Email templates are read once per name and cached for the lifetime of the process
 const templateCache = new Map();
 const readTemplate = async (templateName, data) => {
+  if (!ALLOWED_TEMPLATES.has(templateName)) {
+    throw new Error(`Unauthorized email template: ${templateName}`);
+  }
   let template = templateCache.get(templateName);
   if (!template) {
     const candidatePaths = [
@@ -186,7 +211,7 @@ export const sendVerificationEmail = async (email, token, userType = 'buyer') =>
   logger.info('[EMAIL] Dispatching verification email', { email: normalizedEmail, userType });
   try {
     const rawFrontendUrl = process.env.FRONTEND_URL || 'https://www.byblosafrica.site';
-    const baseUrl = rawFrontendUrl.replace(/\/+$/, '');
+    const baseUrl = stripTrailingSlash(rawFrontendUrl);
     // Include email in URL so backend can look up the user without a session
     const verificationUrl = `${baseUrl}/verify-email?token=${token}&email=${encodeURIComponent(normalizedEmail)}&type=${userType}`;
     const appName = process.env.APP_NAME || 'Byblos';
@@ -220,7 +245,7 @@ export const sendVerificationEmail = async (email, token, userType = 'buyer') =>
 export const sendPasswordResetEmail = async (email, token, userType = 'seller') => {
   try {
     const rawFrontendUrl = process.env.FRONTEND_URL || 'https://www.byblosafrica.site';
-    const baseUrl = rawFrontendUrl.replace(/\/+$/, '');
+    const baseUrl = stripTrailingSlash(rawFrontendUrl);
     const resetUrl = `${baseUrl}/${userType}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
     const appName = process.env.APP_NAME || 'Byblos';
 

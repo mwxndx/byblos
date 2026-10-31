@@ -17,7 +17,7 @@ interface BuyerBottomNavProps {
   onSelect: (key: BuyerSection) => void;
 }
 
-export function BuyerBottomNav({ activeNav, navItems, onSelect }: BuyerBottomNavProps) {
+export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<BuyerBottomNavProps>) {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"

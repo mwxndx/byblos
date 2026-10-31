@@ -46,7 +46,9 @@ async function run() {
   }
 }
 
-run().catch((error) => {
+try {
+  await run();
+} catch (error) {
   console.error('[reset-test-db] Failed:', error.message);
   process.exit(1);
-});
+}

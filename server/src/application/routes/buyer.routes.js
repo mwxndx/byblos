@@ -4,7 +4,7 @@ import express from 'express';
 import * as buyerController from '../../domains/commerce/buyers/buyer.controller.js';
 import * as membershipController from '../../domains/growth/membership/membership.controller.js';
 import { protect, hasPermission } from '../middleware/auth.js';
-import { AppError } from '../../shared/utils/errorHandler.js';
+
 import wishlistRoutes from './wishlist.routes.js';
 import { validateRegistration, validateLogin } from '../middleware/authValidation.js';
 import { authLimiter } from '../middleware/authRateLimiter.js';

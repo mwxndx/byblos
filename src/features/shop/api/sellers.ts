@@ -10,7 +10,7 @@ export async function getSellersPage(params: { page?: number; limit?: number } =
 
     if (Array.isArray(responseData)) {
       sellersData = responseData;
-    } else if (responseData && responseData.data && typeof responseData.data === 'object' && 'sellers' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).sellers)) {
+    } else if (responseData?.data && typeof responseData.data === 'object' && 'sellers' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).sellers)) {
       sellersData = (responseData.data as Record<string, unknown>).sellers as unknown[];
     } else if (responseData && 'sellers' in responseData && Array.isArray(responseData.sellers)) {
       sellersData = responseData.sellers as unknown[];
@@ -18,7 +18,7 @@ export async function getSellersPage(params: { page?: number; limit?: number } =
 
     const paginationSource = responseData && 'pagination' in responseData
       ? (responseData.pagination as Record<string, unknown>)
-      : (responseData && responseData.data && typeof responseData.data === 'object' && 'pagination' in responseData.data)
+      : (typeof responseData?.data === 'object' && responseData.data !== null && 'pagination' in responseData.data)
         ? ((responseData.data as Record<string, unknown>).pagination as Record<string, unknown>)
         : {};
 

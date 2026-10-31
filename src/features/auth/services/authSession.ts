@@ -32,24 +32,25 @@ export const getActiveRole = async (): Promise<UserRole | null> => {
  * 5. Records active role under byblos.auth.active_role.
  */
 export const enforceSingleActiveRole = async (activeRole: UserRole): Promise<void> => {
-  const tokensToRevoke: string[] = [];
+  const inactiveRoles = ALL_ROLES.filter((role) => role !== activeRole);
 
-  for (const role of ALL_ROLES) {
-    if (role === activeRole) continue;
-    const oldToken = await storage.get(`${role}Token`);
-    if (oldToken && typeof oldToken === 'string') {
-      tokensToRevoke.push(oldToken);
-    }
-  }
+  const oldTokens = await Promise.all(
+    inactiveRoles.map(async (role) => {
+      const oldToken = await storage.get(`${role}Token`);
+      return typeof oldToken === 'string' && oldToken ? oldToken : null;
+    })
+  );
+  const tokensToRevoke = oldTokens.filter((token): token is string => Boolean(token));
 
   await authStorage.purgeLegacyAndInactiveKeys(activeRole);
 
-  for (const role of ALL_ROLES) {
-    if (role === activeRole) continue;
-    await storage.remove(getSessionKey(role));
-    await storage.remove(`${role}Token`);
-    await storage.remove(`${role}RefreshToken`);
-  }
+  await Promise.all(
+    inactiveRoles.flatMap((role) => [
+      storage.remove(getSessionKey(role)),
+      storage.remove(`${role}Token`),
+      storage.remove(`${role}RefreshToken`)
+    ])
+  );
 
   if (tokensToRevoke.length > 0) {
     try {
@@ -64,9 +65,11 @@ export const enforceSingleActiveRole = async (activeRole: UserRole): Promise<voi
 
 export const clearRoleSessionMarkers = async (): Promise<void> => {
   await authStorage.clearAuth();
-  for (const role of ALL_ROLES) {
-    await storage.remove(`${role}SessionActive`);
-    await storage.remove(`${role}Token`);
-    await storage.remove(`${role}RefreshToken`);
-  }
+  await Promise.all(
+    ALL_ROLES.flatMap((role) => [
+      storage.remove(`${role}SessionActive`),
+      storage.remove(`${role}Token`),
+      storage.remove(`${role}RefreshToken`)
+    ])
+  );
 };

@@ -24,7 +24,7 @@ function getServiceAccount() {
             if (parsed.client_email && parsed.private_key && parsed.project_id) {
                 cachedServiceAccount = {
                     ...parsed,
-                    private_key: parsed.private_key.replace(/\\n/g, '\n'),
+                    private_key: parsed.private_key.replaceAll('\\n', '\n'),
                 };
                 return cachedServiceAccount;
             }
@@ -40,7 +40,7 @@ function getServiceAccount() {
     let privateKey = process.env.FIREBASE_PRIVATE_KEY || process.env.GOOGLE_PRIVATE_KEY;
 
     if (projectId && clientEmail && privateKey) {
-        privateKey = privateKey.replace(/\\n/g, '\n');
+        privateKey = privateKey.replaceAll('\\n', '\n');
         cachedServiceAccount = {
             project_id: projectId,
             client_email: clientEmail,
@@ -67,7 +67,7 @@ async function getAccessToken() {
     if (!sa) return null;
 
     const now = Math.floor(Date.now() / 1000);
-    if (cachedToken && cachedToken.expiresAt > now + 60) return cachedToken.accessToken;
+    if (cachedToken?.expiresAt > now + 60) return cachedToken.accessToken;
 
     const jwtOptions = {
         algorithm: 'RS256',

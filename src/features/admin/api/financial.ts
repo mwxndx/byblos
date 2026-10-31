@@ -37,7 +37,8 @@ export async function getPaymentProviderBalances() {
       payout: { error: 'Unavailable' },
       timestamp: new Date().toISOString()
     };
-  } catch (error) {
+  } catch {
+    // Graceful degradation: return placeholder health metrics when endpoint fails
     return {
       payin: { error: 'Unavailable' },
       payout: { error: 'Unavailable' },

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import https from 'https';
+import https from 'node:https';
 import dns from 'node:dns';
 import logger from '../../shared/utils/logger.js';
 import { PaymentStatus } from '../../shared/constants/enums.js';
@@ -252,7 +252,8 @@ class PaystackProviderClient {
             ]
         } = options;
 
-        for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        // Polling loop with interval delay is inherently sequential
+        for (let attempt = 1; attempt <= maxAttempts; attempt += 1) { // NOSONAR: javascript:S9382
             const status = await this.verifyTransaction(reference);
             if (finalStatuses.includes(String(status.status || '').toLowerCase())) {
                 return status;
@@ -378,7 +379,8 @@ class PaystackProviderClient {
 
     async _retryRequest(fn, retries = 1, delay = 1000) {
         let lastError;
-        for (let attempt = 1; attempt <= retries + 1; attempt += 1) {
+        // Exponential retry backoff loop is inherently sequential
+        for (let attempt = 1; attempt <= retries + 1; attempt += 1) { // NOSONAR: javascript:S9382
             try {
                 return await fn();
             } catch (error) {

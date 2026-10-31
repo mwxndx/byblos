@@ -17,7 +17,7 @@ import { cn, formatCurrency } from '@/shared/utils/formatting';
 import { useWishlist } from '@/features/shop/wishlist/useWishlist';
 import { useIsProductWishlisted } from '@/features/shop/wishlist/wishlistStore';
 
-function ProductWishlistButton({ product }: { product: ProductWithApiFields }) {
+function ProductWishlistButton({ product }: Readonly<{ product: ProductWithApiFields }>) {
   const { addToWishlist, removeFromWishlist } = useWishlist();
   const wishlisted = useIsProductWishlisted(product.id);
 

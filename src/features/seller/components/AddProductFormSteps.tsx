@@ -31,6 +31,11 @@ interface AddProductFormStepsProps {
   hasCoordinates: boolean;
 }
 
+const DIGITAL_CATEGORY_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  audio: Music,
+  video: Video,
+};
+
 const fieldLabel = 'text-sm font-medium text-label-2';
 const errorText = 'text-[13px] text-sys-red';
 const MAX_DIGITAL_PRODUCT_FILE_SIZE_MB = 60;
@@ -115,7 +120,7 @@ export const AddProductFormSteps = ({
             <div role="radiogroup" aria-label="Digital format" className="grid grid-cols-3 gap-2">
               {DIGITAL_CATEGORIES.map(cat => {
                 const isSelected = (formData.digital_category || 'document') === cat.id;
-                const Icon = cat.id === 'audio' ? Music : cat.id === 'video' ? Video : FileText;
+                const Icon = DIGITAL_CATEGORY_ICONS[cat.id] ?? FileText;
                 return (
                   <button
                     key={cat.id}
@@ -155,7 +160,7 @@ export const AddProductFormSteps = ({
 
       {/* Photos */}
       <div className="space-y-1.5">
-        <label className={fieldLabel}>Photos</label>
+        <span className={fieldLabel}>Photos</span>
         <div className="grid grid-cols-3 gap-2.5">
           {[0, 1, 2].map(slot => {
             const preview = slot === 0 ? imagePreview : extraPreviews[slot - 1];
@@ -249,7 +254,7 @@ export const AddProductFormSteps = ({
       {/* Digital: required upload */}
       {formData.product_type === 'digital' && (() => {
         const spec = getDigitalCategorySpec(formData.digital_category);
-        const Icon = formData.digital_category === 'audio' ? Music : formData.digital_category === 'video' ? Video : FileText;
+        const Icon = DIGITAL_CATEGORY_ICONS[formData.digital_category || ''] ?? FileText;
         return (
           <div className="space-y-3 rounded-card border border-separator bg-surface-1 p-4">
             <div className="flex items-center justify-between">
@@ -269,11 +274,7 @@ export const AddProductFormSteps = ({
                       {formData.digital_file?.name || formData.digital_file_name}
                     </p>
                     <p className="text-[11px] text-label-3">
-                      {formData.digital_file
-                        ? `${(formData.digital_file.size / (1024 * 1024)).toFixed(1)} MB`
-                        : formData.digital_file_size
-                        ? `${(formData.digital_file_size / (1024 * 1024)).toFixed(1)} MB`
-                        : spec.label} • {spec.label} format verified
+                      {`${(formData.digital_file?.size ?? formData.digital_file_size) != null ? `${(((formData.digital_file?.size ?? formData.digital_file_size) as number) / (1024 * 1024)).toFixed(1)} MB` : spec.label} • ${spec.label} format verified`}
                     </p>
                   </div>
                 </div>
@@ -348,12 +349,12 @@ export const AddProductFormSteps = ({
         <div className="space-y-4 rounded-card border border-separator bg-surface-1 p-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className={fieldLabel}>Start time</label>
-              <Input type="time" value={formData.service_options.start_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, start_time: e.target.value } }))} />
+              <label htmlFor="ap-service-start-time" className={fieldLabel}>Start time</label>
+              <Input id="ap-service-start-time" type="time" value={formData.service_options.start_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, start_time: e.target.value } }))} />
             </div>
             <div className="space-y-1.5">
-              <label className={fieldLabel}>End time</label>
-              <Input type="time" value={formData.service_options.end_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, end_time: e.target.value } }))} />
+              <label htmlFor="ap-service-end-time" className={fieldLabel}>End time</label>
+              <Input id="ap-service-end-time" type="time" value={formData.service_options.end_time} onChange={e => setFormData(p => ({ ...p, service_options: { ...p.service_options, end_time: e.target.value } }))} />
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -406,12 +407,14 @@ export const AddProductFormSteps = ({
 
           {physicalOptionsOpen && (
             <div className="border-t border-separator">
-              <label className="flex cursor-pointer items-start justify-between gap-3 p-4">
+              <label htmlFor="ap-custom-product" className="flex cursor-pointer items-start justify-between gap-3 p-4">
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium text-label">Custom product</span>
                   <span className="mt-0.5 block text-[13px] text-label-3">Buyer submits instructions before payment.</span>
                 </span>
                 <input
+                  id="ap-custom-product"
+                  aria-label="Custom product"
                   type="checkbox"
                   checked={formData.is_custom_product}
                   onChange={event => {
@@ -424,12 +427,14 @@ export const AddProductFormSteps = ({
 
               <div className="h-px bg-separator" />
 
-              <label className="flex cursor-pointer items-start justify-between gap-3 p-4">
+              <label htmlFor="ap-imported-product" className="flex cursor-pointer items-start justify-between gap-3 p-4">
                 <span className="min-w-0 flex-1">
                   <span className="block text-sm font-medium text-label">Imported / pre-order item</span>
                   <span className="mt-0.5 block text-[13px] text-label-3">Buyer sees the estimated ready time before paying.</span>
                 </span>
                 <input
+                  id="ap-imported-product"
+                  aria-label="Imported / pre-order item"
                   type="checkbox"
                   checked={formData.is_imported_product}
                   onChange={event => {
@@ -443,7 +448,7 @@ export const AddProductFormSteps = ({
               {formData.is_custom_product && (
                 <div className="space-y-3 border-t border-separator p-4">
                   <div className="space-y-1.5">
-                    <label className={fieldLabel}>Production days</label>
+                    <span className={fieldLabel}>Production days</span>
                     <Select value={formData.production_days} onValueChange={value => { clearError('production_days'); setFormData(p => ({ ...p, production_days: value })); }}>
                       <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -475,7 +480,7 @@ export const AddProductFormSteps = ({
               {formData.is_imported_product && (
                 <div className="space-y-3 border-t border-separator p-4">
                   <div className="space-y-1.5">
-                    <label className={fieldLabel}>Estimated ready time</label>
+                    <span className={fieldLabel}>Estimated ready time</span>
                     <Select value={formData.import_days} onValueChange={value => { clearError('import_days'); setFormData(p => ({ ...p, import_days: value })); }}>
                       <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -498,7 +503,7 @@ export const AddProductFormSteps = ({
 
       {/* Category (secondary) */}
       <div className="space-y-1.5">
-        <label className={fieldLabel}>Category</label>
+        <span className={fieldLabel}>Category</span>
         <Select value={formData.aesthetic} onValueChange={v => setFormData(p => ({ ...p, aesthetic: v }))}>
           <SelectTrigger className="h-11">
             <SelectValue />

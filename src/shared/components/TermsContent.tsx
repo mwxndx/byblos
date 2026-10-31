@@ -369,6 +369,6 @@ const Sub = ({ title, children }: { title: string; children: React.ReactNode }) 
 
 const BulletList = ({ items }: { items: string[] }) => (
   <ul className="list-disc pl-5 mt-2 space-y-1.5 text-slate-300">
-    {items.map((item, i) => <li key={i}>{item}</li>)}
+    {items.map((item) => <li key={item}>{item}</li>)}
   </ul>
 );

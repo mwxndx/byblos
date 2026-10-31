@@ -30,7 +30,7 @@ function safeDecodeToken(value: string) {
   }
 }
 
-function LegCard({ title, leg }: { title: string; leg?: PublicTrackingLeg | null }) {
+function LegCard({ title, leg }: Readonly<{ title: string; leg?: PublicTrackingLeg | null }>) {
   if (!leg) return null;
 
   const origin = leg.origin?.address || leg.origin?.label;

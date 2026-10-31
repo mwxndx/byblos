@@ -18,7 +18,20 @@ export async function getBuyers(params: AdminListParams = {}): Promise<Paginated
     : (Array.isArray(response.data) ? response.data : []);
 
   const items = rows.map((raw) => {
-    const buyer = raw as Record<string, unknown>;
+    const buyer = raw as {
+      id?: string | number;
+      name?: string;
+      full_name?: string;
+      email?: string;
+      phone?: string | number;
+      status?: string;
+      city?: string;
+      location?: string;
+      created_at?: string;
+      createdAt?: string;
+      user_id?: string | number;
+      [key: string]: unknown;
+    };
     return {
       id: String(buyer.id || `buyer-${globalThis.crypto.randomUUID()}`),
       name: String(buyer.name || buyer.full_name || 'Unnamed Buyer'),

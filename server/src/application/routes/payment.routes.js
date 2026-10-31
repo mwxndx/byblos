@@ -95,7 +95,7 @@ publicRouter.get(
   (req, res, next) => {
     // Map invoiceId to paymentId for backward compatibility
     req.params.paymentId = req.params.invoiceId;
-    paymentController.checkStatus(req, res, next);
+    paymentController.checkStatus(req, res, next).catch(next);
   }
 );
 

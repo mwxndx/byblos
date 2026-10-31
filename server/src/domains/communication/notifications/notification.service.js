@@ -335,7 +335,8 @@ class NotificationService {
         let pushed = 0;
         let failed = 0;
 
-        for (let i = 0; i < recipients.length; i += safeBatchSize) {
+        // Chunked batching intentional: throttles dispatch to avoid gateway rate limits
+        for (let i = 0; i < recipients.length; i += safeBatchSize) { // NOSONAR: javascript:S9382
             const batch = recipients.slice(i, i + safeBatchSize);
             const settled = await Promise.allSettled(
                 batch.map(recipient =>
@@ -477,8 +478,8 @@ class NotificationService {
 
         const outdatedTokens = tokens.filter((row) => {
             if (!row.app_version) return true;
-            const parsed = parseInt(String(row.app_version).trim(), 10);
-            if (!isNaN(parsed)) {
+            const parsed = Number.parseInt(String(row.app_version).trim(), 10);
+            if (!Number.isNaN(parsed)) {
                 return parsed < Number(minVersionCode);
             }
             return true;
@@ -527,7 +528,8 @@ class NotificationService {
         const invalidTokens = [];
         const batchSize = 50;
 
-        for (let i = 0; i < outdatedTokens.length; i += batchSize) {
+        // Chunked batching intentional: throttles FCM push notification dispatch to avoid flooding
+        for (let i = 0; i < outdatedTokens.length; i += batchSize) { // NOSONAR: javascript:S9382
             const batch = outdatedTokens.slice(i, i + batchSize);
             const results = await Promise.allSettled(
                 batch.map(device => sendFcmV1({

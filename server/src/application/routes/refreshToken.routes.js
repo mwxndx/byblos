@@ -26,7 +26,7 @@ router.post('/revoke-token', authLimiter, async (req, res) => {
   try {
     const tokenBlacklist = (await import('../../domains/identity/tokens/tokenBlacklist.service.js')).default;
     const { verifyRefreshToken } = await import('../../shared/utils/refreshToken.js');
-    for (const t of tokens) {
+    await Promise.all(tokens.map(async (t) => {
       try {
         let decoded = null;
         try {
@@ -34,13 +34,13 @@ router.post('/revoke-token', authLimiter, async (req, res) => {
         } catch {
           decoded = verifyRefreshToken(t);
         }
-        if (decoded && decoded.exp) {
+        if (decoded?.exp) {
           await tokenBlacklist.addToken(t, decoded.exp);
         }
       } catch {
         // Token already invalid/expired or malformed — ignore
       }
-    }
+    }));
   } catch {
     // Graceful error handling
   }

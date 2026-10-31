@@ -14,8 +14,8 @@ function validateWithdrawalBody(body) {
     if (!amount || !mpesaNumber || !mpesaName) {
         return 'amount, mpesaNumber and mpesaName are required';
     }
-    const parsed = parseFloat(amount);
-    if (isNaN(parsed) || parsed <= 0) return 'amount must be a positive number';
+    const parsed = Number.parseFloat(amount);
+    if (Number.isNaN(parsed) || parsed <= 0) return 'amount must be a positive number';
     try {
         payoutService.validateAmount(parsed);
     } catch (err) {
@@ -58,7 +58,7 @@ export const createWithdrawal = async (req, res, next) => {
         const request = await WithdrawalService.createWithdrawalRequest({
             entityId: sellerId,
             entityType: 'seller',
-            amount: parseFloat(amount),
+            amount: Number.parseFloat(amount),
             mpesaNumber: normalizedPhone,
             mpesaName,
             idempotencyKey,
@@ -85,8 +85,8 @@ export const getWithdrawals = async (req, res, next) => {
     const sellerId = req.user?.sellerId;
     if (!sellerId) return next(new AppError('Authentication required', 401));
 
-    const page = Math.max(1, parseInt(req.query.page ?? '1', 10) || 1);
-    const limit = Math.min(50, parseInt(req.query.limit ?? '20', 10) || 20);
+    const page = Math.max(1, Number.parseInt(req.query.page ?? '1', 10) || 1);
+    const limit = Math.min(50, Number.parseInt(req.query.limit ?? '20', 10) || 20);
     const offset = (page - 1) * limit;
 
     const ALLOWED_STATUSES = new Set(['processing', 'completed', 'failed', 'manual_review', 'compensation_required']);
@@ -115,9 +115,9 @@ export const getWithdrawals = async (req, res, next) => {
 
 export const getWithdrawalById = async (req, res, next) => {
     const sellerId = req.user?.sellerId;
-    const requestId = parseInt(req.params.id, 10);
+    const requestId = Number.parseInt(req.params.id, 10);
     if (!sellerId) return next(new AppError('Authentication required', 401));
-    if (isNaN(requestId)) return next(new AppError('Invalid request ID', 400));
+    if (Number.isNaN(requestId)) return next(new AppError('Invalid request ID', 400));
 
     try {
         const request = await WithdrawalService.getWithdrawalById(requestId, sellerId);

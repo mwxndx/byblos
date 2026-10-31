@@ -15,7 +15,7 @@ const cardClass =
  * The withdraw form itself reuses the existing RefundConfirmDialog + the T+2
  * clearance logic buyers already have.
  */
-export function BuyerRefundsTab({ refundAmount }: { refundAmount: number }) {
+export function BuyerRefundsTab({ refundAmount }: Readonly<{ refundAmount: number }>) {
   const {
     isDialogOpen,
     setIsDialogOpen,
@@ -109,7 +109,7 @@ export function BuyerRefundsTab({ refundAmount }: { refundAmount: number }) {
               {formatCurrency(clearingBalance)}
             </p>
           </div>
-          <p className="mt-1 truncate text-[9px] font-semibold text-slate-400 dark:text-white/40 sm:text-[10px]" title={`Next: ${nextDate}${nextTime ? ` at ${nextTime}` : ''}`}>
+          <p className="mt-1 truncate text-[9px] font-semibold text-slate-400 dark:text-white/40 sm:text-[10px]" title={`Next: ${nextDate}${nextTime ? ' at ' + nextTime : ''}`}>
             {isClearing ? `Next: ${nextDate}` : 'No hold'}
           </p>
         </div>

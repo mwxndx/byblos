@@ -18,7 +18,7 @@ export const reverseOrderSettlementForRefundHelper = async (client, orderId, sou
     );
 
     const payout = payouts[0];
-    if (!payout || !payout.seller_id) {
+    if (!payout?.seller_id) {
         return { adjusted: false, reason: 'no_seller_payout' };
     }
 
@@ -133,7 +133,8 @@ export const reverseOrderSettlementForRefundHelper = async (client, orderId, sou
     return { adjusted: false, reason: `settlement_status_${settlementStatus || 'unknown'}` };
 };
 
-const reverseSingleCreatorEarning = async (client, earning, source, isPartialOrder, numRefund, numTotal, parseMeta, balanceField, table, creatorIdField) => {
+const reverseSingleCreatorEarning = async (client, earning, options = {}) => {
+    const { source, isPartialOrder, numRefund, numTotal, parseMeta, balanceField, table, creatorIdField } = options;
     const totalAmountCents = toCents(earning.amount);
     if (totalAmountCents <= 0 || earning.status === 'reversed') return null;
 
@@ -259,18 +260,16 @@ export const reverseCreatorEarningsForRefundHelper = async (client, orderId, sou
     );
 
     if (earningsRows.length > 0) {
-        results.salesCommission = await reverseSingleCreatorEarning(
-            client,
-            earningsRows[0],
+        results.salesCommission = await reverseSingleCreatorEarning(client, earningsRows[0], {
             source,
             isPartialOrder,
-            refundAmount,
-            orderTotal,
+            numRefund: refundAmount,
+            numTotal: orderTotal,
             parseMeta,
-            'total_earnings',
-            'creator_earnings',
-            'creator_id'
-        );
+            balanceField: 'total_earnings',
+            table: 'creator_earnings',
+            creatorIdField: 'creator_id'
+        });
     }
 
     // 2. Reversal for creator-refers-seller earnings
@@ -283,18 +282,16 @@ export const reverseCreatorEarningsForRefundHelper = async (client, orderId, sou
     );
 
     if (refEarningsRows.length > 0) {
-        results.referralCommission = await reverseSingleCreatorEarning(
-            client,
-            refEarningsRows[0],
+        results.referralCommission = await reverseSingleCreatorEarning(client, refEarningsRows[0], {
             source,
             isPartialOrder,
-            refundAmount,
-            orderTotal,
+            numRefund: refundAmount,
+            numTotal: orderTotal,
             parseMeta,
-            'total_referral_earnings',
-            'creator_referral_earnings',
-            'referrer_creator_id'
-        );
+            balanceField: 'total_referral_earnings',
+            table: 'creator_referral_earnings',
+            creatorIdField: 'referrer_creator_id'
+        });
     }
 
     return results;

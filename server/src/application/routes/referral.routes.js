@@ -1,9 +1,7 @@
+// @ts-check
+import express from 'express';
 import { validate } from '../middleware/validate.js';
 import * as V from '../../shared/validations/referral.validation.js';
-// @ts-check
-'use strict';
-
-import express from 'express';
 import { protect } from '../middleware/auth.js';
 import * as referralController from '../../domains/growth/referrals/referral.controller.js';
 

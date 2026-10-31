@@ -53,7 +53,7 @@ export async function recordFraudEvent(event) {
 
     // Real-time push so a human sees this immediately, not only on the next
     // Detections-tab visit. Fire-and-forget; reportAlert never throws.
-    reportAlert({
+    void reportAlert({
       level: 'error',
       title: `Fraud event: ${event.eventType}`,
       message: `A ${event.eventType} fraud event was recorded.`,
@@ -65,7 +65,7 @@ export async function recordFraudEvent(event) {
         expectedAmount: event.expectedAmount ?? null,
         providerAmount: event.providerAmount ?? null
       }
-    });
+    }).catch(() => {});
   } catch (error) {
     logger.error('[FraudEvents] Failed to persist fraud event', {
       original: event,

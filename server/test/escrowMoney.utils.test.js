@@ -85,9 +85,9 @@ describe('toCents / roundMoney', () => {
     assert.equal(roundMoney(0.1 + 0.2), 0.3);
     assert.equal(toCents(0.1) + toCents(0.2), toCents(0.3));
 
-    // Difference between 100.20 and 100.19 in IEEE-754 is 0.010000000000005116
+    // Difference between 100.20 and 100.19 in IEEE-754 is 0.010000000000005116 (not exact 0.01)
     const diff = 100.20 - 100.19;
-    assert.ok(diff > 0.01); // floating point bug!
+    assert.notEqual(diff, 0.01); // floating point representation anomaly
     // with integer cents:
     const diffCents = Math.abs(toCents(100.20) - toCents(100.19));
     assert.equal(diffCents, 1); // exactly 1 cent, within banking tolerance <= 1

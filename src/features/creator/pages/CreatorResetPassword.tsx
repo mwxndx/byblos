@@ -138,7 +138,7 @@ export default function CreatorResetPassword() {
   );
 }
 
-function Requirement({ met, label }: { met: boolean; label: string }) {
+function Requirement({ met, label }: Readonly<{ met: boolean; label: string }>) {
   return (
     <span className={met ? 'flex items-center gap-1 text-emerald-600 dark:text-emerald-400' : 'flex items-center gap-1 text-slate-400 dark:text-white/45'}>
       {met ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}

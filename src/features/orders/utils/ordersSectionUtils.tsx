@@ -53,7 +53,7 @@ export const formatOrderDate = (dateInput: DateLike | null | undefined): string 
 };
 
 export const formatOrderCurrency = (value: number | undefined, currency = 'KSH') => {
-  if (value === undefined || isNaN(value)) return `${currency} 0`;
+  if (value === undefined || Number.isNaN(value)) return `${currency} 0`;
   return `${currency} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
@@ -71,7 +71,7 @@ export const getBuyerServiceCharge = (order?: ApiOrder | null): number => {
 };
 
 export const isPaidOrder = (order: ApiOrder): boolean => {
-  const paymentStatus = String(order.paymentStatus || (order as unknown as Record<string, unknown>).payment_status || '').toLowerCase();
+  const paymentStatus = String(order.paymentStatus || (order as unknown as { payment_status?: string }).payment_status || '').toLowerCase();
   return ['completed', 'success', 'paid'].includes(paymentStatus);
 };
 
@@ -99,7 +99,7 @@ export const isServiceOrder = (order?: ApiOrder | null): boolean => {
   // fallback for any response shape that omits it entirely.
   if (String(order.order_type || order.orderType || '').toUpperCase() === 'SERVICE') return true;
   const metadata = (order.metadata as Record<string, unknown>) || {};
-  const orderType = String((order as unknown as Record<string, unknown>).order_type || (order as unknown as Record<string, unknown>).type || metadata.product_type || metadata.order_type || '').toLowerCase();
+  const orderType = String((order as unknown as { order_type?: string; type?: string }).order_type || (order as unknown as { order_type?: string; type?: string }).type || (metadata as Record<string, string>).product_type || (metadata as Record<string, string>).order_type || '').toLowerCase();
   return orderType === 'service' || order.items.some((item: ApiOrderItem) => item.productType === 'service' || (item as unknown as Record<string, unknown>).isService);
 };
 
@@ -182,7 +182,7 @@ export const getPaymentStatusBadge = (status?: string) => {
     default:
       return (
         <span className="bg-gray-600 dark:bg-gray-600 !text-white text-xs sm:text-sm font-bold px-3 py-1 rounded-full shadow-sm inline-flex items-center tracking-wide">
-          {(status || 'Pending').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+          {(status || 'Pending').split('_').join(' ').replace(/\b\w/g, (c) => c.toUpperCase())}
         </span>
       );
   }

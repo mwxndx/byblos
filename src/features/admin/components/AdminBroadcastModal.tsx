@@ -21,7 +21,7 @@ interface AdminBroadcastModalProps {
   onClose: () => void;
 }
 
-export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProps) {
+export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcastModalProps>) {
   const [minVersionCode, setMinVersionCode] = useState<number>(73);
   const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.73');
   const [body, setBody] = useState<string>(
@@ -146,7 +146,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: AdminBroadcastModalProp
                 type="number"
                 min={1}
                 value={minVersionCode}
-                onChange={(e) => setMinVersionCode(parseInt(e.target.value, 10) || 0)}
+                onChange={(e) => setMinVersionCode(Number.parseInt(e.target.value, 10) || 0)}
                 disabled={isSubmitting}
                 className="h-10 text-sm bg-fill border-separator rounded-xl"
                 required

@@ -175,11 +175,13 @@ export async function handleLatePaymentCompensation({ client, orderId, orderRow,
             }
         } catch (err) {
             logger.error('[CorePaymentService] Failed to record/process late payment refund:', err.message);
-            reportAlert({
+            void reportAlert({
                 level: 'error',
                 title: 'Late-payment compensation refund handling failed',
                 message: `Order ${orderId} is COMPENSATION_REQUIRED but its refund processing failed (${err.message}).`,
                 context: { orderId, paymentId: paymentRow.id }
+            }).catch((alertErr) => {
+                logger.warn('[CorePaymentService] reportAlert failed:', alertErr?.message);
             });
         }
     }

@@ -163,7 +163,7 @@ export function useSellerRegistration(onSuccess?: () => void) {
     };
 
     const timer = setTimeout(() => {
-      checkShopName();
+      void checkShopName().catch(() => {});
     }, 500);
 
     return () => clearTimeout(timer);

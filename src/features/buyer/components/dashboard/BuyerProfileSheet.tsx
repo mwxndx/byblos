@@ -302,7 +302,7 @@ interface BuyerProfileSheetProps extends BuyerProfileContentProps {
  * Buyer profile contained by the dashboard body. It intentionally leaves the
  * shared header and fixed bottom navigation visible above the profile panel.
  */
-export function BuyerProfileSheet({ open, onOpenChange, ...content }: BuyerProfileSheetProps) {
+export function BuyerProfileSheet({ open, onOpenChange, ...content }: Readonly<BuyerProfileSheetProps>) {
   return (
     <DashboardProfilePanel
       open={open}

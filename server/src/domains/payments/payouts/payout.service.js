@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import logger from '../../../shared/utils/logger.js';
 import Fees from '../../../shared/config/fees.js';
 import PaystackTransferClient from '../../../infrastructure/providers/PaystackTransferClient.js';

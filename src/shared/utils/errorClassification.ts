@@ -81,8 +81,8 @@ export function classifyApiError(error: unknown, fallbackMessage = 'An unexpecte
   }
 
   if (typeof error === 'object' && error !== null) {
-    const errObj = error as Record<string, unknown>;
-    const resData = (errObj.response as Record<string, unknown> | undefined)?.data as Record<string, unknown> | undefined;
+    const errObj = error as { message?: string; response?: { data?: { message?: string; code?: string | number } } };
+    const resData = errObj.response?.data;
     const msg = String(resData?.message || errObj.message || fallbackMessage);
     return {
       category: 'unknown',

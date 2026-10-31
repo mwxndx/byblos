@@ -147,7 +147,7 @@ export function BaseDashboardLayout({
 
                                 return (
                                     <Link
-                                        key={index}
+                                        key={item.path}
                                         to={item.path}
                                         onClick={() => setSidebarOpen(false)}
                                         className={cn(

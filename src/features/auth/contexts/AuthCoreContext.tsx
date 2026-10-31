@@ -32,7 +32,7 @@ export type {
 // PROVIDER COMPONENT
 // ============================================================================
 
-export function AuthCoreProvider({ children }: { children: ReactNode }) {
+export function AuthCoreProvider({ children }: Readonly<{ children: ReactNode }>) {
     // Session credentials are kept by the platform auth strategy. Do not cache
     // the full profile in web localStorage: it includes contact details and is
     // readable by any injected script. Revalidation restores it when needed.

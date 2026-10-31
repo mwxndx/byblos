@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { useToast } from '@/shared/hooks/use-toast';
+
 import { Button } from '@/shared/ui/button';
 
 // Lazy load the OrdersSection component
@@ -41,9 +41,9 @@ function BuyerDashboard() {
   const navigate = useNavigate();
   const { user: globalUser, logout, updateProfile } = useGlobalAuth();
   const user = globalUser?.role === 'buyer' ? globalUser.profile as BuyerProfile : null;
-  const updateBuyerProfile = (updates: Partial<BuyerProfile>) => updateProfile(updates, 'buyer');
+
   const { wishlist } = useWishlist();
-  const { toast } = useToast();
+
   const { activeSection } = useBuyerActiveSection();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,7 +65,7 @@ function BuyerDashboard() {
 
   // Get refund amount from user - Parse as float to ensure it's a number
   const refundAmount = typeof (user as unknown as { refunds?: string | number })?.refunds === 'string'
-    ? parseFloat((user as unknown as { refunds: string }).refunds)
+    ? Number.parseFloat((user as unknown as { refunds: string }).refunds)
     : ((user as unknown as { refunds?: number })?.refunds || 0);
 
   useEffect(() => {

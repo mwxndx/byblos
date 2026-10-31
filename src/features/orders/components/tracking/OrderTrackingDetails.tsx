@@ -25,7 +25,7 @@ export function OrderTrackingDetails({
   isPhysical,
   journey,
   formatCurrency,
-}: OrderTrackingDetailsProps) {
+}: Readonly<OrderTrackingDetailsProps>) {
   const logistics = order.logistics;
   const deliveryLeg = logistics?.deliveryLeg;
 
@@ -136,7 +136,7 @@ export function OrderTrackingDetails({
   );
 }
 
-function OrderTrackingTimeline({ events }: { events: NonNullable<ApiOrder['logistics']>['events'] }) {
+function OrderTrackingTimeline({ events }: Readonly<{ events: NonNullable<ApiOrder['logistics']>['events'] }>) {
   if (!events?.length) {
     return (
       <p className="rounded-lg border border-separator bg-black/40 px-3 py-2 text-xs text-label-2">

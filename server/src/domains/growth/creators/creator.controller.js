@@ -1,6 +1,6 @@
 import CreatorService from './creator.service.js';
 import AuthService from '../../identity/auth/auth.service.js';
-import WithdrawalService from '../../payments/withdrawals/withdrawal.service.js';
+
 import { revokeSessionTokens, clearAuthCookies } from '../../../shared/utils/sessionRevocation.js';
 import { sanitizeWithdrawalRequest } from '../../../shared/utils/sanitize.js';
 import { setAuthCookie, setRefreshTokenCookie } from '../../../shared/utils/cookie.utils.js';

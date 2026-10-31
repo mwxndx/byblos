@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+
 import { type OrderStatus } from '@/shared/types';
 
 import { useToast } from '@/shared/hooks/use-toast';
@@ -12,11 +12,11 @@ import {
 } from '@/features/seller/hooks/mutations/useSellerOrderMutations';
 import { useAsyncLock } from '@/shared/hooks/useAsyncLock';
 import { useSellerOrders } from '../components/dashboard/hooks/useSellerOrders';
-import { sellerDashboardQueryKeys } from '../components/dashboard/queryKeys';
+
 import { usePickupRequestFlow } from './usePickupRequestFlow';
 
 export function useSellerOrderActions() {
-    const queryClient = useQueryClient();
+
     const ordersQuery = useSellerOrders();
     const orders = useMemo(() => ordersQuery.data || [], [ordersQuery.data]);
     const isLoading = ordersQuery.isLoading;
@@ -47,19 +47,7 @@ export function useSellerOrderActions() {
 
     const pickupFlow = usePickupRequestFlow({ runWithLock });
 
-    // Neither refreshOrders nor markAsDelivered (below) is called by any
-    // handler in this hook, nor returned to a consumer -- confirmed dead
-    // code carried over unchanged from the pre-split hook (each mutation's
-    // own onSuccess already invalidates the relevant queries). Left in
-    // place rather than silently deleted as a side effect of this
-    // structural split -- that's a call for whoever owns this flow to make,
-    // not an incidental cleanup.
-    const refreshOrders = useCallback(async () => {
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: sellerDashboardQueryKeys.orders }),
-            queryClient.invalidateQueries({ queryKey: sellerDashboardQueryKeys.analytics })
-        ]);
-    }, [queryClient]);
+
 
     // Filter orders based on search query
     const filteredOrders = useMemo(() => {
@@ -138,30 +126,7 @@ export function useSellerOrderActions() {
         });
     };
 
-    const markAsDelivered = async (orderId: string) => {
-        // FIX (Task 18): Prevent duplicate order mutations
-        await runWithLock(async () => {
-            try {
-                setIsUpdating(true);
-                await updateOrderStatusMutation.mutateAsync({ orderId, status: 'DELIVERY_COMPLETE' as OrderStatus });
-
-                toast({
-                    title: 'Order Delivered',
-                    description: 'The order has been marked as delivered.',
-                });
-            } catch (err) {
-                console.error('Failed to update order status:', err);
-                toast({
-                    title: 'Error',
-                    description: 'Failed to mark order as delivered. Please try again.',
-                    variant: 'destructive',
-                });
-            } finally {
-                setIsUpdating(false);
-            }
-        });
-    };
-    void markAsDelivered;
+    
 
     const markServiceReadyForBuyerConfirmation = async (orderId: string) => {
         // FIX (Task 18): Prevent duplicate order mutations

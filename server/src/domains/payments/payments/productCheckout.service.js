@@ -75,7 +75,7 @@ async function insertProductOrder(client, data) {
 // master schema marks name/price NOT NULL — populating both satisfies every
 // reader and constraint.
 async function insertOrderItems(client, orderId, lines) {
-  for (const line of lines) {
+  await Promise.all(lines.map(line => {
     const p = line.product;
     const itemMeta = {
       productType: p.product_type,
@@ -83,13 +83,13 @@ async function insertOrderItems(client, orderId, lines) {
       digitalFileName: p.digital_file_name || null,
       imageUrl: p.image_url || null,
     };
-    await client.query(
+    return client.query(
       `INSERT INTO order_items
          (order_id, product_id, name, product_name, price, product_price, quantity, subtotal, metadata)
        VALUES ($1, $2, $3, $3, $4::numeric, $4::numeric, $5, $6::numeric, $7)`,
       [orderId, p.id, p.name, line.price, line.quantity, line.lineSubtotal, JSON.stringify(itemMeta)]
     );
-  }
+  }));
 }
 
 // Return an existing checkout attempt (idempotent replay) or null.
@@ -165,7 +165,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
 
   // 1. Load & validate all products (must share ONE active seller).
   const productIds = items.map((i) => i.productId);
-  const { prows, productById, anyProduct } = await loadAndValidateCheckoutProducts(productIds);
+  const { productById, anyProduct } = await loadAndValidateCheckoutProducts(productIds);
 
   // 2. Build line items + secure per-line pricing.
   const lines = buildValidatedLines(items, productById, isMulti);
@@ -214,7 +214,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
   const fin = deriveOrderFinancials({ subtotal, deliveryFee, collectionFee, creatorCommission });
 
   // Fulfillment + order type from the aggregate.
-  const effectiveType = allDigital ? 'digital' : (singleLine && singleLine.isService ? 'service' : 'physical');
+  const effectiveType = allDigital ? 'digital' : (singleLine?.isService ? 'service' : 'physical');
   const fulfillmentType = resolveFulfillmentType(
     {
       latitude: anyProduct.seller_latitude,
@@ -227,7 +227,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
   );
   const orderType = allDigital
     ? OrderType.DIGITAL
-    : (singleLine && singleLine.isService ? OrderType.SERVICE : OrderType.PHYSICAL);
+    : (singleLine?.isService ? OrderType.SERVICE : OrderType.PHYSICAL);
 
   // 3. Idempotent replay (fast path).
   const existing = await findExistingByToken(idempotencyKey);
@@ -266,7 +266,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
       product_type: singleLine ? singleLine.product.product_type : (allDigital ? 'digital' : 'physical'),
       is_digital: singleLine ? singleLine.product.is_digital : allDigital,
       pre_handoff_sla: preHandoffSla,
-      custom_product: singleLine && singleLine.isCustom
+      custom_product: singleLine?.isCustom
         ? {
             is_custom_product: true,
             production_days: preHandoffSla.production_days,
@@ -436,15 +436,17 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
         `UPDATE product_orders SET status = 'FAILED'::order_status, payment_status = 'failed'::payment_status, updated_at = NOW() WHERE id = $1`,
         [order.id]
       );
-      // Release the reserved stock for every line so a declined charge doesn't hold inventory.
-      for (const l of lines) {
-        if (l.product.track_inventory === true) {
-          await pool.query(
-            `UPDATE products SET reserved_quantity = GREATEST(COALESCE(reserved_quantity, 0) - $2, 0), updated_at = NOW() WHERE id = $1`,
-            [l.product.id, l.quantity]
-          ).catch((e) => logger.error('[CHECKOUT] Failed to release reserved stock', { productId: l.product.id, error: e.message }));
-        }
-      }
+      // Release the reserved stock for every line in parallel so a declined charge doesn't hold inventory.
+      await Promise.all(
+        lines
+          .filter(l => l.product.track_inventory === true)
+          .map(l =>
+            pool.query(
+              `UPDATE products SET reserved_quantity = GREATEST(COALESCE(reserved_quantity, 0) - $2, 0), updated_at = NOW() WHERE id = $1`,
+              [l.product.id, l.quantity]
+            ).catch(e => logger.error('[CHECKOUT] Failed to release reserved stock', { productId: l.product.id, error: e.message }))
+          )
+      );
       return {
         success: false,
         failed: true,

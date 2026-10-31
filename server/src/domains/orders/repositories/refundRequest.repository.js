@@ -119,7 +119,7 @@ export async function countAll({ status, overdueOnly } = {}) {
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const sql = `SELECT COUNT(*) FROM refund_requests ${whereClause}`;
   const { rows } = await query(sql, params);
-  return parseInt(rows[0].count, 10);
+  return Number.parseInt(rows[0].count, 10);
 }
 
 /**

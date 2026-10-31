@@ -7,7 +7,7 @@ interface BuyerDashboardHeaderProps {
   onOpenProfile: () => void;
 }
 
-export function BuyerDashboardHeader({ onOpenProfile }: BuyerDashboardHeaderProps) {
+export function BuyerDashboardHeader({ onOpenProfile }: Readonly<BuyerDashboardHeaderProps>) {
   const { isAuthenticated } = useGlobalAuth();
   const navigate = useNavigate();
 

@@ -71,7 +71,7 @@ export default function MarketingDashboard() {
     const [topPerfs, setTopPerfs] = useState<MarketingRecord | null>(null);
     const [referrals, setReferrals] = useState<MarketingRecord | null>(null);
 
-    const user = globalUser?.profile || JSON.parse(sessionStorage.getItem('marketing_user') || '{}');
+
 
     const fetchAll = useCallback(async () => {
         setLoading(true);
@@ -115,7 +115,8 @@ export default function MarketingDashboard() {
 
             setTopPerfs(extractObject(tp));
             setReferrals(extractObject(ref));
-        } catch (err) {
+        } catch {
+            // Graceful degradation: display error message to user
             setError('Failed to load dashboard data. Please refresh.');
         } finally {
             setLoading(false);
@@ -163,8 +164,8 @@ export default function MarketingDashboard() {
                             <option value={12}>Last 12 Months</option>
                         </select>
                         <button
-                            onClick={async () => {
-                                await logout();
+                            onClick={() => {
+                                logout();
                                 navigate('/admin/marketing/login');
                             }}
                             className="rounded-xl border border-gray-200 bg-white px-2.5 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 shrink-0"
@@ -270,8 +271,8 @@ export default function MarketingDashboard() {
                                     outerRadius={80}
                                     label={({ category }) => category}
                                 >
-                                    {productMix.map((_entry: MarketingRecord, index: number) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    {productMix.map((entry: MarketingRecord, index: number) => (
+                                        <Cell key={`cell-${entry.category || entry.name || index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />

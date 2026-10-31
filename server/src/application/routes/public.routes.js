@@ -1,6 +1,6 @@
 import express from 'express';
 import * as publicController from '../controllers/public.controller.js';
-import paymentController from '../../domains/payments/payments/payment.controller.js';
+
 import { getCsrfToken } from '../controllers/csrf.controller.js';
 import { publicApiRateLimiter } from '../middleware/rateLimiting.js';
 

@@ -13,13 +13,15 @@ export interface LocationMapConfig {
 }
 
 let cachedConfigPromise: Promise<LocationMapConfig> | null = null;
+let hasCachedConfigPromise = false;
 
 export async function getLocationConfig(): Promise<LocationMapConfig> {
-  if (cachedConfigPromise) {
-    return cachedConfigPromise;
+  if (hasCachedConfigPromise && cachedConfigPromise) {
+    return await cachedConfigPromise;
   }
 
-  cachedConfigPromise = (async () => {
+  hasCachedConfigPromise = true;
+  const fetchPromise = (async () => {
     try {
       const response = await apiClient.get('/locations/config');
       return (response.data?.data as LocationMapConfig) || {};
@@ -29,11 +31,13 @@ export async function getLocationConfig(): Promise<LocationMapConfig> {
     }
   })();
 
-  return cachedConfigPromise;
+  cachedConfigPromise = fetchPromise;
+  return await fetchPromise;
 }
 
 export function resetLocationConfigCache(): void {
   cachedConfigPromise = null;
+  hasCachedConfigPromise = false;
 }
 
 export async function searchLocations(query: string): Promise<LocationSearchResult[]> {

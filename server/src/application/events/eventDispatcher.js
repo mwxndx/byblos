@@ -69,19 +69,18 @@ class EventDispatcher {
 
     async dispatchEvent(event, payload, listeners = this.listeners(event), extraArgs = []) {
         const errors = [];
-        for (const listener of listeners) {
-            try {
-                await listener(payload, ...extraArgs);
-            } catch (error) {
-                errors.push(error);
+        const results = await Promise.allSettled(listeners.map(listener => listener(payload, ...extraArgs)));
+        results.forEach((res) => {
+            if (res.status === 'rejected') {
+                errors.push(res.reason);
                 logger.error('[EventBus] Listener failed', {
                     event,
                     eventId: payload?.eventId,
-                    error: error.message,
-                    stack: error.stack
+                    error: res.reason?.message,
+                    stack: res.reason?.stack
                 });
             }
-        }
+        });
         return errors;
     }
 
@@ -127,25 +126,10 @@ class EventDispatcher {
 
         let completed = 0;
         let failed = 0;
-        for (const row of rows) {
-            const listeners = this.listeners(row.event_name);
-            const payload = {
-                ...(row.payload || {}),
-                eventId: row.event_id
-            };
-            if (this.criticalEvents.has(row.event_name) && listeners.length === 0) {
-                await this.markOutboxFailed(row.event_id, new Error(`Critical event ${row.event_name} has no registered listeners`), row.attempts);
-                failed++;
-                continue;
-            }
-            const errors = await this.dispatchEvent(row.event_name, payload, listeners);
-            if (errors.length === 0) {
-                await this.markOutboxCompleted(row.event_id, row.attempts);
-                completed++;
-            } else {
-                await this.markOutboxFailed(row.event_id, errors[0], row.attempts);
-                failed++;
-            }
+        const results = await Promise.all(rows.map(row => this.dispatchOutboxRow(row)));
+        for (const res of results) {
+            completed += res.completed;
+            failed += res.failed;
         }
 
         if (rows.length > 0) {

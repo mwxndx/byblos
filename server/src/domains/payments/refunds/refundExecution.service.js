@@ -186,7 +186,7 @@ class RefundExecutionService {
         ...orderMeta,
         refund_summary: refundSummary,
         refund_completed: isOrderFullyRefunded ? refundItem : (orderMeta.refund_completed || refundItem),
-        refund_credited: buyerRefunded ? true : false
+        refund_credited: Boolean(buyerRefunded)
       };
 
       if (!buyerRefunded) {

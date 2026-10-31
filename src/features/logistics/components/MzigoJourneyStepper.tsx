@@ -1,29 +1,46 @@
 import { AlertTriangle, Check, Clock } from '@/shared/ui/icons';
 import { JOURNEY_STEPS, type Journey } from '../utils/mzigoJourney';
 
+const TONE_MAP: Record<string, string> = {
+  attention: 'border-red-400 bg-red-400 text-black',
+  delayed: 'border-amber-400 bg-amber-400 text-black',
+};
+
+function getStepDotClass(isDone: boolean, isCurrent: boolean, currentTone: string): string {
+  if (isDone) return 'border-yellow-400/70 bg-yellow-400/20 text-yellow-300';
+  if (isCurrent) return currentTone;
+  return 'border-white/15 bg-white/[0.03] text-label-2';
+}
+
+function renderStepIcon(isDone: boolean, isCurrent: boolean, state: string, compact: boolean) {
+  const iconSize = compact ? 12 : 14;
+  if (isDone) {
+    return <Check size={iconSize} />;
+  }
+  if (isCurrent && state === 'attention') {
+    return <AlertTriangle size={iconSize} />;
+  }
+  if (isCurrent && state === 'delayed') {
+    return <Clock size={iconSize} />;
+  }
+  return <span className={`h-1.5 w-1.5 rounded-full ${isCurrent ? 'bg-black' : 'bg-current'}`} />;
+}
+
 /**
  * Horizontal 4-step progress bar shared by the courier console and the
  * buyer/seller tracking card. Done steps fill in, the current step pulses in
  * yellow, and a delayed/attention journey tints the current step.
  */
-export function MzigoJourneyStepper({ journey, compact = false }: { journey: Journey; compact?: boolean }) {
+export function MzigoJourneyStepper({ journey, compact = false }: Readonly<{ journey: Journey; compact?: boolean }>) {
   const steps = journey.steps || JOURNEY_STEPS;
-  const currentTone = journey.state === 'attention'
-    ? 'border-red-400 bg-red-400 text-black'
-    : journey.state === 'delayed'
-      ? 'border-amber-400 bg-amber-400 text-black'
-      : 'border-yellow-400 bg-yellow-400 text-black';
+  const currentTone = TONE_MAP[journey.state] ?? 'border-yellow-400 bg-yellow-400 text-black';
 
   return (
     <div className="flex items-center">
       {steps.map((step, index) => {
         const isDone = index < journey.stepIndex;
         const isCurrent = index === journey.stepIndex;
-        const dotClass = isDone
-          ? 'border-yellow-400/70 bg-yellow-400/20 text-yellow-300'
-          : isCurrent
-            ? currentTone
-            : 'border-white/15 bg-white/[0.03] text-label-2';
+        const dotClass = getStepDotClass(isDone, isCurrent, currentTone);
 
         return (
           <div key={step.key} className="flex flex-1 items-center last:flex-none">
@@ -33,15 +50,7 @@ export function MzigoJourneyStepper({ journey, compact = false }: { journey: Jou
                   compact ? 'h-6 w-6' : 'h-7 w-7'
                 }`}
               >
-                {isDone ? (
-                  <Check size={compact ? 12 : 14} />
-                ) : isCurrent && journey.state === 'attention' ? (
-                  <AlertTriangle size={compact ? 12 : 14} />
-                ) : isCurrent && journey.state === 'delayed' ? (
-                  <Clock size={compact ? 12 : 14} />
-                ) : (
-                  <span className={`h-1.5 w-1.5 rounded-full ${isCurrent ? 'bg-black' : 'bg-current'}`} />
-                )}
+                {renderStepIcon(isDone, isCurrent, journey.state, compact)}
               </span>
               {!compact && (
                 <span

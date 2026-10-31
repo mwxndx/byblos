@@ -1,15 +1,15 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
-import Fees from '../../../shared/config/fees.js';
-import { OrderStatus, ProductType, OrderType } from '../../../shared/constants/enums.js';
+
+import { OrderStatus } from '../../../shared/constants/enums.js';
 import Order from './order.model.js';
 import Buyer from '../../commerce/buyers/buyer.model.js';
 import escrowManager from '../escrow/EscrowManager.js';
 import { assertValidTransition } from '../../../shared/utils/OrderStatusGuard.js';
 import { assertOrderStatusUpdateAuthorized } from './orderStatusUpdatePolicy.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
-import InventoryReservationService from '../../commerce/products/inventoryReservation.service.js';
-import OrderReadService from './orderRead.service.js';
+
+
 import { executeExceptionalReversalHelper } from './orderReversalHelper.js';
 import {
   parseOrderMetadata,
@@ -204,7 +204,7 @@ export class OrderService {
       const completedOrder = upd.rows[0];
 
       const release = await escrowManager.releaseFunds(client, completedOrder, 'AutoHandoffTimeout');
-      if (release && release.success === false) {
+      if (release?.success === false) {
         await client.query('ROLLBACK');
         logger.warn(`[autoComplete] Order ${orderId} not auto-completed; escrow release blocked: ${release.reason}`);
         return null;
@@ -266,7 +266,7 @@ export class OrderService {
     return hasBuyerDoorDelivery(order);
   }
 
-  static async _emitOrderUpdate(orderId, oldStatus, newStatus, notes, source) {
+  static _emitOrderUpdate(orderId, oldStatus, newStatus, notes, source) {
     try {
       eventBus.emit(AppEvents.ORDER.UPDATED, {
         payload: { id: orderId, order_id: orderId, oldStatus, newStatus, notes, source }

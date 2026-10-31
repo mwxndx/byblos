@@ -175,7 +175,8 @@ export const requirePaystackWebhookHmac = async (req, res, next) => {
     try {
         const { getRedisClient } = await import('../../shared/config/redis.js');
         redisClient = getRedisClient();
-    } catch (e) {
+    } catch {
+        // Fallback: Redis is optional for webhook replay protection
         redisClient = null;
     }
 

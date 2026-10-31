@@ -39,4 +39,7 @@ async function checkPayment(paymentId) {
 
 // Get payment ID from command line argument or use default
 const paymentId = process.argv[2] || 52;
-checkPayment(paymentId);
+checkPayment(paymentId).catch((err) => {
+  console.error('Unhandled error in checkPayment:', err);
+  process.exit(1);
+});

@@ -21,7 +21,7 @@ export function wantsDoorDelivery(metadata = {}) {
 }
 
 export function isExplicitProviderFailure(err) {
-    const code = err && err.statusCode;
+    const code = err?.statusCode;
     return typeof code === 'number' && code >= 400 && code < 500;
 }
 
@@ -43,7 +43,7 @@ export function parseItems(normalizedOrder) {
             productId: Number.parseInt(it.productId ?? it.product_id ?? it.id, 10),
             quantity: Math.max(1, Number.parseInt(it.quantity ?? 1, 10) || 1),
         }));
-    } else if (service && service.id !== undefined && service.id !== null) {
+    } else if (service?.id != null) {
         list = [{
             productId: Number.parseInt(service.id, 10),
             quantity: Math.max(1, Number.parseInt(service.quantity ?? 1, 10) || 1),
@@ -67,7 +67,7 @@ export function buildValidatedLines(items, productById, isMulti) {
             throw new AppError('Invalid order amount after secure calculation', 400);
         }
         const lineSubtotal = roundMoney(dbPrice * qty);
-        if (!(lineSubtotal > 0)) throw new AppError('Invalid order amount after secure calculation', 400);
+        if (lineSubtotal <= 0) throw new AppError('Invalid order amount after secure calculation', 400);
         const productType = String(p.product_type || '').toLowerCase();
         const isDigital = p.is_digital === true || productType === 'digital';
         const isService = productType === 'service';

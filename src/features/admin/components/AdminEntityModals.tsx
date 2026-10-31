@@ -92,8 +92,8 @@ export function AdminEntityModals({
                                 { label: 'Last Known Location', value: buyer.location },
                                 { label: 'Account Status', value: buyer.status, isBadge: true },
                                 { label: 'Joined Network', value: safeFormatDate(buyer.createdAt) }
-                              ].map((info, i) => (
-                                <div key={i} className="flex justify-between items-center py-2 border-b border-separator">
+                              ].map((info) => (
+                                <div key={info.label} className="flex justify-between items-center py-2 border-b border-separator">
                                   <span className="text-label-3 text-sm font-medium">{info.label}</span>
                                   {info.isBadge ? (
                                     <Badge

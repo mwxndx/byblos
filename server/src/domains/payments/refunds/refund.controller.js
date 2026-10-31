@@ -10,8 +10,8 @@ import refundExecutionService from './refundExecution.service.js';
 export const getAllRefundRequests = async (req, res, next) => {
   try {
     const { status, overdue, sortBy = 'urgency', page = 1, limit = 20 } = req.query;
-    const parsedPage = parseInt(page, 10);
-    const parsedLimit = parseInt(limit, 10);
+    const parsedPage = Number.parseInt(page, 10);
+    const parsedLimit = Number.parseInt(limit, 10);
     const offset = (parsedPage - 1) * parsedLimit;
     const overdueOnly = overdue === 'true' || overdue === true;
 

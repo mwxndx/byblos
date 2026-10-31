@@ -4,16 +4,16 @@ FROM node:22-slim AS base
 
 # Dependencies stage
 FROM base AS deps
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ \
-    pkg-config \
     libcairo2-dev \
+    libgif-dev \
     libjpeg-dev \
     libpango1.0-dev \
-    libgif-dev \
     librsvg2-dev \
+    make \
+    pkg-config \
+    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

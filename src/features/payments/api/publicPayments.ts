@@ -49,7 +49,7 @@ export async function pollPaymentStatus(
       }
     };
 
-    checkStatus();
+    void checkStatus().catch(reject);
   });
 }
 

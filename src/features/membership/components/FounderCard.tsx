@@ -34,7 +34,7 @@ export function FounderCard({
   quote = 'Buying on social media finally feels right.',
   caption = "Your money's held safe until your order shows up.",
   instagramHandle = '@byblosafrica',
-}: FounderCardProps) {
+}: Readonly<FounderCardProps>) {
   const formattedNumber =
     typeof memberNumber === 'number'
       ? memberNumber.toString().padStart(6, '0')
@@ -179,7 +179,7 @@ export function FounderCard({
  * centre-stage. The card keeps its exact 900x566 dimensions (no stretch). This is
  * the node handed to exportCardAsPng().
  */
-export function StoryShareFrame(props: FounderCardProps) {
+export function StoryShareFrame(props: Readonly<FounderCardProps>) {
   return (
     <div
       style={{
@@ -230,7 +230,7 @@ export function StoryShareFrame(props: FounderCardProps) {
  * preserved). Render this on-screen; rasterize the hidden full-scale
  * <StoryShareFrame> for the actual file.
  */
-export function ScaledFounderCard(props: FounderCardProps) {
+export function ScaledFounderCard(props: Readonly<FounderCardProps>) {
   const outerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.333);
 

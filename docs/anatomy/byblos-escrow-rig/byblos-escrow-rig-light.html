@@ -520,7 +520,7 @@ function fitProjection(points, width, height, { pad = 24, headroom = 0, azimuth 
         elevation,
     };
 }
-const escape = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const escape = (text) => text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 const attrs = (pairs) => Object.entries(pairs)
     .filter(([, value]) => value !== undefined && value !== false)
     .map(([key, value]) => ` ${key}="${escape(String(value))}"`)
@@ -544,7 +544,8 @@ function solidSvg(paths, { tone = "hi", crease = "faint", halo = false, lit = fa
     if (inner)
         parts.push(inner);
     parts.push(`<path class="iso-line iso-edge" data-tone="${tone}" d="${paths.outline}"/>`);
-    return `<g${attrs({ class: className ? `iso-solid ${className}` : "iso-solid", "data-lit": lit ? "" : undefined, "data-seamless": paths.seamless ? "" : undefined })}>${parts.join("")}</g>`;
+    const solidClass = className ? "iso-solid " + className : "iso-solid";
+    return `<g${attrs({ class: solidClass, "data-lit": lit ? "" : undefined, "data-seamless": paths.seamless ? "" : undefined })}>${parts.join("")}</g>`;
 }
 function lineSvg(d, { tone = "lo", dotted = false, dashed = false, flow = false, className, free } = {}) {
     if (!d)
@@ -561,7 +562,11 @@ function lineSvg(d, { tone = "lo", dotted = false, dashed = false, flow = false,
 }
 function dotsSvg(points, { size = 0.5, tone = "mid", pulse = false } = {}) {
     const dots = points
-        .map(([x, y, alpha], index) => `<circle cx="${tenth(x)}" cy="${tenth(y)}" r="${size}"${alpha !== undefined && alpha < 1 ? ` fill-opacity="${Math.max(0, alpha).toFixed(2)}"` : ""}${pulse ? ` data-pulse="" style="--pulse-at:${(index * 137) % 1600}ms"` : ""}/>`)
+        .map(([x, y, alpha], index) => {
+            const alphaAttr = alpha !== undefined && alpha < 1 ? ' fill-opacity="' + Math.max(0, alpha).toFixed(2) + '"' : '';
+            const pulseAttr = pulse ? ' data-pulse="" style="--pulse-at:' + ((index * 137) % 1600) + 'ms"' : '';
+            return `<circle cx="${tenth(x)}" cy="${tenth(y)}" r="${size}"${alphaAttr}${pulseAttr}/>`;
+        })
         .join("");
     return `<g class="iso-dots" data-tone="${tone}">${dots}</g>`;
 }
@@ -569,7 +574,7 @@ function fadedSvg(list, style = {}) {
     const groups = new Map();
     for (const entry of list) {
         const [d, alpha] = Array.isArray(entry) ? entry : [entry.d, entry.alpha];
-        if (!d || !(alpha > 0.02))
+        if (!d || alpha <= 0.02)
             continue;
         const level = Math.min(1, Math.round(alpha * 20) / 20);
         groups.set(level, (groups.get(level) ?? "") + d);
@@ -612,14 +617,16 @@ function fadeLineSvg(points, { fade = [0, 0], tone = "lo", className, stops = 6 
         const d = pathOf(piece);
         const [x1, y1] = piece[0];
         const [x2, y2] = piece[piece.length - 1];
-        const id = `iso-fade-${hashOf(`${d}|${tone}|${rising}`)}`;
+        const hashKey = d + "|" + tone + "|" + rising;
+        const id = "iso-fade-" + hashOf(hashKey);
         const marks = Array.from({ length: stops + 1 }, (_, index) => {
             const t = index / stops;
             const alpha = ease(rising ? t : 1 - t);
             return `<stop offset="${t.toFixed(3)}" stop-opacity="${alpha.toFixed(3)}" style="stop-color:${paint}"/>`;
         }).join("");
         const gradient = `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${tenth(x1)}" y1="${tenth(y1)}" x2="${tenth(x2)}" y2="${tenth(y2)}">${marks}</linearGradient>`;
-        return `<defs>${gradient}</defs><path${attrs({ class: className ? `iso-line ${className}` : "iso-line", "data-tone": tone, "data-free": rising ? "start" : "end", d, style: `stroke:url(#${id})` })}/>`;
+        const lineClass = className ? "iso-line " + className : "iso-line";
+        return `<defs>${gradient}</defs><path${attrs({ class: lineClass, "data-tone": tone, "data-free": rising ? "start" : "end", d, style: "stroke:url(#" + id + ")" })}/>`;
     };
     const parts = [];
     if (start > 0.05)
@@ -645,7 +652,7 @@ function figureSvg({ width, height, label, body, standalone = false, className }
     const style = standalone ? `<style>${ISO_CSS}</style>` : "";
     return `<svg${attrs({
         xmlns: "http://www.w3.org/2000/svg",
-        class: `iso-svg${standalone ? " iso" : ""}${className ? ` ${className}` : ""}`,
+        class: "iso-svg" + (standalone ? " iso" : "") + (className ? " " + className : ""),
         "data-theme": standalone || undefined,
         viewBox: `0 0 ${width} ${height}`,
         role: "img",
@@ -662,13 +669,15 @@ function swatchSvg(mark) {
 }
 function plateHtml({ fig, title, hint, readout = "", keys = [], caption, body }) {
     const corner = (name, text, extra = "") => `<span class="iso-plate-corner" data-corner="${name}"${extra}>${escape(text)}</span>`;
-    const legend = keys.length || caption
-        ? `<figcaption class="iso-legend">${keys.length ? `<span class="iso-keys">${keys.map((key) => `<span class="iso-key">${swatchSvg(key.mark)}${escape(key.label)}</span>`).join("")}</span>` : ""}${caption ? `<span class="iso-caption">${escape(caption)}</span>` : ""}</figcaption>`
-        : "";
+    const keyItems = keys.map((key) => '<span class="iso-key">' + swatchSvg(key.mark) + escape(key.label) + '</span>').join("");
+    const keysHtml = keys.length ? '<span class="iso-keys">' + keyItems + '</span>' : "";
+    const captionHtml = caption ? `<span class="iso-caption">${escape(caption)}</span>` : "";
+    const legend = keys.length || caption ? `<figcaption class="iso-legend">${keysHtml}${captionHtml}</figcaption>` : "";
     return `<figure class="iso-figure"><div class="iso-plate"><div class="iso-plate-corners" aria-hidden="true">${corner("fig", fig)}${title ? corner("title", title) : ""}${hint ? corner("hint", hint) : ""}${corner("readout", readout, " data-readout")}</div>${body}</div>${legend}</figure>`;
 }
 function pageHtml({ title, theme = "dark", body, script = "", width = 650 }) {
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(title)}</title><style>${ISO_CSS}${PAGE_CSS.replace("__WIDTH__", String(width))}</style></head><body class="iso" data-theme="${theme}"><main class="iso-page">${body}</main>${script ? `<script type="module">${script.replace(/<\/(script)/gi, "<\\/$1")}<\/script>` : ""}</body></html>`;
+    const scriptTag = script ? '<script type="module">' + script.replace(/<\/(script)/gi, '<\/$1') + '</script>' : '';
+    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escape(title)}</title><style>${ISO_CSS}${PAGE_CSS.replace("__WIDTH__", String(width))}</style></head><body class="iso" data-theme="${theme}"><main class="iso-page">${body}</main>${scriptTag}</body></html>`;
 }
 const PAGE_CSS = `
 *{box-sizing:border-box}
@@ -835,7 +844,6 @@ function draw() {
   needle.setAttribute("d", needleAt(s));
 
   // Numerical & Status updates
-  const escrowVal = Math.round(10000 * (1 - s));
   const sellerVal = Math.round(8500 * s);
   const courierVal = Math.round(1000 * s);
   const commVal = Math.round(500 * s);

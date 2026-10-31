@@ -1,8 +1,8 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
-import Fees from '../../../shared/config/fees.js';
-import { OrderStatus, PaymentStatus, ProductType } from '../../../shared/constants/enums.js';
-import { safeJson } from '../../../shared/utils/order.utils.js';
+
+
+
 
 const LOGISTICS_SUMMARY_SELECT = `
         (
@@ -117,8 +117,9 @@ class Order {
         try {
           JSON.parse(val);
           return val; // Trust already-json string
-        } catch (e) {
-          return JSON.stringify(val); // Wrap raw string
+        } catch {
+          // Expected: raw non-JSON string, wrap via JSON.stringify
+          return JSON.stringify(val);
         }
       }
       return JSON.stringify(val); // Object to string
@@ -159,7 +160,7 @@ class Order {
 
     // 5. DEFENSIVE AUDITING (FINAL)
     // Only strings or null should reach JSON columns now ($13, $16, $18)
-    const jsonIndices = [12, 15, 17]; // index: $13, $16, $18
+
     values.forEach((val, i) => {
       const colNum = i + 1;
       if (typeof val === 'object' && val !== null && !(val instanceof Date)) {
@@ -212,9 +213,9 @@ class Order {
         orderId,
         productId,
         item.name || `Product ${item.productId}`,
-        parseFloat(item.price).toFixed(2),
+        Number.parseFloat(item.price).toFixed(2),
         Number.parseInt(item.quantity, 10),
-        parseFloat(subtotal).toFixed(2),
+        Number.parseFloat(subtotal).toFixed(2),
         {
           ...(item.metadata || {}),
           original_price: item.price,

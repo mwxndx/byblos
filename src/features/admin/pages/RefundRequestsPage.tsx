@@ -36,7 +36,6 @@ export default function RefundRequestsPage() {
     sortBy,
     setSortBy,
     isLoadingRequests,
-    fetchRefundRequests,
     handleConfirmRefund,
     handleRejectRefund,
   } = useRefundRequests();

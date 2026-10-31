@@ -6,7 +6,7 @@ interface SellerDashboardErrorStateProps {
   onRetry: () => void;
 }
 
-export function SellerDashboardErrorState({ error, onRetry }: SellerDashboardErrorStateProps) {
+export function SellerDashboardErrorState({ error, onRetry }: Readonly<SellerDashboardErrorStateProps>) {
   return (
     <div className="min-h-screen bg-[var(--byblos-bg,#000000)] flex items-center justify-center px-4 transition-colors duration-200">
       <div className="text-center space-y-6 p-8">

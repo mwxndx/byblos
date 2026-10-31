@@ -11,7 +11,7 @@ export interface LoadingScreenProps {
  *
  * Uses the active theme background with the minimal pulsing yellow dot indicator.
  */
-export function LoadingScreen({ message = 'Loading...' }: LoadingScreenProps) {
+export function LoadingScreen({ message = 'Loading...' }: Readonly<LoadingScreenProps>) {
     return (
         <div
             // Announce app boot / lazy-route loading to assistive tech -- this

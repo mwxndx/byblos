@@ -10,9 +10,9 @@ export async function getProductsPage(filters: { city?: string; location?: strin
 
     if (Array.isArray(responseData)) {
       productsData = responseData;
-    } else if (responseData && Array.isArray(responseData.data)) {
+    } else if (Array.isArray(responseData?.data)) {
       productsData = responseData.data;
-    } else if (responseData && responseData.data && typeof responseData.data === 'object' && 'products' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).products)) {
+    } else if (typeof responseData?.data === 'object' && responseData.data !== null && 'products' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).products)) {
       productsData = (responseData.data as Record<string, unknown>).products as unknown[];
     } else if (responseData && 'products' in responseData && Array.isArray(responseData.products)) {
       productsData = responseData.products as unknown[];
@@ -20,7 +20,7 @@ export async function getProductsPage(filters: { city?: string; location?: strin
 
     const pagination = responseData && 'pagination' in responseData
       ? (responseData.pagination as Record<string, unknown>)
-      : (responseData && responseData.data && typeof responseData.data === 'object' && 'pagination' in responseData.data)
+      : (typeof responseData?.data === 'object' && responseData.data !== null && 'pagination' in responseData.data)
         ? ((responseData.data as Record<string, unknown>).pagination as Record<string, unknown>)
         : {
             total: 0,
@@ -38,8 +38,8 @@ export async function getProductsPage(filters: { city?: string; location?: strin
         hasMore: Boolean(pagination.hasMore)
       }
     };
-  } catch (error) {
-    const err = error as { message?: string; response?: { status?: number; statusText?: string; data?: unknown }; stack?: string };
+  } catch {
+    // Graceful degradation: return empty products page on error
     return {
       products: [],
       pagination: {
@@ -63,7 +63,8 @@ export async function getProduct(id: string): Promise<ApiProduct | null> {
     const responseData = response.data as Record<string, unknown>;
     const productData = responseData.product || responseData;
     return productData ? transformProduct(productData) : null;
-  } catch (error) {
+  } catch {
+    // Graceful degradation: return null if product endpoint is unavailable or not found
     return null;
   }
 }
@@ -78,14 +79,15 @@ export async function getFeaturedProducts(limit: number = 8): Promise<ApiProduct
       productsData = responseData;
     } else if (responseData && 'products' in responseData && Array.isArray(responseData.products)) {
       productsData = responseData.products as unknown[];
-    } else if (responseData && 'data' in responseData && responseData.data && typeof responseData.data === 'object' && 'products' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).products)) {
+    } else if (typeof responseData?.data === 'object' && responseData.data !== null && 'products' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).products)) {
       productsData = (responseData.data as Record<string, unknown>).products as unknown[];
     } else if (responseData && 'data' in responseData && Array.isArray(responseData.data)) {
       productsData = responseData.data as unknown[];
     }
 
     return productsData.map(transformProduct);
-  } catch (error) {
+  } catch {
+    // Graceful degradation: return empty array when products fetch fails
     return [];
   }
 }
@@ -103,14 +105,15 @@ export async function getProductsByLocation(location: string): Promise<ApiProduc
       productsData = responseData;
     } else if (responseData && 'products' in responseData && Array.isArray(responseData.products)) {
       productsData = responseData.products as unknown[];
-    } else if (responseData && 'data' in responseData && responseData.data && typeof responseData.data === 'object' && 'products' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).products)) {
+    } else if (typeof responseData?.data === 'object' && responseData.data !== null && 'products' in responseData.data && Array.isArray((responseData.data as Record<string, unknown>).products)) {
       productsData = (responseData.data as Record<string, unknown>).products as unknown[];
     } else if (responseData && 'data' in responseData && Array.isArray(responseData.data)) {
       productsData = responseData.data as unknown[];
     }
 
     return productsData.map(transformProduct);
-  } catch (error) {
+  } catch {
+    // Graceful degradation: return empty array when products fetch fails
     return [];
   }
 }

@@ -9,7 +9,7 @@ import TermsModal from './TermsModal';
  * section. Shared across the buyer, seller, and creator account settings so
  * an already-registered user can always re-read what they agreed to.
  */
-export function LegalLinks({ className = '' }: { className?: string }) {
+export function LegalLinks({ className = '' }: Readonly<{ className?: string }>) {
   const [openSection, setOpenSection] = useState<'agreement' | 'privacy' | null>(null);
 
   return (

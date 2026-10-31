@@ -294,7 +294,7 @@ async function executeSmokeSuite() {
       `## 🚀 Staging Smoke Verification Report`,
       `**Target Environment:** \`${targetOrigin}\``,
       `**Timestamp:** ${new Date().toISOString()}`,
-      `**Outcome:** ${failed === 0 ? '✅ ALL CHECKS PASSED' : `❌ ${failed} CHECKS FAILED`}`,
+      `**Outcome:** ${failed === 0 ? '✅ ALL CHECKS PASSED' : '❌ ' + failed + ' CHECKS FAILED'}`,
       ``,
       `| Check | Status | Duration | Details / Error |`,
       `| :--- | :---: | :---: | :--- |`

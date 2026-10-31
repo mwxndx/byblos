@@ -3,7 +3,7 @@ import apiClient from '@/infrastructure/http/apiClient';
 export interface ApiLiveEtaResponse {
   orderId: string;
   legId: string | null;
-  trackingStatus: 'preparing' | 'waiting_for_location' | 'in_transit' | 'arriving' | 'delivered' | string;
+  trackingStatus: 'preparing' | 'waiting_for_location' | 'in_transit' | 'arriving' | 'delivered' | (string & {});
   etaMinutes: number | null;
   estimatedArrival: string | null;
   routeProgress: number;

@@ -19,7 +19,12 @@ export interface MarketingOverview {
   [key: string]: unknown;
 }
 
-export type MarketingRecord = Record<string, unknown>;
+export interface MarketingRecord {
+  location?: string;
+  city?: string;
+  percentage?: number | string;
+  [key: string]: unknown;
+}
 
 export interface GeographyData {
   buyers?: MarketingRecord[];

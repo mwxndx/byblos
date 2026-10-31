@@ -154,7 +154,7 @@ export async function updateLogisticsLegStatus({
   verificationCode?: string | null;
 }) {
   const payload: { status: LogisticsStatusUpdate; verificationCode?: string } = { status };
-  if (verificationCode && verificationCode.trim()) {
+  if (verificationCode?.trim()) {
     payload.verificationCode = verificationCode.trim().toUpperCase();
   }
 

@@ -24,7 +24,7 @@ export function OrderTrackingHeader({
   isOpen,
   onToggle,
   state,
-}: OrderTrackingHeaderProps) {
+}: Readonly<OrderTrackingHeaderProps>) {
   const { isSeller, isDoorDelivery, isPickup, isDigital, journey, riderMoving, liveEta } = state;
 
   const headerTitle = getHeaderTitle(isSeller, isDoorDelivery, isPickup, isDigital);

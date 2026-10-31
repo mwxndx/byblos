@@ -8,7 +8,13 @@
  * NOTE: Context types are defined inline here to avoid circular imports.
  */
 import { createContext } from 'react';
-import type { GlobalAuthContextType } from '../types/authTypes';
+import type {
+    GlobalAuthContextType,
+    BuyerProfile,
+    BuyerRegistrationData,
+    SellerProfile,
+    SellerRegistrationData
+} from '../types/authTypes';
 
 // ── GlobalAuth ─────────────────────────────────────────────────────────────
 export const GlobalAuthContext = createContext<GlobalAuthContextType | undefined>(undefined);
@@ -24,8 +30,6 @@ export interface AdminAuthContextType {
 export const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
 // ── BuyerAuth ──────────────────────────────────────────────────────────────
-import type { BuyerProfile, BuyerRegistrationData } from '../types/authTypes';
-
 export interface BuyerAuthContextType {
     user: BuyerProfile | null;
     isAuthenticated: boolean;
@@ -41,8 +45,6 @@ export interface BuyerAuthContextType {
 export const BuyerAuthContext = createContext<BuyerAuthContextType | undefined>(undefined);
 
 // ── SellerAuth ─────────────────────────────────────────────────────────────
-import type { SellerProfile, SellerRegistrationData } from '../types/authTypes';
-
 export interface SellerAuthContextType {
     seller: SellerProfile | null;
     isAuthenticated: boolean;

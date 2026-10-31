@@ -66,7 +66,7 @@ export function appNavigate(path: string, options?: NavigateOptions): boolean {
  */
 export function emitSessionExpired(redirectPath: string = '/buyer/login'): boolean {
   if (!isAppNavigatorReady()) return false;
-  const targetPath = redirectPath && redirectPath.startsWith('/') ? redirectPath : '/buyer/login';
+  const targetPath = redirectPath?.startsWith('/') ? redirectPath : '/buyer/login';
   globalThis.dispatchEvent(
     new CustomEvent<SessionExpiredDetail>(SESSION_EXPIRED_EVENT, {
       detail: { redirectPath: targetPath },

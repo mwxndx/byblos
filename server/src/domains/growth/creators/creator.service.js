@@ -1,9 +1,16 @@
-import crypto from 'crypto';
+function stripTrailingSlash(url) {
+  if (!url) return '';
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return url.slice(0, end);
+}
+
+import crypto from 'node:crypto';
 import User from '../../identity/users/user.model.js';
 import AuthService from '../../identity/auth/auth.service.js';
 import { pool } from '../../../infrastructure/database/database.js';
 import { signToken } from '../../../shared/utils/jwt.js';
-import { sendEmail, sendVerificationEmail } from '../../../shared/utils/email.js';
+import { sendEmail } from '../../../shared/utils/email.js';
 import Fees from '../../../shared/config/fees.js';
 import logger from '../../../shared/utils/logger.js';
 import notificationService from '../../communication/notifications/notification.service.js';
@@ -86,6 +93,13 @@ const CREATOR_SHOP_REQUEST_COLUMNS = `
   csr.created_at, csr.updated_at
 `;
 
+
+function _determineSuggestedRole(hasSeller, hasBuyer, defaultRole) {
+  if (hasSeller && !hasBuyer) return 'seller';
+  if (hasBuyer && !hasSeller) return 'buyer';
+  return defaultRole || 'buyer';
+}
+
 class CreatorService {
   static async findByUserId(userId, client = pool) {
     const { rows } = await client.query(
@@ -105,7 +119,7 @@ class CreatorService {
 
   static async inviteCreator({ sellerId, invitedByUserId, email }) {
     const normalizedEmail = normalizeEmail(email);
-    if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    if (!normalizedEmail?.includes('@')) {
       throw new Error('Enter a valid creator email.');
     }
 
@@ -209,7 +223,7 @@ class CreatorService {
   }
 
   static async sendCreatorInviteEmail(invite, seller) {
-    const baseUrl = process.env.FRONTEND_URL.replace(/\/+$/, '');
+    const baseUrl = stripTrailingSlash(process.env.FRONTEND_URL);
     const inviteUrl = `${baseUrl}/creator/register?token=${invite.invite_token}`;
     const shopName = seller?.shop_name || 'a Byblos seller';
 
@@ -229,7 +243,7 @@ class CreatorService {
   }
 
   static async sendExistingCreatorShopRequestEmail(invite, seller, creator) {
-    const baseUrl = process.env.FRONTEND_URL.replace(/\/+$/, '');
+    const baseUrl = stripTrailingSlash(process.env.FRONTEND_URL);
     const dashboardUrl = `${baseUrl}/creator/dashboard`;
 
     const shopName = seller?.shop_name || 'a Byblos seller';
@@ -250,7 +264,7 @@ class CreatorService {
   }
 
   static async listSellerInvites(sellerId) {
-    const { rows } = await pool.query(
+    await pool.query(
       `SELECT ${SELLER_CREATOR_INVITE_COLUMNS},
               s.shop_name,
               s.slug,
@@ -606,7 +620,7 @@ class CreatorService {
           );
           const hasBuyer = Boolean(roles[0]?.has_buyer);
           const hasSeller = Boolean(roles[0]?.has_seller);
-          const suggestedRole = hasSeller && !hasBuyer ? 'seller' : hasBuyer && !hasSeller ? 'buyer' : user.role || 'buyer';
+          const suggestedRole = _determineSuggestedRole(hasSeller, hasBuyer, user.role);
 
           const err = new Error('This email already has a Byblos account. Enter that account password to add creator access.');
           err.code = 'EXISTING_ACCOUNT';
@@ -690,7 +704,7 @@ class CreatorService {
   static async registerDirect(data) {
     const email = normalizeEmail(data.email);
 
-    if (!email || !email.includes('@')) {
+    if (!email?.includes('@')) {
       throw new Error('Enter a valid email address.');
     }
     if (!data.firstName || !data.lastName || !data.password || !data.mpesaNumber) {
@@ -730,7 +744,7 @@ class CreatorService {
           );
           const hasBuyer = Boolean(roles[0]?.has_buyer);
           const hasSeller = Boolean(roles[0]?.has_seller);
-          const suggestedRole = hasSeller && !hasBuyer ? 'seller' : hasBuyer && !hasSeller ? 'buyer' : user.role || 'buyer';
+          const suggestedRole = _determineSuggestedRole(hasSeller, hasBuyer, user.role);
 
           const err = new Error('This email already has a Byblos account. Enter that account password to add creator access.');
           err.code = 'EXISTING_ACCOUNT';
@@ -851,7 +865,7 @@ class CreatorService {
       [String(code).trim().toUpperCase(), sellerId]
     );
     const link = rows[0];
-    if (!link || link.creator_status !== 'active') return null;
+    if (link?.creator_status !== 'active') return null;
 
     // RULE 1 — CREATOR SELF-REFERRAL PREVENTION
     // A creator must never receive creator commission from an order where the creator is also the buyer.
@@ -1272,7 +1286,7 @@ class CreatorService {
     const toEarning = (e) => ({
       amount: Number.parseFloat(e.amount || 0),
       createdAt: new Date(e.created_at),
-      flaggedForReview: (e.metadata || {}).flagged_for_review === true
+      flaggedForReview: e.metadata?.flagged_for_review === true
     });
 
     // Load recent sales + referral earnings for clearance. Tolerate a database
@@ -1321,7 +1335,7 @@ class CreatorService {
     try {
       allEarnings = await loadEarnings('id, amount, created_at, metadata', true);
     } catch (err) {
-      if (err && err.code === '42703') {
+      if (err?.code === '42703') {
         allEarnings = await loadEarnings('id, amount, created_at', false);
       } else {
         throw err;
@@ -1423,7 +1437,7 @@ class CreatorService {
    */
   static async _reverseSingleEarning(client, { table, creatorIdColumn, totalsColumn, earning }, source) {
     const amount = Number.parseFloat(earning.amount || 0);
-    if (!(amount > 0)) {
+    if (amount <= 0) {
       return { adjusted: false, reason: 'invalid_amount' };
     }
 
@@ -1501,7 +1515,7 @@ class CreatorService {
       if (!earning) {
         throw new AppError('Flagged earning not found.', 404);
       }
-      if ((earning.metadata || {}).flagged_for_review !== true) {
+      if (earning.metadata?.flagged_for_review !== true) {
         throw new AppError('This earning is not currently flagged for review.', 400);
       }
       if (earning.status === 'reversed' || earning.status === 'reversal_compensation_required') {

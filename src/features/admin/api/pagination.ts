@@ -14,7 +14,7 @@ export function toRequestParams({ page, limit, search }: AdminListParams): Recor
   const params: Record<string, string | number> = {};
   if (page && page > 1) params.page = page;
   if (limit) params.limit = limit;
-  if (search && search.trim()) params.search = search.trim();
+  if (search?.trim()) params.search = search.trim();
   return params;
 }
 

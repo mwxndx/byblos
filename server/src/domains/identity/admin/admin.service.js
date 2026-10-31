@@ -724,15 +724,15 @@ class AdminService {
     return {
       ...seller,
       metrics: {
-        totalOrders: parseInt(metrics.total_orders, 10),
-        totalSales: parseFloat(metrics.total_sales),
-        totalCommission: parseFloat(metrics.total_commission),
-        netSales: parseFloat(metrics.net_sales),
-        pendingOrders: parseInt(metrics.pending_orders, 10),
-        completedOrders: parseInt(metrics.completed_orders, 10),
-        cancelledOrders: parseInt(metrics.cancelled_orders, 10),
-        totalProducts: parseInt(productCountRes.rows[0].total, 10),
-        wishlistCount: parseInt(wishlistCountRes.rows[0].total, 10)
+        totalOrders: Number.parseInt(metrics.total_orders, 10),
+        totalSales: Number.parseFloat(metrics.total_sales),
+        totalCommission: Number.parseFloat(metrics.total_commission),
+        netSales: Number.parseFloat(metrics.net_sales),
+        pendingOrders: Number.parseInt(metrics.pending_orders, 10),
+        completedOrders: Number.parseInt(metrics.completed_orders, 10),
+        cancelledOrders: Number.parseInt(metrics.cancelled_orders, 10),
+        totalProducts: Number.parseInt(productCountRes.rows[0].total, 10),
+        wishlistCount: Number.parseInt(wishlistCountRes.rows[0].total, 10)
       },
       recentOrders: recentOrdersRes.rows
     };

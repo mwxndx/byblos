@@ -101,7 +101,7 @@ export function isPaymentPurposeRefundable(purpose, context = {}) {
   }
 
   // Declared purpose lookup
-  if (Object.prototype.hasOwnProperty.call(PAYMENT_PURPOSE_REFUNDABILITY, normalized)) {
+  if (Object.hasOwn(PAYMENT_PURPOSE_REFUNDABILITY, normalized)) {
     return PAYMENT_PURPOSE_REFUNDABILITY[normalized];
   }
 
@@ -113,11 +113,13 @@ export function isPaymentPurposeRefundable(purpose, context = {}) {
       ...context
     });
 
-    reportAlert({
+    void reportAlert({
       level: 'warn',
       title: 'Unknown Payment Purpose in Refund Accounting',
       message: `Payment purpose "${normalized}" is not registered in PAYMENT_PURPOSE_REFUNDABILITY. Failing closed (non-refundable).`,
       context: { purpose: normalized, ...context }
+    }).catch((err) => {
+      logger.warn('[PAYMENT_PURPOSE_POLICY] reportAlert failed:', err?.message);
     });
   } catch (alertErr) {
     try {

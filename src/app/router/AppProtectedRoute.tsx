@@ -21,7 +21,7 @@ export function AppProtectedRoute({
     allowedRoles,
     redirectTo,
     fallback,
-}: AppProtectedRouteProps) {
+}: Readonly<AppProtectedRouteProps>) {
     const { user, isAuthenticated, isLoading, role, switchAccount } = useGlobalAuth();
     const location = useLocation();
     const navigate = useNavigate();
@@ -138,15 +138,15 @@ export function AppProtectedRoute({
 }
 
 // ─── Convenience Wrappers ──────────────────────────────────────────────────────
-export function BuyerProtectedRoute({ children }: { children: React.ReactNode }) {
+export function BuyerProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
     return <AppProtectedRoute allowedRoles={['buyer']}>{children}</AppProtectedRoute>;
 }
 
-export function SellerProtectedRoute({ children }: { children: React.ReactNode }) {
+export function SellerProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
     return <AppProtectedRoute allowedRoles={['seller']}>{children}</AppProtectedRoute>;
 }
 
-export function AdminProtectedRoute({ children }: { children: React.ReactNode }) {
+export function AdminProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
     return <AppProtectedRoute allowedRoles={['admin']}>{children}</AppProtectedRoute>;
 }
 

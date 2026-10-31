@@ -1,3 +1,14 @@
+function unwrapOrders(responseBody: unknown): unknown[] {
+  if (Array.isArray(responseBody)) return responseBody;
+  if (!responseBody || typeof responseBody !== 'object') return [];
+  const body = responseBody as { data?: unknown; orders?: unknown };
+  if (Array.isArray(body.orders)) return body.orders;
+  if (Array.isArray(body.data)) return body.data;
+  const nested = body.data as { orders?: unknown } | undefined;
+  if (Array.isArray(nested?.orders)) return nested.orders;
+  return [];
+}
+
 import { buyerApiInstance, ApiError } from './instance';
 import type { ApiOrder } from '@/shared/types';
 
@@ -119,7 +130,7 @@ export async function downloadDigitalProduct(orderId: string, productId: string,
     let filename = 'download.zip';
     if (contentDisposition) {
       const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
-      if (matches != null && matches[1]) {
+      if (matches?.[1]) {
         filename = matches[1].replace(/['"]/g, '');
       }
     }
@@ -128,7 +139,7 @@ export async function downloadDigitalProduct(orderId: string, productId: string,
     document.body.appendChild(link);
     link.click();
 
-    link.parentNode?.removeChild(link);
+    link.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
     const err = error as ApiError;

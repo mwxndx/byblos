@@ -199,7 +199,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                     Back
                   </Button>
                 )}
-                {currentStep < 4 && !(currentStep === 3 && hasPhysicalShop === null) ? (
+                {currentStep < 4 && (currentStep !== 3 || hasPhysicalShop !== null) ? (
                   <Button
                     type="button"
                     onClick={() => {

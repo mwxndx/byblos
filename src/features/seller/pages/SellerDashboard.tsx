@@ -42,7 +42,7 @@ const SELLER_TABS_ORDER: readonly SellerTabId[] = [
   'creators',
 ];
 
-export default function SellerDashboard({ children }: SellerDashboardProps) {
+export default function SellerDashboard({ children }: Readonly<SellerDashboardProps>) {
   useThemeScope('seller');
   const navigate = useNavigate();
   const location = useLocation();
@@ -154,7 +154,8 @@ export default function SellerDashboard({ children }: SellerDashboardProps) {
           ? `${shopUsername} was copied as linked text.`
           : `${shopUrl} was copied.`,
       });
-    } catch (err) {
+    } catch {
+      // Fallback: notify user if clipboard API fails
       toast({
         title: 'Error',
         description: 'Failed to copy link. Please try again.',

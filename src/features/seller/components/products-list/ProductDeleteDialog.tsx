@@ -10,7 +10,7 @@ interface ProductDeleteDialogProps {
   onConfirm: () => void;
 }
 
-export function ProductDeleteDialog({ open, deletingId, onOpenChange, onCancel, onConfirm }: ProductDeleteDialogProps) {
+export function ProductDeleteDialog({ open, deletingId, onOpenChange, onCancel, onConfirm }: Readonly<ProductDeleteDialogProps>) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90vw] sm:max-w-[340px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white">

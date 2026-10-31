@@ -42,7 +42,7 @@ export const storage = {
         return String(val);
       }
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
+      const msg = e instanceof Error ? e.message : (typeof e === 'string' ? e : JSON.stringify(e));
       console.warn(`[Storage] Failed to read ${key} from SecureStorage`, msg);
     }
 
@@ -94,7 +94,7 @@ export const storage = {
       try {
         await Preferences.set({ key, value });
       } catch (prefErr: unknown) {
-        const prefMsg = prefErr instanceof Error ? prefErr.message : String(prefErr);
+        const prefMsg = prefErr instanceof Error ? prefErr.message : (typeof prefErr === 'string' ? prefErr : JSON.stringify(prefErr));
         console.warn(`[Storage] Failed to set ${key} in Preferences fallback`, prefMsg);
       }
     }

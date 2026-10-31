@@ -14,7 +14,7 @@ interface CreatorSocialProfilesProps {
   profile?: CreatorProfile;
 }
 
-export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
+export function CreatorSocialProfiles({ profile }: Readonly<CreatorSocialProfilesProps>) {
   const [instagram, setInstagram] = useState(profile?.instagramLink || '');
   const [tiktok, setTiktok] = useState(profile?.tiktokLink || '');
   const updateMutation = useUpdateCreatorProfileMutation();
@@ -90,7 +90,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
             <div className="mb-2 flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
                 <img src={instagramLogo} alt="Instagram" className="h-5 w-5 shrink-0 object-contain" />
-                <label className="truncate text-xs font-medium text-label">Instagram profile</label>
+                <label htmlFor="creator-ig-input" className="truncate text-xs font-medium text-label">Instagram profile</label>
               </div>
               <div className="flex shrink-0 items-center gap-1">
                 {instagramHref && (
@@ -118,6 +118,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
               </div>
             </div>
             <Input
+              id="creator-ig-input"
               type="text"
               value={instagram}
               onChange={(e) => setInstagram(e.target.value)}
@@ -132,7 +133,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
             <div className="mb-2 flex items-center justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
                 <img src={tiktokLogo} alt="TikTok" className="h-5 w-5 shrink-0 object-contain" />
-                <label className="truncate text-xs font-medium text-label">TikTok profile</label>
+                <label htmlFor="creator-tiktok-input" className="truncate text-xs font-medium text-label">TikTok profile</label>
               </div>
               <div className="flex shrink-0 items-center gap-1">
                 {tiktokHref && (
@@ -160,6 +161,7 @@ export function CreatorSocialProfiles({ profile }: CreatorSocialProfilesProps) {
               </div>
             </div>
             <Input
+              id="creator-tiktok-input"
               type="text"
               value={tiktok}
               onChange={(e) => setTiktok(e.target.value)}

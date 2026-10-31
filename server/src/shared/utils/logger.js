@@ -1,8 +1,7 @@
-import { fileURLToPath } from 'url';
-import path from 'path';
-import { dirname } from 'path';
-import fs from 'fs';
-import { createRequire } from 'module';
+import { fileURLToPath } from 'node:url';
+import path, { dirname } from 'node:path';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

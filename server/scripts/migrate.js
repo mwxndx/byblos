@@ -195,7 +195,7 @@ snapshotSql = snapshotSql.replace(/SET\s+transaction_timeout\s*=\s*0\s*;/gi, '--
                 // whole deploy). Ignore Markdown docs as a runtime safety net; keep all
                 // non-migration files out of this directory in the first place (docs
                 // live at server/MIGRATIONS.md — enforced by migrationHygiene.test.js).
-                ignorePattern: '.*\\.md$',
+                ignorePattern: String.raw`.*\.md$`,
                 verbose: true,
                 logger: {
                     info: console.log,

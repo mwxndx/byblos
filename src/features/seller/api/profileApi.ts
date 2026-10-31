@@ -127,7 +127,7 @@ export const sellerProfileApi = {
       throw new Error('Malformed server response payload. Please try again.');
     }
 
-    const body = responseBody as Record<string, unknown>;
+    const body = responseBody as { status?: string; message?: string; error?: string; [key: string]: unknown };
 
     if (body.status === 'error' || body.status === 'fail') {
       throw new Error(String(body.message || body.error || 'Login failed'));

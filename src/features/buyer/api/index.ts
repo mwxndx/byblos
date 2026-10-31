@@ -1,5 +1,4 @@
-import { buyerApiInstance } from './instance';
-import { getBuyerProfile, updateBuyerProfile, getProfile, updateProfile } from './profile';
+import { getProfile, updateProfile } from './profile';
 import { login, register, resendVerification, forgotPassword, resetPassword, checkBuyerByPhone, saveBuyerInfo, autoLogin, verifyEmail } from './auth';
 import { getOrders, getOrder, cancelOrder, confirmOrderReceipt, markOrderAsCollected, downloadDigitalProduct } from './orders';
 import { getWishlist, addToWishlist, removeFromWishlist, syncWishlist } from './wishlist';
@@ -51,7 +50,5 @@ export const buyerApi = {
 };
 
 export default buyerApi;
-export { buyerApiInstance };
-export { getBuyerProfile, updateBuyerProfile };
 
 

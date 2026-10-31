@@ -1,3 +1,10 @@
+function stripTrailingSlash(url) {
+  if (!url) return '';
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47 /* '/' */) end--;
+  return url.slice(0, end);
+}
+
 import crypto from 'node:crypto';
 import { pool } from '../../infrastructure/database/database.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
@@ -48,7 +55,7 @@ function parseToken(rawToken) {
 }
 
 function frontendBaseUrl() {
-    return (process.env.FRONTEND_URL || 'https://byblosafrica.site').replace(/\/+$/, '');
+    return stripTrailingSlash(process.env.FRONTEND_URL || 'https://byblosafrica.site');
 }
 
 function mapSafeLeg(row, prefix, audience) {

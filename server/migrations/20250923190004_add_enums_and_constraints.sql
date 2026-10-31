@@ -86,9 +86,9 @@ BEGIN
             payment_status = COALESCE(UPPER(TRIM(NULLIF(payment_status, ''))), 'PENDING')
         WHERE 
             status IS NULL OR 
-            status = '' OR 
+            LENGTH(TRIM(status)) = 0 OR 
             payment_status IS NULL OR 
-            payment_status = '';
+            LENGTH(TRIM(payment_status)) = 0;
             
         -- Map status to valid values
         UPDATE orders 
@@ -97,7 +97,8 @@ BEGIN
                 WHEN status IN ('PENDING', 'PROCESSING', 'COMPLETED', 'CANCELLED', 'FAILED') 
                 THEN status
                 ELSE 'FAILED'
-            END;
+            END
+        WHERE TRUE;
             
         -- Map payment_status to valid values
         UPDATE orders 
@@ -108,7 +109,8 @@ BEGIN
                     'REFUNDED', 'PARTIALLY_REFUNDED', 'CANCELLED'
                 ) THEN payment_status
                 ELSE 'PENDING'
-            END;
+            END
+        WHERE TRUE;
     END IF;
 END $$;
 

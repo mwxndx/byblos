@@ -90,7 +90,7 @@ class PaymentController {
 
       // Do not report an explicitly-rejected charge as success (the buyer must
       // not be told "check your phone" for a payment that was declined).
-      if (result && result.failed) {
+      if (result?.failed) {
         return res.status(402).json({
           status: 'failed',
           message: 'Payment could not be initiated. Please try again.',
@@ -100,7 +100,7 @@ class PaymentController {
 
       res.status(200).json({
         status: 'success',
-        message: result && result.pending
+        message: result?.pending
           ? 'Payment request received; awaiting confirmation.'
           : 'Product payment initiated. Check your phone.',
         data: result

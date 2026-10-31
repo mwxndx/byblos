@@ -1,7 +1,11 @@
-import { checkShopNameAvailability, sellerProfileApi, transformSeller } from './profileApi';
-import { sellerProductsApi, transformProduct } from './productsApi';
+import { sellerProfileApi } from './profileApi';
+import { sellerProductsApi } from './productsApi';
 import { sellerOrdersApi } from './ordersApi';
-import { sellerWithdrawalsApi, withdrawalService } from './withdrawalsApi';
+import { sellerWithdrawalsApi } from './withdrawalsApi';
+
+export { checkShopNameAvailability, transformSeller } from './profileApi';
+export { transformProduct } from './productsApi';
+export { withdrawalService } from './withdrawalsApi';
 
 export type {
   OrderQueryParams,
@@ -15,8 +19,6 @@ export type {
 export type { ApiSellerProduct as Product } from '@/shared/types/api/product';
 export type { ApiSeller as Seller } from '@/shared/types/api/seller';
 export type { ApiWithdrawalRequest as WithdrawalRequest } from '@/shared/types/api/withdrawal';
-
-export { checkShopNameAvailability, transformProduct, transformSeller, withdrawalService };
 
 /**
  * Aggregated seller API surface. This barrel is the single source of truth for

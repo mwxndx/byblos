@@ -6,8 +6,8 @@ import { xss } from 'express-xss-sanitizer';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import path from 'path';
-import { mkdir } from 'fs/promises';
+import path from 'node:path';
+import { mkdir } from 'node:fs/promises';
 
 import logger from '../../shared/utils/logger.js';
 import routes from '../routes/index.js';
@@ -23,6 +23,7 @@ import { timingSafeEqualString } from '../../shared/utils/crypto.utils.js';
 
 export default async (app) => {
     // 1. Basic Setup
+    app.disable('x-powered-by');
     app.set('trust proxy', 1);
     app.use(requestId);
 

@@ -5,12 +5,12 @@ export function DashboardStat({
   value,
   icon,
   tone = 'border-separator bg-white/[0.03]',
-}: {
+}: Readonly<{
   label: string;
   value: number | string;
   icon: ReactNode;
   tone?: string;
-}) {
+}>) {
   return (
     <div className={`rounded-2xl border p-4 ${tone}`}>
       <div className="mb-3 flex items-center justify-between gap-3">

@@ -1,6 +1,6 @@
 import { LogOut, MapPin, PackageCheck, Store, Truck } from '@/shared/ui/icons';
 import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { AppHeader } from '@/shared/ui/AppHeader';
 import { Skeleton } from '@/shared/ui/skeleton';
@@ -22,12 +22,12 @@ const STAGES: Array<{ key: RequestStage; title: string; icon: typeof Store }> = 
 ];
 
 const MzigoDashboardPage = () => {
-  const navigate = useNavigate();
+
   const [view, setView] = useState<View>('todo');
   const {
     now,
     updatingStatusKey,
-    partner,
+
     dashboard,
     grouped,
     activeCount,

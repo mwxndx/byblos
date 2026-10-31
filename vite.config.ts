@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv, type ViteDevServer } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import path from 'node:path';
-import type { IncomingMessage, ServerResponse } from 'http';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {

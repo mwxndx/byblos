@@ -71,6 +71,6 @@ export const generateOrderNumber = async (client) => {
   }
   const res = await client.query("SELECT nextval('order_number_seq') as seq");
   const seq = res.rows[0].seq;
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  const dateStr = new Date().toISOString().slice(0, 10).replaceAll('-', '');
   return `ORD-${dateStr}-${String(seq).padStart(6, '0')}`;
 };

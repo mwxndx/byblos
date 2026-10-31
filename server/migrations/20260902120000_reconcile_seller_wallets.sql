@@ -45,4 +45,5 @@ SET balance = GREATEST(
         WHERE o.seller_id = s.id AND o.payment_status = 'completed' AND o.status NOT IN ('CANCELLED', 'FAILED', 'EXPIRED', 'REFUND_PENDING', 'REFUNDED')
       ), 0)
     ),
-    updated_at = NOW();
+    updated_at = NOW()
+WHERE TRUE;

@@ -13,7 +13,7 @@ interface RefundRequestCardProps {
   onReject: () => void;
 }
 
-export function RefundRequestCard({ request, getStatusBadge, formatCurrency, onApprove, onReject }: RefundRequestCardProps) {
+export function RefundRequestCard({ request, getStatusBadge, formatCurrency, onApprove, onReject }: Readonly<RefundRequestCardProps>) {
   const details = (() => {
     try {
       return typeof request.payment_details === 'string'

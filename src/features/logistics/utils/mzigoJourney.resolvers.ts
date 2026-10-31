@@ -46,32 +46,23 @@ export function deriveJourneyFromStatuses(
   const riderInMotion = hasStatusKeyword(delivery, 'out_for_delivery', 'out for');
   const atHub = hasStatusKeyword(pickup, 'picked_up', 'dropped', 'hub') || hasStatusKeyword(delivery, 'courier', 'assigned');
 
-  let stepIndex = 0;
-  let percentProgress = 15;
-  let activeLeg: Journey['activeLeg'] = 'seller_to_hub';
-  let activeEta = pickupDeadline || deliveryDeadline || null;
+  const stepIndex = (isCompleted || hasStatusKeyword(delivery, 'delivered'))
+    ? 3
+    : riderInMotion
+      ? 2
+      : atHub
+        ? 1
+        : 0;
 
-  if (isCompleted || hasStatusKeyword(delivery, 'delivered')) {
-    stepIndex = 3;
-    percentProgress = 100;
-    activeLeg = 'completed';
-    activeEta = deliveryDeadline || null;
-  } else if (riderInMotion) {
-    stepIndex = 2;
-    percentProgress = 75;
-    activeLeg = 'hub_to_buyer';
-    activeEta = deliveryDeadline || null;
-  } else if (atHub) {
-    stepIndex = 1;
-    percentProgress = 45;
-    activeLeg = 'hub';
-    activeEta = deliveryDeadline || null;
-  } else {
-    stepIndex = 0;
-    percentProgress = 15;
-    activeLeg = 'seller_to_hub';
-    activeEta = pickupDeadline || deliveryDeadline || null;
-  }
+  const percentProgress = stepIndex === 3 ? 100 : stepIndex === 2 ? 75 : stepIndex === 1 ? 45 : 15;
+  const activeLeg: Journey['activeLeg'] = stepIndex === 3
+    ? 'completed'
+    : stepIndex === 2
+      ? 'hub_to_buyer'
+      : stepIndex === 1
+        ? 'hub'
+        : 'seller_to_hub';
+  const activeEta = stepIndex === 0 ? (pickupDeadline || deliveryDeadline || null) : (deliveryDeadline || null);
 
   let state: JourneyState = 'normal';
   if (failed) state = 'attention';
@@ -118,12 +109,9 @@ export function deriveHubCollectionJourney(request: LogisticsRequestCard, comple
   const failed = hasStatusKeyword(pickup, 'failed');
   const delayed = hasStatusKeyword(pickup, 'delayed');
 
-  let stepIndex = 0;
-  let percentProgress = 15;
-  let activeLeg: Journey['activeLeg'] = 'seller_to_hub';
-  if (collected) { stepIndex = 3; percentProgress = 100; activeLeg = 'completed'; }
-  else if (atHub) { stepIndex = 2; percentProgress = 70; activeLeg = 'hub_to_buyer'; }
-  else if (enRoute) { stepIndex = 1; percentProgress = 45; activeLeg = 'hub'; }
+  const stepIndex = collected ? 3 : atHub ? 2 : enRoute ? 1 : 0;
+  const percentProgress = stepIndex === 3 ? 100 : stepIndex === 2 ? 70 : stepIndex === 1 ? 45 : 15;
+  const activeLeg: Journey['activeLeg'] = stepIndex === 3 ? 'completed' : stepIndex === 2 ? 'hub_to_buyer' : stepIndex === 1 ? 'hub' : 'seller_to_hub';
 
   let state: JourneyState = 'normal';
   if (failed) state = 'attention';
@@ -176,20 +164,26 @@ export function resolveDigitalOrderJourney(order: ApiOrder): Journey {
 export function resolveServiceOrderJourney(order: ApiOrder): Journey {
   const isCompleted = order.status === 'COMPLETED';
   const isFulfilling = order.status === 'FULFILLING' || order.status === 'PROCESSING';
+
   const stepIndex = isCompleted ? 2 : isFulfilling ? 1 : 0;
+  const label = isCompleted ? 'Completed' : isFulfilling ? 'In Progress' : 'Booking Confirmed';
+  const detail = isCompleted
+    ? 'Service rendered and confirmed.'
+    : isFulfilling
+      ? 'Seller is currently providing the booked service.'
+      : 'Service booking is confirmed and scheduled.';
+  const activeLeg: Journey['activeLeg'] = isCompleted ? 'completed' : 'hub';
+  const percentProgress = isCompleted ? 100 : isFulfilling ? 60 : 25;
+
   return {
     stepIndex,
     steps: SERVICE_JOURNEY_STEPS,
     state: 'normal',
-    label: isCompleted ? 'Completed' : isFulfilling ? 'In Progress' : 'Booking Confirmed',
-    detail: isCompleted
-      ? 'Service rendered and confirmed.'
-      : isFulfilling
-        ? 'Seller is currently providing the booked service.'
-        : 'Service booking is confirmed and scheduled.',
+    label,
+    detail,
     isDelivered: isCompleted,
-    activeLeg: isCompleted ? 'completed' : 'hub',
-    percentProgress: isCompleted ? 100 : isFulfilling ? 60 : 25,
+    activeLeg,
+    percentProgress,
   };
 }
 
@@ -199,29 +193,34 @@ export function resolveHubCollectionOrderJourney(order: ApiOrder): Journey {
   const isCompleted = order.status === 'COMPLETED' || collectedByHub;
   const isReady = order.status === 'READY_FOR_BUYER' || order.status === 'COLLECTION_PENDING';
   const isAtHub = hasStatusKeyword(pickupLeg?.status, 'picked_up', 'dropped', 'hub') || isReady;
+
   const stepIndex = isCompleted ? 3 : isReady ? 2 : isAtHub ? 1 : 0;
+  const label = isCompleted
+    ? 'Collected'
+    : isReady
+      ? 'Ready at Hub'
+      : isAtHub
+        ? 'Mzigo Hub'
+        : 'Seller Handoff';
+  const detail = isCompleted
+    ? 'Package collected at Byblos CBD Hub and confirmed.'
+    : isReady
+      ? 'Your order is ready for collection at Byblos CBD Hub (Shop SL 32, Dynamic Mall, Tom Mboya St).'
+      : isAtHub
+        ? 'Package received and verified at Byblos CBD Hub.'
+        : 'Seller is preparing package for delivery to Byblos CBD Hub.';
+  const activeLeg: Journey['activeLeg'] = isCompleted ? 'completed' : isReady ? 'hub_to_buyer' : isAtHub ? 'hub' : 'seller_to_hub';
+  const percentProgress = isCompleted ? 100 : isReady ? 75 : isAtHub ? 45 : 15;
 
   return {
     stepIndex,
     steps: HUB_COLLECTION_JOURNEY_STEPS,
     state: 'normal',
-    label: isCompleted
-      ? 'Collected'
-      : isReady
-        ? 'Ready at Hub'
-        : isAtHub
-          ? 'Mzigo Hub'
-          : 'Seller Handoff',
-    detail: isCompleted
-      ? 'Package collected at Byblos CBD Hub and confirmed.'
-      : isReady
-        ? 'Your order is ready for collection at Byblos CBD Hub (Shop SL 32, Dynamic Mall, Tom Mboya St).'
-        : isAtHub
-          ? 'Package received and verified at Byblos CBD Hub.'
-          : 'Seller is preparing package for delivery to Byblos CBD Hub.',
+    label,
+    detail,
     isDelivered: isCompleted,
-    activeLeg: isCompleted ? 'completed' : isReady ? 'hub_to_buyer' : isAtHub ? 'hub' : 'seller_to_hub',
+    activeLeg,
     activeEta: pickupLeg?.deadlineAt || order.logistics?.deadlineAt || null,
-    percentProgress: isCompleted ? 100 : isReady ? 75 : isAtHub ? 45 : 15,
+    percentProgress,
   };
 }

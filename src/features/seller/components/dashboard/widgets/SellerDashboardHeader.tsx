@@ -7,7 +7,7 @@ interface SellerDashboardHeaderProps {
   onOpenProfile: () => void;
 }
 
-export function SellerDashboardHeader({ sellerFirstName, onOpenProfile }: SellerDashboardHeaderProps) {
+export function SellerDashboardHeader({ sellerFirstName, onOpenProfile }: Readonly<SellerDashboardHeaderProps>) {
   return (
     <AppHeader
       left={<NotificationBell role="seller" />}

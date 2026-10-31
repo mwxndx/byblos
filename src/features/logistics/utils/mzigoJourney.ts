@@ -3,23 +3,9 @@ import type { ApiOrder } from '@/shared/types';
 import { hasBuyerPaidDoorDelivery } from '@/features/seller/utils/sellerOrders.utils';
 import {
   type Journey,
-  type JourneyState,
-  type JourneyStep,
-  type NextAction,
   type RequestStage,
-  MZIGO_CBD_HUB,
-  DOOR_DELIVERY_JOURNEY_STEPS,
-  HUB_COLLECTION_JOURNEY_STEPS,
-  DIGITAL_JOURNEY_STEPS,
-  SERVICE_JOURNEY_STEPS,
-  COURIER_JOURNEY_STEPS,
-  PICKUP_JOURNEY_STEPS,
-  JOURNEY_STEPS,
 } from './mzigoJourney.types';
 import {
-  isRiderMoving,
-  isPickupTrackable,
-  isDeliveryTrackable,
   requestHasDoorDelivery,
   deriveJourneyFromStatuses,
   deriveHubCollectionJourney,
@@ -27,11 +13,6 @@ import {
   resolveServiceOrderJourney,
   resolveHubCollectionOrderJourney,
 } from './mzigoJourney.resolvers';
-import {
-  courierActions,
-  requestNextStop,
-  routeLink,
-} from './mzigoJourney.actions';
 
 export type {
   Journey,
@@ -39,7 +20,7 @@ export type {
   JourneyStep,
   NextAction,
   RequestStage,
-};
+} from './mzigoJourney.types';
 
 export {
   MZIGO_CBD_HUB,
@@ -50,15 +31,21 @@ export {
   COURIER_JOURNEY_STEPS,
   PICKUP_JOURNEY_STEPS,
   JOURNEY_STEPS,
+} from './mzigoJourney.types';
+
+export {
   isRiderMoving,
   isPickupTrackable,
   isDeliveryTrackable,
   requestHasDoorDelivery,
   deriveJourneyFromStatuses,
+} from './mzigoJourney.resolvers';
+
+export {
   courierActions,
   requestNextStop,
   routeLink,
-};
+} from './mzigoJourney.actions';
 
 /** Collapse pickup + delivery leg statuses into one linear courier journey. */
 export function deriveJourney(request: LogisticsRequestCard): Journey {

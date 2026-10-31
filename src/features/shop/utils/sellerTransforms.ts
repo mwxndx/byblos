@@ -62,7 +62,16 @@ function extractSellerMetrics(sObj: Record<string, unknown>) {
 
 export function isDeletedSeller(seller: unknown): boolean {
   if (!seller || typeof seller !== 'object') return false;
-  const sObj = seller as Record<string, unknown>;
+  const sObj = seller as {
+      status?: string;
+      is_active?: boolean;
+      isActive?: boolean;
+      shop_name?: string;
+      shopName?: string;
+      full_name?: string;
+      fullName?: string;
+      [key: string]: unknown;
+    };
 
   const status = String(sObj.status || '').toLowerCase();
   if (status === 'deleted' || status === 'suspended') return true;

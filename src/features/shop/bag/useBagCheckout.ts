@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { BuyerProfile } from '@/features/auth/types/authTypes';
 import { useToast } from '@/shared/hooks/use-toast';
@@ -31,7 +31,7 @@ interface PaymentModalData {
  */
 export function useBagCheckout(bag: BagContextValue) {
   const { toast } = useToast();
-  const navigate = useNavigate();
+
   const { isAuthenticated, user: globalUser } = useGlobalAuth();
   const buyerProfile = globalUser?.role === 'buyer' ? (globalUser.profile as BuyerProfile) : null;
   const rawRegisteredNumber = String(
@@ -43,7 +43,7 @@ export function useBagCheckout(bag: BagContextValue) {
     ''
   ).trim();
   const registeredPaystackPhone = rawRegisteredNumber ? normalizePhoneForPaystack(rawRegisteredNumber) : '';
-  const hasRegisteredPaymentNumber = Boolean(registeredPaystackPhone && registeredPaystackPhone.length >= 10);
+  const hasRegisteredPaymentNumber = (registeredPaystackPhone?.length ?? 0) >= 10;
 
   const checkBuyerByPhoneMutation = useCheckBuyerByPhoneMutation();
   const initiateProductMutation = useInitiateProductMutation();
@@ -89,7 +89,7 @@ export function useBagCheckout(bag: BagContextValue) {
     return checkoutTokenRef.current;
   };
 
-  const handleBookingConfirm = async (data: BagBooking) => {
+  const handleBookingConfirm = (data: BagBooking) => {
     setBooking(data);
     setIsBookingModalOpen(false);
   };
@@ -239,7 +239,7 @@ export function useBagCheckout(bag: BagContextValue) {
     const buyerEmail = buyerProfile?.email || globalBuyer?.email;
     const buyerName = buyerProfile?.fullName || globalBuyer?.fullName || globalBuyer?.email?.split('@')[0] || 'Buyer';
 
-    if (buyerEmail && buyerEmail.trim() !== '') {
+    if (buyerEmail?.trim()) {
       await runWithLock(async () => {
         await executePayment({
           fullName: buyerName,

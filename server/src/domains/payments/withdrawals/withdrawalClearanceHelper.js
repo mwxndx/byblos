@@ -11,7 +11,7 @@ export async function computeCreatorClearingBalance(client, creatorId, lockedBal
     const toEarning = (e) => ({
         amount: Number.parseFloat(e.amount || 0),
         createdAt: new Date(e.created_at),
-        flaggedForReview: (e.metadata || {}).flagged_for_review === true
+        flaggedForReview: e.metadata?.flagged_for_review === true
     });
 
     const [salesResult, referralResult] = await Promise.all([

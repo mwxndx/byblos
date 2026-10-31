@@ -7,7 +7,7 @@ export interface RouteFallbackProps {
     message?: string;
 }
 
-export function RouteFallback({ message = 'Loading' }: RouteFallbackProps) {
+export function RouteFallback({ message = 'Loading' }: Readonly<RouteFallbackProps>) {
     return <LoadingScreen message={message} />;
 }
 

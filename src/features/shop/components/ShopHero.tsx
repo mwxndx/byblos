@@ -13,7 +13,7 @@ interface ShopHeroProps {
   sellerInitials: string;
 }
 
-export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, sellerInitials }: ShopHeroProps) {
+export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, sellerInitials }: Readonly<ShopHeroProps>) {
   const location = useLocation();
   const navigate = useNavigate();
   const isBuyer = location.pathname.startsWith('/buyer');

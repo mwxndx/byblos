@@ -32,6 +32,17 @@ import { useInviteCreatorMutation } from '@/features/seller/hooks/useSellerProfi
 
 const inputClass = 'h-11 border-slate-200 dark:border-separator bg-white dark:bg-[#141414] text-slate-900 dark:text-white placeholder:text-slate-500 dark:text-white/40';
 
+function getListingButtonContent(isPending: boolean, isMarketplaceEnabled: boolean) {
+  if (isPending) return <Loader2 className="h-4 w-4 animate-spin" />;
+  if (isMarketplaceEnabled) return 'Remove Shop from Marketplace';
+  return (
+    <span className="inline-flex items-center gap-2">
+      <Sparkles className="h-4 w-4" />
+      List Shop in Marketplace
+    </span>
+  );
+}
+
 export function CreatorsTab() {
   const { data, isLoading, refetch } = useSellerCreatorsQuery();
   const updateListingMutation = useUpdateCreatorListingMutation();
@@ -78,8 +89,8 @@ export function CreatorsTab() {
   }, [data, hasUnsavedChanges]);
 
   const handleSaveListing = async () => {
-    const rateNumber = parseFloat(commissionRate);
-    if (isNaN(rateNumber) || rateNumber < 1 || rateNumber > 30) {
+    const rateNumber = Number.parseFloat(commissionRate);
+    if (Number.isNaN(rateNumber) || rateNumber < 1 || rateNumber > 30) {
       toast.error('Please enter a valid commission rate between 1% and 30%.');
       return;
     }
@@ -249,16 +260,7 @@ export function CreatorsTab() {
                       : 'bg-yellow-400 text-black hover:bg-yellow-300 shadow-sm'
                   }`}
                 >
-                  {updateListingMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : isMarketplaceEnabled ? (
-                    'Remove Shop from Marketplace'
-                  ) : (
-                    <span className="inline-flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
-                      List Shop in Marketplace
-                    </span>
-                  )}
+                  {getListingButtonContent(updateListingMutation.isPending, isMarketplaceEnabled)}
                 </Button>
               </div>
             </div>

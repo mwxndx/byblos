@@ -26,7 +26,7 @@ export async function checkAppVersion(
     const res = await apiClient.get<{ data: AppVersionPolicy }>('/public/app-version');
     return res.data?.data;
   },
-  getInfoFn = async () => {
+  getInfoFn = () => {
     return App.getInfo();
   }
 ): Promise<AppVersionStatus> {
@@ -47,7 +47,7 @@ export async function checkAppVersion(
       getInfoFn(),
     ]);
 
-    const installedVersionCode = parseInt(info?.build || '0', 10);
+    const installedVersionCode = Number.parseInt(info?.build || '0', 10);
     const minVersionCode = policy?.minAndroidVersionCode ?? 0;
     const forceUpdate = policy?.forceUpdate ?? true;
 
@@ -79,6 +79,6 @@ export function openPlayStore(storeUrl = 'market://details?id=space.bybloshq.app
   try {
     window.location.href = storeUrl;
   } catch {
-    window.open('https://play.google.com/store/apps/details?id=space.bybloshq.app', '_system');
+    window.open('https://play.google.com/store/apps/details?id=space.bybloshq.app', '_system', 'noopener,noreferrer');
   }
 }

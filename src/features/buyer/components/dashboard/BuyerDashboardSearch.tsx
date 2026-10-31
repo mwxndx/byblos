@@ -12,7 +12,7 @@ export function BuyerDashboardSearch({
   activeSection,
   productSearchQuery,
   onProductSearchChange,
-}: BuyerDashboardSearchProps) {
+}: Readonly<BuyerDashboardSearchProps>) {
   if (activeSection !== 'shop') return null;
 
   const cities = SUPPORTED_CITIES;

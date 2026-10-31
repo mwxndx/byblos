@@ -14,7 +14,7 @@ interface DeleteAccountButtonProps {
  * Two-step "Delete account" control (Google Play data-deletion requirement).
  * Dark-themed so it reads correctly on the black surfaces it lives on.
  */
-export function DeleteAccountButton({ deleteAccount, onDeleted }: DeleteAccountButtonProps) {
+export function DeleteAccountButton({ deleteAccount, onDeleted }: Readonly<DeleteAccountButtonProps>) {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
 

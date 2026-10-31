@@ -26,7 +26,7 @@ interface ReminderCardProps {
   onDismiss: () => void;
 }
 
-function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismiss }: ReminderCardProps) {
+function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismiss }: Readonly<ReminderCardProps>) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-separator bg-white/[0.03] p-4 sm:p-5">
       <button
@@ -86,7 +86,7 @@ interface SellerRemindersProps {
  * ~24h after signup — enough time to set up without nagging on day one — and
  * each carries a "Do not show this again" action persisted per seller.
  */
-export function SellerReminders({ sellerProfile, totalProducts, onSelectTab }: SellerRemindersProps) {
+export function SellerReminders({ sellerProfile, totalProducts, onSelectTab }: Readonly<SellerRemindersProps>) {
   const sellerId = sellerProfile?.id;
 
   const [dismissed, setDismissed] = useState<Record<string, boolean>>(() => ({

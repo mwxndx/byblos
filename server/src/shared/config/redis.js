@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 
 dotenv.config();
 

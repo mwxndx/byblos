@@ -21,11 +21,11 @@ export const sellerHasPhysicalShop = (seller) => {
     const physicalAddress = String(seller.physical_address || seller.physicalAddress || '').trim();
     if (!physicalAddress) return false;
 
-    const lat = parseFloat(seller.latitude);
-    const lng = parseFloat(seller.longitude);
+    const lat = Number.parseFloat(seller.latitude);
+    const lng = Number.parseFloat(seller.longitude);
 
     // Check for presence and valid non-zero values
-    if (!lat || !lng || isNaN(lat) || isNaN(lng)) return false;
+    if (!lat || !lng || Number.isNaN(lat) || Number.isNaN(lng)) return false;
 
     // Check against Nairobi sentinel placeholder (-1.2921, 36.8219)
     // We use a small epsilon for floating point comparison

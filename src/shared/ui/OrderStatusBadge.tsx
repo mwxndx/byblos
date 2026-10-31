@@ -7,7 +7,7 @@ interface OrderStatusBadgeProps {
   className?: string;
 }
 
-export function OrderStatusBadge({ status, viewerRole = 'seller', className }: OrderStatusBadgeProps) {
+export function OrderStatusBadge({ status, viewerRole = 'seller', className }: Readonly<OrderStatusBadgeProps>) {
   const statusValue = (status || '').toUpperCase();
 
   let content: { icon: React.ReactNode; label: string; style: string };

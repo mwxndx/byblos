@@ -97,13 +97,13 @@ export const globalErrorHandler = (err, req, res, next) => {
     // operational 4xx/404/413 above are expected and intentionally excluded so
     // the channel stays signal, not noise. Fire-and-forget; never blocks the
     // response and never throws.
-    reportError(err, {
+    void reportError(err, {
       title: 'Unhandled API error',
       requestId,
       method: req.method,
       path: req.originalUrl,
       statusCode: error.statusCode
-    });
+    }).catch(() => {});
   }
 
   // Send response based on environment
@@ -162,8 +162,13 @@ export const handleJWTExpiredError = () => {
 // Handle PostgreSQL Unique Violation (23505)
 export const handlePostgresUniqueError = (err) => {
   const detail = err.detail || '';
-  // C-1: Use a safer regex to prevent ReDoS by explicitly excluding parentheses
-  const match = detail.match(/\(([^)]+)\)=\(([^)]+)\)/);
+  // Match 'Key (col)=(val) already exists' deterministically to eliminate ReDoS risk
+  const keyIdx = detail.indexOf('(');
+  const sepIdx = detail.indexOf(')=(');
+  const endIdx = detail.lastIndexOf(')');
+  const match = (keyIdx !== -1 && sepIdx > keyIdx && endIdx > sepIdx + 2)
+    ? [detail, detail.slice(keyIdx + 1, sepIdx), detail.slice(sepIdx + 3, endIdx)]
+    : null;
   const message = match
     ? `Duplicate value for ${match[1]}: ${match[2]}. Please use another value!`
     : 'Duplicate field value. Please use another value!';

@@ -102,11 +102,7 @@ const scheduleFulfillmentRetry = (options = {}) => {
       if (rows.length === 0) return;
       logger.info(`[${jobId}] Found ${rows.length} payment(s) needing fulfillment retry`);
 
-      for (const payment of rows) {
-        // Atomically CLAIM the row before doing any work: clear the retry flags
-        // guarded on them still being set. Under multi-instance, only the worker
-        // whose UPDATE matches (rowCount === 1) proceeds to enqueue — others see
-        // zero rows and skip, so a fulfillment job is never enqueued twice.
+      const retrySinglePayment = async (payment) => {
         let claimed = false;
         try {
           const { rowCount } = await pool.query(
@@ -120,16 +116,15 @@ const scheduleFulfillmentRetry = (options = {}) => {
         } catch (err) {
           const e = /** @type {Error} */ (err);
           logger.error(`[${jobId}] Claim failed for payment ${payment.id}:`, e.message);
-          continue;
+          return;
         }
-        if (!claimed) continue; // another worker already claimed this payment
+        if (!claimed) return;
 
         try {
           await FulfillmentQueueService.enqueue(null, payment.order_id);
           logger.info(`[${jobId}] Successfully retried fulfillment for payment ${payment.id}`);
         } catch (err) {
           const e = /** @type {Error} */ (err);
-          // Enqueue failed after claiming — restore the flag so the next tick retries.
           await pool.query(
             `UPDATE payments
              SET metadata = COALESCE(metadata, '{}'::jsonb) || '{"needs_fulfillment":"true"}'::jsonb
@@ -138,7 +133,9 @@ const scheduleFulfillmentRetry = (options = {}) => {
           ).catch(() => {});
           logger.error(`[${jobId}] Retry failed for payment ${payment.id}:`, e.message);
         }
-      }
+      };
+
+      await Promise.all(rows.map(retrySinglePayment));
     } catch (err) {
       const e = /** @type {Error} */ (err);
       logger.error(`[${jobId}] Cron query error:`, e.message);

@@ -268,13 +268,16 @@ async function verifyPaymentStatusStorage(failures) {
         }
     }
 
-    for (const [table, column] of [['payments', 'status'], ['product_orders', 'payment_status']]) {
-        const definition = await columnDefinition(table, column);
-        if (!definition) {
-            continue;
-        }
+    const columnDefinitions = await Promise.all(
+        [['payments', 'status'], ['product_orders', 'payment_status']].map(async ([table, column]) => ({
+            table,
+            column,
+            definition: await columnDefinition(table, column)
+        }))
+    );
 
-        if (definition.data_type === 'USER-DEFINED' && definition.udt_name === 'payment_status') {
+    for (const { table, column, definition } of columnDefinitions) {
+        if (!definition || (definition.data_type === 'USER-DEFINED' && definition.udt_name === 'payment_status')) {
             continue;
         }
 
@@ -320,28 +323,15 @@ export const verifyRequiredIndexes = async () => {
     logger.info('[SCHEMA-CHECK] Verifying critical fintech schema structures...');
     const failures = [];
 
-    for (const table of REQUIRED_TABLES) {
-        if (!(await tableExists(table))) {
-            failures.push({ type: 'missing_table', name: table });
-        }
-    }
+    const [tableResults, colResults, idxResults, trigResults] = await Promise.all([
+        Promise.all(REQUIRED_TABLES.map(async (table) => ((await tableExists(table)) ? null : { type: 'missing_table', name: table }))),
+        Promise.all(REQUIRED_COLUMNS.map(async ([table, column]) => ((await columnExists(table, column)) ? null : { type: 'missing_column', name: `${table}.${column}` }))),
+        Promise.all(REQUIRED_INDEXES.map(async (index) => ((await indexExists(index)) ? null : { type: 'missing_index_or_constraint', name: index }))),
+        Promise.all(REQUIRED_TRIGGERS.map(async ([table, trigger]) => ((await triggerExists(table, trigger)) ? null : { type: 'missing_trigger', name: `${table}.${trigger}` })))
+    ]);
 
-    for (const [table, column] of REQUIRED_COLUMNS) {
-        if (!(await columnExists(table, column))) {
-            failures.push({ type: 'missing_column', name: `${table}.${column}` });
-        }
-    }
-
-    for (const index of REQUIRED_INDEXES) {
-        if (!(await indexExists(index))) {
-            failures.push({ type: 'missing_index_or_constraint', name: index });
-        }
-    }
-
-    for (const [table, trigger] of REQUIRED_TRIGGERS) {
-        if (!(await triggerExists(table, trigger))) {
-            failures.push({ type: 'missing_trigger', name: `${table}.${trigger}` });
-        }
+    for (const res of [...tableResults, ...colResults, ...idxResults, ...trigResults]) {
+        if (res) failures.push(res);
     }
 
     if (await columnExists('product_orders', 'client_checkout_token')) {
@@ -362,7 +352,8 @@ export const verifyRequiredIndexes = async () => {
             failures,
             action: 'Run pending migrations before starting the backend.'
         });
-        throw new Error(`Critical fintech schema verification failed: ${failures.map(f => `${f.type}:${f.name}`).join(', ')}`);
+        const failureSummary = failures.map(f => `${f.type}:${f.name}`).join(', ');
+        throw new Error(`Critical fintech schema verification failed: ${failureSummary}`);
     }
 
     logger.info('[SCHEMA-CHECK] Critical fintech schema structures verified', {

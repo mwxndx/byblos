@@ -1,8 +1,8 @@
-import { writeFileSync, existsSync, mkdirSync } from 'fs';
-import { resolve, dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { SitemapStream, streamToPromise } from 'sitemap';
-import { Readable } from 'stream';
+import { Readable } from 'node:stream';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -90,4 +90,9 @@ async function generateSitemap() {
   }
 }
 
-generateSitemap();
+try {
+  await generateSitemap();
+} catch (err) {
+  console.error('Unhandled error in generateSitemap:', err);
+  process.exit(1);
+}

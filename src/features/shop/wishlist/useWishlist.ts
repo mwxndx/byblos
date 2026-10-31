@@ -59,7 +59,7 @@ export function useWishlist() {
       id: String(item.id),
       name: item.name,
       description: item.description,
-      price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+      price: typeof item.price === 'string' ? Number.parseFloat(item.price) : item.price,
       image_url: item.image_url,
       sellerId: item.sellerId,
       seller,
@@ -149,8 +149,8 @@ export function useWishlist() {
     try {
       await removeMutation.mutateAsync(pid);
       toast({ title: 'Removed from wishlist', description: 'The item has been removed from your wishlist.' });
-    } catch (err) {
-      // Rollback
+    } catch {
+      // Rollback optimistic removal on error
       addWishlistId(pid);
       toast({ title: 'Failed to remove', description: 'There was an error removing this item.', variant: 'destructive' });
     } finally {

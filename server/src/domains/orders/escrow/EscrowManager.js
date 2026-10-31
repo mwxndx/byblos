@@ -81,14 +81,14 @@ class EscrowManager {
         );
 
         // Guard: if either value is NaN or 0, abort — something is wrong upstream
-        if (isNaN(rawPayout) || rawPayout <= 0) {
+        if (Number.isNaN(rawPayout) || rawPayout <= 0) {
             logger.error(
                 `[EscrowManager] Invalid seller_payout_amount for Order ${orderId}: ` +
                 `"${order.seller_payout_amount ?? order.sellerPayoutAmount}". Aborting release.`
             );
             return { success: false, reason: 'invalid_payout_amount' };
         }
-        if (isNaN(rawTotal) || rawTotal <= 0) {
+        if (Number.isNaN(rawTotal) || rawTotal <= 0) {
             logger.error(
                 `[EscrowManager] Invalid total_amount for Order ${orderId}: ` +
                 `"${order.total_amount ?? order.totalAmount}". Aborting release.`
@@ -108,12 +108,12 @@ class EscrowManager {
             // Surface it operationally — a negative fee means seller payout > order
             // total, i.e. inconsistent pricing upstream, and would otherwise zero
             // out platform revenue on this order silently. reportAlert dedupes.
-            reportAlert({
+            void reportAlert({
                 level: 'warn',
                 title: 'Negative platform fee on escrow release',
                 message: `Order ${orderId}: seller payout (${sellerPayoutAmount}) exceeds order total (${totalAmount}); platform fee clamped to 0. Check order pricing.`,
                 context: { orderId, totalAmount, sellerPayoutAmount }
-            });
+            }).catch(() => {});
         }
         const sellerId = order.seller_id ?? order.sellerId;
 

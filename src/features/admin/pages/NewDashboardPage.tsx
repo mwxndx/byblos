@@ -172,8 +172,8 @@ const NewAdminDashboard = () => {
               variant="outline"
               aria-label="Sign out"
               title="Sign out"
-              onClick={async () => {
-                await logout();
+              onClick={() => {
+                logout();
                 navigate('/admin/login', { replace: true });
               }}
               className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"

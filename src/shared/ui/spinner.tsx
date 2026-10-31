@@ -4,7 +4,7 @@ interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export function Spinner({ className, ...props }: SpinnerProps) {
+export function Spinner({ className, ...props }: Readonly<SpinnerProps>) {
   return (
     <div
       className={cn(

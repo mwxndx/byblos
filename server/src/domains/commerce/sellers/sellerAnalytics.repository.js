@@ -14,7 +14,7 @@ export async function countAvailableProducts(sellerId) {
     WHERE seller_id = $1 AND status = 'available'
   `;
   const { rows } = await query(sql, [sellerId]);
-  return parseInt(rows[0]?.total_products ?? 0, 10);
+  return Number.parseInt(rows[0]?.total_products ?? 0, 10);
 }
 
 /**
@@ -231,7 +231,7 @@ export async function countWishlistsForSeller(sellerId) {
     WHERE p.seller_id = $1
   `;
   const { rows } = await query(sql, [sellerId]);
-  return parseInt(rows[0]?.wishlist_count ?? 0, 10);
+  return Number.parseInt(rows[0]?.wishlist_count ?? 0, 10);
 }
 
 /**
@@ -248,5 +248,5 @@ export async function countRecentKnocks(sellerId) {
       AND created_at >= NOW() - INTERVAL '24 hours'
   `;
   const { rows } = await query(sql, [sellerId]);
-  return parseInt(rows[0]?.click_count ?? 0, 10);
+  return Number.parseInt(rows[0]?.click_count ?? 0, 10);
 }

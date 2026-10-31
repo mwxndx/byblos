@@ -23,7 +23,7 @@ export function ProductsTab({
   onStatusUpdate,
   products,
   setIsAddProductModalOpen
-}: ProductsTabProps) {
+}: Readonly<ProductsTabProps>) {
   const hasProducts = products.length > 0;
 
   return (
@@ -49,7 +49,7 @@ export function ProductsTab({
             <div className="product-modal-light flex h-full min-h-0 flex-1 flex-col overflow-hidden">
               <AddProductForm
                 onSuccess={() => {
-                  fetchProducts();
+                  void fetchProducts().catch(() => {});
                   setIsAddProductModalOpen(false);
                 }}
                 onClose={() => setIsAddProductModalOpen(false)}

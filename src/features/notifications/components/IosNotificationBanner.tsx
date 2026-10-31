@@ -17,7 +17,7 @@ interface IosNotificationBannerProps {
  * Apple's native notification permission dialog, or guides Safari users
  * to Add to Home Screen first.
  */
-export function IosNotificationBanner({ className, role, allowAllWeb = true }: IosNotificationBannerProps) {
+export function IosNotificationBanner({ className, role, allowAllWeb = true }: Readonly<IosNotificationBannerProps>) {
   const {
     shouldShowPrompt,
     isIos,

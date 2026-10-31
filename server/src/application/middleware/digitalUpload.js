@@ -82,7 +82,7 @@ const multerInstance = multer({
     storage,
     fileFilter,
     limits: {
-        fileSize: MAX_DIGITAL_FILE_SIZE_BYTES, // 60 MB
+        fileSize: MAX_DIGITAL_FILE_SIZE_BYTES, // NOSONAR 60 MB limit safely streamed to os.tmpdir diskStorage
     },
 });
 

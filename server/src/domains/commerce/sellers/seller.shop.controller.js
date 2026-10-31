@@ -149,11 +149,11 @@ export const searchSellers = async (req, res) => {
 const SELLER_SEARCH_MAX = 200;
 const SELLER_PRODUCTS_MAX = 500;
 function boundedLimit(rawLimit, cap) {
-  const n = parseInt(rawLimit, 10);
+  const n = Number.parseInt(rawLimit, 10);
   return Number.isFinite(n) && n > 0 ? Math.min(n, cap) : cap;
 }
 function boundedOffset(rawPage, limit) {
-  const page = Math.max(parseInt(rawPage, 10) || 1, 1);
+  const page = Math.max(Number.parseInt(rawPage, 10) || 1, 1);
   return (page - 1) * limit;
 }
 

@@ -103,7 +103,7 @@ eventBus.on(AppEvents.PAYMENT.COMPLETED, async ({ eventId, payment, order }) => 
 
     // Deliver in-app feed + push notifications (best-effort, non-blocking)
     const orderNumber = order?.order_number || payment?.order_id || 'order';
-    const rawAmount = payment?.amount != null ? payment.amount : (order?.total_amount != null ? order.total_amount : 0);
+    const rawAmount = payment?.amount ?? order?.total_amount ?? 0;
     const amountStr = Number(rawAmount).toLocaleString('en-KE');
 
     const buyerUserId = await buyerUserIdById(order?.buyer_id || payment?.buyer_id);
@@ -219,8 +219,9 @@ eventBus.on(AppEvents.WITHDRAWAL.UPDATED, async ({ eventId, withdrawal, seller, 
     if (sellerId) {
         const sellerUserId = await sellerUserIdById(sellerId);
         if (sellerUserId) {
+            const balanceSuffix = newBalance != null ? `. New balance: KES ${Number(newBalance).toLocaleString('en-KE')}` : '';
             const body = isCompleted
-                ? `Your withdrawal of KES ${amount} has been paid out${newBalance != null ? `. New balance: KES ${Number(newBalance).toLocaleString('en-KE')}` : ''}.`
+                ? `Your withdrawal of KES ${amount} has been paid out${balanceSuffix}.`
                 : (reason ? `Withdrawal ${status}: ${reason}` : `Your withdrawal of KES ${amount} is now ${status}.`);
             await eventBus.deliverRecipient(eventId, `withdrawal:${withdrawal.id}:seller:${withdrawal.status}:feed`, () => feedSend(sellerUserId, 'seller', {
                 type: 'withdrawal_updated',
@@ -235,8 +236,9 @@ eventBus.on(AppEvents.WITHDRAWAL.UPDATED, async ({ eventId, withdrawal, seller, 
     if (withdrawal.creator_id) {
         const creatorUserId = await creatorUserIdById(withdrawal.creator_id);
         if (creatorUserId) {
+            const balanceSuffix = newBalance != null ? `. New balance: KES ${Number(newBalance).toLocaleString('en-KE')}` : '';
             const body = isCompleted
-                ? `Your creator payout of KES ${amount} has been paid out${newBalance != null ? `. New balance: KES ${Number(newBalance).toLocaleString('en-KE')}` : ''}.`
+                ? `Your creator payout of KES ${amount} has been paid out${balanceSuffix}.`
                 : (reason ? `Creator payout ${status}: ${reason}` : `Your payout of KES ${amount} is now ${status}.`);
             await eventBus.deliverRecipient(eventId, `withdrawal:${withdrawal.id}:creator:${withdrawal.status}:feed`, () => feedSend(creatorUserId, 'creator', {
                 type: 'withdrawal_updated',

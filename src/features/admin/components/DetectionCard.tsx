@@ -17,7 +17,7 @@ const EARNING_TYPE_LABEL: Record<FlaggedEarning['earning_type'], string> = {
   referral: 'Creator-refers-seller reward',
 };
 
-export function DetectionCard({ earning, formatCurrency, onRelease, onReverse }: DetectionCardProps) {
+export function DetectionCard({ earning, formatCurrency, onRelease, onReverse }: Readonly<DetectionCardProps>) {
   const isResolved = earning.metadata?.review_resolution !== undefined;
 
   return (

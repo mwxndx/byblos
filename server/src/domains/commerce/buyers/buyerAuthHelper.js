@@ -38,7 +38,7 @@ export const createSendToken = (data, statusCode, req, res, next) => {
   const refreshToken = buyerUserId ? generateRefreshToken(buyerUserId, 'buyer') : undefined;
   setRefreshTokenCookie(res, refreshToken);
 
-  if (user && user.is_verified !== undefined) {
+  if (user?.is_verified !== undefined) {
     buyer.is_verified = user.is_verified;
   }
 

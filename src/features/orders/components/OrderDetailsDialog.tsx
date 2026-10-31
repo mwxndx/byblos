@@ -14,7 +14,7 @@ interface OrderDetailsDialogProps {
   onConfirmReceiptClick: (orderId: string) => void;
 }
 
-export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage, onConfirmReceiptClick }: OrderDetailsDialogProps) {
+export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage, onConfirmReceiptClick }: Readonly<OrderDetailsDialogProps>) {
   return (
       <Dialog open={!!order} onOpenChange={(open) => !open && onClose()}>
         <DialogContent className="w-[92vw] sm:max-w-xl bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
@@ -31,7 +31,7 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
 
               <div className="space-y-6 max-h-[60dvh] overflow-y-auto pr-2">
                 {order.items.map((item, idx) => (
-                  <div key={idx} className="flex gap-4 items-start">
+                  <div key={item.id ?? `${item.name}-${idx}`} className="flex gap-4 items-start">
                     {item.imageUrl ? (
                       <button
                         type="button"

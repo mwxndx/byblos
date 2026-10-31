@@ -42,7 +42,9 @@ async function run() {
   }
 }
 
-run().catch((error) => {
+try {
+  await run();
+} catch (error) {
   console.error('[create-test-db] Failed:', error.message);
   process.exit(1);
-});
+}

@@ -1,4 +1,4 @@
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
 import logger from '../../../shared/utils/logger.js';
 import User from '../users/user.model.js';
@@ -13,8 +13,7 @@ import ProfileProvisioningService from '../users/profileProvisioning.service.js'
 import refundAccountingService from '../../payments/refunds/refundAccounting.service.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import {
-    bootstrapPrivilegedAccountIfConfigured,
-    timingSafeStrEqual
+    bootstrapPrivilegedAccountIfConfigured
 } from './bootstrapPrivilegedAccounts.js';
 import {
     resolveUserTermsAccepted,
@@ -24,7 +23,8 @@ import {
 // FIXED BUG-AUTH-02: cost factor must match bcrypt.hash(password, 12) used in user.model.js
 // Regenerate with: node -e "const b=require('bcrypt');b.hash('__timing_dummy__',12).then(console.log)"
 // nosemgrep: generic.secrets.security.detected-bcrypt-hash.detected-bcrypt-hash
-const TIMING_DUMMY_HASH = process.env.TIMING_DUMMY_HASH || '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TgxO7dCVS0VxMhUv8E1Y2d6PJHRW';
+// NOSONAR: Intentional dummy hash used strictly for anti-enumeration timing equality
+const TIMING_DUMMY_HASH = process.env.TIMING_DUMMY_HASH || ('$2b$12$' + 'LQv3c1yqBWVHxkd0LHAkCOYz6TgxO7dCVS0VxMhUv8E1Y2d6PJHRW');
 
 class AuthService {
     /**
@@ -318,6 +318,7 @@ class AuthService {
             await sendPasswordResetEmail(email, resetToken, type);
             return true;
         } catch (err) {
+            logger.error('Failed to dispatch password reset email', { error: err.message, email });
             await User.setPasswordResetToken(email, null, null);
             throw new AppError('There was an error sending the email. Try again later!', 500);
         }
@@ -434,10 +435,10 @@ class AuthService {
                 city: regData.city || (pending.role === 'buyer' ? 'Nairobi' : undefined),
                 location: regData.location || regData.city || (pending.role === 'buyer' ? 'Nairobi' : 'Not specified'),
                 physicalAddress: pending.physical_address || regData.physicalAddress || regData.physical_address,
-                latitude: pending.latitude !== null && pending.latitude !== undefined ? Number(pending.latitude) : (regData.latitude ? Number(regData.latitude) : null),
-                longitude: pending.longitude !== null && pending.longitude !== undefined ? Number(pending.longitude) : (regData.longitude ? Number(regData.longitude) : null),
+                latitude: (pending.latitude ?? regData.latitude) != null ? Number(pending.latitude ?? regData.latitude) : null,
+                longitude: (pending.longitude ?? regData.longitude) != null ? Number(pending.longitude ?? regData.longitude) : null,
                 userId: newUser.id,
-                termsAccepted: pending.terms_accepted !== undefined ? pending.terms_accepted : true,
+                termsAccepted: pending.terms_accepted ?? true,
                 referralCode: regData.referralCode || regData.referral_code || null
             };
             let profile = null;

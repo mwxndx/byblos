@@ -1,4 +1,3 @@
-import Fees from '../../../shared/config/fees.js';
 
 /**
  * Validate and sanitize image URL/data with SSRF protection.
@@ -54,7 +53,7 @@ export const sanitizeDigitalPath = (filePath) => {
     if (!filePath) return null;
 
     if (typeof filePath !== 'string') {
-        throw new Error('Invalid digital file path: expected a string');
+        throw new TypeError('Invalid digital file path: expected a string');
     }
 
     const trimmed = filePath.trim();
@@ -73,7 +72,7 @@ export const sanitizeDigitalPath = (filePath) => {
         throw new Error('Invalid digital file path: expected a Cloudinary public_id, not a URL');
     }
 
-    if (!/^[a-zA-Z0-9_\-\.\/]+$/.test(trimmed)) {
+    if (!/^[a-zA-Z0-9_\-./]+$/.test(trimmed)) {
         throw new Error('Invalid digital file path: invalid characters in public_id');
     }
 
@@ -181,12 +180,26 @@ export const resolveProductUpdateCustomFields = (existing, data) => {
     };
 };
 
+function _determineTargetStatus(status, soldAt, data) {
+    if (status) return status;
+    if (soldAt) return 'sold';
+    if (data.is_sold === false || data.isSold === false) return 'available';
+    return undefined;
+}
+
+function _determineTargetSoldAt(soldAt, dataSoldAt, targetStatus) {
+    if (soldAt !== undefined) return soldAt;
+    if (dataSoldAt !== undefined) return dataSoldAt;
+    if (targetStatus === 'available') return null;
+    return undefined;
+}
+
 /**
  * Resolve status, soldAt, and is_sold synchronization.
  */
 export const resolveProductStatusUpdate = (data, status, soldAt) => {
-    const targetStatus = status || (soldAt ? 'sold' : (data.is_sold === false || data.isSold === false ? 'available' : undefined));
-    const targetSoldAt = soldAt !== undefined ? soldAt : (data.sold_at !== undefined ? data.sold_at : (targetStatus === 'available' ? null : undefined));
+    const targetStatus = _determineTargetStatus(status, soldAt, data);
+    const targetSoldAt = _determineTargetSoldAt(soldAt, data.sold_at, targetStatus);
     const isMarkedSold = targetStatus === 'sold' || Boolean(targetSoldAt);
 
     if (targetStatus !== undefined || targetSoldAt !== undefined || data.is_sold !== undefined || data.isSold !== undefined) {

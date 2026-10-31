@@ -20,11 +20,11 @@ export const getStableDeviceId = (): string => {
     if (existing) return existing;
 
     const generated = globalThis.crypto?.randomUUID?.()
-      || `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      || `device-${Date.now()}-${Math.random().toString(36).slice(2)}`; // NOSONAR Non-cryptographic client device tracking fallback
     localStorage.setItem(storageKey, generated);
     return generated;
   } catch {
-    return `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return `device-${Date.now()}-${Math.random().toString(36).slice(2)}`; // NOSONAR Non-cryptographic client device tracking fallback
   }
 };
 

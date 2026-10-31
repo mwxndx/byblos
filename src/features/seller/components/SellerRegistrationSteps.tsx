@@ -286,8 +286,8 @@ export const SellerRegistrationSteps = ({
                             { label: "1 Number", met: checkPasswordStrength(formData.password).hasNumber },
                             { label: "1 Special", met: checkPasswordStrength(formData.password).hasSpecial },
                             { label: "Upper/Lower", met: checkPasswordStrength(formData.password).hasUpper && checkPasswordStrength(formData.password).hasLower },
-                          ].map((req, index) => (
-                            <div key={index} className="flex items-center space-x-2">
+                          ].map((req) => (
+                            <div key={req.label} className="flex items-center space-x-2">
                               {req.met ? (
                                 <div className="bg-green-500/20 p-0.5 rounded-full">
                                   <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600 dark:text-green-400" />

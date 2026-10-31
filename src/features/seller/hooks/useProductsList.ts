@@ -10,7 +10,7 @@ import { createInitialEditFormData, processImage } from '../components/products-
 interface UseProductsListParams {
   products: Product[];
   onDelete: (id: string) => Promise<void>;
-  onStatusUpdate?: (productId: string, status: 'available' | 'sold', soldAt: string | null) => void;
+  onStatusUpdate?: (productId: string, status: 'available' | 'sold', soldAt: string | null) => Promise<void> | void;
   onRefresh?: () => void;
 }
 
@@ -211,7 +211,7 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     if (editFormData.product_type === 'service') {
       const lat = sellerProfile?.latitude ? Number(sellerProfile.latitude) : null;
       const lng = sellerProfile?.longitude ? Number(sellerProfile.longitude) : null;
-      const hasCoordinates = lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng) && !(lat === 0 && lng === 0);
+      const hasCoordinates = lat !== null && lng !== null && Number.isFinite(lat) && Number.isFinite(lng) && (lat !== 0 || lng !== 0);
       if (!hasCoordinates) {
         toast({
           title: 'Location Coordinates Required',
@@ -307,7 +307,8 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
       const soldAt = newStatus === 'sold' ? new Date().toISOString() : null;
       await onStatusUpdate(productId, newStatus, soldAt);
       onRefresh?.();
-    } catch (error) {
+    } catch {
+      // Fallback: notify user of failure
       toast({
         title: 'Error',
         description: 'Failed to update product status',

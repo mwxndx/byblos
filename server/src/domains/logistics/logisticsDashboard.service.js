@@ -70,7 +70,6 @@ class LogisticsDashboardService {
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
-            let notificationEvent = null;
 
             await client.query(
                 `INSERT INTO roles (name, slug)
@@ -904,7 +903,7 @@ class LogisticsDashboardService {
                 [
                     safeRequestId,
                     nextStatus,
-                    note || `Admin dispute resolution: ${normalizedResolution.replace(/_/g, ' ')}`,
+                    note || `Admin dispute resolution: ${normalizedResolution.replaceAll('_', ' ')}`,
                     admin?.id || null,
                     admin?.email || 'Admin',
                     JSON.stringify({
@@ -1114,8 +1113,7 @@ class LogisticsDashboardService {
         } else if (normalizedStatus === 'manual_review') {
             filters.push(`(lr.status = 'manual_review' OR lr.metadata->'admin_dispute_resolution'->>'resolution' = 'manual_review')`);
         } else if (normalizedStatus === 'overdue') {
-            filters.push(`COALESCE(pl.deadline_at, dl.deadline_at, lr.deadline_at) < NOW()`);
-            filters.push(`lr.status NOT IN ('completed', 'cancelled')`);
+            filters.push(`COALESCE(pl.deadline_at, dl.deadline_at, lr.deadline_at) < NOW()`, `lr.status NOT IN ('completed', 'cancelled')`);
         } else if (normalizedStatus !== 'all') {
             params.push(normalizedStatus);
             filters.push(`lr.status = $${params.length}`);

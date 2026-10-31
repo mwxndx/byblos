@@ -29,7 +29,7 @@ export function DashboardProfilePanel({
   children,
   bottomInset = '0px',
   className,
-}: DashboardProfilePanelProps) {
+}: Readonly<DashboardProfilePanelProps>) {
   const titleId = useId();
   const panelRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);

@@ -11,12 +11,16 @@ export function AppUpdateGate() {
     if (!isNativeApp()) return;
 
     let mounted = true;
-    checkAppVersion().then((status) => {
-      if (mounted && status.updateRequired) {
-        setUpdateRequired(true);
-        setPolicy(status.policy);
-      }
-    });
+    checkAppVersion()
+      .then((status) => {
+        if (mounted && status.updateRequired) {
+          setUpdateRequired(true);
+          setPolicy(status.policy);
+        }
+      })
+      .catch((err) => {
+        console.warn('[AppUpdateGate] Failed to check app version:', err);
+      });
 
     return () => {
       mounted = false;
@@ -94,8 +98,8 @@ export function AppUpdateGate() {
               What's New:
             </h2>
             <ul className="text-xs text-slate-600 dark:text-zinc-400 space-y-1.5 list-disc list-inside">
-              {policy.releaseNotes.map((note, idx) => (
-                <li key={idx} className="leading-snug">{note}</li>
+              {policy.releaseNotes.map((note) => (
+                <li key={note} className="leading-snug">{note}</li>
               ))}
             </ul>
           </div>

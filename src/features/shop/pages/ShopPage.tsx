@@ -19,17 +19,17 @@ const ShopPage = () => {
   const {
     sellerInfo,
     creatorModeNotice,
-    themeClasses,
+
     themeAccentVars,
     shopPageTheme,
     setShopPageTheme,
     resolvedShopTheme,
-    products,
+
     hasDigitalProducts,
     filteredProducts,
     searchQuery,
     setSearchQuery,
-    avatarLoadFailed,
+
     setAvatarLoadFailed,
     sellerInitials,
     showSellerAvatar,
@@ -42,8 +42,8 @@ const ShopPage = () => {
   const searchParams = new URLSearchParams(location.search);
   const isCreatorPreview = searchParams.get('view') === 'creator-preview';
   const previewRateParam = searchParams.get('rate');
-  const previewRate = previewRateParam ? parseFloat(previewRateParam) : null;
-  const effectiveCommissionRate = sellerInfo?.creatorCommissionRate ?? (previewRate !== null && !isNaN(previewRate) ? previewRate : 0.01);
+  const previewRate = previewRateParam ? Number.parseFloat(previewRateParam) : null;
+  const effectiveCommissionRate = sellerInfo?.creatorCommissionRate ?? (previewRate !== null && !Number.isNaN(previewRate) ? previewRate : 0.01);
   const formattedCommissionPercent = (effectiveCommissionRate * 100).toFixed(1).replace(/\.0$/, '');
   const bagAdd = (location.state as { bagAdd?: Product } | null)?.bagAdd ?? null;
 

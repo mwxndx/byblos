@@ -15,7 +15,7 @@ interface OverviewTabProps {
   onSelectTab: (tab: SellerTabId) => void;
 }
 
-export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, onSelectTab }: OverviewTabProps) {
+export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, onSelectTab }: Readonly<OverviewTabProps>) {
   const recentOrders = (analytics.recentOrders || []).slice(0, 5);
 
   const balance = analytics.availableBalance ?? analytics.balance;

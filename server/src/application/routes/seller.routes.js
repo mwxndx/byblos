@@ -1,6 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
-import logger from '../../shared/utils/logger.js';
+
 import * as sellerController from '../../domains/commerce/sellers/seller.controller.js';
 import * as productController from '../../domains/commerce/products/product.controller.js';
 import * as analyticsController from '../controllers/analytics.controller.js';

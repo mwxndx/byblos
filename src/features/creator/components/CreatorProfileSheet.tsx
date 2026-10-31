@@ -32,7 +32,7 @@ function ReadOnlyDetail({ icon: Icon, label, value }: { icon: React.ComponentTyp
   );
 }
 
-export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: CreatorProfileSheetProps) {
+export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: Readonly<CreatorProfileSheetProps>) {
   const { theme, setTheme } = useThemeScope('creator');
   const updateMutation = useUpdateCreatorProfileMutation();
 

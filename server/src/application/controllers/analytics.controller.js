@@ -44,27 +44,27 @@ const mapAnalyticsDto = ({
 
   return {
     totalProducts,
-    totalSales: parseFloat(sellerStats.total_sales || 0),
-    totalRevenue: parseFloat(sellerStats.net_revenue || 0),
-    balance: parseFloat(sellerStats.balance || 0),
-    availableBalance: parseFloat(sellerStats.available_balance ?? sellerStats.balance ?? 0),
-    pendingSettlementBalance: parseFloat(sellerStats.pending_settlement_balance || 0),
-    withdrawalReservedBalance: parseFloat(sellerStats.withdrawal_reserved_balance || 0),
-    refundReservedBalance: parseFloat(sellerStats.refund_reserved_balance || 0),
+    totalSales: Number.parseFloat(sellerStats.total_sales || 0),
+    totalRevenue: Number.parseFloat(sellerStats.net_revenue || 0),
+    balance: Number.parseFloat(sellerStats.balance || 0),
+    availableBalance: Number.parseFloat(sellerStats.available_balance ?? sellerStats.balance ?? 0),
+    pendingSettlementBalance: Number.parseFloat(sellerStats.pending_settlement_balance || 0),
+    withdrawalReservedBalance: Number.parseFloat(sellerStats.withdrawal_reserved_balance || 0),
+    refundReservedBalance: Number.parseFloat(sellerStats.refund_reserved_balance || 0),
     nextSettlementAt: sellerStats.next_settlement_at || null,
-    creatorCount: parseInt(sellerStats.creator_count || 0),
-    creatorGeneratedSales: parseFloat(sellerStats.creator_generated_sales || 0),
+    creatorCount: Number.parseInt(sellerStats.creator_count || 0),
+    creatorGeneratedSales: Number.parseFloat(sellerStats.creator_generated_sales || 0),
     wishlistCount,
     clickCount,
     monthlySales: (monthlySalesRows || []).map(row => ({
       month: row.month,
-      sales: parseFloat(row.sales || 0)
+      sales: Number.parseFloat(row.sales || 0)
     })),
     recentOrders: (recentOrdersRows || []).map(order => ({
       id: order.id,
       orderNumber: order.order_number,
       status: order.status,
-      totalAmount: parseFloat(order.total_amount || 0),
+      totalAmount: Number.parseFloat(order.total_amount || 0),
       createdAt: order.created_at,
       items: order.items || []
     })),
@@ -94,7 +94,7 @@ const handleAnalyticsError = (error, next) => {
  * @access  Private/Seller
  */
 export const getSellerAnalytics = async (req, res, next) => {
-  if (!req.user || !req.user.id) {
+  if (!req.user?.id) {
     return next(new AppError('Authentication required', 401));
   }
 

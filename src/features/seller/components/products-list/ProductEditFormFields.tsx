@@ -14,7 +14,7 @@ interface ProductEditFormFieldsProps {
 export function ProductEditFormFields({
   formData,
   onFormDataChange,
-}: ProductEditFormFieldsProps) {
+}: Readonly<ProductEditFormFieldsProps>) {
   return (
     <div className="space-y-3">
       <div>

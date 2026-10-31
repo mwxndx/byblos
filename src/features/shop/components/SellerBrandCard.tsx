@@ -47,7 +47,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     const shopLink = isBuyer
         ? `/buyer/shop/${encodeURIComponent(canonicalSlug)}`
         : `/${encodeURIComponent(canonicalSlug)}`;
-    const avatarUrl = String(seller.avatarUrl || (seller as unknown as Record<string, unknown>).avatar_url || '');
+    const avatarUrl = String(seller.avatarUrl || (seller as unknown as { avatar_url?: string }).avatar_url || '');
     const [avatarFailed, setAvatarFailed] = useState(false);
     const [knockCount, setKnockCount] = useState(getNumber(seller.knockCount, seller.knock_count));
     const palette = useMemo(() => getThemePalette(seller.theme), [seller.theme]);
@@ -96,7 +96,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     const stop = (event: { stopPropagation: () => void }) => event.stopPropagation();
 
     return (
-        <article
+        <div
             className={cn(
                 'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border bg-black p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70',
                 className,
@@ -179,7 +179,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                     </button>
                 )}
             </div>
-        </article>
+        </div>
     );
 };
 

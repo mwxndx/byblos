@@ -57,7 +57,9 @@ async function run() {
   }
 }
 
-run().catch((error) => {
+try {
+  await run();
+} catch (error) {
   console.error('[apply-test-schema] Failed:', error.message);
   process.exit(1);
-});
+}

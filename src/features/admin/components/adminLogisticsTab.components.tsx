@@ -3,7 +3,7 @@ import { Button } from '@/shared/ui/button';
 import type { LogisticsLeg, LogisticsLegType, LogisticsRequestCard, LogisticsStatusUpdate } from '@/features/logistics/api';
 import { PICKUP_STATUSES, DELIVERY_STATUSES, label, formatDate, formatCurrency, normalizePhone } from '../utils/adminLogisticsTab.utils';
 
-export function ContactLinks({ phone, email, label: contactLabel }: { phone?: string | null; email?: string | null; label: string }) {
+export function ContactLinks({ phone, email, label: contactLabel }: Readonly<{ phone?: string | null; email?: string | null; label: string }>) {
   const normalized = normalizePhone(phone);
   return (
     <div className="flex flex-wrap gap-2">

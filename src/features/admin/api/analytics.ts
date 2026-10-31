@@ -15,7 +15,7 @@ export async function getAnalytics() {
 
 export async function getMonthlyMetrics() {
   const response = await api.get('/admin/metrics/monthly');
-  if (response.data && response.data.data) {
+  if (response.data?.data) {
     return {
       ...response.data,
       data: response.data.data.map((item: Record<string, unknown>) => ({

@@ -50,7 +50,34 @@ export async function getWithdrawalRequests(
     : (Array.isArray(response.data) ? response.data : []);
 
   const items = rows.map((raw) => {
-    const request = raw as Record<string, unknown>;
+    const request = raw as {
+      id?: string | number;
+      amount?: number | string;
+      mpesa_number?: string;
+      mpesaNumber?: string;
+      mpesa_name?: string;
+      mpesaName?: string;
+      status?: string;
+      seller_id?: string | number;
+      sellerId?: string | number;
+      entityName?: string;
+      entity_name?: string;
+      seller_name?: string;
+      sellerName?: string;
+      entityEmail?: string;
+      entity_email?: string;
+      seller_email?: string;
+      sellerEmail?: string;
+      provider_reference?: string;
+      providerReference?: string;
+      created_at?: string;
+      createdAt?: string;
+      processed_at?: string;
+      processedAt?: string;
+      processed_by?: string;
+      processedBy?: string;
+      [key: string]: unknown;
+    };
     const id = String(request.id || `withdrawal-${globalThis.crypto.randomUUID()}`);
     return {
       id,
@@ -82,7 +109,7 @@ export async function updateWithdrawalRequestStatus(
   status: 'completed' | 'failed',
   idempotencyKey: string
 ) {
-  return api.patch(
+  return await api.patch(
     `/admin/withdrawal-requests/${requestId}/status`,
     { status },
     { headers: { 'Idempotency-Key': idempotencyKey } }
