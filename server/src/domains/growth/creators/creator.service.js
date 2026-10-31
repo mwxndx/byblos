@@ -264,7 +264,7 @@ class CreatorService {
   }
 
   static async listSellerInvites(sellerId) {
-    await pool.query(
+    const { rows } = await pool.query(
       `SELECT ${SELLER_CREATOR_INVITE_COLUMNS},
               s.shop_name,
               s.slug,

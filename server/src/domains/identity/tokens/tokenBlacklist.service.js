@@ -11,6 +11,11 @@ import { getRedisClient } from '../../../shared/config/redis.js';
  * Redis key format: bl:<token>  value: '1'
  */
 
+let _graceInvalidator = null;
+export function registerGraceInvalidator(fn) {
+    _graceInvalidator = fn;
+}
+
 class TokenBlacklistService {
     constructor() {
         // In-memory fallback — used when Redis is unavailable
@@ -49,7 +54,10 @@ class TokenBlacklistService {
      * @param {string} token - JWT token to blacklist
      * @param {number} expiresAt - Unix timestamp when the token expires (seconds or ms)
      */
-    async addToken(token, expiresAt) {
+    async addToken(token, expiresAt, reason = 'revoked') {
+        if (_graceInvalidator) {
+            try { _graceInvalidator(token, reason); } catch {}
+        }
         let expSec;
         if (expiresAt instanceof Date) {
             expSec = Math.floor(expiresAt.getTime() / 1000);

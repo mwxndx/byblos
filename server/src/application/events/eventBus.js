@@ -192,4 +192,6 @@ class AppEventBus extends EventEmitter {
 }
 
 export { AppEvents } from './eventTypes.js';
-export default new AppEventBus();
+const eventBus = new AppEventBus();
+export { eventBus };
+export default eventBus;

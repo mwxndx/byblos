@@ -1,11 +1,26 @@
 import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
-import tokenBlacklist from '../../domains/identity/tokens/tokenBlacklist.service.js';
+import tokenBlacklist, { registerGraceInvalidator } from '../../domains/identity/tokens/tokenBlacklist.service.js';
 import CacheService from './cache.service.js';
 
 // In-memory fallback map for RFC 6819 grace period when Redis is unavailable
 const _refreshGraceMemory = new Map();
 const REFRESH_GRACE_WINDOW_SECONDS = 30;
+
+export const clearRefreshGrace = (token) => {
+  try {
+    const tokenHash = crypto.createHash('sha256').update(String(token)).digest('hex');
+    const graceKey = `refresh_grace:${tokenHash}`;
+    _refreshGraceMemory.delete(graceKey);
+    CacheService.delete(graceKey).catch(() => {});
+  } catch {}
+};
+
+registerGraceInvalidator((token, reason) => {
+  if (reason !== 'rotation') {
+    clearRefreshGrace(token);
+  }
+});
 
 // Periodic cleanup of expired entries in memory map
 setInterval(() => {
@@ -214,7 +229,7 @@ export const refreshAccessToken = async (refreshToken) => {
   }
 
   // Blacklist the consumed refresh token (token rotation: old token is invalidated)
-  await tokenBlacklist.addToken(refreshToken, decoded.exp);
+  await tokenBlacklist.addToken(refreshToken, decoded.exp, 'rotation');
 
   // Access token always uses JWT_SECRET — separate from refresh secret
   const accessToken = jwt.sign(

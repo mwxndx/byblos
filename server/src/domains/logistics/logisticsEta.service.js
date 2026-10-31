@@ -230,19 +230,20 @@ export class LogisticsEtaService {
     const order = orderRows[0];
 
     // 2. Validate tenant ownership
+    const userRole = user?.role || user?.userType;
     const isBuyer = Boolean(user && (
       (user.buyerId && String(order.buyer_id) === String(user.buyerId))
       || (user.buyerProfileId && String(order.buyer_id) === String(user.buyerProfileId))
-      || (user.userType === 'buyer' && user.profileId && String(order.buyer_id) === String(user.profileId))
-      || (user.userType === 'buyer' && user.profile_id && String(order.buyer_id) === String(user.profile_id))
+      || ((!userRole || userRole === 'buyer') && user.profileId && String(order.buyer_id) === String(user.profileId))
+      || ((!userRole || userRole === 'buyer') && user.profile_id && String(order.buyer_id) === String(user.profile_id))
     ));
     const isSeller = Boolean(user && (
       (user.sellerId && String(order.seller_id) === String(user.sellerId))
       || (user.sellerProfileId && String(order.seller_id) === String(user.sellerProfileId))
-      || (user.userType === 'seller' && user.profileId && String(order.seller_id) === String(user.profileId))
-      || (user.userType === 'seller' && user.profile_id && String(order.seller_id) === String(user.profile_id))
+      || ((!userRole || userRole === 'seller') && user.profileId && String(order.seller_id) === String(user.profileId))
+      || ((!userRole || userRole === 'seller') && user.profile_id && String(order.seller_id) === String(user.profile_id))
     ));
-    const isAdmin = user && ['admin', 'logistics'].includes(user.role || user.userType);
+    const isAdmin = Boolean(user && ['admin', 'logistics'].includes(userRole));
     const isTokenAuthorized = Boolean(
       clientCheckoutToken
       && order.client_checkout_token

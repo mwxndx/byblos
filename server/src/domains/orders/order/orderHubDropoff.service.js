@@ -18,6 +18,7 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
 import { OrderStatus } from '../../../shared/constants/enums.js';
+import eventBus from '../../../application/events/eventBus.js';
 
 import OrderService from './OrderService.js';
 import LogisticsRequestService from '../../logistics/logisticsRequest.service.js';
