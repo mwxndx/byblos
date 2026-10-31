@@ -523,6 +523,7 @@ class OrderDeadlineService {
                             updated_at: new Date().toISOString()
                         };
 
+                        /** @type {Record<string, any>} */
                         const metaUpdate = {
                             refund_summary: refundSummary,
                             refund_credited: buyerRefunded ? true : false
@@ -713,6 +714,7 @@ class OrderDeadlineService {
                     updated_at: new Date().toISOString()
                 };
 
+                /** @type {Record<string, any>} */
                 const metaUpdate = {
                     refund_summary: refundSummary,
                     refund_credited: buyerRefunded ? true : false
