@@ -502,6 +502,7 @@ class OrderDeadlineService {
                             completed_at: new Date().toISOString()
                         };
 
+                        /** @type {Record<string, any>} */
                         let orderMeta = {};
                         if (lockedOrder.metadata) {
                             try {
@@ -691,6 +692,7 @@ class OrderDeadlineService {
                     completed_at: new Date().toISOString()
                 };
 
+                /** @type {Record<string, any>} */
                 let orderMeta = {};
                 if (lockedOrder.metadata) {
                     try {
