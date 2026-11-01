@@ -86,19 +86,18 @@ const ALLOWED_TEMPLATES = new Set([
   'creator-shop-request'
 ]);
 
-// Email templates are compiled once per name and cached for the lifetime of the process
-const templateCache = new Map();
+// Email template paths cached for the lifetime of the process
+const templatePathCache = new Map();
 const readTemplate = async (templateName, data) => {
   if (!ALLOWED_TEMPLATES.has(templateName)) {
     throw new Error(`Unauthorized email template: ${templateName}`);
   }
-  let compiled = templateCache.get(templateName);
-  if (!compiled) {
+  let templatePath = templatePathCache.get(templateName);
+  if (!templatePath) {
     const candidatePaths = [
       join(__dirname, `../../email-templates/${templateName}.ejs`),
       join(__dirname, `../../../email-templates/${templateName}.ejs`)
     ];
-    let templatePath = null;
     for (const candidate of candidatePaths) {
       try {
         await fs.promises.access(candidate);
@@ -111,11 +110,9 @@ const readTemplate = async (templateName, data) => {
     if (!templatePath) {
       throw new Error(`Email template not found: ${templateName}`);
     }
-    const templateContent = await fs.promises.readFile(templatePath, 'utf-8');
-    compiled = ejs.compile(templateContent);
-    templateCache.set(templateName, compiled);
+    templatePathCache.set(templateName, templatePath);
   }
-  return compiled(data);
+  return ejs.renderFile(templatePath, data, { cache: true });
 };
 
 // Validate recipient email address format before sending to prevent SMTP injection or addressparser ReDoS
