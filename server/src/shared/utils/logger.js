@@ -13,46 +13,44 @@ if (!fs.existsSync(logsDir)) {
 }
 
 const require = createRequire(import.meta.url);
-/** @type {any} */
-let winston;
-/** @type {any} */
-let DailyRotateFile;
-/** @type {import('winston').Logger | any} */
-let logger;
 
-try {
-  winston = require('winston');
-  DailyRotateFile = require('winston-daily-rotate-file');
-} catch (error) {
-  const formatMessage = (message, meta) => {
-    if (meta.length === 0) return message;
-    return `${message} ${meta.map(item => {
-      if (item instanceof Error) return item.stack || item.message;
-      if (typeof item === 'string') return item;
-      try {
-        return JSON.stringify(item);
-      } catch {
-        return String(item);
-      }
-    }).join(' ')}`;
-  };
+function createLoggerInstance() {
+  /** @type {any} */
+  let winston;
+  /** @type {any} */
+  let DailyRotateFile;
 
-  const fallbackLogger = {
-    debug: (message, ...meta) => console.debug(formatMessage(message, meta)),
-    info: (message, ...meta) => console.info(formatMessage(message, meta)),
-    warn: (message, ...meta) => console.warn(formatMessage(message, meta)),
-    error: (message, ...meta) => console.error(formatMessage(message, meta)),
-    stream: {
-      write: (message) => console.info(String(message).trim()),
-    },
-  };
+  try {
+    winston = require('winston');
+    DailyRotateFile = require('winston-daily-rotate-file');
+  } catch (error) {
+    const formatMessage = (message, meta) => {
+      if (meta.length === 0) return message;
+      return `${message} ${meta.map(item => {
+        if (item instanceof Error) return item.stack || item.message;
+        if (typeof item === 'string') return item;
+        try {
+          return JSON.stringify(item);
+        } catch {
+          return String(item);
+        }
+      }).join(' ')}`;
+    };
 
-  console.warn('[LOGGER] winston transports unavailable; using console logger fallback', error.message);
-  logger = fallbackLogger;
-}
+    const fallbackLogger = {
+      debug: (message, ...meta) => console.debug(formatMessage(message, meta)),
+      info: (message, ...meta) => console.info(formatMessage(message, meta)),
+      warn: (message, ...meta) => console.warn(formatMessage(message, meta)),
+      error: (message, ...meta) => console.error(formatMessage(message, meta)),
+      stream: {
+        write: (message) => console.info(String(message).trim()),
+      },
+    };
 
-// Create a simple console logger
-if (!logger) {
+    console.warn('[LOGGER] winston transports unavailable; using console logger fallback', error.message);
+    return fallbackLogger;
+  }
+
   const fileTransportsDisabled = process.env.DISABLE_FILE_LOGS === 'true' || process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'production';
   const transports = [
     // Console transport - Always enabled for Docker/Render container visibility
@@ -92,26 +90,27 @@ if (!logger) {
     );
   }
 
-  logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-  format: winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.errors({ stack: true }), // Include stack trace
-    winston.format.json() // Production logs should be JSON
-  ),
-  transports,
-  exitOnError: false, // Don't exit on handled exceptions
+  const inst = winston.createLogger({
+    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+    format: winston.format.combine(
+      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      winston.format.errors({ stack: true }), // Include stack trace
+      winston.format.json() // Production logs should be JSON
+    ),
+    transports,
+    exitOnError: false, // Don't exit on handled exceptions
   });
+
+  inst.stream = {
+    write: (message) => {
+      inst.info(message.trim());
+    },
+  };
+
+  return inst;
 }
 
-// No longer silencing console in production to ensure Docker logs work correctly.
-
-
-// Create a stream object for morgan
-logger.stream = {
-  write: (message) => {
-    logger.info(message.trim());
-  },
-};
+/** @type {import('winston').Logger | any} */
+const logger = createLoggerInstance();
 
 export default logger;

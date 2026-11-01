@@ -80,7 +80,7 @@ describe('UniversalHttpClient — keyed token refresh (Android role race)', () =
     expect(buyer.status).toBe(200);
     // The bug: a single shared promise would refresh only one role and the
     // other would retry with an expired token. The fix refreshes both.
-    expect(refreshCalls.sort()).toEqual(['buyer', 'seller']);
+    expect(refreshCalls.sort((a, b) => a.localeCompare(b))).toEqual(['buyer', 'seller']);
   });
 
   test('Web: concurrent 401s share ONE refresh (single-flight preserved)', async () => {

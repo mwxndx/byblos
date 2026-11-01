@@ -21,7 +21,7 @@ describe('withdrawalFees utility', () => {
       expect(getWithdrawalFee(0)).toBe(0);
       expect(getWithdrawalFee(-10)).toBe(0);
       expect(getWithdrawalFee(49.99)).toBe(0);
-      expect(getWithdrawalFee(NaN)).toBe(0);
+      expect(getWithdrawalFee(Number.NaN)).toBe(0);
       expect(getWithdrawalFee(Infinity)).toBe(0);
     });
 

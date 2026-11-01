@@ -151,8 +151,13 @@ class PaystackTransferClient {
         let normalized = raw
             .toLowerCase()
             .replace(/[^a-z0-9_-]+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^[-_]+/, '').replace(/[-_]+$/, '');
+            .replace(/-+/g, '-');
+
+        let start = 0;
+        let end = normalized.length;
+        while (start < end && (normalized.charCodeAt(start) === 45 || normalized.charCodeAt(start) === 95)) start++;
+        while (end > start && (normalized.charCodeAt(end - 1) === 45 || normalized.charCodeAt(end - 1) === 95)) end--;
+        normalized = normalized.slice(start, end);
 
         if (normalized.length >= 16 && normalized.length <= 50) {
             return normalized;
@@ -161,8 +166,10 @@ class PaystackTransferClient {
         const suffix = crypto.createHash('sha256').update(raw).digest('hex').slice(0, 16);
         const base = normalized || 'byblos-transfer';
         const maxBaseLength = 50 - suffix.length - 1;
-        const trimmedBase = base.slice(0, maxBaseLength);
-        const cleanBase = (trimmedBase.endsWith('-') || trimmedBase.endsWith('_')) ? trimmedBase.replace(/[-_]+$/, '') : trimmedBase;
+        let cleanBase = base.slice(0, maxBaseLength);
+        let cleanEnd = cleanBase.length;
+        while (cleanEnd > 0 && (cleanBase.charCodeAt(cleanEnd - 1) === 45 || cleanBase.charCodeAt(cleanEnd - 1) === 95)) cleanEnd--;
+        cleanBase = cleanBase.slice(0, cleanEnd);
         normalized = `${cleanBase}-${suffix}`;
 
         if (normalized.length < 16) {

@@ -167,7 +167,7 @@ export async function registerNativePushNotifications(
     void registerWebPush(role, requestConfig);
     return;
   }
-  if (isRegisteringNativePush && registrationPromise) {
+  if (isRegisteringNativePush && registrationPromise !== null) {
     return await registrationPromise;
   }
 

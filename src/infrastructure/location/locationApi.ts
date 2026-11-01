@@ -16,7 +16,7 @@ let cachedConfigPromise: Promise<LocationMapConfig> | null = null;
 let hasCachedConfigPromise = false;
 
 export async function getLocationConfig(): Promise<LocationMapConfig> {
-  if (hasCachedConfigPromise && cachedConfigPromise) {
+  if (hasCachedConfigPromise && cachedConfigPromise !== null) {
     return await cachedConfigPromise;
   }
 

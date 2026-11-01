@@ -86,7 +86,7 @@ describe('Live ETA API and Logistics Query Keys', () => {
 
     const result = await fetchOrderLiveEta('42');
     expect(result).toEqual(mockEtaData);
-    expect(result.routeProgress).toBe(0.65);
+    expect(result.routeProgress).toBeCloseTo(0.65);
     expect(result.etaMinutes).toBe(15);
   });
 

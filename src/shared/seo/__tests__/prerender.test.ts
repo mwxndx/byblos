@@ -3,6 +3,23 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { generateHtml, pages, SITE_URL } from '../../../../scripts/prerender-public-pages.mjs';
 
+function stripHtmlTags(html: string): string {
+  let inTag = false;
+  let out = '';
+  for (let i = 0; i < html.length; i++) {
+    const ch = html[i];
+    if (ch === '<') {
+      inTag = true;
+      out += ' ';
+    } else if (ch === '>') {
+      inTag = false;
+    } else if (!inTag) {
+      out += ch;
+    }
+  }
+  return out;
+}
+
 describe('Public Pages Static Pre-rendering (SSG)', () => {
   const dummyTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -41,7 +58,7 @@ describe('Public Pages Static Pre-rendering (SSG)', () => {
       expect(page.content).toBeTruthy();
 
       // Ensure word count is rich (> 200 words)
-      const rawText = page.content.replace(/<[^>]+>/g, ' ');
+      const rawText = stripHtmlTags(page.content);
       const words = rawText.split(/\s+/).filter(Boolean);
       expect(words.length).toBeGreaterThan(200);
     }
@@ -90,7 +107,7 @@ describe('Public Pages Static Pre-rendering (SSG)', () => {
         expect(fileContent).toContain('class="prerender-fallback"');
 
         // Check word count of the generated file
-        const textOnly = fileContent.replace(/<[^>]+>/g, ' ');
+        const textOnly = stripHtmlTags(fileContent);
         const wordCount = textOnly.split(/\s+/).filter(Boolean).length;
         expect(wordCount).toBeGreaterThan(500);
       }

@@ -5,8 +5,6 @@ import logger from '../../shared/utils/logger.js';
 dotenv.config();
 
 const { Pool } = pg;
-/** @type {import('pg').Pool} */
-let pool;
 
 // Required environment variables for database:
 // Either individual DB_* variables or a valid DATABASE_URL must be provided.
@@ -93,7 +91,8 @@ const logTarget = hasIndividualVars
   : (process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:([^:@]+)@/, ':***@') : 'DATABASE_URL');
 logger.info(`Initializing database pool: ${logTarget} (SSL: ${!!dbConfig.ssl}, Pool Max: ${dbConfig.max})`);
 
-pool = new Pool(dbConfig);
+/** @type {import('pg').Pool} */
+const pool = new Pool(dbConfig);
 
 export { pool };
 

@@ -8,9 +8,25 @@ const SALT_ROUNDS = 10;
 
 const query = (text, params) => pool.query(text, params);
 
+function trimHyphens(str) {
+  if (!str) return '';
+  let start = 0;
+  let end = str.length;
+  while (start < end && str.charCodeAt(start) === 45 /* '-' */) start++;
+  while (end > start && str.charCodeAt(end - 1) === 45 /* '-' */) end--;
+  return str.slice(start, end);
+}
+
+function slugifyShopName(name) {
+  if (!name) return null;
+  const replaced = String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
+  const slug = trimHyphens(replaced);
+  return slug || null;
+}
+
 export const createSeller = async (sellerData, externalClient = null) => {
   const { fullName, shopName, email, whatsappNumber, city, location, physicalAddress, latitude, longitude, userId = null, termsAccepted = false } = sellerData;
-  const slug = shopName ? String(shopName).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').replace(/-+$/, '') : null;
+  const slug = slugifyShopName(shopName);
 
   const result = await (externalClient || pool).query(
     `INSERT INTO sellers (full_name, shop_name, slug, email, whatsapp_number, city, location, physical_address, latitude, longitude, user_id, terms_accepted, terms_accepted_at)
@@ -86,7 +102,7 @@ export const findSellerByShopName = async (shopName) => {
 
   logger.debug('Executing findSellerByShopName query', { shopName: rawInput.replace(/[\n\r]/g, '') });
 
-  const slugified = rawInput.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+/, '').replace(/-+$/, '');
+  const slugified = slugifyShopName(rawInput) || '';
   const unslugified = rawInput.replaceAll('-', ' ');
 
   const queryText = `

@@ -6,8 +6,6 @@ function stripTrailingSlash(url) {
 }
 
 // @ts-nocheck
-'use strict';
-
 import crypto from 'node:crypto';
 
 // @ts-ignore

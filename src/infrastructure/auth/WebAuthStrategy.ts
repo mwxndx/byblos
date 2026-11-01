@@ -9,7 +9,7 @@ let hasActiveCsrfFetch = false;
 const CSRF_TTL = 10 * 60 * 1000; // 10 minutes
 
 export const getFreshCsrfToken = async (): Promise<string | null> => {
-  if (hasActiveCsrfFetch && csrfFetchPromise) {
+  if (hasActiveCsrfFetch && csrfFetchPromise !== null) {
     return await csrfFetchPromise;
   }
 
