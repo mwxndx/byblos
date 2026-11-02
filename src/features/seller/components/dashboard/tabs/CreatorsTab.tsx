@@ -30,7 +30,7 @@ import {
 } from '@/features/seller/hooks/useSellerCreators';
 import { useInviteCreatorMutation } from '@/features/seller/hooks/useSellerProfile';
 
-const inputClass = 'h-11 border-[#34343a] bg-[#121214] text-white placeholder:text-[#a1a1a6] rounded-[12px] focus-visible:ring-1 focus-visible:ring-[#f5c518]';
+const inputClass = 'h-11 border-slate-200 dark:border-separator bg-white dark:bg-[#141414] text-slate-900 dark:text-white placeholder:text-slate-500 dark:text-white/40';
 
 function getListingButtonContent(isPending: boolean, isMarketplaceEnabled: boolean) {
   if (isPending) return <Loader2 className="h-4 w-4 animate-spin" />;

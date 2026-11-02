@@ -1,5 +1,6 @@
+import { Button } from '@/shared/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
-import { AlertTriangle, RefreshCw, ShieldCheck, XCircle } from '@/shared/ui/icons';
+import { CheckCircle, Package, RefreshCw, XCircle } from '@/shared/ui/icons';
 import type { ApiOrder } from '@/shared/types';
 import { getBuyerServiceCharge, isServiceOrder } from '@/features/orders/utils/ordersSectionUtils';
 import { OrderDetailsDialog } from './OrderDetailsDialog';
@@ -47,123 +48,134 @@ export function BuyerOrderDialogs({
   const selectedOrderServiceCharge = getBuyerServiceCharge(selectedOrderForDetails);
 
   const confirmationContent = currentIsService ? (
-    <div className="space-y-2 text-center">
-      <p className="text-sm text-slate-600 dark:text-[#a1a1a6] leading-relaxed">
-        By clicking <strong>Confirm Receipt</strong>, you confirm that the service was completed. Once confirmed, funds will be released to the provider.
+    <div className="space-y-4">
+      <p>By clicking <strong>"Mark Service Completed"</strong>, you agree that the service has been completed to your satisfaction.</p>
+      <p className="text-sm text-label-2">
+        Once confirmed, funds will be released to the provider.
       </p>
     </div>
   ) : (
-    <div className="space-y-2 text-center">
-      <p className="text-sm text-slate-600 dark:text-[#a1a1a6] leading-relaxed">
-        By clicking Confirm Receipt, you confirm you received your order. Once confirmed, funds will be released to the provider.
+    <div className="space-y-4">
+      <p>
+        Have you picked up and inspected your package from{' '}
+        <strong>
+          "{currentIsHubCollection ? 'Dynamic Mall, Tom Mboya St, Nairobi | Shop SL 32' : currentOrder?.seller?.physicalAddress || currentOrder?.seller?.shopName || 'the seller'}"
+        </strong>?
       </p>
-      {showPhysicalReceiptLocation && (
-        <p className="text-xs text-slate-500 dark:text-[#8a8a91] pt-1">
-          Collection location: <strong>{currentOrder?.seller?.physicalAddress || 'Dynamic Mall, Tom Mboya St, Nairobi | Shop SL 32'}</strong>
-        </p>
-      )}
+      <p className="text-sm text-label-2">
+        Please only confirm after you have physically received and inspected your package.
+      </p>
     </div>
   );
 
   return (
     <>
-      {/* ── Cancel Order Dialog matching Penpot ── */}
       <Dialog open={showCancelDialog} onOpenChange={onCancelDialogChange}>
-        <DialogContent className="w-[92vw] sm:max-w-[360px] bg-white dark:bg-[#27272c] border border-slate-200 dark:border-[#34343a] text-slate-950 dark:text-white rounded-[20px] p-6 shadow-2xl transition-colors duration-200 text-center">
-          <div className="w-14 h-14 rounded-full bg-[#ff5a52]/15 border border-[#ff5a52]/30 flex items-center justify-center mx-auto text-[#ff5a52] mb-3">
-            <AlertTriangle className="h-7 w-7" />
-          </div>
-
-          <DialogHeader className="space-y-2 text-center">
-            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white text-center">
+        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
+              <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+                <XCircle className="h-4 w-4 text-label" />
+              </div>
               Cancel Order
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-600 dark:text-[#a1a1a6] leading-relaxed text-center">
-              Are you sure you want to cancel this order? This action cannot be undone. You will receive a refund to your account balance.
+            <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
+              Are you sure you want to cancel this order? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="mt-5 flex flex-col gap-2.5 sm:flex-col sm:space-x-0">
-            <button
-              type="button"
+          <div className="bg-red-50 dark:bg-red-500/15 border border-red-200 dark:border-red-400/30 rounded-xl p-3 my-2">
+            <p className="text-sm text-red-800 dark:text-red-100 font-semibold">
+              This action cannot be undone. You will receive a refund to your account balance.
+            </p>
+          </div>
+
+          <DialogFooter className="mt-4 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onCancelDialogChange(false)}
+              disabled={isCancelling === currentOrderId}
+              className="border-slate-300 dark:border-white/20 bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+            >
+              No, Keep Order
+            </Button>
+            <Button
               onClick={onCancelOrder}
               disabled={isCancelling === currentOrderId}
-              className="h-14 w-full rounded-[14px] bg-[#ff5a52] text-white font-semibold text-base hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
             >
               {isCancelling === currentOrderId ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Cancelling...</span>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Cancelling...
                 </>
               ) : (
-                'Cancel Order'
+                'Yes, Cancel Order'
               )}
-            </button>
-            <button
-              type="button"
-              onClick={() => onCancelDialogChange(false)}
-              disabled={isCancelling === currentOrderId}
-              className="h-14 w-full rounded-[14px] border border-slate-200 dark:border-[#34343a] bg-transparent text-slate-800 dark:text-white font-semibold text-base hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
-            >
-              No, Keep Order
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <OrderDetailsDialog
-        order={selectedOrderForDetails}
-        serviceCharge={selectedOrderServiceCharge}
-        onClose={() => onSelectedOrderChange(null)}
-        onViewImage={onViewingImageChange}
-        onConfirmReceiptClick={onConfirmReceiptClick}
-      />
+      <OrderDetailsDialog order={selectedOrderForDetails} serviceCharge={selectedOrderServiceCharge} onClose={() => onSelectedOrderChange(null)} onViewImage={onViewingImageChange} onConfirmReceiptClick={onConfirmReceiptClick} />
 
-      {/* ── Confirm Delivery Dialog matching Penpot ── */}
       <Dialog open={showReceiptDialog} onOpenChange={onReceiptDialogChange}>
-        <DialogContent className="w-[92vw] sm:max-w-[360px] bg-white dark:bg-[#27272c] border border-slate-200 dark:border-[#34343a] text-slate-950 dark:text-white rounded-[20px] p-6 shadow-2xl transition-colors duration-200 text-center">
-          <div className="w-14 h-14 rounded-full bg-[#30d158]/15 border border-[#30d158]/30 flex items-center justify-center mx-auto text-[#30d158] mb-3">
-            <ShieldCheck className="h-7 w-7" />
-          </div>
-
-          <DialogHeader className="space-y-2 text-center">
-            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white text-center">
-              Delivery Confirmation
+        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
+              <div className={`w-8 h-8 bg-gradient-to-r ${currentIsService ? 'from-purple-500 to-indigo-500' : 'from-green-500 to-emerald-500'} rounded-full flex items-center justify-center`}>
+                <CheckCircle className="h-4 w-4 text-label" />
+              </div>
+              {currentIsService ? 'Confirm Service Completion' : 'Confirm Package Receipt'}
             </DialogTitle>
-            <DialogDescription asChild>
+            <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
               {confirmationContent}
             </DialogDescription>
           </DialogHeader>
 
-          <DialogFooter className="mt-5 flex flex-col gap-2.5 sm:flex-col sm:space-x-0">
-            <button
-              type="button"
+          {showPhysicalReceiptLocation && (
+            <div className="bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-400/30 rounded-xl p-4 my-3">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Package className="h-4 w-4 text-label" />
+                </div>
+                <div>
+                  <h5 className="text-sm font-bold text-blue-900 dark:text-blue-100">Delivery Confirmation</h5>
+                  <p className="text-xs text-blue-700 dark:text-blue-200/80 mt-1 leading-relaxed">
+                    By clicking confirm below, you verify that you have physically inspected your order and received it in good condition.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="mt-4 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onReceiptDialogChange(false)}
+              disabled={isConfirming === currentOrderId}
+              className="border-slate-300 dark:border-white/20 bg-white dark:bg-transparent text-slate-800 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+            >
+              Not Yet
+            </Button>
+            <Button
               onClick={onConfirmReceipt}
               disabled={isConfirming === currentOrderId}
-              className="h-14 w-full rounded-[14px] bg-slate-900 text-white dark:bg-white dark:text-black font-semibold text-base hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
             >
               {isConfirming === currentOrderId ? (
                 <>
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  <span>Confirming...</span>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Confirming...
                 </>
               ) : (
-                'Confirm Receipt'
+                'Yes, I Have Received It'
               )}
-            </button>
-            <button
-              type="button"
-              onClick={() => onReceiptDialogChange(false)}
-              disabled={isConfirming === currentOrderId}
-              className="h-14 w-full rounded-[14px] border border-slate-200 dark:border-[#34343a] bg-transparent text-slate-800 dark:text-white font-semibold text-base hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
-            >
-              Not Yet
-            </button>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ── Image Preview Modal ── */}
       <Dialog open={!!viewingImage} onOpenChange={(open) => !open && onViewingImageChange(null)}>
         <DialogContent className="sm:max-w-3xl bg-transparent border-0 shadow-none p-0 flex items-center justify-center pointer-events-none">
           <DialogHeader className="sr-only">
@@ -173,7 +185,7 @@ export function BuyerOrderDialogs({
           <div className="relative w-full h-full flex items-center justify-center pointer-events-auto">
             <button
               onClick={() => onViewingImageChange(null)}
-              className="absolute -top-10 right-0 sm:-right-10 z-50 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors border border-white/20"
+              className="absolute -top-10 right-0 sm:-right-10 z-50 p-2 bg-black/50 hover:bg-black/70 rounded-full text-label transition-colors border border-white/20"
             >
               <XCircle className="h-6 w-6" />
             </button>
@@ -190,3 +202,5 @@ export function BuyerOrderDialogs({
     </>
   );
 }
+
+

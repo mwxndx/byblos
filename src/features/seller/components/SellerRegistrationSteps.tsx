@@ -1,8 +1,11 @@
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
-import { Eye, EyeOff, Globe, Store } from '@/shared/ui/icons';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
+import { Store, Globe, Check, X, Eye, EyeOff } from '@/shared/ui/icons';
 import ShopLocationPicker from '@/shared/components/ShopLocationPicker';
-import { locationData, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
-import { PasswordChecklist } from '@/features/auth/components/PasswordChecklist';
+import { checkPasswordStrength, locationData, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
 
 interface SellerRegistrationStepsProps {
   currentStep: number;
@@ -46,299 +49,320 @@ export const SellerRegistrationSteps = ({
   isExistingUser,
 }: SellerRegistrationStepsProps) => {
   return (
-    <div className="w-full flex flex-col gap-4">
-      {/* Step 1: Shop & Contact */}
-      {currentStep === 1 && (
-        <>
-          <div className="grid grid-cols-2 gap-3 w-full">
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="firstName" className="text-[13px] font-medium text-[#a1a1a6]">
-                First name
-              </label>
-              <input
-                id="firstName"
-                name="firstName"
-                type="text"
-                placeholder="Amina"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                required
-                className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-              />
-            </div>
+    <>
+                {/* Step 1: Shop & Contact */}
+                {currentStep === 1 && (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                      <div className="space-y-0.5 sm:space-y-2">
+                        <Label htmlFor="firstName" className="text-[10px] sm:text-sm font-medium text-gray-200">
+                          First Name
+                        </Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          type="text"
+                          placeholder="First Name"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          required
+                          className="input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base"
+                        />
+                      </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="lastName" className="text-[13px] font-medium text-[#a1a1a6]">
-                Last name
-              </label>
-              <input
-                id="lastName"
-                name="lastName"
-                type="text"
-                placeholder="Wanjiru"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                required
-                className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-              />
-            </div>
-          </div>
+                      <div className="space-y-0.5 sm:space-y-2">
+                        <Label htmlFor="lastName" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          Last Name
+                        </Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          type="text"
+                          placeholder="Last Name"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          required
+                          className="input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base"
+                        />
+                      </div>
+                    </div>
 
-          <div className="flex flex-col gap-1.5 w-full">
-            <div className="flex items-center justify-between">
-              <label htmlFor="shopName" className="text-[13px] font-medium text-[#a1a1a6]">
-                Shop name
-              </label>
-              {formData.shopName.length >= 3 && (
-                <span
-                  className={`text-[11px] font-semibold tracking-wider ${
-                    isCheckingShopName
-                      ? 'text-[#a1a1a6]'
-                      : shopNameAvailable
-                      ? 'text-[#30d158]'
-                      : 'text-[#ff453a]'
-                  }`}
-                >
-                  {isCheckingShopName ? 'Checking...' : shopNameAvailable ? 'Available' : 'Taken'}
-                </span>
-              )}
-            </div>
-            <input
-              id="shopName"
-              name="shopName"
-              type="text"
-              placeholder="Unique shop name"
-              value={formData.shopName}
-              onChange={handleInputChange}
-              required
-              className={`h-14 w-full bg-[#27272c] border ${
-                shopNameAvailable === false ? 'border-red-500' : 'border-[#34343a]'
-              } focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors`}
-            />
-            <p className="text-[11px] text-[#8a8a91]">
-              byblosafrica.site/{formData.shopName.toLowerCase() || 'yourshop'}
-            </p>
-          </div>
+                    <div className="space-y-0.5 sm:space-y-2">
+                      <Label htmlFor="shopName" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                        Shop Name
+                        {formData.shopName.length >= 3 && (
+                          <span className={`text-[8px] sm:text-[10px] font-bold uppercase tracking-wider ${shopNameAvailable ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                            {isCheckingShopName ? 'Checking...' : shopNameAvailable ? 'Available' : 'Taken'}
+                          </span>
+                        )}
+                      </Label>
+                      <Input
+                        id="shopName"
+                        name="shopName"
+                        type="text"
+                        placeholder="Unique shop name"
+                        value={formData.shopName}
+                        onChange={handleInputChange}
+                        required
+                        className={`input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base ${shopNameAvailable === false ? 'border-red-500' : ''}`}
+                      />
+                      <p className="text-[8px] sm:text-[10px] text-slate-500 dark:text-slate-400">byblosafrica.site/{formData.shopName.toLowerCase() || 'yourshop'}</p>
+                    </div>
 
-          <div className="flex flex-col gap-1.5 w-full">
-            <div className="flex items-center justify-between">
-              <label htmlFor="email" className="text-[13px] font-medium text-[#a1a1a6]">
-                Email address
-              </label>
-              {isExistingUser && (
-                <span className="text-[11px] text-[#f5c518] font-semibold">Linked to Byblos account</span>
-              )}
-            </div>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="you@example.com"
-              value={formData.email}
-              onChange={handleInputChange}
-              readOnly={isExistingUser}
-              required
-              className={`h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors ${
-                isExistingUser ? 'opacity-80 cursor-not-allowed' : ''
-              }`}
-            />
-          </div>
-        </>
-      )}
+                    <div className="space-y-0.5 sm:space-y-2">
+                      <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                        <span>Email Address</span>
+                        {isExistingUser && (
+                          <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>
+                        )}
+                      </Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder="Your email address"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        readOnly={isExistingUser}
+                        required
+                        className={`input-mobile !pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base ${isExistingUser ? 'opacity-80 cursor-not-allowed' : ''}`}
+                      />
+                    </div>
 
-      {/* Step 2: Location */}
-      {currentStep === 2 && (
-        <>
-          <div className="flex flex-col gap-1.5 w-full">
-            <label htmlFor="city" className="text-[13px] font-medium text-[#a1a1a6]">
-              City
-            </label>
-            <select
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData((prev) => ({ ...prev, city: e.target.value, location: '' }))}
-              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] transition-colors appearance-none cursor-pointer"
-            >
-              <option value="Nairobi" className="bg-[#27272c] text-white">Nairobi</option>
-            </select>
-          </div>
+                  </>
+                )}
 
-          <div className="flex flex-col gap-1.5 w-full">
-            <label htmlFor="location" className="text-[13px] font-medium text-[#a1a1a6]">
-              Area / location
-            </label>
-            <select
-              id="location"
-              value={formData.location}
-              onChange={(e) => setFormData((prev) => ({ ...prev, location: e.target.value }))}
-              disabled={!formData.city}
-              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] transition-colors appearance-none cursor-pointer"
-            >
-              <option value="" disabled className="bg-[#27272c] text-[#8a8a91]">
-                Select your area
-              </option>
-              {formData.city &&
-                locationData[formData.city]?.sort((a, b) => a.localeCompare(b)).map((area) => (
-                  <option key={area} value={area} className="bg-[#27272c] text-white">
-                    {area}
-                  </option>
-                ))}
-            </select>
-          </div>
-        </>
-      )}
+                {/* Step 2: Location */}
+                {currentStep === 2 && (
+                  <>
+                    <div className="space-y-0.5 sm:space-y-2">
+                      <Label className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">City</Label>
+                      <Select
+                        value={formData.city}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, city: value, location: '' }))}
+                      >
+                        <SelectTrigger className="!pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-white dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-white focus:ring-white text-[10px] sm:text-base">
+                          <SelectValue placeholder="Nairobi" className="text-slate-400 dark:text-slate-400" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
+                          <SelectItem value="Nairobi" className="text-slate-900 dark:text-white focus:bg-gray-100 focus:text-black dark:focus:bg-white/10 dark:focus:text-white text-xs">
+                            Nairobi
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-      {/* Step 3: Shop Type / Location */}
-      {currentStep === 3 && (
-        <div className="w-full flex flex-col gap-4">
-          {hasPhysicalShop === null ? (
-            <div className="grid grid-cols-2 gap-3 w-full pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setHasPhysicalShop(false);
-                  setFormData((prev) => ({
-                    ...prev,
-                    physicalAddress: '',
-                    latitude: undefined,
-                    longitude: undefined,
-                  }));
-                  setCurrentStep(4);
-                }}
-                className="h-32 rounded-[14.5px] bg-[#27272c] border border-[#34343a] hover:border-[#f5c518] p-4 flex flex-col items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
-              >
-                <Globe className="w-8 h-8 text-[#a1a1a6]" />
-                <span className="text-[14px] font-semibold text-white">Online only</span>
-              </button>
+                    <div className="space-y-0.5 sm:space-y-2">
+                      <Label className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">Area/Location</Label>
+                      <Select
+                        value={formData.location}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, location: value }))}
+                        disabled={!formData.city}
+                      >
+                        <SelectTrigger className="!pl-4 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-white dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-white focus:ring-white disabled:opacity-50 text-[10px] sm:text-base">
+                          <SelectValue placeholder={formData.city ? 'Select your area' : 'Select city first'} className="text-slate-400 dark:text-slate-400" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
+                          {formData.city && locationData[formData.city]?.sort((a, b) => a.localeCompare(b)).map((area) => (
+                            <SelectItem key={area} value={area} className="text-slate-900 dark:text-white focus:bg-gray-100 focus:text-black dark:focus:bg-white/10 dark:focus:text-white text-xs">{area}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </>
+                )}
 
-              <button
-                type="button"
-                onClick={() => setHasPhysicalShop(true)}
-                className="h-32 rounded-[14.5px] bg-[#27272c] border border-[#34343a] hover:border-[#f5c518] p-4 flex flex-col items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
-              >
-                <Store className="w-8 h-8 text-[#f5c518]" />
-                <span className="text-[14px] font-semibold text-white">Physical shop</span>
-              </button>
-            </div>
-          ) : (
-            <div className="w-full">
-              {hasPhysicalShop && (
-                <ShopLocationPicker
-                  initialAddress={formData.physicalAddress}
-                  initialCoordinates={
-                    formData.latitude && formData.longitude
-                      ? { lat: formData.latitude, lng: formData.longitude }
-                      : null
-                  }
-                  onLocationChange={(address, coords) => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      physicalAddress: address,
-                      latitude: coords?.lat,
-                      longitude: coords?.lng,
-                    }));
-                  }}
-                />
-              )}
-            </div>
-          )}
-        </div>
-      )}
+                {/* Step 3: Shop Details */}
+                {currentStep === 3 && (
+                  <div className="space-y-4 animate-in fade-in duration-500">
+                    {hasPhysicalShop === null ? (
+                      <div className="space-y-6 py-4">
+                        <div className="text-center space-y-2">
+                          <h3 className="text-lg font-bold text-slate-950 dark:text-white">Do you have a physical shop?</h3>
+                          <p className="text-slate-600 dark:text-slate-400 text-xs font-medium">
+                            Adding your shop location helps local customers find you easily.
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              setHasPhysicalShop(false);
+                              setFormData(prev => ({ ...prev, physicalAddress: '', latitude: undefined, longitude: undefined }));
+                              setCurrentStep(4); // Move directly to verification
+                            }}
+                            variant="ghost"
+                            className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-all group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill uppercase tracking-wider bg-slate-50 dark:bg-fill text-center"
+                          >
+                            <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Globe className="h-8 w-8 text-slate-500 dark:text-zinc-400 group-hover:text-slate-950 dark:group-hover:text-white" />
+                            </div>
+                            <span className="font-bold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
+                              Online Only
+                            </span>
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => setHasPhysicalShop(true)}
+                            variant="ghost"
+                            className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-all group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill uppercase tracking-wider bg-slate-50 dark:bg-fill text-center"
+                          >
+                            <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Store className="h-8 w-8 text-slate-800 dark:text-white" />
+                            </div>
+                            <span className="font-bold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
+                              Have a Shop
+                            </span>
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4 animate-in zoom-in-95 duration-300">
+                        {hasPhysicalShop && (
+                          <ShopLocationPicker
+                            initialAddress={formData.physicalAddress}
+                            initialCoordinates={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : null}
+                            onLocationChange={(address, coords) => {
+                              setFormData(prev => ({
+                                ...prev,
+                                physicalAddress: address,
+                                latitude: coords?.lat,
+                                longitude: coords?.lng
+                              }));
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-      {/* Step 4: Password */}
-      {currentStep === 4 && (
-        <>
-          {isExistingUser && (
-            <p className="text-xs text-[#f5c518] font-medium bg-[#f5c518]/10 p-3 rounded-xl border border-[#f5c518]/30">
-              Enter your existing Byblos account password to link your seller profile.
-            </p>
-          )}
+                {/* Step 4: Security */}
+                {currentStep === 4 && (
+                  <>
+                    {isExistingUser && (
+                      <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-400/10 dark:bg-yellow-400/15 p-2 rounded-lg border border-yellow-400/30">
+                        Enter your existing Byblos account password to link your seller profile.
+                      </p>
+                    )}
+                    <div className="space-y-0.5 sm:space-y-2">
+                      <Label htmlFor="password" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        Password
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="password"
+                          name="password"
+                          type={showPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
+                          placeholder="Create a password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                          className="input-mobile !pl-4 !pr-8 sm:!pr-12 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base"
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 pr-2 sm:pr-4 flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                          ) : (
+                            <Eye className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
 
-          <div className="flex flex-col gap-1.5 w-full">
-            <label htmlFor="password" className="text-[13px] font-medium text-[#a1a1a6]">
-              Password
-            </label>
-            <div className="relative w-full">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] pl-4 pr-12 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[#8a8a91] hover:text-white transition-colors"
-                onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
-          </div>
+                    {/* Password Strength Checklist */}
+                    {formData.password && (
+                      <div className="mt-2 p-3 bg-slate-100 dark:bg-fill rounded-xl border border-slate-200 dark:border-separator">
+                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">Password Requirements:</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {[
+                            { label: "8+ chars", met: checkPasswordStrength(formData.password).minLength },
+                            { label: "1 Number", met: checkPasswordStrength(formData.password).hasNumber },
+                            { label: "1 Special", met: checkPasswordStrength(formData.password).hasSpecial },
+                            { label: "Upper/Lower", met: checkPasswordStrength(formData.password).hasUpper && checkPasswordStrength(formData.password).hasLower },
+                          ].map((req) => (
+                            <div key={req.label} className="flex items-center space-x-2">
+                              {req.met ? (
+                                <div className="bg-green-500/20 p-0.5 rounded-full">
+                                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600 dark:text-green-400" />
+                                </div>
+                              ) : (
+                                <div className="bg-slate-300 dark:bg-gray-700 p-0.5 rounded-full">
+                                  <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-600 dark:text-label-2" />
+                                </div>
+                              )}
+                              <span className={`text-[10px] sm:text-xs ${req.met ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-slate-600 dark:text-label-2'}`}>
+                                {req.label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-          <div className="flex flex-col gap-1.5 w-full">
-            <label htmlFor="confirmPassword" className="text-[13px] font-medium text-[#a1a1a6]">
-              Confirm password
-            </label>
-            <div className="relative w-full">
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-                className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] pl-4 pr-12 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[#8a8a91] hover:text-white transition-colors"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
-            {passwordError && <p className="text-xs text-red-400 mt-0.5">{passwordError}</p>}
-          </div>
+                    <div className="space-y-0.5 sm:space-y-2">
+                      <Label htmlFor="confirmPassword" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        Confirm Password
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          name="confirmPassword"
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
+                          placeholder="Confirm your password"
+                          value={formData.confirmPassword}
+                          onChange={handleInputChange}
+                          required
+                          className="input-mobile !pl-4 !pr-8 sm:!pr-12 h-8 sm:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-base"
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 pr-2 sm:pr-4 flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                          ) : (
+                            <Eye className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                          )}
+                        </button>
+                      </div>
+                      {passwordError && (
+                        <p className="text-[10px] sm:text-sm text-red-500 dark:text-red-400 font-semibold">{passwordError}</p>
+                      )}
+                    </div>
 
-          <PasswordChecklist
-            password={formData.password}
-            confirmPassword={formData.confirmPassword}
-            title="PASSWORD REQUIREMENTS"
-            showMatch={false}
-          />
-
-          <div className="flex items-center gap-3 pt-1">
-            <input
-              type="checkbox"
-              id="termsAccepted"
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-              className="w-4 h-4 rounded border-[#34343a] bg-[#27272c] text-[#f5c518] focus:ring-[#f5c518] accent-[#f5c518] cursor-pointer"
-            />
-            <label htmlFor="termsAccepted" className="text-[13px] text-[#a1a1a6] cursor-pointer">
-              I agree to the{' '}
-              <button
-                type="button"
-                onClick={() => setIsTermsModalOpen(true)}
-                className="text-[#f5c518] hover:underline font-medium"
-              >
-                Terms and Privacy Policy
-              </button>
-            </label>
-          </div>
-        </>
-      )}
-    </div>
+                    <div className="pt-2">
+                      <div className="flex items-start space-x-2 bg-gray-900/40 p-3 rounded-xl border border-gray-800">
+                        <input
+                          type="checkbox"
+                          id="termsAccepted"
+                          checked={termsAccepted}
+                          onChange={(e) => setTermsAccepted(e.target.checked)}
+                          className="mt-1 h-4 w-4 rounded border-gray-700 bg-gray-800 text-yellow-500 focus:ring-yellow-500"
+                        />
+                        <Label htmlFor="termsAccepted" className="text-xs text-label-2 leading-tight">
+                          I agree to the{' '}
+                          <button
+                            type="button"
+                            onClick={() => setIsTermsModalOpen(true)}
+                            className="text-yellow-400 hover:text-yellow-300 font-medium underline underline-offset-2"
+                          >
+                            Terms & Conditions
+                          </button>
+                          {' '}and have read the Privacy Policy.
+                        </Label>
+                      </div>
+                    </div>
+                  </>
+                )}
+    </>
   );
 };
-export default SellerRegistrationSteps;

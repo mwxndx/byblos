@@ -9,7 +9,7 @@ import { MzigoJourneyStepper } from './MzigoJourneyStepper';
 function CallButton({ name, phone }: Readonly<{ name: string; phone?: string | null }>) {
   if (!phone) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#34343a] bg-[#121214] px-3 py-1.5 text-xs text-[#a1a1a6]">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-separator bg-white/[0.03] px-3 py-1.5 text-xs text-label-2">
         <Phone size={13} />
         {name}: no number
       </span>
@@ -18,9 +18,9 @@ function CallButton({ name, phone }: Readonly<{ name: string; phone?: string | n
   return (
     <a
       href={`tel:${phone}`}
-      className="inline-flex items-center gap-1.5 rounded-full border border-[#34343a] bg-[#121214] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#27272c]"
+      className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 text-xs font-semibold text-label transition hover:bg-white/10"
     >
-      <Phone size={13} className="text-[#f5c518]" />
+      <Phone size={13} />
       Call {name}
     </a>
   );
@@ -69,84 +69,79 @@ export function RequestCard({
   const isCodeInvalid = Boolean(trimmedCode && validation && !validation.isValid);
 
   const bannerTone = journey.state === 'attention'
-    ? 'border-red-500/30 bg-red-500/10 text-red-200'
-    : 'border-[#f5c518]/30 bg-[#f5c518]/10 text-[#f5c518]';
+    ? 'border-red-400/40 bg-red-400/10 text-red-200'
+    : 'border-amber-400/40 bg-amber-400/10 text-amber-100';
 
   return (
-    <article className={`rounded-[16px] border border-[#34343a] bg-[#27272c] p-4 text-white shadow-sm ${tone}`}>
+    <article className={`rounded-2xl border p-4 text-label shadow-[0_18px_45px_rgba(0,0,0,0.45)] ${tone}`}>
       {/* Top row — flow (deliver vs collect) on the left, timing on the right. */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
-          {isDoorDelivery ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold text-sky-200">
-              <Truck size={13} />
-              Door delivery
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f5c518]/30 bg-[#f5c518]/10 px-2.5 py-1 text-[11px] font-semibold text-[#f5c518]">
-              <Store size={13} />
-              Hub collection
-            </span>
-          )}
-          <span className="rounded-full bg-[#121214] border border-[#34343a] px-2 py-0.5 text-[10px] font-mono font-semibold text-[#a1a1a6]">
-            {request.order.orderNumber}
+        {isDoorDelivery ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/30 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold text-sky-200">
+            <Truck size={13} />
+            Door delivery
           </span>
-        </div>
-        {isCompleted ? (
-          <span className="text-[11px] font-semibold text-[#30d158]">Done · {formatDate(completedAt)}</span>
-        ) : request.isOverdue ? (
-          <span className="text-[11px] font-semibold text-[#ff5a52]">{deadlineText(request.deadlineAt, now)}</span>
         ) : (
-          <span className="text-[11px] text-[#a1a1a6]">Due {deadlineText(request.deadlineAt, now)}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2.5 py-1 text-[11px] font-semibold text-yellow-200">
+            <Store size={13} />
+            Hub collection
+          </span>
+        )}
+        {isCompleted ? (
+          <span className="text-[11px] font-semibold text-emerald-300">Done · {formatDate(completedAt)}</span>
+        ) : request.isOverdue ? (
+          <span className="text-[11px] font-semibold text-red-300">{deadlineText(request.deadlineAt, now)}</span>
+        ) : (
+          <span className="text-[11px] text-label-2">Due {deadlineText(request.deadlineAt, now)}</span>
         )}
       </div>
 
       {/* Product identity. */}
       <div className="mt-3 flex items-start gap-3">
-        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-[#34343a] bg-[#121214]">
+        <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-separator bg-black/45">
           {imageSrc ? (
             <img src={imageSrc} alt={productSummary} className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-[#a1a1a6]">
+            <div className="flex h-full w-full items-center justify-center text-label-2">
               <ShoppingBag size={18} />
             </div>
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-semibold text-white">{productSummary}</h3>
-          <p className="text-[11px] text-[#a1a1a6]">{sellerDisplayName}</p>
+          <h3 className="truncate text-base font-semibold text-label">{productSummary}</h3>
+          <p className="text-[11px] text-label-2">Order {request.order.orderNumber} · {sellerDisplayName}</p>
         </div>
       </div>
 
       {/* Journey stepper — now uses the correct track for each flow. */}
-      <div className="mt-3 rounded-xl border border-[#34343a] bg-[#121214] px-3 py-3">
+      <div className="mt-3 rounded-xl border border-separator bg-black/35 px-3 py-3">
         <MzigoJourneyStepper journey={journey} />
       </div>
 
       {/* Delayed / needs-attention overlay. */}
       {journey.state !== 'normal' && !isCompleted && (
-        <p className={`mt-3 rounded-xl border px-3 py-2 text-xs font-medium ${bannerTone}`}>
+        <p className={`mt-3 rounded-lg border px-3 py-2 text-xs font-medium ${bannerTone}`}>
           {journey.detail}
         </p>
       )}
 
       {/* Next stop — where to go for the current action, with a route link inline. */}
       {nextStop && (
-        <div className="mt-3 flex items-start gap-2 rounded-xl border border-[#34343a] bg-[#121214] px-3 py-2.5">
-          <MapPin size={15} className="mt-0.5 shrink-0 text-[#f5c518]" />
+        <div className="mt-3 flex items-start gap-2 rounded-xl border border-separator bg-black/40 px-3 py-2.5">
+          <MapPin size={15} className="mt-0.5 shrink-0 text-yellow-300" />
           <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-wide text-[#636366]">{nextStop.verb}</p>
-            <p className="truncate text-sm font-medium text-white">{nextStop.place}</p>
+            <p className="text-[11px] uppercase tracking-wide text-label-2">{nextStop.verb}</p>
+            <p className="truncate text-sm text-label">{nextStop.place}</p>
           </div>
           {route && (
             <a
               href={route.href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#f5c518] transition hover:underline"
+              className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-yellow-200 transition hover:text-yellow-100"
             >
               <Navigation size={13} />
-              Open map
+              Route
             </a>
           )}
         </div>
@@ -154,12 +149,12 @@ export function RequestCard({
 
       {/* Optional Handover verification code input for terminal handover */}
       {isHandoverAction && (
-        <div className="mt-3 rounded-xl border border-[#f5c518]/30 bg-[#121214] p-3">
+        <div className="mt-3 rounded-xl border border-yellow-400/30 bg-black/45 p-3">
           <div className="flex items-center justify-between gap-2">
-            <label htmlFor={`handover-code-${request.id}`} className="text-xs font-semibold text-[#f5c518]">
+            <label htmlFor={`handover-code-${request.id}`} className="text-xs font-semibold text-yellow-300">
               Package Handover Code / OTP
             </label>
-            <span className="text-[10px] text-[#a1a1a6]">Optional or 4-digit PIN</span>
+            <span className="text-[10px] text-label-2">Optional or 4-digit PIN</span>
           </div>
           <input
             id={`handover-code-${request.id}`}
@@ -168,10 +163,10 @@ export function RequestCard({
             onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
             placeholder="e.g. 1042 or BYB-LOG-..."
             maxLength={24}
-            className="mt-1.5 w-full rounded-xl border border-[#34343a] bg-[#27272c] px-3 py-2 text-xs font-mono tracking-wider text-white placeholder-[#636366] focus:border-[#f5c518] focus:outline-none"
+            className="mt-1.5 w-full rounded-xl border border-separator bg-black/60 px-3 py-2 text-xs font-mono tracking-wider text-white placeholder-white/30 focus:border-yellow-400 focus:outline-none"
           />
           {isCodeInvalid && validation?.error && (
-            <p className="mt-1.5 text-[11px] font-medium text-[#ff5a52]">{validation.error}</p>
+            <p className="mt-1.5 text-[11px] font-medium text-red-400">{validation.error}</p>
           )}
         </div>
       )}
@@ -186,7 +181,7 @@ export function RequestCard({
             const codeToSend = trimmedCode && validation?.isValid ? validation.sanitized : null;
             onStatusUpdate(request.id, actions.primary!.legType, actions.primary!.status, codeToSend);
           }}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#f5c518] px-4 py-2.5 text-sm font-bold text-black transition hover:bg-[#e0b415] disabled:cursor-not-allowed disabled:opacity-55 shadow-sm"
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-yellow-400 px-4 py-2.5 text-sm font-bold text-black transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-55"
         >
           {updatingStatusKey === `${request.id}:${actions.primary.legType}:${actions.primary.status}` && (
             <Loader2 size={15} className="animate-spin" />
@@ -200,7 +195,7 @@ export function RequestCard({
         type="button"
         onClick={() => setExpanded((v) => !v)}
         aria-expanded={expanded}
-        className="mt-2.5 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#34343a] bg-[#121214] px-3 py-2 text-xs font-semibold text-[#a1a1a6] transition hover:text-white"
+        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-label-2 transition hover:bg-white/10"
       >
         {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         {expanded ? 'Less' : 'More'}
@@ -219,7 +214,7 @@ export function RequestCard({
                   type="button"
                   disabled={Boolean(updatingStatusKey)}
                   onClick={() => onStatusUpdate(request.id, action.legType, action.status)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-[#34343a] bg-[#121214] px-3 py-1.5 text-xs font-semibold text-[#a1a1a6] transition hover:text-white disabled:cursor-not-allowed disabled:opacity-55"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-label-2 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   {updatingStatusKey === `${request.id}:${action.legType}:${action.status}` && (
                     <Loader2 size={12} className="animate-spin" />
@@ -230,12 +225,12 @@ export function RequestCard({
             </div>
           )}
 
-          <div className="rounded-xl border border-[#34343a] bg-[#121214] p-3">
-            <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[#a1a1a6]">
+          <div className="rounded-xl border border-separator bg-black/40 p-3">
+            <p className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
               <ShoppingBag size={13} />
               What&apos;s in the package
             </p>
-            <div className="space-y-1 text-xs text-[#a1a1a6]">
+            <div className="space-y-1 text-xs text-label-2">
               {request.product.items.map((item) => (
                 <p key={item.id}>
                   {item.name} &times;{item.quantity} — {formatCurrency(item.subtotal)}
@@ -245,39 +240,39 @@ export function RequestCard({
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-xl border border-[#34343a] bg-[#121214] p-3">
-              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[#a1a1a6]">
+            <div className="rounded-xl border border-separator bg-black/40 p-3">
+              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
                 <Store size={13} />
                 Pick up from
               </p>
-              <p className="text-sm font-semibold text-white">{sellerDisplayName}</p>
-              <p className="text-xs text-[#a1a1a6]">{sellerAddress}</p>
-              <p className="mt-1 text-xs text-[#636366]">{request.seller.phone || 'No phone saved'}</p>
+              <p className="text-sm font-semibold text-label">{sellerDisplayName}</p>
+              <p className="text-xs text-label-2">{sellerAddress}</p>
+              <p className="mt-1 text-xs text-label-2">{request.seller.phone || 'No phone saved'}</p>
             </div>
 
-            <div className="rounded-xl border border-[#34343a] bg-[#121214] p-3">
-              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-[#a1a1a6]">
+            <div className="rounded-xl border border-separator bg-black/40 p-3">
+              <p className="mb-1 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
                 <UserRound size={13} />
                 Deliver to
               </p>
-              <p className="text-sm font-semibold text-white">{buyerName}</p>
-              <p className="text-xs text-[#a1a1a6]">{buyerAddress}</p>
-              <p className="mt-1 text-xs text-[#636366]">{request.buyer.phone || 'No phone saved'}</p>
+              <p className="text-sm font-semibold text-label">{buyerName}</p>
+              <p className="text-xs text-label-2">{buyerAddress}</p>
+              <p className="mt-1 text-xs text-label-2">{request.buyer.phone || 'No phone saved'}</p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#34343a] bg-[#121214] p-3 text-xs">
-            <span className="flex items-center gap-1.5 text-[#a1a1a6]">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-separator bg-black/40 p-3 text-xs">
+            <span className="flex items-center gap-1.5 text-label-2">
               <MapPin size={13} />
               Handover: {request.sellerDropoff.address || request.sellerDropoff.label || 'hub'}
             </span>
-            <span className="text-[#a1a1a6]">
+            <span className="text-label-2">
               Fees — pickup {statusLabel(request.pickupFeeStatus)}, delivery {statusLabel(request.deliveryFeeStatus)}
             </span>
           </div>
 
           {request.events[0]?.message && (
-            <p className="rounded-xl border border-[#34343a] bg-[#121214] p-3 text-xs text-[#a1a1a6]">
+            <p className="rounded-xl border border-separator bg-black/40 p-3 text-xs text-label-2">
               Latest update: {request.events[0].message}
             </p>
           )}

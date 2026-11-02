@@ -1,10 +1,10 @@
-import { Home, Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
+import { BarChart3, Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
 import type { SellerTabId } from '../types';
 
 type SellerNavTabId = Exclude<SellerTabId, 'settings'>;
 
 const tabIcons: Record<SellerNavTabId, LucideIcon> = {
-  overview: Home,
+  overview: BarChart3,
   products: Package,
   orders: ShoppingBag,
   withdrawals: Wallet,
@@ -27,16 +27,16 @@ interface SellerDashboardTabsProps {
   onSelectTab: (tab: SellerTabId) => void;
 }
 
-// Fixed bottom navigation matching Penpot design system:
-// Solid #27272c container with #34343a border, 62px height,
-// gold active states (#f5c518) and muted inactive states (#a1a1a6).
+// Fixed bottom navigation, styled identically to the buyer bottom nav
+// (BuyerBottomNav): plain icons with a colour-only active state, a dot for
+// unread orders and a count pill for pending creators.
 export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreatorsCount = 0, onSelectTab }: Readonly<SellerDashboardTabsProps>) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-[#34343a] bg-[#27272c] pb-safe-bottom transition-colors duration-200"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"
       aria-label="Dashboard sections"
     >
-      <div className="flex h-[62px] items-center justify-around px-2 max-w-lg mx-auto">
+      <div className="flex h-14 items-center justify-around px-1">
         {tabs.map(({ id, label }) => {
           const Icon = tabIcons[id];
           const isActive = activeTab === id;
@@ -50,21 +50,21 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
               onClick={() => onSelectTab(id)}
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
-              className="relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-1 border-none bg-transparent py-1 transition-transform active:scale-95"
+              className="relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 border-none bg-transparent py-1.5 transition-opacity duration-150 active:scale-95"
             >
               <Icon
-                size={20}
-                className={isActive ? 'text-[#f5c518]' : 'text-[#a1a1a6]'}
+                size={18}
+                className={isActive ? 'text-[#F5C518]' : 'text-slate-500 transition-colors dark:text-white/50'}
               />
-              <span className={`text-[11px] font-medium transition-colors ${isActive ? 'font-semibold text-[#f5c518]' : 'text-[#a1a1a6]'}`}>
+              <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'font-bold text-[#F5C518]' : 'text-slate-500 dark:text-white/50'}`}>
                 {label}
               </span>
               {count > 0 ? (
-                <span className="absolute top-1.5 right-[50%] flex h-[16px] min-w-[16px] translate-x-[14px] items-center justify-center rounded-full bg-[#f5c518] px-1 text-[9px] font-bold text-black shadow-sm">
+                <span className="absolute top-1 right-[50%] flex h-[15px] min-w-[15px] translate-x-[12px] items-center justify-center rounded-full bg-[#F5C518] px-1 text-[9px] font-semibold text-black shadow-sm">
                   {count > 99 ? '99+' : count}
                 </span>
               ) : showDot ? (
-                <div className="absolute top-2 right-[50%] h-2 w-2 translate-x-[12px] rounded-full bg-[#f5c518] ring-2 ring-[#27272c]" />
+                <div className="absolute top-1.5 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-[#F5C518] ring-2 ring-black" />
               ) : null}
             </button>
           );
@@ -73,4 +73,3 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
     </nav>
   );
 }
-

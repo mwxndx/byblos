@@ -249,21 +249,9 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
     return <SellerDashboardErrorState error={error} onRetry={fetchData} />;
   }
 
-  const activeSellerProfile = (liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile;
-  const shopUsername = getShopUsername(sellerProfile?.shopName);
-  const canonicalSlug = sellerProfile?.slug || (liveSellerProfile as unknown as typeof sellerProfile)?.slug || sellerProfile?.shopName;
-  const shopUrl = canonicalSlug ? getShopUrl(canonicalSlug) : '';
-
   return (
-    <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[#121214] text-white transition-colors duration-200" style={{ minHeight: '100%', height: '100%', overflowY: 'hidden' } as React.CSSProperties}>
-      <SellerDashboardHeader
-        sellerFirstName={sellerFirstName}
-        sellerProfile={activeSellerProfile}
-        shopUsername={shopUsername}
-        shopUrl={shopUrl}
-        onCopyShopLink={handleCopyShopLink}
-        onOpenProfile={() => setIsProfileOpen(true)}
-      />
+    <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ minHeight: '100%', height: '100%', overflowY: 'hidden' } as React.CSSProperties}>
+      <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       {/* Main Content Area */}
       <div className="relative flex-1 min-h-0 overflow-hidden">
@@ -271,7 +259,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchCancel}
-          className="h-full overflow-y-auto overflow-x-hidden bg-[#121214]"
+          className="h-full overflow-y-auto overflow-x-hidden"
           style={{
             WebkitOverflowScrolling: 'touch',
             scrollBehavior: 'smooth',
@@ -282,16 +270,14 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
             style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
           >
-          {activeTab !== 'overview' && (
-            <div className="mb-5 mt-1 sm:mb-6">
-              <SellerProfileHero
-                sellerProfile={activeSellerProfile}
-                shopUsername={shopUsername}
-                onCopyShopLink={handleCopyShopLink}
-                canEdit
-              />
-            </div>
-          )}
+          <div className="mb-5 mt-1 sm:mb-6">
+            <SellerProfileHero
+              sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
+              shopUsername={getShopUsername(sellerProfile?.shopName)}
+              onCopyShopLink={handleCopyShopLink}
+              canEdit
+            />
+          </div>
 
           {activeTab === 'orders' && <OrdersTab />}
 
@@ -312,9 +298,8 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             <OverviewTab
               analytics={analytics}
               pendingOverviewOrders={pendingOverviewOrders}
-              sellerProfile={activeSellerProfile}
+              sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
               onSelectTab={handleSelectTab}
-              onCopyShopLink={handleCopyShopLink}
             />
           )}
 

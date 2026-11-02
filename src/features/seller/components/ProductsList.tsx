@@ -57,11 +57,11 @@ export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: 
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="mx-auto w-16 h-16 bg-[#121214] border border-[#34343a] rounded-full flex items-center justify-center mb-4">
-          <Plus className="h-8 w-8 text-[#f5c518]" />
+        <div className="mx-auto w-16 h-16 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mb-4">
+          <Plus className="h-8 w-8 text-emerald-400" />
         </div>
-        <h3 className="text-lg font-medium text-white mb-1">No products yet</h3>
-        <p className="text-[#a1a1a6] text-sm">Get started by adding your first product from the button above</p>
+        <h3 className="text-lg font-medium text-slate-950 mb-1">No products yet</h3>
+        <p className="text-slate-700">Get started by adding your first product from the button above</p>
       </div>
     );
   }
@@ -80,20 +80,20 @@ export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: 
       />
 
       <div className="relative max-w-md">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#a1a1a6] pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
         <Input
           aria-label="Search products"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           placeholder="Search products..."
-          className="bg-[#27272c] border-[#34343a] text-white placeholder:text-[#a1a1a6] rounded-[14px] pl-10 h-11 focus-visible:ring-1 focus-visible:ring-[#f5c518]"
+          className="bg-white border-slate-200 text-slate-950 placeholder:text-slate-500 rounded-xl pl-10 h-10"
         />
       </div>
 
       {filteredProducts.length === 0 ? (
-        <div className="rounded-[16px] border border-[#34343a] bg-[#27272c] p-8 text-center shadow-sm">
-          <p className="text-[#a1a1a6] text-sm">No products match "{searchQuery}".</p>
-          <Button variant="link" className="mt-2 text-[#f5c518]" onClick={() => setSearchQuery('')}>
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-slate-700">No products match "{searchQuery}".</p>
+          <Button variant="link" className="mt-2 text-yellow-700" onClick={() => setSearchQuery('')}>
             Clear search
           </Button>
         </div>

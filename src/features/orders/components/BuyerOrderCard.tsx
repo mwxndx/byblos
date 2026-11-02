@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { OrderStatusBadge } from '@/shared/ui/OrderStatusBadge';
-import { Check, ChevronDown, Download, Loader2, ShieldCheck } from '@/shared/ui/icons';
+import { ChevronDown, Download, Loader2, Package } from '@/shared/ui/icons';
 import type { ApiOrder } from '@/shared/types';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
 import { getOrderInstruction } from '@/features/orders/utils/orderInstructions';
 import { OrderLogisticsTracking } from './OrderLogisticsTracking';
 import {
   canConfirmOrderReceipt,
+  OrderMetaPills,
   formatOrderCurrency,
   formatOrderDate,
   getConfirmReceiptLabel,
@@ -27,12 +29,25 @@ interface BuyerOrderCardProps {
   onDownload: (order: ApiOrder) => void;
 }
 
+
 function deriveBuyerOrderProductType(order: ApiOrder, isService: boolean, isDigital: boolean): string {
   if (order.order_type) return order.order_type;
   if (order.orderType) return order.orderType;
   if (isService) return 'SERVICE';
   if (isDigital) return 'DIGITAL';
   return order.items[0]?.productType || 'PHYSICAL';
+}
+
+function getBuyerOrderCardBorder(isService: boolean, isDigital: boolean): string {
+  if (isService) return 'border-purple-400/45';
+  if (isDigital) return 'border-red-400/45';
+  return 'border-white/15';
+}
+
+function getBuyerOrderItemClass(isService: boolean, isDigital: boolean): string {
+  if (isService) return 'bg-purple-500/10 border-purple-400/25';
+  if (isDigital) return 'bg-red-500/10 border-red-400/25';
+  return 'bg-white/8 border-white/12';
 }
 
 export function BuyerOrderCard({
@@ -47,6 +62,10 @@ export function BuyerOrderCard({
   const mainImage = mainItem?.imageUrl ? getImageUrl(mainItem.imageUrl) : null;
   const isService = isServiceOrder(order);
   const isDigital = isDigitalOrder(order);
+  // order.order_type / orderType is authoritative; isService/isDigital above
+  // already check it first, so deriving productType from them keeps this in
+  // sync instead of re-guessing from the first item's own (often-unset)
+  // productType field.
   const productType = deriveBuyerOrderProductType(order, isService, isDigital);
   const canConfirmReceipt = canConfirmOrderReceipt(order);
   const buyerServiceCharge = getBuyerServiceCharge(order);
@@ -56,176 +75,192 @@ export function BuyerOrderCard({
     orderType: productType.toUpperCase(),
     fulfillmentType: order.fulfillment_type,
   });
+  const cardClasses = [
+    'overflow-hidden transition-all duration-300 bg-black border shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40',
+    getBuyerOrderCardBorder(isService, isDigital)
+  ].join(' ');
+  const itemClasses = [
+    'flex items-center justify-between gap-3 sm:gap-4 p-2 sm:p-3 rounded-lg border transition-colors',
+    getBuyerOrderItemClass(isService, isDigital)
+  ].join(' ');
 
   const [expanded, setExpanded] = useState(false);
   const itemCount = order.items?.length || 0;
   const extraCount = itemCount > 1 ? itemCount - 1 : 0;
   const summaryName = mainItem?.name || `#${order.orderNumber || order.id.slice(0, 8).toUpperCase()}`;
 
-  const shopName = order.seller?.shopName || order.seller?.name || 'Shop';
-  const shopInitial = shopName.trim().charAt(0).toUpperCase();
-
   return (
-    <Card className="overflow-hidden transition-all duration-200 bg-white dark:bg-[#27272c] border border-slate-200 dark:border-[#34343a] rounded-[16px] shadow-sm">
+    <Card className={cardClasses}>
       <CardContent className="p-0">
-        {/* Top bar with shop avatar + name, order number, and status */}
-        <div className="flex items-center justify-between gap-3 p-4 sm:p-5 border-b border-slate-100 dark:border-[#34343a]/70">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-[#34343a] bg-slate-100 dark:bg-[#121214] flex items-center justify-center font-bold text-xs text-slate-800 dark:text-white">
-              {mainImage ? (
-                <img src={mainImage} alt={shopName} className="h-full w-full object-cover" />
-              ) : (
-                <span>{shopInitial}</span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-slate-900 dark:text-white">
-                {shopName}
-              </p>
-              <p className="text-[11px] text-slate-500 dark:text-[#a1a1a6] font-medium">
-                #{order.orderNumber || order.id.slice(0, 8).toUpperCase()}
-              </p>
-            </div>
+        {/* Collapsed summary bar — always visible */}
+        <div className="flex items-center gap-3 p-4 sm:p-5">
+          <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/15 bg-white/10 sm:h-14 sm:w-14">
+            {mainImage ? (
+              <img src={mainImage} alt={summaryName} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-label-2">
+                <Package className="h-5 w-5" />
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <OrderStatusBadge status={order.status} viewerRole="buyer" />
-            {getPaymentStatusBadge(order.paymentStatus)}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-label sm:text-base">
+              {summaryName}
+              {extraCount > 0 && <span className="text-label-2"> +{extraCount} more</span>}
+            </p>
+            <p className="text-[11px] text-label-2 sm:text-xs">{formatOrderDate(order)}</p>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+            className="shrink-0 gap-1 rounded-lg border border-white/15 px-2.5 text-xs font-semibold text-label hover:bg-white/10 hover:text-white sm:px-3"
+          >
+            <span className="hidden sm:inline">{expanded ? 'Hide details' : 'View details'}</span>
+            <span className="sm:hidden">{expanded ? 'Hide' : 'Details'}</span>
+            <ChevronDown className={cn('h-4 w-4 transition-transform', expanded && 'rotate-180')} />
+          </Button>
         </div>
 
-        {/* 3-column Meta Grid: Items, Placed, Total */}
-        <div className="p-4 sm:p-5 space-y-3.5">
-          <div className="grid grid-cols-3 gap-2 py-2 px-3 rounded-[12px] bg-slate-50 dark:bg-[#121214] border border-slate-100 dark:border-[#34343a]/50 text-center">
-            <div>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#a1a1a6] font-medium">Items</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-0.5">
-                {itemCount} {itemCount === 1 ? 'item' : 'items'}
-              </p>
+        {expanded && (
+        <>
+        <div className="p-4 sm:p-6 border-b border-separator">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                <h3 className="text-lg sm:text-xl font-bold text-label">
+                  #{order.orderNumber || order.id.slice(0, 8).toUpperCase()}
+                </h3>
+                <div className="flex gap-1.5 sm:gap-2">
+                  <OrderStatusBadge status={order.status} viewerRole="buyer" />
+                  {getPaymentStatusBadge(order.paymentStatus)}
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#a1a1a6] font-medium">Placed</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-0.5">
-                {formatOrderDate(order)}
-              </p>
-            </div>
-            <div>
-              <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-[#a1a1a6] font-medium">Total</p>
-              <p className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+            <div className="text-right">
+              <p className="text-xs text-label-2 uppercase tracking-wider mb-1">Total</p>
+              <p className="text-xl sm:text-2xl font-bold text-label">
                 {formatOrderCurrency((order as unknown as Record<string, unknown>).total_amount as number || order.totalAmount, order.currency)}
               </p>
+              <p className="mt-1 text-[11px] font-medium text-label-2">
+                Includes 2% Byblos charge{buyerServiceCharge > 0 ? ` (${formatOrderCurrency(buyerServiceCharge, order.currency)})` : ''}
+              </p>
+            </div>
+          </div>
+          <OrderMetaPills
+            pills={[
+              { label: 'Shop', value: order.seller?.shopName || order.seller?.name || 'Store' },
+              { label: 'Items', value: `${itemCount} item${itemCount === 1 ? '' : 's'}` },
+              { label: 'Placed', value: formatOrderDate(order) },
+            ]}
+          />
+        </div>
+
+        {instruction && (
+          <div
+            className={cn(
+              'mx-4 sm:mx-6 mt-3 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors',
+              instruction.color === 'blue' && 'bg-blue-50 text-blue-950 border-blue-200 dark:bg-blue-950/40 dark:text-blue-200 dark:border-blue-500/30',
+              instruction.color === 'amber' && 'bg-amber-50 text-amber-950 border-amber-200 dark:bg-yellow-950/40 dark:text-yellow-200 dark:border-yellow-500/30',
+              instruction.color === 'green' && 'bg-emerald-50 text-emerald-950 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-500/30',
+              instruction.color === 'red' && 'bg-red-50 text-red-950 border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-500/30',
+            )}
+          >
+            {instruction.text}
+          </div>
+        )}
+
+        <div className="mx-4 sm:mx-6">
+          <OrderLogisticsTracking
+            order={order}
+            view="buyer"
+            isPhysical={productType.toLowerCase() === 'physical'}
+            formatCurrency={(value, currency) => formatOrderCurrency(value || 0, currency || order.currency)}
+          />
+        </div>
+
+        <div className="p-4 sm:p-6 space-y-2 sm:space-y-3">
+          {order.items.slice(0, 2).map((item, idx) => (
+            <div key={item.id ?? `${item.name}-${idx}`} className={itemClasses}>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm sm:text-base font-semibold text-label truncate">{item.name}</p>
+                <p className="text-xs text-label-2">Qty {item.quantity || 1}</p>
+              </div>
+              <p className="shrink-0 text-sm font-semibold text-label">{formatOrderCurrency(item.price || 0, order.currency)}</p>
+            </div>
+          ))}
+          {order.items.length > 2 && (
+            <p className="text-xs sm:text-sm text-center text-label-2 py-1 sm:py-2">
+              + {order.items.length - 2} more item{order.items.length - 2 > 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
+
+        <div className="p-4 sm:p-6 pt-0 flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {mainImage && (
+              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden border-2 border-white/15">
+                <img src={mainImage} alt="Seller" className="h-full w-full object-cover" />
+              </div>
+            )}
+            <div>
+              <p className="text-xs text-label-2">Seller</p>
+              <p className="text-sm sm:text-base font-semibold text-label">
+                {order.seller?.shopName || order.seller?.name || 'Store'}
+              </p>
             </div>
           </div>
 
-          {/* Escrow note with shield icon */}
-          <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-[#a1a1a6] px-1">
-            <ShieldCheck className="h-4 w-4 text-[#f5c518] shrink-0" />
-            <span className="leading-snug">
-              {canConfirmReceipt
-                ? 'Confirm receipt to release payment to the seller.'
-                : 'Your funds are held securely in escrow until delivery is confirmed.'}
-            </span>
-          </div>
-
-          {/* Action buttons row */}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
-            {canConfirmReceipt && (
-              <button
-                type="button"
-                onClick={() => onConfirmReceipt(order.id)}
-                className="h-10 px-4 rounded-[12px] bg-slate-900 text-white dark:bg-white dark:text-black font-semibold text-xs flex items-center gap-1.5 hover:opacity-90 transition-opacity"
-              >
-                <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-500" />
-                <span>{getConfirmReceiptLabel(order)}</span>
-              </button>
-            )}
-
-            <button
-              type="button"
+          <div className="flex gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 sm:flex-none border-white/20 hover:bg-white/10 text-label text-xs sm:text-sm"
               onClick={() => onViewDetails(order)}
-              className="h-10 px-4 rounded-[12px] border border-slate-200 dark:border-[#34343a] bg-transparent text-slate-800 dark:text-white font-semibold text-xs hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
             >
               View Details
-            </button>
+            </Button>
+
+            {canConfirmReceipt && (
+              <Button
+                size="sm"
+                className="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-label font-semibold text-xs sm:text-sm"
+                onClick={() => onConfirmReceipt(order.id)}
+              >
+                {getConfirmReceiptLabel(order)}
+              </Button>
+            )}
 
             {isPaidOrder(order) && isDigitalOrder(order) && (
-              <button
-                type="button"
+              <Button
+                size="sm"
+                className="flex-1 sm:flex-none bg-yellow-500 hover:bg-yellow-600 text-black font-semibold text-xs sm:text-sm gap-1.5"
                 onClick={() => onDownload(order)}
                 disabled={downloadingOrderId === order.id}
-                className="h-10 px-4 rounded-[12px] bg-[#f5c518] text-black font-semibold text-xs flex items-center gap-1.5 hover:bg-yellow-300 transition-colors disabled:opacity-50"
               >
                 {downloadingOrderId === order.id ? (
                   <>
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    <span>
-                      {downloadProgress[order.id] !== undefined
-                        ? `Downloading ${downloadProgress[order.id]}%`
-                        : 'Preparing...'}
-                    </span>
+                    {downloadProgress[order.id] !== undefined
+                      ? `Downloading ${downloadProgress[order.id]}%`
+                      : 'Preparing...'}
                   </>
                 ) : (
                   <>
                     <Download className="h-3.5 w-3.5" />
-                    <span>Download</span>
+                    Download
                   </>
                 )}
-              </button>
+              </Button>
             )}
-
-            <button
-              type="button"
-              onClick={() => setExpanded(v => !v)}
-              className="ml-auto h-10 px-3 rounded-[12px] text-xs font-semibold text-slate-500 dark:text-[#a1a1a6] hover:text-slate-800 dark:hover:text-white flex items-center gap-1 transition-colors"
-            >
-              <span>{expanded ? 'Hide Tracking' : 'Track'}</span>
-              <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', expanded && 'rotate-180')} />
-            </button>
           </div>
-
-          {/* Expanded logistics tracking & items */}
-          {expanded && (
-            <div className="pt-3 border-t border-slate-100 dark:border-[#34343a]/70 space-y-3">
-              {instruction && (
-                <div
-                  className={cn(
-                    'px-3.5 py-2 rounded-xl text-xs font-semibold border transition-colors',
-                    instruction.color === 'blue' && 'bg-blue-50 text-blue-950 border-blue-200 dark:bg-blue-950/40 dark:text-blue-200 dark:border-blue-500/30',
-                    instruction.color === 'amber' && 'bg-amber-50 text-amber-950 border-amber-200 dark:bg-yellow-950/40 dark:text-yellow-200 dark:border-yellow-500/30',
-                    instruction.color === 'green' && 'bg-emerald-50 text-emerald-950 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-500/30',
-                    instruction.color === 'red' && 'bg-red-50 text-red-950 border-red-200 dark:bg-red-950/40 dark:text-red-200 dark:border-red-500/30',
-                  )}
-                >
-                  {instruction.text}
-                </div>
-              )}
-
-              <OrderLogisticsTracking
-                order={order}
-                view="buyer"
-                isPhysical={productType.toLowerCase() === 'physical'}
-                formatCurrency={(value, currency) => formatOrderCurrency(value || 0, currency || order.currency)}
-              />
-
-              <div className="space-y-2 pt-1">
-                {order.items.map((item, idx) => (
-                  <div
-                    key={item.id ?? `${item.name}-${idx}`}
-                    className="flex items-center justify-between gap-3 p-2.5 rounded-[10px] bg-slate-50 dark:bg-[#121214] border border-slate-100 dark:border-[#34343a]/50 text-xs"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-slate-900 dark:text-white truncate">{item.name}</p>
-                      <p className="text-slate-500 dark:text-[#a1a1a6]">Qty: {item.quantity || 1}</p>
-                    </div>
-                    <p className="font-semibold text-slate-900 dark:text-white shrink-0">
-                      {formatOrderCurrency(item.price || 0, order.currency)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
+        </>
+        )}
       </CardContent>
     </Card>
   );
 }
+
+

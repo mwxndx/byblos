@@ -1,9 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loader2, Mail } from '@/shared/ui/icons';
+import { ArrowLeft, CheckCircle2, Loader2, Sparkles } from '@/shared/ui/icons';
 import { toast } from 'sonner';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { useForgotPasswordMutation } from '@/features/auth/hooks/useAuthMutations';
-import { PenpotAuthLayout } from '@/features/auth/components/PenpotAuthLayout';
 
 export default function CreatorForgotPassword() {
   const [email, setEmail] = useState('');
@@ -24,86 +25,82 @@ export default function CreatorForgotPassword() {
     }
   };
 
-  if (sent) {
-    return (
-      <PenpotAuthLayout
-        roleTag="CREATOR PORTAL"
-        title="Check your email"
-        subtitle="We’ve sent a reset link to your inbox. It can take a minute to arrive."
-        showTrustLine={true}
-        showBackButton={true}
-        onBack={() => navigate('/creator/login')}
-      >
-        <div className="w-full flex flex-col items-center gap-6">
-          <div className="w-16 h-16 rounded-full bg-[#f5c518]/15 border border-[#f5c518]/30 flex items-center justify-center text-[#f5c518]">
-            <Mail className="w-8 h-8" />
-          </div>
-
-          <p className="text-[14px] text-center text-[#a1a1a6] leading-relaxed">
-            If an account exists for <span className="text-white font-medium">{email}</span>, follow the instructions in the email to reset your password.
-          </p>
-
-          <Link
-            to="/creator/login"
-            className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm mt-2"
-          >
-            Back to log in
-          </Link>
-        </div>
-      </PenpotAuthLayout>
-    );
-  }
-
   return (
-    <PenpotAuthLayout
-      roleTag="CREATOR PORTAL"
-      title="Reset your password"
-      subtitle="Enter the email linked to your account and we’ll send you a reset link."
-      showTrustLine={true}
-      showBackButton={true}
-      onBack={() => navigate('/creator/login')}
-    >
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
-        {/* Email Field */}
-        <div className="flex flex-col gap-1.5 w-full">
-          <label htmlFor="email" className="text-[13px] font-medium text-[#a1a1a6]">
-            Email
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            autoComplete="email"
-            aria-label="Email"
-            required
-            disabled={forgotMut.isPending}
-            className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-          />
+    <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="relative flex h-16 items-center justify-between sm:h-20">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/creator/login')}
+              className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              <span>Back</span>
+            </Button>
+            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center gap-2 text-center sm:max-w-[50%]">
+              <Sparkles className="h-5 w-5 text-yellow-400 shrink-0" />
+              <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">Creator Portal</h1>
+            </div>
+            <div className="flex-1" aria-hidden="true" />
+          </div>
         </div>
+      </header>
 
-        {/* Primary Action Button */}
-        <button
-          type="submit"
-          disabled={forgotMut.isPending}
-          aria-label="Send reset link"
-          className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm mt-2 disabled:opacity-60 cursor-pointer"
-        >
-          {forgotMut.isPending ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Send reset link'}
-        </button>
-
-        {/* Back link */}
-        <div className="flex justify-center pt-2">
-          <Link
-            to="/creator/login"
-            className="text-[14px] font-medium text-[#f5c518] hover:underline transition-colors"
-          >
-            Back to log in
-          </Link>
+      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
+        <div className="my-auto w-full rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+          {sent ? (
+            <div className="space-y-4 text-center">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/15">
+                <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+              </span>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">Check your email</h1>
+              <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">
+                If an account exists for <span className="font-bold text-slate-900 dark:text-white/80">{email}</span>, we&apos;ve sent a link
+                to reset your password. It expires in 1 hour.
+              </p>
+              <Link
+                to="/creator/login"
+                className="btn-white inline-flex h-11 w-full items-center justify-center rounded-2xl bg-white font-semibold text-black transition hover:bg-gray-100 border border-gray-200 shadow-sm"
+              >
+                Back to log in
+              </Link>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Forgot password?</h1>
+                <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">
+                  Enter your account email and we&apos;ll send you a link to set a new password.
+                </p>
+              </div>
+              <Input
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                type="email"
+                aria-label="Email"
+                placeholder="Email"
+                className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400"
+                required
+              />
+              <Button
+                disabled={forgotMut.isPending}
+                className="btn-white h-12 w-full rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
+              >
+                {forgotMut.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Send reset link'}
+              </Button>
+              <p className="text-center text-sm font-medium text-slate-500 dark:text-white/50">
+                Remembered it?{' '}
+                <Link to="/creator/login" className="font-semibold text-yellow-500 dark:text-yellow-300 hover:text-yellow-400 dark:hover:text-yellow-200">
+                  Log in
+                </Link>
+              </p>
+            </form>
+          )}
         </div>
-      </form>
-    </PenpotAuthLayout>
+      </div>
+    </main>
   );
 }

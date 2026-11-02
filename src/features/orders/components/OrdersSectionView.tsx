@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Package, RefreshCw, Search } from '@/shared/ui/icons';
+import { ArrowRight, Package, RefreshCw, Search } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
+import { EmptyState } from '@/shared/ui/empty-state';
 import type { ApiOrder } from '@/shared/types';
 import { BuyerOrderCard } from './BuyerOrderCard';
 import { BuyerOrderDialogs } from './BuyerOrderDialogs';
@@ -90,44 +91,37 @@ export function OrdersSectionView({
 
   return (
     <div className="space-y-6">
-      {/* Search Bar matching Penpot #27272c / #34343a / 14px radius */}
+      {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-400 dark:text-[#8a8a91] pointer-events-none" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
         <Input
           type="text"
           aria-label="Search orders"
-          placeholder="Search orders"
+          placeholder="Search orders by item, shop, or order number..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="h-12 rounded-[14px] border border-slate-200 dark:border-[#34343a] bg-white dark:bg-[#27272c] pl-10 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#8a8a91] text-sm font-medium transition-colors"
+          className="border-stone-200 bg-stone-50 pl-9 focus-visible:ring-stone-400"
         />
       </div>
 
       {filteredOrders.length === 0 ? (
-        <div className="py-12 sm:py-16">
-          <div className="max-w-md mx-auto rounded-[16px] p-8 bg-white dark:bg-[#27272c] border border-slate-200 dark:border-[#34343a] text-center space-y-4 shadow-sm transition-colors duration-200">
-            <div className="w-[72px] h-[72px] mx-auto bg-[#f5c518]/15 border border-[#f5c518]/30 rounded-2xl flex items-center justify-center text-[#f5c518] shadow-sm">
-              <Package className="h-8 w-8" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-              No orders found
-            </h3>
-            <p className="text-slate-600 dark:text-[#a1a1a6] text-sm leading-relaxed max-w-sm mx-auto">
-              {searchQuery
-                ? 'No orders match your search. Try different keywords.'
-                : 'When you buy from a shop, your orders and their delivery progress show up here.'}
-            </p>
-            {!searchQuery && (
-              <button
-                type="button"
-                onClick={() => { window.location.href = '/buyer/dashboard'; }}
-                className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-slate-900 text-white dark:bg-white dark:text-black font-semibold text-sm hover:opacity-90 transition-opacity"
+        <EmptyState
+          icon={<Package className="h-7 w-7" />}
+          title="No orders found"
+          description={searchQuery ? 'No orders match your search. Try different keywords.' : "You haven't placed any orders yet. Start shopping!"}
+          action={
+            !searchQuery ? (
+              <Button
+                variant="outline"
+                className="border-slate-300 dark:border-white/20 text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/10"
+                onClick={() => window.location.href = '/'}
               >
                 Browse Products
-              </button>
-            )}
-          </div>
-        </div>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="space-y-4">
           {filteredOrders.map(order => (

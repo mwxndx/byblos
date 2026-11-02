@@ -51,8 +51,8 @@ export const AdminWithdrawalsTab = ({
   processingRequestId,
 }: AdminWithdrawalsTabProps) => {
   return (
-    <Card className="bg-[#27272c] border border-[#34343a] rounded-2xl overflow-hidden shadow-sm">
-      <CardHeader className="p-4 sm:p-6 md:p-8 border-b border-[#34343a] bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-6">
+    <Card className="bg-surface-1 backdrop-blur-2xl border border-separator rounded-card overflow-hidden shadow-2xl">
+      <CardHeader className="p-4 sm:p-6 md:p-8 border-b border-separator bg-white/[0.01] flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 md:gap-6">
         <div>
           <CardTitle className="text-xl sm:text-2xl md:text-3xl font-semibold text-label tracking-tight">Payouts</CardTitle>
           <CardDescription className="text-xs md:text-sm text-label-2 font-medium">Seller withdrawal requests</CardDescription>

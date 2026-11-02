@@ -19,8 +19,8 @@ describe('BuyerBottomNav', () => {
     // Sticks to bottom
     expect(nav).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'z-50');
 
-    // Solid colors for light & dark themes (matching Penpot #27272c dark token)
-    expect(nav).toHaveClass('bg-white', 'dark:bg-[#27272c]');
+    // Solid colors for light & dark themes
+    expect(nav).toHaveClass('bg-white', 'dark:bg-[#000000]');
 
     // Must NOT have translucent /95 or backdrop-blur
     expect(nav.className).not.toContain('/95');

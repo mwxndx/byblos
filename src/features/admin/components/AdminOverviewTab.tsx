@@ -31,7 +31,7 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* App Release Management Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 bg-[#27272c] rounded-2xl border border-[#34343a] shadow-sm gap-3.5 sm:gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 bg-surface-1 rounded-2xl border border-separator shadow-sm gap-3.5 sm:gap-4">
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0">
             <UploadCloud className="w-5 h-5 sm:w-6 sm:h-6" />

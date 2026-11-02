@@ -57,7 +57,6 @@ export {
   EnvelopeSimple as MailPlus,
   MapPin,
   Megaphone,
-  List,
   List as Menu,
   ChatCircle as MessageCircle,
   ChatText as MessageSquare,

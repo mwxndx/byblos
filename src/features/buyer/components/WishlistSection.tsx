@@ -13,24 +13,17 @@ export default function WishlistSection() {
 
   if (wishlist.length === 0) {
     return (
-      <div className="py-12 sm:py-16">
-        <div className="max-w-md mx-auto rounded-[16px] p-8 bg-white dark:bg-[#27272c] border border-slate-200 dark:border-[#34343a] text-center space-y-4 shadow-sm transition-colors duration-200">
-          <div className="w-[72px] h-[72px] mx-auto bg-[#f5c518]/15 border border-[#f5c518]/30 rounded-2xl flex items-center justify-center text-[#f5c518] shadow-sm">
-            <Heart className="h-8 w-8 fill-current" />
+      <div className="text-center py-16 sm:py-20 lg:py-24">
+        <div className="max-w-2xl mx-auto rounded-3xl p-10 sm:p-12 bg-white dark:bg-black border border-slate-200/80 dark:border-separator shadow-xl dark:shadow-2xl transition-colors duration-200">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-yellow-400/15 dark:bg-yellow-400/10 border border-yellow-400/20 rounded-3xl flex items-center justify-center shadow-sm">
+            <Heart className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 text-yellow-500 dark:text-yellow-400 fill-current" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+          <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">
             Your wishlist is empty
           </h3>
-          <p className="text-slate-600 dark:text-[#a1a1a6] text-sm leading-relaxed max-w-sm mx-auto">
-            Tap the heart on any product to save it here for later.
+          <p className="text-slate-600 dark:text-zinc-400 text-sm sm:text-base lg:text-lg font-normal max-w-md mx-auto px-4">
+            Start adding items you love to your wishlist and they'll appear here
           </p>
-          <button
-            type="button"
-            onClick={() => navigate('/buyer/dashboard')}
-            className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-slate-900 text-white dark:bg-white dark:text-black font-semibold text-sm hover:opacity-90 transition-opacity"
-          >
-            Browse shops
-          </button>
         </div>
       </div>
     );
@@ -46,20 +39,20 @@ export default function WishlistSection() {
   return (
     <div className="space-y-6">
       <div className="relative w-full max-w-sm ml-auto mb-6">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-[#8a8a91] pointer-events-none z-10" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 pointer-events-none z-10" />
         <Input
           type="text"
           aria-label="Search wishlist"
           placeholder="Search wishlist..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="bg-white dark:bg-[#27272c] border border-slate-200 dark:border-[#34343a] text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#8a8a91] rounded-[14px] pl-10 h-11 shadow-sm transition-colors"
+          className="bg-white dark:bg-fill border border-slate-200 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 rounded-xl pl-10 h-10 shadow-sm transition-colors"
         />
       </div>
 
       {filteredWishlist.length === 0 && searchQuery ? (
-        <div className="text-center py-12 px-4 bg-slate-100 dark:bg-[#27272c] rounded-2xl border border-slate-200 dark:border-[#34343a]">
-          <p className="text-slate-500 dark:text-[#a1a1a6] text-sm">No items found matching "{searchQuery}"</p>
+        <div className="text-center py-12 px-4 bg-slate-100 dark:bg-fill rounded-2xl border border-slate-200 dark:border-separator">
+          <p className="text-slate-500 dark:text-slate-400">No items found matching "{searchQuery}"</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-5">
@@ -89,3 +82,5 @@ export default function WishlistSection() {
     </div>
   );
 }
+
+

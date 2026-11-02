@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Eye, EyeOff, Loader2 } from '@/shared/ui/icons';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Sparkles, X } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { useCreatorRegisterMutation } from '@/features/creator/hooks/mutations/useCreatorAuthMutations';
 import { useCreatorInviteQuery } from '@/features/creator/hooks/queries/useCreatorInviteQuery';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { Label } from '@/shared/ui/label';
 import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
 import TermsModal from '@/shared/components/TermsModal';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
+
 import { useGlobalAuth } from '@/features/auth/hooks/useGlobalAuth';
-import { PenpotAuthLayout } from '@/features/auth/components/PenpotAuthLayout';
-import { PasswordChecklist } from '@/features/auth/components/PasswordChecklist';
 
 type CreatorInvite = {
   email?: string;
@@ -90,7 +91,15 @@ export default function CreatorRegister() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  const passwordStrength = {
+    minLength: form.password.length >= 8,
+    hasNumber: /\d/.test(form.password),
+    hasSpecial: /[!@#$%^&*(),.?":{}|<>]/.test(form.password),
+    hasUpper: /[A-Z]/.test(form.password),
+    hasLower: /[a-z]/.test(form.password)
+  };
   const passwordsMatch = form.password.length > 0 && form.password === form.confirmPassword;
+
   const registerMutation = useCreatorRegisterMutation();
 
   useModalBackDismiss(existingAccountPrompt, () => setExistingAccountPrompt(false));
@@ -144,10 +153,10 @@ export default function CreatorRegister() {
   // If a token was provided in the URL, validate it first
   if (token && inviteLoading) {
     return (
-      <main className="min-h-screen bg-[#121214] text-white flex items-center justify-center px-4">
-        <div className="flex items-center gap-3 rounded-2xl border border-[#34343a] bg-[#27272c] px-5 py-3 shadow-xl">
-          <Loader2 className="h-5 w-5 animate-spin text-[#f5c518]" />
-          <span className="text-sm font-semibold text-white/80">Validating invite link...</span>
+      <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex items-center justify-center px-4 transition-colors duration-200">
+        <div className="flex items-center gap-3 rounded-full border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 px-5 py-3 shadow-xl">
+          <Loader2 className="h-5 w-5 animate-spin text-yellow-500" />
+          <span className="text-sm font-semibold text-slate-800 dark:text-white/80">Validating invite link...</span>
         </div>
       </main>
     );
@@ -158,13 +167,13 @@ export default function CreatorRegister() {
     const errorMsg = getErrorMessage(inviteError, 'This creator invite link is missing or has expired.');
     const isAlreadyUsed = errorMsg.toLowerCase().includes('already been used') || errorMsg.toLowerCase().includes('already used');
     return (
-      <main className="min-h-screen bg-[#121214] text-white flex items-center justify-center px-4">
-        <div className="max-w-md w-full rounded-3xl border border-[#34343a] bg-[#27272c] p-8 text-center space-y-4 shadow-2xl">
+      <main className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex items-center justify-center px-4 transition-colors duration-200">
+        <div className="max-w-md w-full rounded-3xl border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-8 text-center space-y-4 shadow-2xl">
           <div className="text-4xl">{isAlreadyUsed ? '✅' : '🔗'}</div>
-          <h1 className="text-xl font-semibold tracking-tight text-white">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
             {isAlreadyUsed ? 'Invite Already Used' : 'Invalid invite link'}
           </h1>
-          <p className="text-sm text-[#a1a1a6] leading-relaxed">
+          <p className="text-sm text-slate-600 dark:text-white/55 leading-relaxed">
             {isAlreadyUsed
               ? 'This creator invite has already been redeemed. If you have already created your account, please log in.'
               : 'This creator invite link is missing or has expired. Please ask the seller to resend your invite, then open the link from the email.'}
@@ -172,7 +181,7 @@ export default function CreatorRegister() {
           <button
             type="button"
             onClick={() => navigate('/creator/login')}
-            className="btn-white inline-flex h-14 w-full items-center justify-center rounded-[14.5px] bg-white text-base font-semibold text-black hover:bg-white/90 shadow-sm transition"
+            className="btn-white inline-flex h-11 w-full items-center justify-center rounded-2xl bg-white text-sm font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
           >
             Go to creator login
           </button>
@@ -182,212 +191,171 @@ export default function CreatorRegister() {
   }
 
   return (
-    <PenpotAuthLayout
-      roleTag="CREATOR PORTAL"
-      title="Create account"
-      subtitle={invite ? `${invite.shopName} invited you to sell through Byblos.` : 'Set up your creator account to start earning.'}
-      footerLead="Already have an account?"
-      footerLinkText="Log in"
-      footerLinkTo="/creator/login"
-      showBackButton={true}
-      onBack={() => navigate('/')}
-    >
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-3.5">
-        {authUser && !token && (
-          <p className="text-xs text-[#f5c518] font-medium bg-[#f5c518]/10 p-3 rounded-xl border border-[#f5c518]/30">
-            Enter your existing Byblos account password to add creator access.
-          </p>
-        )}
+    <main className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="relative flex h-16 items-center justify-between sm:h-20">
+            <div className="flex flex-1 items-center gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                <span>Back</span>
+              </Button>
+            </div>
 
-        {/* First & Last Name row */}
-        <div className="grid grid-cols-2 gap-3 w-full">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-medium text-[#a1a1a6]">
-              First name
-            </label>
-            <input
-              value={form.firstName}
-              onChange={(e) => updateForm('firstName', e.target.value)}
-              aria-label="First name"
-              placeholder="Amina"
-              required
-              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-medium text-[#a1a1a6]">
-              Last name
-            </label>
-            <input
-              value={form.lastName}
-              onChange={(e) => updateForm('lastName', e.target.value)}
-              aria-label="Last name"
-              placeholder="Wanjiru"
-              required
-              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-            />
+            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center gap-2 text-center sm:max-w-[50%]">
+              <Sparkles className="h-5 w-5 text-yellow-400 shrink-0" />
+              <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">Creator Portal</h1>
+            </div>
+
+            <div className="flex-1" aria-hidden="true" />
           </div>
         </div>
+      </header>
 
-        {/* Email */}
-        <div className="flex flex-col gap-1.5 w-full">
-          <label htmlFor="email" className="text-[13px] font-medium text-[#a1a1a6]">
-            Email
-          </label>
-          <input
-            value={form.email}
-            readOnly={Boolean(token || (authUser && !token))}
-            onChange={(e) => updateForm('email', e.target.value)}
-            type="email"
-            id="email"
-            name="email"
-            autoComplete="email"
-            aria-label="Email"
-            placeholder="you@example.com"
-            required
-            className={`h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors ${authUser && !token ? 'opacity-80 cursor-not-allowed' : ''}`}
-          />
-        </div>
+      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
+        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+          <div className="space-y-1.5 text-center">
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
+            <p className="text-xs font-medium text-slate-600 dark:text-white/55">
+              {invite
+                ? `${invite.shopName} invited you to sell through Byblos.`
+                : 'Earn when your audience buys safely.'}
+            </p>
+          </div>
 
-        {/* M-Pesa Number */}
-        <div className="flex flex-col gap-1.5 w-full">
-          <label className="text-[13px] font-medium text-[#a1a1a6]">
-            M-Pesa number
-          </label>
-          <input
-            value={form.mpesaNumber}
-            onChange={(e) => updateForm('mpesaNumber', e.target.value)}
-            aria-label="M-Pesa number"
-            placeholder="0712 345 678"
-            required
-            className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-          />
-        </div>
-
-        {/* WhatsApp Number (optional) */}
-        <div className="flex flex-col gap-1.5 w-full">
-          <label className="text-[13px] font-medium text-[#a1a1a6]">
-            WhatsApp number (optional)
-          </label>
-          <input
-            value={form.whatsappNumber}
-            onChange={(e) => updateForm('whatsappNumber', e.target.value)}
-            aria-label="WhatsApp number (optional)"
-            placeholder="0712 345 678"
-            className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-          />
-        </div>
-
-        {/* Password */}
-        <div className="flex flex-col gap-1.5 w-full">
-          <label htmlFor="password" className="text-[13px] font-medium text-[#a1a1a6]">
-            Password
-          </label>
-          <div className="relative w-full">
-            <input
-              value={form.password}
-              onChange={(e) => updateForm('password', e.target.value)}
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              autoComplete="new-password"
-              aria-label="Password"
-              placeholder="••••••••"
+        <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+          {authUser && !token && (
+            <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-400/10 dark:bg-yellow-400/15 p-2 rounded-lg border border-yellow-400/30 sm:col-span-2">
+              Enter your existing Byblos account password to add creator access.
+            </p>
+          )}
+          <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <div className="space-y-1 sm:col-span-2">
+            {authUser && !token && (
+              <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>
+            )}
+            <Input
+              value={form.email}
+              readOnly={Boolean(token || (authUser && !token))}
+              onChange={(e) => updateForm('email', e.target.value)}
+              type="email"
+              id="email"
+              name="email"
+              autoComplete="email"
+              aria-label="Email"
+              placeholder="Email"
+              className={`h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white/70 placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 w-full ${authUser && !token ? 'opacity-80 cursor-not-allowed' : ''}`}
               required
-              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] pl-4 pr-12 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
             />
+          </div>
+          <Input value={form.mpesaNumber} onChange={(e) => updateForm('mpesaNumber', e.target.value)} aria-label="M-Pesa number" placeholder="M-Pesa number" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" required />
+          <Input value={form.whatsappNumber} onChange={(e) => updateForm('whatsappNumber', e.target.value)} aria-label="WhatsApp number (optional)" placeholder="WhatsApp number (Optional)" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 sm:col-span-2" />
+          <div className="relative sm:col-span-2">
+            <Input value={form.password} onChange={(e) => updateForm('password', e.target.value)} type={showPassword ? 'text' : 'password'} id="password" name="password" autoComplete="new-password" aria-label="Password" placeholder="Password" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[#8a8a91] hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 dark:text-white/45 transition hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white"
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-        </div>
-
-        {/* Confirm Password */}
-        <div className="flex flex-col gap-1.5 w-full">
-          <label htmlFor="confirmPassword" className="text-[13px] font-medium text-[#a1a1a6]">
-            Confirm password
-          </label>
-          <div className="relative w-full">
-            <input
-              value={form.confirmPassword}
-              onChange={(e) => updateForm('confirmPassword', e.target.value)}
-              type={showConfirmPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              name="confirmPassword"
-              autoComplete="new-password"
-              aria-label="Confirm password"
-              placeholder="••••••••"
-              required
-              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] pl-4 pr-12 text-white text-[16px] placeholder-[#8a8a91] transition-colors"
-            />
+          <div className="relative sm:col-span-2">
+            <Input value={form.confirmPassword} onChange={(e) => updateForm('confirmPassword', e.target.value)} type={showConfirmPassword ? 'text' : 'password'} id="confirmPassword" name="confirmPassword" autoComplete="new-password" aria-label="Confirm password" placeholder="Confirm password" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400 pr-12" required />
             <button
               type="button"
               onClick={() => setShowConfirmPassword((current) => !current)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[#8a8a91] hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 dark:text-white/45 transition hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white"
               aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
             >
-              {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+          {form.password && (
+            <div className="rounded-2xl border border-black/[0.08] dark:border-separator bg-slate-100 dark:bg-black/30 p-3 sm:col-span-2 transition-colors duration-200">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-white/50">Password checklist</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {[
+                  { label: '8+ characters', met: passwordStrength.minLength },
+                  { label: '1 number', met: passwordStrength.hasNumber },
+                  { label: '1 special character', met: passwordStrength.hasSpecial },
+                  { label: 'Upper and lowercase', met: passwordStrength.hasUpper && passwordStrength.hasLower },
+                  { label: 'Passwords match', met: passwordsMatch }
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-2 text-xs font-bold">
+                    <span className={`rounded-full p-0.5 ${item.met ? 'bg-green-500/20 text-green-500 dark:text-green-300' : 'bg-slate-300 dark:bg-white/10 text-slate-400 dark:text-white/35'}`}>
+                      {item.met ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                    </span>
+                    <span className={item.met ? 'text-green-600 dark:text-green-300' : 'text-slate-600 dark:text-white/45'}>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="sm:col-span-2">
+            <div className="flex items-start space-x-2 rounded-xl border border-black/[0.08] dark:border-separator bg-slate-50 dark:bg-fill p-3">
+              <input
+                type="checkbox"
+                id="termsAccepted"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="mt-0.5 rounded accent-yellow-400 cursor-pointer"
+              />
+              <Label htmlFor="termsAccepted" className="text-xs font-medium text-slate-600 dark:text-label-2 cursor-pointer">
+                I agree to the{' '}
+                <button
+                  type="button"
+                  onClick={() => setIsTermsModalOpen(true)}
+                  className="font-semibold text-yellow-600 hover:underline dark:text-yellow-400"
+                >
+                  Terms &amp; Conditions
+                </button>
+              </Label>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:col-span-2 sm:grid-cols-2">
+            <Button disabled={loading || !passwordsMatch || !termsAccepted} className="btn-white h-12 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition disabled:cursor-not-allowed disabled:opacity-50">
+              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Create creator account'}
+            </Button>
+            <Link to="/creator/login" className="inline-flex h-12 items-center justify-center rounded-2xl border border-black/[0.08] dark:border-separator bg-slate-100 dark:bg-white/[0.03] px-4 text-sm font-semibold text-slate-900 dark:text-white transition hover:bg-slate-200 dark:hover:bg-white/10">
+              Creator login
+            </Link>
+          </div>
+        </form>
         </div>
+      </div>
 
-        {/* Password Requirements Checklist */}
-        <PasswordChecklist
-          password={form.password}
-          confirmPassword={form.confirmPassword}
-          title="PASSWORD CHECKLIST"
-          showMatch={true}
-        />
-
-        {/* Terms Checkbox */}
-        <div className="flex items-center gap-3 pt-1">
-          <input
-            type="checkbox"
-            id="termsAccepted"
-            checked={termsAccepted}
-            onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="w-4 h-4 rounded border-[#34343a] bg-[#27272c] text-[#f5c518] focus:ring-[#f5c518] accent-[#f5c518] cursor-pointer"
-          />
-          <label htmlFor="termsAccepted" className="text-[13px] text-[#a1a1a6] cursor-pointer">
-            I agree to the{' '}
-            <button
-              type="button"
-              onClick={() => setIsTermsModalOpen(true)}
-              className="text-[#f5c518] hover:underline font-medium"
-            >
-              Terms and Privacy Policy
-            </button>
-          </label>
-        </div>
-
-        {/* Primary Action Button */}
-        <button
-          type="submit"
-          disabled={loading || !passwordsMatch || !termsAccepted}
-          aria-label="Create creator account"
-          className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm mt-3 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-        >
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create account'}
-        </button>
-      </form>
-
-      {/* Existing account modal */}
+      {/* Already registered prompt modal. Previously a hand-rolled
+          `fixed inset-0` div with no role="dialog"/aria-modal, no focus
+          trap, and no Escape handling -- unlike TermsModal right below,
+          which already uses these same Radix Dialog primitives. A
+          keyboard-only creator hitting this (registering with an email
+          that already has a Byblos account) could Tab straight past it
+          into background page content and had no way to dismiss it
+          without a mouse. Rebuilt on Dialog/DialogContent, which gets
+          focus trapping, Escape-to-close, and dialog semantics for free.
+          registerModalDismiss (the Android/browser back-button handler
+          below) is unaffected -- it drives the same existingAccountPrompt
+          state Dialog's open prop now also reads. */}
       <Dialog open={existingAccountPrompt} onOpenChange={(open) => !open && setExistingAccountPrompt(false)}>
-        <DialogContent className="w-[92vw] sm:max-w-md rounded-3xl border border-[#34343a] bg-[#27272c] text-white p-6 shadow-2xl transition-colors duration-200">
-          <div className="w-12 h-12 rounded-2xl bg-[#f5c518]/20 text-[#f5c518] flex items-center justify-center text-2xl font-semibold">
+        <DialogContent className="w-[92vw] sm:max-w-md rounded-3xl border border-black/[0.08] dark:border-white/15 bg-white dark:bg-surface-1 text-slate-950 dark:text-white p-6 shadow-2xl transition-colors duration-200">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-400/20 text-yellow-500 dark:text-yellow-400 flex items-center justify-center text-2xl font-semibold">
             !
           </div>
 
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold tracking-tight text-white">
+            <DialogTitle className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
               You already have a Byblos account
             </DialogTitle>
-            <DialogDescription className="text-sm text-[#a1a1a6] leading-relaxed">
+            <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
               Log in with your existing account, then add Creator access from your account switcher.
             </DialogDescription>
           </DialogHeader>
@@ -431,7 +399,7 @@ export default function CreatorRegister() {
               type="button"
               variant="outline"
               onClick={() => setExistingAccountPrompt(false)}
-              className="h-11 rounded-xl border-[#34343a] bg-transparent text-white hover:bg-white/10 transition"
+              className="h-11 rounded-xl border-slate-300 dark:border-white/15 bg-slate-100 dark:bg-white/[0.05] text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition"
             >
               Dismiss
             </Button>
@@ -444,6 +412,6 @@ export default function CreatorRegister() {
         onClose={() => setIsTermsModalOpen(false)}
         onAccept={() => setTermsAccepted(true)}
       />
-    </PenpotAuthLayout>
+    </main>
   );
 }

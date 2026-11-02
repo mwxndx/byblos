@@ -233,19 +233,19 @@ export function SettingsTab({
         }}
       />
 
-      <section className="rounded-[16px] border border-[#34343a] bg-[#27272c] p-4 shadow-sm sm:p-5 lg:p-6 text-white">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
         <SectionHeader title="Legal" description="Review the documents you agreed to when you registered." />
         <div className="mt-4">
           <LegalLinks />
         </div>
       </section>
 
-      <section className="rounded-[16px] border border-[#34343a] bg-[#27272c] p-4 shadow-sm sm:p-5 lg:p-6 text-white">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
         <SectionHeader title="Account" description="Sign out of your seller account on this device." />
         <div className="mt-4">
           <Button
             onClick={onLogout}
-            className="h-11 w-full border border-[#34343a] bg-[#121214] font-semibold text-red-400 hover:bg-red-500/10 rounded-[12px]"
+            className="h-10 w-full bg-red-600 font-semibold text-slate-900 dark:text-white hover:bg-red-500"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Logout
