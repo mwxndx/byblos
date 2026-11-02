@@ -90,7 +90,7 @@ describe('DashboardProfilePanel', () => {
     expect(drawerAside).toHaveClass('border-l', 'border-separator', 'max-w-md');
   });
 
-  it('smoothly transitions through a slide-out exit lifecycle when closing before unmounting', async () => {
+  it('smoothly transitions through an exit lifecycle when closing before unmounting', async () => {
     vi.useFakeTimers();
     try {
       const onOpenChange = vi.fn();
@@ -105,12 +105,10 @@ describe('DashboardProfilePanel', () => {
       const panelHost = screen.getByTestId('dashboard-profile-panel');
       const drawerAside = screen.getByRole('complementary', { name: 'Profile' });
 
-      // In open state, elements have data-state="open" and GPU transform acceleration
+      // In open state, elements have data-state="open" and basic opacity transition
       expect(panelHost).toHaveAttribute('data-state', 'open');
       expect(drawerAside).toHaveAttribute('data-state', 'open');
-      expect(drawerAside).toHaveClass('transform-gpu', 'will-change-transform');
-      expect(drawerAside.className).toContain('slide-in-from-right');
-      expect(drawerAside.className).toContain('slide-out-to-right');
+      expect(drawerAside).toHaveClass('transition-opacity');
 
       // Now close the panel
       rerender(
@@ -121,14 +119,14 @@ describe('DashboardProfilePanel', () => {
         </div>,
       );
 
-      // It must NOT instantly disappear (zero-frame cut/glitch); it must remain in DOM with data-state="closed"
+      // It must NOT instantly disappear; it remains in DOM with data-state="closed" during exit transition
       expect(screen.queryByTestId('dashboard-profile-panel')).not.toBeNull();
       expect(screen.getByTestId('dashboard-profile-panel')).toHaveAttribute('data-state', 'closed');
       expect(screen.getByRole('complementary', { name: 'Profile' })).toHaveAttribute('data-state', 'closed');
 
-      // Advance timers past the exit animation duration (220ms)
+      // Advance timers past the exit transition duration (150ms)
       act(() => {
-        vi.advanceTimersByTime(250);
+        vi.advanceTimersByTime(200);
       });
 
       // Now it has cleanly unmounted

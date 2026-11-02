@@ -18,9 +18,8 @@ interface DashboardProfilePanelProps {
  * global Sheet primitive, it does not portal to document.body, so a dashboard
  * header and bottom navigation remain visible and interactive above it.
  *
- * Implements smooth hardware-accelerated slide transitions at 100% solid opacity
- * over an independently fading backdrop, eliminating visual ghosting, blur jitter,
- * and compositor jank across buyer, seller, and creator dashboards.
+ * Uses a clean, basic opacity transition (no slide animations) for instant,
+ * smooth, and 100% jank-free appearance across all devices and webviews.
  */
 export function DashboardProfilePanel({
   open,
@@ -43,10 +42,10 @@ export function DashboardProfilePanel({
 
   useEffect(() => {
     if (!open && shouldRender) {
-      // 200ms slide-out animation + 50ms buffer before cleanly unmounting from DOM
+      // 150ms basic transition before unmounting from DOM
       const timer = window.setTimeout(() => {
         setShouldRender(false);
-      }, 250);
+      }, 150);
       return () => window.clearTimeout(timer);
     }
   }, [open, shouldRender]);
@@ -87,20 +86,17 @@ export function DashboardProfilePanel({
     <div
       data-state={state}
       className={cn(
-        'dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 overflow-hidden',
-        !open && 'pointer-events-none',
+        'dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 overflow-hidden transition-opacity duration-150',
+        open ? 'opacity-100' : 'opacity-0 pointer-events-none',
       )}
       style={{ bottom: bottomInset }}
       data-testid="dashboard-profile-panel"
     >
-      {/* Translucent backdrop overlay: smoothly fades in/out independently without ghosting the drawer */}
+      {/* Translucent backdrop overlay */}
       <div
         aria-hidden="true"
         data-state={state}
-        className={cn(
-          'absolute inset-0 bg-black/35 dark:bg-black/60 transition-opacity duration-300 ease-out',
-          open ? 'opacity-100' : 'opacity-0 duration-200 ease-in',
-        )}
+        className="absolute inset-0 bg-black/40 dark:bg-black/60"
       />
 
       {/* Backdrop click dismiss button */}
@@ -112,7 +108,7 @@ export function DashboardProfilePanel({
         tabIndex={open ? 0 : -1}
       />
 
-      {/* Drawer aside: hardware-accelerated slide-in at 100% solid opacity with smooth easing */}
+      {/* Drawer aside: basic fade transition without slide animations */}
       <aside
         ref={panelRef}
         role="complementary"
@@ -121,11 +117,8 @@ export function DashboardProfilePanel({
         data-state={state}
         className={cn(
           'absolute top-0 right-0 z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-[var(--shadow-pop)] border-l border-separator',
-          'transform-gpu will-change-transform',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out',
-          'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
-          'data-[state=open]:duration-300 data-[state=closed]:duration-200',
-          'data-[state=open]:ease-out data-[state=closed]:ease-in',
+          'transition-opacity duration-150 ease-out',
+          open ? 'opacity-100' : 'opacity-0',
           className,
         )}
       >
