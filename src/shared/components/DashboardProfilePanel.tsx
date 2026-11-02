@@ -52,6 +52,16 @@ export function DashboardProfilePanel({
     }
   }, [open, shouldRender]);
 
+  // Lock body scroll while panel is open to prevent background touch-drag and scroll bleed
+  useEffect(() => {
+    if (!open) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
 

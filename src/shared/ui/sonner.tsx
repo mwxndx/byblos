@@ -12,7 +12,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       className="toaster group"
       position="top-right"
       offset="calc(var(--sat, 0px) + 64px)"
-      mobileOffset="calc(var(--sat, 0px) + 64px)"
+      mobileOffset={{ top: "calc(var(--sat, 0px) + 16px)", left: "16px", right: "16px" }}
       expand={false}
       richColors
       toastOptions={{

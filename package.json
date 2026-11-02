@@ -37,7 +37,6 @@
     "test:env:rebuild": "npm run test:env:down && npm run test:env:up && npm run test:env:setup && npm run test:env:seed",
     "mobile:sync": "npm run build && npx cap sync android",
     "mobile:android": "npx cap open android",
-    "mobile:build": "npm run build && npx cap sync android",
     "start": "vite preview --port 3000"
   },
   "dependencies": {

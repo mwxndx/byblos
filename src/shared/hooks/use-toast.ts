@@ -57,11 +57,18 @@ function toast(props: ToastOptions) {
   };
 }
 
+toast.success = (message: ReactNode, options?: Parameters<typeof sonnerToast.success>[1]) => sonnerToast.success(message, options);
+toast.error = (message: ReactNode, options?: Parameters<typeof sonnerToast.error>[1]) => sonnerToast.error(message, options);
+toast.info = (message: ReactNode, options?: Parameters<typeof sonnerToast.info>[1]) => sonnerToast.info(message, options);
+toast.warning = (message: ReactNode, options?: Parameters<typeof sonnerToast.warning>[1]) => sonnerToast.warning(message, options);
+toast.promise = sonnerToast.promise;
+toast.dismiss = (toastId?: string | number) => sonnerToast.dismiss(toastId);
+
 function useToast() {
   return {
     toasts: [],
     toast,
-    dismiss: (toastId?: string) => sonnerToast.dismiss(toastId),
+    dismiss: (toastId?: string | number) => sonnerToast.dismiss(toastId),
   };
 }
 

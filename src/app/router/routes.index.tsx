@@ -10,9 +10,9 @@ import { mzigoRoutes } from './mzigo.routes';
 import { safeLazy } from '@/shared/utils/safeLazy';
 import { RouteFallback } from '@/app/router/RouteFallback';
 
-// Eager pages
-import IndexPage from '@/features/shop/pages/MarketplaceIndex';
-import { ShopPage } from '@/features/shop';
+// Lazy-loaded pages
+const IndexPage = safeLazy(() => import('@/features/shop/pages/MarketplaceIndex'));
+const ShopPage = safeLazy(() => import('@/features/shop/pages/ShopPage'));
 
 // Lazy-loaded public & auth pages
 const VerifyEmail = safeLazy(() => import('@/features/auth/pages/VerifyEmail'));
@@ -24,12 +24,20 @@ const DeleteAccountPage = safeLazy(() => import('@/shared/components/DeleteAccou
 export const routes = [
   {
     path: '/',
-    element: <IndexPage />,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <IndexPage />
+      </Suspense>
+    ),
   },
   // Public shop page — no auth required
   {
     path: '/shop/:shopName',
-    element: <ShopPage />,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <ShopPage />
+      </Suspense>
+    ),
   },
   {
     path: '/track/:token',

@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, lazy, Suspense } from 'react';
 
 import { Button } from '@/shared/ui/button';
 
@@ -67,19 +67,6 @@ function BuyerDashboard() {
   const refundAmount = typeof (user as unknown as { refunds?: string | number })?.refunds === 'string'
     ? Number.parseFloat((user as unknown as { refunds: string }).refunds)
     : ((user as unknown as { refunds?: number })?.refunds || 0);
-
-  useEffect(() => {
-    const originalBodyStyle = document.body.style.cssText;
-    const originalHtmlStyle = document.documentElement.style.cssText;
-
-    document.body.style.cssText = 'margin: 0; padding: 0; background-color: var(--byblos-bg, #000000); overflow-x: hidden;';
-    document.documentElement.style.cssText = 'margin: 0; padding: 0; background-color: var(--byblos-bg, #000000); overflow-x: hidden;';
-
-    return () => {
-      document.body.style.cssText = originalBodyStyle;
-      document.documentElement.style.cssText = originalHtmlStyle;
-    };
-  }, []);
 
   const navItems = [
     { key: 'shop', label: 'Shops', Icon: Store, path: '/buyer/dashboard' },
@@ -154,11 +141,9 @@ function BuyerDashboard() {
           onTouchEnd={handleDashboardTouchEnd}
           onTouchCancel={handleDashboardTouchCancel}
         >
-          {activeSection === 'shop' && (
-            <>
-              <SellersGrid filterCity="" filterArea="" searchQuery={searchQuery} isBuyer={true} />
-            </>
-          )}
+          <div className={activeSection === 'shop' ? 'block' : 'hidden'} aria-hidden={activeSection !== 'shop'}>
+            <SellersGrid filterCity="" filterArea="" searchQuery={searchQuery} isBuyer={true} />
+          </div>
 
           {activeSection === 'notifications' && (
             <div className="mx-auto w-full max-w-[760px]">
