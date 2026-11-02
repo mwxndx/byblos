@@ -221,7 +221,7 @@ jobs:
         run: npm install
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps chromium
+        run: npx --yes playwright install --with-deps chromium
 
       - name: Build frontend for preview
         run: npm run build

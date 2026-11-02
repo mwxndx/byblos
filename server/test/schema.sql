@@ -6136,6 +6136,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (113, '20261024022500_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (114, '20261024131500_default_and_backfill_buyers_city', '2026-10-24 13:15:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (115, '20261025233000_sync_deleted_buyer_status', '2026-10-25 23:30:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (116, '20261027200000_make_refund_requests_buyer_id_nullable', '2026-10-27 20:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (117, '20261102160000_normalize_seller_shop_names', '2026-11-02 16:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
