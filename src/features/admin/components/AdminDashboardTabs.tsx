@@ -23,7 +23,7 @@ interface AdminDashboardTabsProps {
 
 export function AdminDashboardTabs({ counts = {} }: Readonly<AdminDashboardTabsProps>) {
   return (
-    <div className="bg-surface-1 border border-separator rounded-2xl p-1 sticky top-2 z-40">
+    <div className="bg-[#27272c] border border-[#34343a] rounded-2xl p-1 sticky top-2 z-40 shadow-sm">
       <TabsList className="bg-transparent border-0 p-0 h-auto flex flex-nowrap overflow-x-auto no-scrollbar gap-1 touch-pan-x scroll-smooth overscroll-x-contain">
         {ADMIN_TABS.map((tab) => {
           const Icon = tab.icon;

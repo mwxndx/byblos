@@ -1,10 +1,11 @@
 import { useNavigate, Link } from 'react-router-dom';
-import { Button } from '@/shared/ui/button';
 import { useToast } from '@/shared/hooks/use-toast';
-import { Loader2, Mail, ArrowLeft, RefreshCw, ShoppingBag } from '@/shared/ui/icons';
+import { Loader2, Mail, RefreshCw } from '@/shared/ui/icons';
 import TermsModal from '@/shared/components/TermsModal';
 import { BuyerRegisterSteps } from '@/features/buyer/components/BuyerRegisterSteps';
 import { useBuyerRegister } from '@/features/buyer/hooks/useBuyerRegister';
+import { PenpotAuthLayout } from '@/features/auth/components/PenpotAuthLayout';
+import { AuthProgressBar } from '@/features/auth/components/AuthProgressBar';
 
 export function BuyerRegister() {
   const navigate = useNavigate();
@@ -33,209 +34,191 @@ export function BuyerRegister() {
     isExistingUser,
   } = useBuyerRegister();
 
+  const getSubtitle = () => {
+    switch (currentStep) {
+      case 1:
+        return 'Tell us a little about you.';
+      case 2:
+        return 'Where are you based?';
+      case 3:
+        return 'Secure your account.';
+      default:
+        return 'Tell us a little about you.';
+    }
+  };
+
+  if (isRegistered) {
+    return (
+      <PenpotAuthLayout
+        roleTag="BUYER PORTAL"
+        title="Verification sent"
+        subtitle="One more step to join us"
+        showTrustLine={true}
+        showBackButton={true}
+        onBack={() => navigate('/buyer/login')}
+      >
+        <div className="w-full flex flex-col items-center gap-6">
+          <div className="w-16 h-16 rounded-full bg-[#f5c518]/15 border border-[#f5c518]/30 flex items-center justify-center text-[#f5c518]">
+            <Mail className="w-8 h-8" />
+          </div>
+
+          <div className="text-center space-y-2">
+            <h3 className="text-xl font-bold text-white tracking-tight">Check your email</h3>
+            <p className="text-[14px] text-[#a1a1a6] leading-relaxed max-w-[320px] mx-auto">
+              We've sent a verification link to <span className="text-white font-medium underline">{formData.email}</span>.
+              Please click the link to activate your account.
+            </p>
+          </div>
+
+          <div className="w-full space-y-3 pt-2">
+            <Link
+              to="/buyer/login"
+              className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm"
+            >
+              Go to Login
+            </Link>
+
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendCooldown > 0 || isResending}
+              className="h-12 w-full rounded-[14.5px] border border-[#34343a] bg-transparent text-[14px] text-[#a1a1a6] hover:text-white hover:bg-white/5 transition flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isResending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <RefreshCw className="w-4 h-4" />
+              )}
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Didn't receive it? Resend"}
+            </button>
+            <p className="text-[11px] text-[#8a8a91] text-center">Also check your spam / junk folder.</p>
+          </div>
+        </div>
+      </PenpotAuthLayout>
+    );
+  }
+
   return (
-    <main
-      className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200"
-      style={{
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    <PenpotAuthLayout
+      roleTag="BUYER PORTAL"
+      title="Create account"
+      subtitle={getSubtitle()}
+      footerLead="Already have an account?"
+      footerLinkText="Log in"
+      footerLinkTo="/buyer/login"
+      showBackButton={true}
+      onBack={() => {
+        if (currentStep > 1) {
+          setCurrentStep(currentStep - 1);
+        } else {
+          navigate('/');
+        }
       }}
     >
-      {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="relative flex h-16 items-center justify-between sm:h-20">
-            {/* Left: Back Button */}
-            <div className="flex flex-1 items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/')}
-                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                <span>Back</span>
-              </Button>
-            </div>
+      <div className="w-full flex flex-col">
+        {/* Progress bar */}
+        <AuthProgressBar currentStep={currentStep} totalSteps={3} />
 
-            {/* Center: Title */}
-            <div className="absolute left-1/2 flex min-w-0 max-w-[46%] -translate-x-1/2 items-center justify-center gap-2 text-center sm:max-w-[50%]">
-              <ShoppingBag className="h-5 w-5 text-yellow-400 shrink-0" />
-              <h1 className="truncate text-xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
-                Buyer Portal
-              </h1>
-            </div>
-
-            {/* Right: Empty to balance flex-1 */}
-            <div className="flex-1" aria-hidden="true" />
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
-        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
-          <div className="space-y-1.5 text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
-              {isRegistered ? 'Verification Sent!' : 'Create Account'}
-            </h2>
-            {isRegistered && (
-              <p className="text-xs font-medium text-slate-600 dark:text-white/55">
-                One more step to join us
-              </p>
-            )}
-
-            {!isRegistered && (
-              <div className="pt-2 flex items-center justify-center gap-2">
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
-                  1
-                </div>
-                <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
-                  2
-                </div>
-                <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
-                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
-                  3
-                </div>
-              </div>
-            )}
-          </div>
-
-          {isRegistered ? (
-            <div className="text-center py-6 space-y-4">
-              <div className="mx-auto flex items-center justify-center pb-2">
-                <Mail className="h-14 w-14 text-slate-900 dark:text-white animate-pulse" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Check your email</h3>
-                <p className="text-slate-600 dark:text-white/60 text-xs leading-relaxed max-w-[280px] mx-auto">
-                  We've sent a verification link to <span className="text-slate-900 dark:text-white font-semibold underline">{formData.email}</span>.
-                  Please click the link to activate your account.
-                </p>
-              </div>
-              <div className="pt-3 space-y-2.5">
-                <Button
-                  onClick={() => navigate('/buyer/login')}
-                  className="btn-white h-12 w-full rounded-2xl bg-white font-semibold text-black transition hover:bg-gray-100 border border-gray-200 shadow-sm"
-                >
-                  Go to Login
-                </Button>
-                <Button
-                  onClick={handleResend}
-                  disabled={resendCooldown > 0 || isResending}
-                  variant="ghost"
-                  className="h-11 w-full rounded-2xl border border-black/10 dark:border-separator bg-black/5 dark:bg-fill text-xs text-slate-700 dark:text-white/70 hover:bg-black/10 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition flex items-center justify-center gap-2"
-                >
-                  {isResending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4" />
-                  )}
-                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Didn't receive it? Resend"}
-                </Button>
-                <p className="text-[10px] text-slate-500 dark:text-white/40">Also check your spam / junk folder.</p>
-              </div>
-            </div>
-          ) : (
-
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <BuyerRegisterSteps
-                currentStep={currentStep}
-                formData={formData}
-                handleInputChange={handleInputChange}
-                setFormData={setFormData}
-                errors={errors}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-                showConfirmPassword={showConfirmPassword}
-                setShowConfirmPassword={setShowConfirmPassword}
-                termsAccepted={termsAccepted}
-                setTermsAccepted={setTermsAccepted}
-                setIsTermsModalOpen={setIsTermsModalOpen}
-                isExistingUser={isExistingUser}
-              />
-
-              {/* Navigation Buttons */}
-              <div className="flex gap-2.5 pt-2">
-                {currentStep > 1 && (
-                  <Button
-                    type="button"
-                    onClick={() => setCurrentStep(currentStep - 1)}
-                    className="btn-white h-12 flex-1 rounded-2xl border border-gray-200 bg-white text-xs font-semibold text-black hover:bg-gray-100 shadow-sm transition"
-                  >
-                    Back
-                  </Button>
-                )}
-                {currentStep < 3 ? (
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      if (currentStep === 1) {
-                        if (!formData.firstName || !formData.lastName || !formData.email || !formData.mobilePayment) {
-                          toast({
-                            title: "Missing Information",
-                            description: "Please fill in all personal details",
-                            variant: 'destructive',
-                          });
-                          return;
-                        }
-                      } else if (currentStep === 2) {
-                        if (!formData.city || !formData.location) {
-                          toast({
-                            title: "Missing Information",
-                            description: "Please select your city and area",
-                            variant: 'destructive',
-                          });
-                          return;
-                        }
-                      }
-                      setCurrentStep(currentStep + 1);
-                    }}
-                    className="btn-white h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
-                  >
-                    Next
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    className="btn-white h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"
-                    disabled={isLoading || !termsAccepted}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
-                      </>
-                    ) : 'Register'}
-                  </Button>
-                )}
-              </div>
-            </form>
-          )}
-
-          {!isRegistered && (
-            <div className="pt-2 text-center">
-              <p className="text-xs text-slate-600 dark:text-white/55">
-                Already have an account?{' '}
-                <Link
-                  to="/buyer/login"
-                  className="font-semibold text-yellow-600 dark:text-yellow-300 hover:underline"
-                >
-                  Sign In
-                </Link>
-              </p>
-            </div>
-          )}
-          <TermsModal
-            isOpen={isTermsModalOpen}
-            onClose={() => setIsTermsModalOpen(false)}
-            onAccept={() => setTermsAccepted(true)}
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
+          <BuyerRegisterSteps
+            currentStep={currentStep}
+            formData={formData}
+            handleInputChange={handleInputChange}
+            setFormData={setFormData}
+            errors={errors}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            showConfirmPassword={showConfirmPassword}
+            setShowConfirmPassword={setShowConfirmPassword}
+            termsAccepted={termsAccepted}
+            setTermsAccepted={setTermsAccepted}
+            setIsTermsModalOpen={setIsTermsModalOpen}
+            isExistingUser={isExistingUser}
           />
-        </div>
+
+          {/* Action buttons */}
+          <div className="pt-2 w-full">
+            {currentStep === 1 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!formData.firstName || !formData.lastName || !formData.email || !formData.mobilePayment) {
+                    toast({
+                      title: 'Missing Information',
+                      description: 'Please fill in all personal details',
+                      variant: 'destructive',
+                    });
+                    return;
+                  }
+                  setCurrentStep(2);
+                }}
+                className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm cursor-pointer"
+              >
+                Next
+              </button>
+            ) : currentStep === 2 ? (
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(1)}
+                  className="h-14 w-full rounded-[14.5px] border border-[#34343a] text-white hover:bg-white/10 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!formData.city || !formData.location) {
+                      toast({
+                        title: 'Missing Information',
+                        description: 'Please select your city and area',
+                        variant: 'destructive',
+                      });
+                      return;
+                    }
+                    setCurrentStep(3);
+                  }}
+                  className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(2)}
+                  className="h-14 w-full rounded-[14.5px] border border-[#34343a] text-white hover:bg-white/10 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={isLoading || !termsAccepted}
+                  className="btn-white h-14 w-full rounded-[14.5px] bg-white font-semibold text-black hover:bg-white/90 active:scale-[0.99] transition-all flex items-center justify-center text-[16px] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    'Create account'
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </form>
       </div>
-    </main>
+
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+        onAccept={() => setTermsAccepted(true)}
+      />
+    </PenpotAuthLayout>
   );
 }
 
-
+export default BuyerRegister;

@@ -20,10 +20,10 @@ interface BuyerBottomNavProps {
 export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<BuyerBottomNavProps>) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-[#34343a] bg-white dark:bg-[#27272c] pb-safe-bottom transition-colors duration-200"
       aria-label="Buyer navigation"
     >
-      <div className="flex items-center justify-around h-14 px-1">
+      <div className="flex items-center justify-around h-[62px] px-1">
         {navItems.map(item => {
           const isActive = activeNav === item.key;
           return (
@@ -31,22 +31,22 @@ export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<Buyer
               key={item.key}
               type="button"
               onClick={() => onSelect(item.key)}
-              className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-transparent border-none cursor-pointer relative py-1.5 transition-opacity duration-150 active:scale-95"
+              className="flex-1 flex flex-col items-center justify-center gap-1 bg-transparent border-none cursor-pointer relative py-1.5 transition-opacity duration-150 active:scale-95"
             >
               <item.Icon
-                size={18}
-                className={isActive ? 'text-[#F5C518]' : 'text-slate-500 dark:text-white/50 transition-colors'}
+                size={20}
+                className={isActive ? 'text-[#f5c518]' : 'text-slate-500 dark:text-[#a1a1a6] transition-colors'}
               />
-              <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'text-[#F5C518] font-bold' : 'text-slate-500 dark:text-white/50'}`}>
+              <span className={`text-[10px] transition-colors ${isActive ? 'text-[#f5c518] font-bold' : 'text-slate-500 dark:text-[#a1a1a6] font-medium'}`}>
                 {item.label}
               </span>
               {item.badge && (
                 item.count && item.count > 0 ? (
-                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[15px] h-[15px] px-1 rounded-full text-[9px] font-semibold flex items-center justify-center bg-[#F5C518] text-black shadow-sm">
+                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[16px] h-4 px-1 rounded-full text-[10px] font-bold flex items-center justify-center bg-[#f5c518] text-black shadow-sm">
                     {item.count > 99 ? '99+' : item.count}
                   </span>
                 ) : (
-                  <div className="absolute top-1.5 right-[50%] translate-x-[10px] w-2 h-2 rounded-full bg-[#F5C518] ring-2 ring-black" />
+                  <div className="absolute top-1.5 right-[50%] translate-x-[10px] w-2 h-2 rounded-full bg-[#f5c518] ring-1 ring-black/40" />
                 )
               )}
             </button>
@@ -56,5 +56,3 @@ export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<Buyer
     </nav>
   );
 }
-
-

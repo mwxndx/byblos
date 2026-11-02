@@ -8,8 +8,15 @@ interface BuyerDashboardHeaderProps {
 }
 
 export function BuyerDashboardHeader({ onOpenProfile }: Readonly<BuyerDashboardHeaderProps>) {
-  const { isAuthenticated } = useGlobalAuth();
+  const { isAuthenticated, user } = useGlobalAuth();
   const navigate = useNavigate();
+
+  const buyerProfile = user?.profile as { fullName?: string; email?: string } | undefined;
+  const buyerInitial = buyerProfile?.fullName
+    ? buyerProfile.fullName.trim().charAt(0).toUpperCase()
+    : buyerProfile?.email
+      ? buyerProfile.email.trim().charAt(0).toUpperCase()
+      : 'A';
 
   return (
     <AppHeader
@@ -19,7 +26,7 @@ export function BuyerDashboardHeader({ onOpenProfile }: Readonly<BuyerDashboardH
             type="button"
             onClick={() => navigate('/')}
             aria-label="Back to landing page"
-            className="flex h-9 items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] px-2.5 text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-white/12 text-xs font-bold"
+            className="flex h-10 items-center gap-1.5 rounded-full border border-slate-200 dark:border-[#34343a] bg-slate-100 dark:bg-[#27272c] px-3 text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-[#34343a] text-xs font-semibold"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>Home</span>
@@ -33,12 +40,18 @@ export function BuyerDashboardHeader({ onOpenProfile }: Readonly<BuyerDashboardH
           aria-label={isAuthenticated ? 'Open profile' : 'Sign in or view profile'}
           className={
             isAuthenticated
-              ? "flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-white/12"
-              : "flex h-9 items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] px-2.5 text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-white/12"
+              ? "flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-[#34343a] bg-slate-100 dark:bg-[#27272c] text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-[#34343a] font-semibold text-sm"
+              : "flex h-10 items-center gap-1.5 rounded-full border border-slate-200 dark:border-[#34343a] bg-slate-100 dark:bg-[#27272c] px-3 text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-[#34343a] text-xs font-semibold"
           }
         >
-          <UserRound className={isAuthenticated ? "h-5 w-5" : "h-4 w-4"} />
-          {!isAuthenticated && <span className="text-xs font-bold pr-0.5">Sign In</span>}
+          {isAuthenticated ? (
+            <span>{buyerInitial}</span>
+          ) : (
+            <>
+              <UserRound className="h-4 w-4" />
+              <span className="text-xs font-semibold pr-0.5">Sign In</span>
+            </>
+          )}
         </button>
       }
     />

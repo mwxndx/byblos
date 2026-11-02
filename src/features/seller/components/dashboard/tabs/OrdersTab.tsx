@@ -2,14 +2,14 @@ import SellerOrdersSection from '../../SellerOrdersSection';
 
 export function OrdersTab() {
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div className="text-center px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-slate-950 mb-1.5">Order Management</h2>
-        <p className="text-slate-700 text-xs sm:text-sm lg:text-base font-medium">View and manage customer orders</p>
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Orders</h2>
+          <p className="text-xs sm:text-sm text-[#a1a1a6] mt-0.5">View and manage customer orders</p>
+        </div>
       </div>
       <SellerOrdersSection />
     </div>
   );
 }
-
-

@@ -68,7 +68,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                 && isPaid
                                 && ['PAID', 'AWAITING_SELLER_ACTION', 'DELIVERY_PENDING'].includes(order.status);
 
-                            let cardClasses = "transition-all duration-300 bg-black border shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40 ";
+                            let cardClasses = "transition-all duration-300 bg-[#27272c] border rounded-[16px] shadow-sm hover:border-[#f5c518]/50 ";
                             let itemClasses = "text-xs sm:text-sm text-label rounded-lg px-3 py-2 border ";
 
                             if (isService) {
@@ -78,8 +78,8 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                 cardClasses += "border-red-400/45";
                                 itemClasses += "bg-red-500/10 border-red-400/25";
                             } else {
-                                cardClasses += "border-white/15";
-                                itemClasses += "bg-white/8 border-white/12";
+                                cardClasses += "border-[#34343a]";
+                                itemClasses += "bg-[#121214] border-[#34343a]";
                             }
 
                             return (

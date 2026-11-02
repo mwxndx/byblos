@@ -19,8 +19,8 @@ describe('SellerDashboardTabs', () => {
     // Sticks to bottom
     expect(nav).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'z-50');
 
-    // Solid colors for light & dark themes
-    expect(nav).toHaveClass('bg-white', 'dark:bg-[#000000]');
+    // Solid colors for Penpot dark theme
+    expect(nav).toHaveClass('bg-[#27272c]', 'border-[#34343a]');
 
     // Must NOT have translucent /95 or backdrop-blur
     expect(nav.className).not.toContain('/95');

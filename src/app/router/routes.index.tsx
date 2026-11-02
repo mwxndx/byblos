@@ -16,6 +16,7 @@ import { ShopPage } from '@/features/shop';
 
 // Lazy-loaded public & auth pages
 const VerifyEmail = safeLazy(() => import('@/features/auth/pages/VerifyEmail'));
+const ChooseRolePage = safeLazy(() => import('@/features/auth/pages/ChooseRolePage'));
 const TrackingPage = safeLazy(() => import('@/features/shop/pages/TrackingPage'));
 const LegalPage = safeLazy(() => import('@/shared/components/LegalPage'));
 const DeleteAccountPage = safeLazy(() => import('@/shared/components/DeleteAccountPage'));
@@ -44,6 +45,14 @@ export const routes = [
     element: (
       <Suspense fallback={<RouteFallback />}>
         <VerifyEmail />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/choose-role',
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <ChooseRolePage />
       </Suspense>
     ),
   },

@@ -113,84 +113,104 @@ export function AdminLogisticsTab() {
     requestId: number,
     resolution: 'manual_review' | 'continue_delivery' | 'mark_failed' | 'resolved'
   ) => {
-    // Re-entrancy guard: one dispute action at a time, so a second click (or a
-    // different resolution button) can't fire a duplicate before the first
-    // resolves. The dispute buttons are also disabled while this is set.
     if (resolvingId !== null) return;
-
     const note = window.prompt('Add an admin note for the tracking history.') || '';
     setResolvingId(requestId);
     disputeMutation.mutate({ requestId, resolution, note });
   };
 
+  const totalOwed = feeTotals.pickup + feeTotals.delivery + feeTotals.collection;
+
   return (
     <div className="space-y-4 sm:space-y-6">
+      {/* Penpot Admin Logistics Stats Grid */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-        <Card className="border-separator bg-surface-1 text-label">
-          <CardContent className="p-3 sm:p-4">
-            <Truck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300" />
-            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Total</p>
-            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.count || 0}</p>
+        <Card className="border-[#34343a] bg-[#27272c] text-white rounded-[16px] shadow-sm">
+          <CardContent className="p-4">
+            <Truck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-white/70" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-[#a1a1a6]">Total</p>
+            <p className="text-xl sm:text-2xl font-bold text-white">{dashboard?.count || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-red-300/20 bg-red-500/10 text-label">
-          <CardContent className="p-3 sm:p-4">
-            <AlertTriangle className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-red-300" />
-            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Failed</p>
-            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.failed || 0}</p>
+        <Card className="border-red-500/20 bg-[#27272c] text-white rounded-[16px] shadow-sm">
+          <CardContent className="p-4">
+            <AlertTriangle className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-[#ff5a52]" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-[#a1a1a6]">Failed</p>
+            <p className="text-xl sm:text-2xl font-bold text-[#ff5a52]">{dashboard?.summary?.failed || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-300/20 bg-yellow-300/10 text-label">
-          <CardContent className="p-3 sm:p-4">
-            <Clock className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300" />
-            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Delayed</p>
-            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.delayed || 0}</p>
+        <Card className="border-[#f5c518]/20 bg-[#27272c] text-white rounded-[16px] shadow-sm">
+          <CardContent className="p-4">
+            <Clock className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-[#f5c518]" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-[#a1a1a6]">Delayed</p>
+            <p className="text-xl sm:text-2xl font-bold text-[#f5c518]">{dashboard?.summary?.delayed || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-cyan-300/20 bg-cyan-300/10 text-label">
-          <CardContent className="p-3 sm:p-4">
-            <ShieldCheck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-cyan-200" />
-            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Review</p>
-            <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.manualReview || 0}</p>
+        <Card className="border-[#f5c518]/20 bg-[#27272c] text-white rounded-[16px] shadow-sm">
+          <CardContent className="p-4">
+            <ShieldCheck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-[#f5c518]" />
+            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-[#a1a1a6]">Review</p>
+            <p className="text-xl sm:text-2xl font-bold text-[#f5c518]">{dashboard?.summary?.manualReview || 0}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Reconciliation: fees owed to Mzigo across the requests in this view. */}
-      <Card className="border-separator bg-surface-1 text-label">
-        <CardContent className="p-3 sm:p-4">
-          <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Owed to Mzigo — this view</p>
-          <div className="mt-2 flex flex-wrap items-baseline gap-x-4 sm:gap-x-8 gap-y-2 text-xs sm:text-sm">
-            <span className="text-label-2">Delivery fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.delivery)}</span></span>
-            <span className="text-label-2">Collection fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.collection)}</span></span>
-            <span className="text-label-2">Pickup fees <span className="ml-1 font-semibold tabular-nums text-label">{formatCurrency(feeTotals.pickup)}</span></span>
-            <span className="text-sm sm:text-base font-semibold">Total <span className="ml-1 tabular-nums">{formatCurrency(feeTotals.pickup + feeTotals.delivery + feeTotals.collection)}</span></span>
+      {/* Reconciliation: fees owed to Mzigo across the requests in this view (Penpot Spec) */}
+      <Card className="border-[#34343a] bg-[#27272c] text-white rounded-[16px] shadow-sm">
+        <CardContent className="p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-2 border-b border-[#34343a] pb-3">
+            <div>
+              <p className="text-xs uppercase tracking-wider font-semibold text-[#a1a1a6]">Owed to Mzigo — this view</p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-white mt-1 tabular-nums">
+                {formatCurrency(totalOwed)}
+              </p>
+            </div>
+            <span className="text-xs text-[#a1a1a6]">Calculated across {requests.length} active legs</span>
+          </div>
+
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+            <div className="rounded-xl border border-[#34343a] bg-[#121214] p-2.5">
+              <span className="text-[#a1a1a6] text-[11px] block">Delivery fees</span>
+              <span className="font-semibold tabular-nums text-white text-sm">{formatCurrency(feeTotals.delivery)}</span>
+            </div>
+            <div className="rounded-xl border border-[#34343a] bg-[#121214] p-2.5">
+              <span className="text-[#a1a1a6] text-[11px] block">Collection fees</span>
+              <span className="font-semibold tabular-nums text-white text-sm">{formatCurrency(feeTotals.collection)}</span>
+            </div>
+            <div className="rounded-xl border border-[#34343a] bg-[#121214] p-2.5">
+              <span className="text-[#a1a1a6] text-[11px] block">Pickup fees</span>
+              <span className="font-semibold tabular-nums text-white text-sm">{formatCurrency(feeTotals.pickup)}</span>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card className="border-separator bg-surface-1 text-label">
-        <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <Card className="border-[#34343a] bg-[#27272c] text-white rounded-[16px] shadow-sm">
+        <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-[#34343a] pb-4">
           <div>
-            <CardTitle className="text-2xl text-label">Logistics Oversight</CardTitle>
-            <p className="mt-1 text-sm text-label-2">Delivered completes logistics only. Escrow release stays under order completion rules.</p>
+            <CardTitle className="text-xl sm:text-2xl text-white font-bold">Logistics Oversight</CardTitle>
+            <p className="mt-1 text-xs sm:text-sm text-[#a1a1a6]">Delivered completes logistics only. Escrow release stays under order completion rules.</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {STATUS_FILTERS.map((filter) => (
               <Button
                 key={filter.value}
                 type="button"
                 size="sm"
                 onClick={() => setStatus(filter.value)}
-                className={status === filter.value ? 'bg-white text-black hover:bg-gray-100 border border-gray-200 shadow-sm' : 'bg-fill text-label hover:bg-white hover:text-black border border-transparent'}
+                className={status === filter.value
+                  ? 'bg-white text-black hover:bg-neutral-100 font-semibold rounded-xl border border-transparent shadow-sm'
+                  : 'bg-[#121214] border border-[#34343a] text-[#a1a1a6] hover:text-white rounded-xl'
+                }
               >
                 {filter.label}
               </Button>
             ))}
             <select
-              className="h-9 rounded-xl border border-separator bg-black px-3 text-sm text-label"
+              className="h-9 rounded-xl border border-[#34343a] bg-[#121214] px-3 text-xs sm:text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#f5c518]"
               value={sort}
               onChange={(event) => setSort(event.target.value as LogisticsSort)}
+              aria-label="Sort logistics requests"
             >
               {SORT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
@@ -198,17 +218,17 @@ export function AdminLogisticsTab() {
             </select>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+        <CardContent className="space-y-5 pt-4">
           {logisticsQuery.isLoading ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              {[0, 1].map((item) => <div key={item} className="h-80 animate-pulse rounded-3xl bg-fill" />)}
+              {[0, 1].map((item) => <div key={item} className="h-80 animate-pulse rounded-2xl bg-[#121214] border border-[#34343a]" />)}
             </div>
           ) : requests.length === 0 ? (
-            <div className="rounded-3xl border border-separator bg-black p-8 text-center text-label-2">
+            <div className="rounded-2xl border border-[#34343a] bg-[#121214] p-8 text-center text-sm text-[#a1a1a6]">
               No logistics requests match this filter.
             </div>
           ) : (
-            <div className="grid gap-5">
+            <div className="grid gap-4">
               {paginatedRequests.map((request) => (
                 <LogisticsAdminCard
                   key={request.id}
@@ -224,7 +244,7 @@ export function AdminLogisticsTab() {
             </div>
           )}
           {total > PAGE_SIZE && (
-            <div className="pt-4 border-t border-separator">
+            <div className="pt-4 border-t border-[#34343a]">
               <AdminPaginationControls pagination={pagination} onPageChange={setPage} />
             </div>
           )}
@@ -233,5 +253,3 @@ export function AdminLogisticsTab() {
     </div>
   );
 }
-
-

@@ -1,10 +1,8 @@
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
-import { Input } from '@/shared/ui/input';
-import { Label } from '@/shared/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
-import { User, Mail, Phone, MapPin, Lock, Eye, EyeOff, Check, X } from '@/shared/ui/icons';
+import { Eye, EyeOff } from '@/shared/ui/icons';
 import { locationData } from '@/shared/utils/constants';
-import { checkPasswordStrength, type BuyerRegisterFormData } from '@/features/buyer/utils/buyerRegisterUtils';
+import type { BuyerRegisterFormData } from '@/features/buyer/utils/buyerRegisterUtils';
+import { PasswordChecklist } from '@/features/auth/components/PasswordChecklist';
 
 interface BuyerRegisterStepsProps {
   currentStep: number;
@@ -38,304 +36,241 @@ export const BuyerRegisterSteps = ({
   isExistingUser = false,
 }: BuyerRegisterStepsProps) => {
   return (
-    <>
-                {/* Step 1: Personal Details */}
-                {currentStep === 1 && (
-                  <>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-0.5 sm:space-y-2">
-                        <Label htmlFor="firstName" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          First Name
-                        </Label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                            <User className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                          </div>
-                          <Input
-                            id="firstName"
-                            name="firstName"
-                            type="text"
-                            placeholder="First Name"
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            required
-                            className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.firstName ? 'border-red-500' : ''}`}
-                          />
-                        </div>
-                        {errors.firstName && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.firstName}</p>}
-                      </div>
+    <div className="w-full flex flex-col gap-4">
+      {/* Step 1: Your Details */}
+      {currentStep === 1 && (
+        <>
+          <div className="grid grid-cols-2 gap-3 w-full">
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="firstName" className="text-[13px] font-medium text-[#a1a1a6]">
+                First name
+              </label>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                placeholder="Amina"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                required
+                className={`h-14 w-full bg-[#27272c] border ${errors.firstName ? 'border-red-500' : 'border-[#34343a]'} focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors`}
+              />
+              {errors.firstName && <p className="text-xs text-red-400 mt-0.5">{errors.firstName}</p>}
+            </div>
 
-                      <div className="space-y-0.5 sm:space-y-2">
-                        <Label htmlFor="lastName" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          Last Name
-                        </Label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                            <User className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                          </div>
-                          <Input
-                            id="lastName"
-                            name="lastName"
-                            type="text"
-                            placeholder="Last Name"
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            required
-                            className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.lastName ? 'border-red-500' : ''}`}
-                          />
-                        </div>
-                        {errors.lastName && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.lastName}</p>}
-                      </div>
-                    </div>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="lastName" className="text-[13px] font-medium text-[#a1a1a6]">
+                Last name
+              </label>
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                placeholder="Wanjiru"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                required
+                className={`h-14 w-full bg-[#27272c] border ${errors.lastName ? 'border-red-500' : 'border-[#34343a]'} focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors`}
+              />
+              {errors.lastName && <p className="text-xs text-red-400 mt-0.5">{errors.lastName}</p>}
+            </div>
+          </div>
 
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="email" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                        <span>Email Address</span>
-                        {isExistingUser && (
-                          <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>
-                        )}
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                          <Mail className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          autoComplete="email"
-                          placeholder="Enter your email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          readOnly={isExistingUser}
-                          required
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${isExistingUser ? 'opacity-80 cursor-not-allowed' : ''} ${errors.email ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors.email && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.email}</p>}
-                    </div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <div className="flex items-center justify-between">
+              <label htmlFor="email" className="text-[13px] font-medium text-[#a1a1a6]">
+                Email address
+              </label>
+              {isExistingUser && (
+                <span className="text-[11px] text-[#f5c518] font-semibold">Linked to Byblos account</span>
+              )}
+            </div>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={handleInputChange}
+              readOnly={isExistingUser}
+              required
+              className={`h-14 w-full bg-[#27272c] border ${errors.email ? 'border-red-500' : 'border-[#34343a]'} focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors ${isExistingUser ? 'opacity-80 cursor-not-allowed' : ''}`}
+            />
+            {errors.email && <p className="text-xs text-red-400 mt-0.5">{errors.email}</p>}
+          </div>
 
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="mobilePayment" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200 flex items-center justify-between">
-                        Mobile Payment (M-Pesa)
-                        <span className="text-[8px] sm:text-[10px] text-yellow-600 dark:text-yellow-400 font-semibold">For STK Push & Refunds</span>
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                          <Phone className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Input
-                          id="mobilePayment"
-                          name="mobilePayment"
-                          type="tel"
-                          placeholder="e.g. 0712345678"
-                          value={formData.mobilePayment}
-                          onChange={handleInputChange}
-                          required
-                          className={`input-mobile !pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.mobilePayment ? 'border-red-500' : ''}`}
-                        />
-                      </div>
-                      {errors.mobilePayment && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.mobilePayment}</p>}
-                    </div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <label htmlFor="mobilePayment" className="text-[13px] font-medium text-[#a1a1a6]">
+              Mobile payment (M-Pesa)
+            </label>
+            <input
+              id="mobilePayment"
+              name="mobilePayment"
+              type="tel"
+              placeholder="0712 345 678"
+              value={formData.mobilePayment}
+              onChange={handleInputChange}
+              required
+              className={`h-14 w-full bg-[#27272c] border ${errors.mobilePayment ? 'border-red-500' : 'border-[#34343a]'} focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] placeholder-[#8a8a91] transition-colors`}
+            />
+            <p className="text-[12px] text-[#a1a1a6]">Used for STK push and refunds</p>
+            {errors.mobilePayment && <p className="text-xs text-red-400 mt-0.5">{errors.mobilePayment}</p>}
+          </div>
+        </>
+      )}
 
-                  </>
-                )}
+      {/* Step 2: Location */}
+      {currentStep === 2 && (
+        <>
+          <div className="flex flex-col gap-1.5 w-full">
+            <label htmlFor="city" className="text-[13px] font-medium text-[#a1a1a6]">
+              City
+            </label>
+            <select
+              id="city"
+              value={formData.city}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  city: val,
+                  location: '',
+                }));
+              }}
+              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] transition-colors appearance-none cursor-pointer"
+            >
+              <option value="Nairobi" className="bg-[#27272c] text-white">Nairobi</option>
+            </select>
+          </div>
 
-                {/* Step 2: Location */}
-                {currentStep === 2 && (
-                  <>
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="city" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        City
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none z-10">
-                          <MapPin className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Select
-                          value={formData.city}
-                          onValueChange={(value) => {
-                            setFormData(prev => ({
-                              ...prev,
-                              city: value,
-                              location: '' // Reset location when city changes
-                            }));
-                          }}
-                        >
-                          <SelectTrigger className="!pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm">
-                            <SelectValue placeholder="Nairobi" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
-                            <SelectItem value="Nairobi" className="text-slate-900 dark:text-white focus:bg-yellow-400 focus:text-black text-xs">
-                              Nairobi
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <label htmlFor="location" className="text-[13px] font-medium text-[#a1a1a6]">
+              Area / location
+            </label>
+            <select
+              id="location"
+              value={formData.location}
+              onChange={(e) => {
+                const val = e.target.value;
+                setFormData((prev) => ({
+                  ...prev,
+                  location: val,
+                }));
+              }}
+              className="h-14 w-full bg-[#27272c] border border-[#34343a] focus:border-[#f5c518] focus:outline-none rounded-[14.5px] px-4 text-white text-[16px] transition-colors appearance-none cursor-pointer"
+            >
+              <option value="" disabled className="bg-[#27272c] text-[#8a8a91]">
+                Select your area
+              </option>
+              {formData.city &&
+                locationData[formData.city]?.map((area) => (
+                  <option key={area} value={area} className="bg-[#27272c] text-white">
+                    {area}
+                  </option>
+                ))}
+            </select>
+            {errors.location && <p className="text-xs text-red-400 mt-0.5">{errors.location}</p>}
+          </div>
+        </>
+      )}
 
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="location" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        Area/Location
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none z-10">
-                          <MapPin className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Select
-                          value={formData.location}
-                          onValueChange={(value) => {
-                            setFormData(prev => ({
-                              ...prev,
-                              location: value
-                            }));
-                          }}
-                          disabled={!formData.city}
-                        >
-                          <SelectTrigger className="!pl-8 sm:!pl-14 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white focus:border-yellow-400 focus:ring-yellow-400 disabled:opacity-50 text-[10px] sm:text-sm">
-                            <SelectValue placeholder={formData.city ? "Select your area" : "Select city first"} />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white dark:bg-zinc-900 border-slate-200 dark:border-white/20 text-slate-950 dark:text-white z-[110]">
-                            {formData.city && locationData[formData.city]?.map((area) => (
-                              <SelectItem key={area} value={area} className="text-slate-900 dark:text-white focus:bg-yellow-400 focus:text-black text-xs">
-                                {area}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </>
-                )}
+      {/* Step 3: Password */}
+      {currentStep === 3 && (
+        <>
+          {isExistingUser && (
+            <p className="text-xs text-[#f5c518] font-medium bg-[#f5c518]/10 p-3 rounded-xl border border-[#f5c518]/30">
+              Enter your existing Byblos account password to link your buyer profile.
+            </p>
+          )}
 
-                {/* Step 3: Security */}
-                {currentStep === 3 && (
-                  <>
-                    {isExistingUser && (
-                      <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-400/10 dark:bg-yellow-400/15 p-2 rounded-lg border border-yellow-400/30">
-                        Enter your existing Byblos account password to link your buyer profile.
-                      </p>
-                    )}
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="password" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        Password
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                          <Lock className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Input
-                          id="password"
-                          name="password"
-                          type={showPassword ? 'text' : 'password'}
-                          autoComplete="new-password"
-                          placeholder="Create a password (min 8 characters)"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          required
-                          className={`input-mobile !pl-8 sm:!pl-14 !pr-8 sm:!pr-12 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.password ? 'border-red-500' : ''}`}
-                        />
-                        <button
-                          type="button"
-                          className="absolute inset-y-0 right-0 pr-2 sm:pr-4 flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? (
-                            <EyeOff className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                          ) : (
-                            <Eye className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
+          <div className="flex flex-col gap-1.5 w-full">
+            <label htmlFor="password" className="text-[13px] font-medium text-[#a1a1a6]">
+              Password
+            </label>
+            <div className="relative w-full">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className={`h-14 w-full bg-[#27272c] border ${errors.password ? 'border-red-500' : 'border-[#34343a]'} focus:border-[#f5c518] focus:outline-none rounded-[14.5px] pl-4 pr-12 text-white text-[16px] placeholder-[#8a8a91] transition-colors`}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[#8a8a91] hover:text-white transition-colors"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            {errors.password && <p className="text-xs text-red-400 mt-0.5">{errors.password}</p>}
+          </div>
 
-                    {/* Password Strength Checklist */}
-                    {formData.password && (
-                      <div className="p-3 bg-slate-100 dark:bg-fill rounded-xl border border-slate-200 dark:border-separator">
-                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">Password Requirements:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {[
-                            { label: "At least 8 characters", met: checkPasswordStrength(formData.password).minLength },
-                            { label: "At least one number", met: checkPasswordStrength(formData.password).hasNumber },
-                            { label: "At least one special char", met: checkPasswordStrength(formData.password).hasSpecial },
-                            { label: "Upper & lowercase letters", met: checkPasswordStrength(formData.password).hasUpper && checkPasswordStrength(formData.password).hasLower },
-                          ].map((req) => (
-                            <div key={req.label} className="flex items-center space-x-2">
-                              {req.met ? (
-                                <div className="bg-green-500/20 p-0.5 rounded-full">
-                                  <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-green-600 dark:text-green-400" />
-                                </div>
-                              ) : (
-                                <div className="bg-slate-300 dark:bg-gray-700 p-0.5 rounded-full">
-                                  <X className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-slate-600 dark:text-label-2" />
-                                </div>
-                              )}
-                              <span className={`text-[10px] sm:text-xs ${req.met ? 'text-green-600 dark:text-green-400 font-semibold' : 'text-slate-600 dark:text-label-2'}`}>
-                                {req.label}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+          <div className="flex flex-col gap-1.5 w-full">
+            <label htmlFor="confirmPassword" className="text-[13px] font-medium text-[#a1a1a6]">
+              Confirm password
+            </label>
+            <div className="relative w-full">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                required
+                className={`h-14 w-full bg-[#27272c] border ${errors.confirmPassword ? 'border-red-500' : 'border-[#34343a]'} focus:border-[#f5c518] focus:outline-none rounded-[14.5px] pl-4 pr-12 text-white text-[16px] placeholder-[#8a8a91] transition-colors`}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-[#8a8a91] hover:text-white transition-colors"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            {errors.confirmPassword && <p className="text-xs text-red-400 mt-0.5">{errors.confirmPassword}</p>}
+          </div>
 
-                    <div className="space-y-0.5 sm:space-y-2">
-                      <Label htmlFor="confirmPassword" className="text-[10px] sm:text-sm font-semibold text-slate-800 dark:text-slate-200">
-                        Confirm Password
-                      </Label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-2 sm:pl-4 flex items-center pointer-events-none">
-                          <Lock className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-slate-400 dark:text-slate-500" />
-                        </div>
-                        <Input
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          autoComplete="new-password"
-                          placeholder="Confirm your password"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          required
-                          className={`input-mobile !pl-8 sm:!pl-14 !pr-8 sm:!pr-12 h-8 sm:h-11 md:h-12 rounded-lg sm:rounded-xl bg-slate-50 dark:bg-fill border-slate-300 dark:border-white/15 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-yellow-400 focus:ring-yellow-400 text-[10px] sm:text-sm ${errors.confirmPassword ? 'border-red-500' : ''}`}
-                        />
-                        <button
-                          type="button"
-                          className="absolute inset-y-0 right-0 pr-2 sm:pr-4 flex items-center text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                          ) : (
-                            <Eye className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                          )}
-                        </button>
-                      </div>
-                      {errors.confirmPassword && <p className="text-[10px] sm:text-sm text-red-500 mt-0.5 sm:mt-1 ml-1 font-medium">{errors.confirmPassword}</p>}
-                    </div>
+          {/* Password Requirements */}
+          <PasswordChecklist
+            password={formData.password}
+            confirmPassword={formData.confirmPassword}
+            title="PASSWORD REQUIREMENTS"
+            showMatch={false}
+          />
 
-                    <div className="pt-2">
-                      <div className="flex items-start space-x-2 bg-slate-50 dark:bg-fill p-3 rounded-xl border border-slate-200 dark:border-separator">
-                        <input
-                          type="checkbox"
-                          id="termsAccepted"
-                          checked={termsAccepted}
-                          onChange={(e) => setTermsAccepted(e.target.checked)}
-                          className="mt-0.5 rounded accent-yellow-400 cursor-pointer"
-                        />
-                        <Label htmlFor="termsAccepted" className="text-[10px] sm:text-xs text-slate-600 dark:text-label-2 font-medium cursor-pointer">
-                          I agree to the{' '}
-                          <button
-                            type="button"
-                            onClick={() => setIsTermsModalOpen(true)}
-                            className="text-yellow-600 dark:text-yellow-400 hover:underline font-semibold"
-                          >
-                            Terms & Conditions
-                          </button>
-                        </Label>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </>
+          {/* Terms checkbox */}
+          <div className="flex items-center gap-3 pt-1">
+            <input
+              type="checkbox"
+              id="termsAccepted"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              className="w-4 h-4 rounded border-[#34343a] bg-[#27272c] text-[#f5c518] focus:ring-[#f5c518] accent-[#f5c518] cursor-pointer"
+            />
+            <label htmlFor="termsAccepted" className="text-[13px] text-[#a1a1a6] cursor-pointer">
+              I agree to the{' '}
+              <button
+                type="button"
+                onClick={() => setIsTermsModalOpen(true)}
+                className="text-[#f5c518] hover:underline font-medium"
+              >
+                Terms and Privacy Policy
+              </button>
+            </label>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
+export default BuyerRegisterSteps;

@@ -1,7 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
 
-import { Button } from '@/shared/ui/button';
-
 // Lazy load the OrdersSection component
 const OrdersSection = lazy(() => import('@/features/orders/components/OrdersSectionContainer'));
 import {
@@ -39,7 +37,7 @@ const SWIPE_SECTIONS = ['shop', 'wishlist', 'orders', 'notifications'] as const;
 function BuyerDashboard() {
   useThemeScope('buyer');
   const navigate = useNavigate();
-  const { user: globalUser, logout, updateProfile } = useGlobalAuth();
+  const { user: globalUser, logout } = useGlobalAuth();
   const user = globalUser?.role === 'buyer' ? globalUser.profile as BuyerProfile : null;
 
   const { wishlist } = useWishlist();
@@ -72,8 +70,8 @@ function BuyerDashboard() {
     const originalBodyStyle = document.body.style.cssText;
     const originalHtmlStyle = document.documentElement.style.cssText;
 
-    document.body.style.cssText = 'margin: 0; padding: 0; background-color: var(--byblos-bg, #000000); overflow-x: hidden;';
-    document.documentElement.style.cssText = 'margin: 0; padding: 0; background-color: var(--byblos-bg, #000000); overflow-x: hidden;';
+    document.body.style.cssText = 'margin: 0; padding: 0; background-color: var(--byblos-bg, #121214); overflow-x: hidden;';
+    document.documentElement.style.cssText = 'margin: 0; padding: 0; background-color: var(--byblos-bg, #121214); overflow-x: hidden;';
 
     return () => {
       document.body.style.cssText = originalBodyStyle;
@@ -121,7 +119,7 @@ function BuyerDashboard() {
   });
 
   return (
-    <div className="page-enter dashboard-layout min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
+    <div className="page-enter dashboard-layout min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#121214)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
       display: 'flex', flexDirection: 'column',
       minHeight: '100%',
       height: '100%',
@@ -145,7 +143,7 @@ function BuyerDashboard() {
           overflowY: 'auto',
           overflowX: 'hidden',
           padding: 'clamp(10px, 4vw, 18px)',
-          paddingBottom: 'calc(4rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+          paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
           WebkitOverflowScrolling: 'touch',
           scrollBehavior: 'smooth',
           overscrollBehavior: 'none',
@@ -167,18 +165,24 @@ function BuyerDashboard() {
                   variant="default"
                   role="buyer"
                   scrollClassName=""
-                  className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+                  className="overflow-hidden rounded-[16px] border border-slate-200 dark:border-[#34343a] bg-white dark:bg-[#27272c] shadow-sm"
                 />
               ) : (
-                <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-6 text-center space-y-3">
-                  <Bell className="mx-auto h-8 w-8 text-yellow-400" />
-                  <h3 className="text-base font-bold text-slate-950 dark:text-white">Alerts & Notifications</h3>
-                  <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
+                <div className="rounded-[16px] border border-slate-200 dark:border-[#34343a] bg-white dark:bg-[#27272c] p-8 text-center space-y-4 max-w-md mx-auto shadow-sm">
+                  <div className="w-[72px] h-[72px] mx-auto bg-[#f5c518]/15 border border-[#f5c518]/30 rounded-2xl flex items-center justify-center text-[#f5c518] shadow-sm">
+                    <Bell className="h-8 w-8" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Alerts & Notifications</h3>
+                  <p className="text-sm text-slate-600 dark:text-[#a1a1a6] leading-relaxed max-w-sm mx-auto">
                     Sign in to your Byblos account to receive instant order tracking updates, delivery notifications, and messages.
                   </p>
-                  <Button onClick={() => navigate('/buyer/login')} className="h-10 px-6 rounded-full bg-[#F5C518] text-black font-bold hover:bg-yellow-300">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/buyer/login')}
+                    className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-slate-900 text-white dark:bg-white dark:text-black font-semibold text-sm hover:opacity-90 transition-opacity"
+                  >
                     Sign In
-                  </Button>
+                  </button>
                 </div>
               )}
             </div>
@@ -187,8 +191,8 @@ function BuyerDashboard() {
           {activeSection === 'wishlist' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs sm:text-sm font-bold text-slate-950 dark:text-white">Wishlist</span>
-                <span className="text-xs font-semibold text-slate-500 dark:text-white/50">{wishlist.length} items</span>
+                <span className="text-sm font-bold text-slate-950 dark:text-white">Wishlist</span>
+                <span className="text-xs font-semibold text-slate-500 dark:text-[#a1a1a6]">{wishlist.length} items</span>
               </div>
               <WishlistSection />
             </div>
@@ -206,15 +210,21 @@ function BuyerDashboard() {
             user ? (
               <BuyerRefundsTab refundAmount={refundAmount} />
             ) : (
-              <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-6 text-center space-y-3">
-                <WalletCards className="mx-auto h-8 w-8 text-yellow-400" />
-                <h3 className="text-base font-bold text-slate-950 dark:text-white">Refunds</h3>
-                <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
+              <div className="rounded-[16px] border border-slate-200 dark:border-[#34343a] bg-white dark:bg-[#27272c] p-8 text-center space-y-4 max-w-md mx-auto shadow-sm">
+                <div className="w-[72px] h-[72px] mx-auto bg-[#f5c518]/15 border border-[#f5c518]/30 rounded-2xl flex items-center justify-center text-[#f5c518] shadow-sm">
+                  <WalletCards className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Refunds</h3>
+                <p className="text-sm text-slate-600 dark:text-[#a1a1a6] leading-relaxed max-w-sm mx-auto">
                   Sign in to view your refund balance and withdrawal history.
                 </p>
-                <Button onClick={() => navigate('/buyer/login')} className="h-10 px-6 rounded-full bg-[#F5C518] text-black font-bold hover:bg-yellow-300">
+                <button
+                  type="button"
+                  onClick={() => navigate('/buyer/login')}
+                  className="inline-flex items-center justify-center h-12 px-6 rounded-[14px] bg-slate-900 text-white dark:bg-white dark:text-black font-semibold text-sm hover:opacity-90 transition-opacity"
+                >
                   Sign In
-                </Button>
+                </button>
               </div>
             )
           )}

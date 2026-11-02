@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, LogOut, UserRound } from '@/shared/ui/icons';
+import { Loader2, LogOut, UserRound, TrendingUp, Wallet, Store } from '@/shared/ui/icons';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { toast } from 'sonner';
 import { useCreatorDashboardQuery } from '@/features/creator/hooks/queries/useCreatorDashboardQuery';
@@ -195,7 +195,14 @@ export default function CreatorDashboard() {
   return (
     <main className="dashboard-layout text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
       <AppHeader
-        left={<NotificationBell triggerClassName="text-label hover:bg-fill" role="creator" />}
+        left={
+          <div className="flex items-center gap-2.5">
+            <NotificationBell triggerClassName="text-label hover:bg-fill" role="creator" />
+            <span className="inline-flex items-center rounded-full bg-[#f5c518]/15 border border-[#f5c518]/30 px-2 py-0.5 text-[10px] font-bold tracking-wider text-[#f5c518]">
+              CREATOR
+            </span>
+          </div>
+        }
         right={
           <button
             type="button"
@@ -218,7 +225,7 @@ export default function CreatorDashboard() {
         </div>
       </div>
 
-      <div className="space-y-5 px-4 pt-3.5 pb-8 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(2.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}>
+      <div className="space-y-5 px-4 pt-3.5 pb-24 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(6rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}>
         {tab === 'performance' ? (
           <>
             <CreatorEarningsHero
@@ -358,6 +365,53 @@ export default function CreatorDashboard() {
             onLogout={handleLogout}
           />
         </div>
+
+      {/* Penpot Fixed Bottom Navigation Bar */}
+      <nav
+        aria-label="Creator bottom navigation"
+        className="fixed bottom-0 left-0 right-0 z-30 flex h-[62px] items-center justify-around border-t border-[#34343a] bg-[#27272c] px-4"
+        style={{ paddingBottom: 'var(--sab, env(safe-area-inset-bottom, 0px))' }}
+      >
+        <button
+          type="button"
+          onClick={() => setTab('performance')}
+          className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+            tab === 'performance' ? 'text-[#f5c518]' : 'text-[#a1a1a6] hover:text-white'
+          }`}
+        >
+          <TrendingUp className="h-5 w-5" />
+          <span className="text-[11px] font-semibold">Performance</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTab('withdrawals')}
+          className={`flex flex-col items-center justify-center gap-1 transition-colors ${
+            tab === 'withdrawals' ? 'text-[#f5c518]' : 'text-[#a1a1a6] hover:text-white'
+          }`}
+        >
+          <Wallet className="h-5 w-5" />
+          <span className="text-[11px] font-semibold">Withdrawals</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setTab('shops')}
+          className={`relative flex flex-col items-center justify-center gap-1 transition-colors ${
+            tab === 'shops' ? 'text-[#f5c518]' : 'text-[#a1a1a6] hover:text-white'
+          }`}
+        >
+          <div className="relative">
+            <Store className="h-5 w-5" />
+            {shopRequests.length > 0 && (
+              <span className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#f5c518] px-1 text-[10px] font-bold text-black">
+                {shopRequests.length}
+              </span>
+            )}
+          </div>
+          <span className="text-[11px] font-semibold">Shops</span>
+        </button>
+      </nav>
     </main>
   );
 }

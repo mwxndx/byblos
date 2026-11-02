@@ -73,7 +73,7 @@ export type BusinessEarningRow = {
   shop_name?: string;
   earnings?: number | string;
 };
-export type WithdrawalRow = { id: number; amount?: number | string; withdrawal_fee?: number | string; status?: WithdrawalStatus };
+export type WithdrawalRow = { id: number; amount?: number | string; withdrawal_fee?: number | string; status?: WithdrawalStatus; created_at?: string; createdAt?: string };
 export type LeaderboardRow = {
   id: number;
   first_name?: string;

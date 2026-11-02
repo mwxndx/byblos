@@ -27,78 +27,76 @@ export function ProductsTab({
   const hasProducts = products.length > 0;
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div className="text-center px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-label mb-1.5">Product Management</h2>
-        <p className="text-label-2 text-xs sm:text-sm lg:text-base font-medium">Manage all your products in one place</p>
-      </div>
-
-      <div className="space-y-4">
-        {/* Service-charge notice — explicitly readable in both light and dark themes. */}
-        <div className="rounded-2xl border border-yellow-300 bg-yellow-50 text-yellow-900 dark:border-yellow-400/30 dark:bg-yellow-400/10 dark:text-yellow-100 px-4 py-3 text-xs sm:text-sm font-semibold leading-relaxed">
-          Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
+    <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto pb-6">
+      {/* Header matching Penpot Seller - Products */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Products</h2>
+          <p className="text-xs sm:text-sm text-[#a1a1a6] mt-0.5">Manage inventory and track stock levels</p>
         </div>
 
-        {/* Single controlled add-product dialog, opened from the header button or the empty-state plus. */}
-        <Dialog open={isAddProductModalOpen} onOpenChange={setIsAddProductModalOpen}>
-          <DialogContent className="flex flex-col w-[92vw] max-w-lg sm:max-w-[540px] h-[85dvh] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
-            <DialogHeader className="sr-only">
-              <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription>Create and publish a new product to your Byblos shop</DialogDescription>
-            </DialogHeader>
-            <div className="product-modal-light flex h-full min-h-0 flex-1 flex-col overflow-hidden">
-              <AddProductForm
-                onSuccess={() => {
-                  void fetchProducts().catch(() => {});
-                  setIsAddProductModalOpen(false);
-                }}
-                onClose={() => setIsAddProductModalOpen(false)}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {hasProducts ? (
-          <>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <div>
-                <h3 className="text-base sm:text-lg font-semibold text-label">All Products</h3>
-                <p className="text-label-2 text-xs sm:text-sm font-medium mt-1">Manage inventory and track stock levels</p>
-              </div>
-
-              <Button
-                size="sm"
-                onClick={() => setIsAddProductModalOpen(true)}
-                className="gap-1.5 bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-lg px-3 py-1.5 rounded-lg font-semibold text-xs w-full sm:w-auto h-8"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Add products
-              </Button>
-            </div>
-
-            <ProductsList
-              products={products as import('@/shared/types').Product[]}
-              onDelete={onDeleteProduct}
-              onEdit={onEditProduct}
-              onStatusUpdate={onStatusUpdate}
-              onRefresh={fetchProducts}
-            />
-          </>
-        ) : (
-          /* Empty state: a single prominent plus that opens the existing creation flow. */
-          <div className="flex flex-col items-center justify-center gap-4 py-14 text-center">
-            <button
-              type="button"
-              onClick={() => setIsAddProductModalOpen(true)}
-              aria-label="Add your first product"
-              className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] shadow-lg transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-button-bg,#f5c518)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-            >
-              <Plus className="h-10 w-10" strokeWidth={2.5} />
-            </button>
-            <p className="text-sm font-semibold text-label-2">Tap the plus to add your first product</p>
-          </div>
-        )}
+        <Button
+          size="sm"
+          onClick={() => setIsAddProductModalOpen(true)}
+          className="gap-2 bg-[#f5c518] hover:bg-[#e5b510] text-black shadow-md px-4 py-2 rounded-[12px] font-semibold text-xs sm:text-sm h-10 w-full sm:w-auto shrink-0 transition-transform active:scale-95"
+        >
+          <Plus className="h-4 w-4" />
+          Add product
+        </Button>
       </div>
+
+      {/* Service-charge notice */}
+      <div className="rounded-[14px] border border-yellow-500/20 bg-yellow-500/10 text-yellow-200 px-4 py-3 text-xs leading-relaxed">
+        Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support operations.
+      </div>
+
+      {/* Single controlled add-product dialog */}
+      <Dialog open={isAddProductModalOpen} onOpenChange={setIsAddProductModalOpen}>
+        <DialogContent className="flex flex-col w-[92vw] max-w-lg sm:max-w-[540px] h-[85dvh] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-[#34343a] bg-[#27272c] text-white rounded-[20px] shadow-2xl [&>button]:z-30">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Add New Product</DialogTitle>
+            <DialogDescription>Create and publish a new product to your Byblos shop</DialogDescription>
+          </DialogHeader>
+          <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-[#27272c] text-white">
+            <AddProductForm
+              onSuccess={() => {
+                void fetchProducts().catch(() => {});
+                setIsAddProductModalOpen(false);
+              }}
+              onClose={() => setIsAddProductModalOpen(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {hasProducts ? (
+        <ProductsList
+          products={products as import('@/shared/types').Product[]}
+          onDelete={onDeleteProduct}
+          onEdit={onEditProduct}
+          onStatusUpdate={onStatusUpdate}
+          onRefresh={fetchProducts}
+        />
+      ) : (
+        /* Empty state matching Penpot: package icon frame, title, description, and prominent CTA */
+        <div className="flex flex-col items-center justify-center gap-4 py-16 text-center rounded-[16px] border border-[#34343a] bg-[#27272c] p-8">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#121214] border border-[#34343a] text-[#a1a1a6]">
+            <Plus className="h-8 w-8 text-[#f5c518]" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-base sm:text-lg font-semibold text-white">No products yet</h3>
+            <p className="text-xs sm:text-sm text-[#a1a1a6] max-w-xs">
+              Get started by adding your first product from the button above
+            </p>
+          </div>
+          <Button
+            onClick={() => setIsAddProductModalOpen(true)}
+            className="mt-2 bg-[#f5c518] hover:bg-[#e5b510] text-black font-semibold rounded-[12px] px-5 py-2 text-sm shadow-md transition-transform active:scale-95"
+          >
+            Add product
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

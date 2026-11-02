@@ -2,7 +2,6 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { Input } from '@/shared/ui/input';
-import { EmptyState } from '@/shared/ui/empty-state';
 import { SellerOrderCard } from './SellerOrderCard';
 
 import { Package, RefreshCw, Download } from '@/shared/ui/icons';
@@ -91,15 +90,15 @@ export default function SellerOrdersSection() {
 
     if (ordersQuery.error) {
         return (
-            <div className="text-center py-12 px-4 bg-white rounded-2xl border border-red-200 shadow-sm">
-                <div className="mx-auto w-16 h-16 bg-red-50 border border-red-200 rounded-full flex items-center justify-center mb-4">
-                    <RefreshCw className="h-8 w-8 text-red-600" />
+            <div className="text-center py-12 px-4 bg-[#27272c] rounded-[16px] border border-[#34343a] shadow-sm">
+                <div className="mx-auto w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mb-4">
+                    <RefreshCw className="h-8 w-8 text-red-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-950 mb-2">Unable to load orders</h3>
-                <p className="text-slate-600 max-w-md mx-auto mb-4">Please try refreshing your orders.</p>
+                <h3 className="text-lg font-semibold text-white mb-2">Unable to load orders</h3>
+                <p className="text-[#a1a1a6] max-w-md mx-auto mb-4 text-sm">Please try refreshing your orders.</p>
                 <Button
                     onClick={() => ordersQuery.refetch()}
-                    className="bg-yellow-400 text-black hover:bg-yellow-500"
+                    className="bg-[#f5c518] text-black hover:bg-[#e5b510] font-semibold rounded-[12px]"
                 >
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Retry
@@ -110,11 +109,17 @@ export default function SellerOrdersSection() {
 
     if (orders.length === 0) {
         return (
-            <EmptyState
-                icon={<Package className="h-7 w-7" />}
-                title="No orders yet"
-                description="Your orders will appear here when customers purchase your products."
-            />
+            <div className="flex flex-col items-center justify-center gap-4 py-16 text-center rounded-[16px] border border-[#34343a] bg-[#27272c] p-8">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#121214] border border-[#34343a] text-[#a1a1a6]">
+                    <Package className="h-8 w-8 text-[#f5c518]" />
+                </div>
+                <div className="space-y-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-white">No orders yet</h3>
+                    <p className="text-xs sm:text-sm text-[#a1a1a6] max-w-xs">
+                        Your orders will appear here when customers purchase your products.
+                    </p>
+                </div>
+            </div>
         );
     }
 
@@ -123,21 +128,21 @@ export default function SellerOrdersSection() {
             <div className="space-y-4 sm:space-y-6">
                 {/* Search and Export Controls */}
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                    {/* Search Bar */}
+                    {/* Search Bar matching Penpot */}
                     <div className="relative flex-1">
                         <Input
-                            placeholder="Search by buyer name, product, or order ID..."
+                            placeholder="Search by buyer, product or order ID"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="h-11 rounded-2xl bg-white border-slate-200 text-slate-950 placeholder:text-slate-500 focus:border-yellow-400/70 focus:ring-yellow-400/20"
+                            className="h-11 rounded-[14px] bg-[#27272c] border-[#34343a] text-white placeholder:text-[#a1a1a6] focus:border-[#f5c518] focus-visible:ring-1 focus-visible:ring-[#f5c518]"
                         />
                     </div>
 
-                    {/* Export Button */}
+                    {/* Export Button matching Penpot */}
                     <Button
                         onClick={() => exportOrdersToCSV(orders)}
                         variant="outline"
-                        className="h-11 rounded-2xl border-slate-200 bg-white text-slate-700 hover:bg-yellow-400 hover:text-black gap-2"
+                        className="h-11 rounded-[12px] border-[#34343a] bg-[#27272c] text-white hover:bg-[#34343a] hover:text-white gap-2 font-medium shrink-0"
                         disabled={orders.length === 0}
                     >
                         <Download className="h-4 w-4" />
@@ -148,8 +153,8 @@ export default function SellerOrdersSection() {
 
                 <div className="space-y-4">
                     {filteredOrders.length === 0 ? (
-                        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
-                            <p className="text-slate-600">No orders found matching "{searchQuery}"</p>
+                        <div className="text-center py-12 px-4 bg-[#27272c] rounded-[16px] border border-[#34343a] shadow-sm">
+                            <p className="text-[#a1a1a6] text-sm">No orders found matching "{searchQuery}"</p>
                         </div>
                     ) : (
                         filteredOrders.map((order) => (
