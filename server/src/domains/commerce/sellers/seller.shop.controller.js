@@ -1,7 +1,7 @@
 // Seller shop/discovery handlers (public shop lookup, search, product listing).
 // Split from seller.controller.js in Phase 15.7b; re-exported via that barrel.
 import { findSellersByLocation, findSellerProducts } from './seller.repository.js';
-import { findSellerByShopName, isShopNameAvailable, findSellerById } from './seller.model.js';
+import { findSellerByShopName, isShopNameAvailable, findSellerById, normalizeShopName } from './seller.model.js';
 import { sanitizeSeller, sanitizePublicSeller } from '../../../shared/utils/sanitize.js';
 import cacheService from '../../../shared/utils/cache.service.js';
 
@@ -17,14 +17,15 @@ export const checkShopNameAvailability = async (req, res) => {
     }
 
     // Validation format rules (must match Zod schema in sellerValidation.js)
-    const shopNameRegex = /^[a-zA-Z0-9._-]+$/;
-    const isAllowedFormat = shopNameRegex.test(shopName) && shopName.length >= 3 && shopName.length <= 30;
+    const normalizedShopName = normalizeShopName(shopName);
+    const shopNameRegex = /^[a-zA-Z0-9._\s-]+$/;
+    const isAllowedFormat = shopNameRegex.test(shopName) && normalizedShopName.length >= 3 && normalizedShopName.length <= 30;
 
     if (!isAllowedFormat) {
       let formatMessage = 'Invalid format';
-      if (shopName.length < 3) formatMessage = 'Shop name must be at least 3 characters';
-      if (shopName.length > 30) formatMessage = 'Shop name must be at most 30 characters';
-      if (!shopNameRegex.test(shopName)) formatMessage = 'Shop name can only contain letters, numbers, dots, dashes, and underscores';
+      if (normalizedShopName.length < 3) formatMessage = 'Shop name must be at least 3 characters';
+      if (normalizedShopName.length > 30) formatMessage = 'Shop name must be at most 30 characters';
+      if (!shopNameRegex.test(shopName)) formatMessage = 'Shop name can only contain letters, numbers, spaces, dots, dashes, and underscores';
 
       return res.status(200).json({
         status: 'success',
@@ -36,13 +37,14 @@ export const checkShopNameAvailability = async (req, res) => {
       });
     }
 
-    const isAvailable = await isShopNameAvailable(shopName);
+    const isAvailable = await isShopNameAvailable(normalizedShopName);
 
     res.status(200).json({
       status: 'success',
       data: {
         available: isAvailable,
         allowed: true,
+        normalizedName: normalizedShopName,
         message: isAvailable ? 'Shop name is available' : 'Shop name is already taken'
       }
     });

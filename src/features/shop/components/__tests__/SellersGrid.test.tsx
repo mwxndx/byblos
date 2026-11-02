@@ -58,4 +58,57 @@ describe('SellersGrid defense-in-depth', () => {
     // Tombstoned shop must NOT be rendered
     expect(screen.queryByText(/deleted-shop-16/i)).not.toBeInTheDocument();
   });
+
+  it('prioritizes shops with business profile photo, instagram, and tiktok first in the buyer dashboard', () => {
+    const mockSellers: Partial<ApiPublicSeller>[] = [
+      {
+        id: '1',
+        shopName: 'Incomplete Shop',
+        fullName: 'Seller Incomplete',
+        status: 'active',
+        is_active: true,
+      },
+      {
+        id: '2',
+        shopName: 'Complete Shop',
+        fullName: 'Seller Complete',
+        avatarUrl: 'https://example.com/avatar.jpg',
+        instagramLink: 'completeshop',
+        tiktokLink: 'completeshop',
+        status: 'active',
+        is_active: true,
+      },
+      {
+        id: '3',
+        shopName: 'Photo Only Shop',
+        fullName: 'Seller Photo',
+        avatarUrl: 'https://example.com/photo.jpg',
+        status: 'active',
+        is_active: true,
+      }
+    ];
+
+    vi.mocked(usePublicSellersQuery).mockReturnValue({
+      data: {
+        sellers: mockSellers as ApiPublicSeller[],
+        pagination: { page: 1, pageSize: 24, total: 3, hasMore: false }
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof usePublicSellersQuery>);
+
+    const { container } = render(
+      <MemoryRouter>
+        <SellersGrid filterCity="" filterArea="" searchQuery="" isBuyer={true} />
+      </MemoryRouter>
+    );
+
+    const renderedText = container.textContent || '';
+    const completeIndex = renderedText.indexOf('Complete Shop');
+    const photoOnlyIndex = renderedText.indexOf('Photo Only Shop');
+    const incompleteIndex = renderedText.indexOf('Incomplete Shop');
+
+    expect(completeIndex).toBeGreaterThanOrEqual(0);
+    expect(completeIndex).toBeLessThan(photoOnlyIndex);
+    expect(photoOnlyIndex).toBeLessThan(incompleteIndex);
+  });
 });

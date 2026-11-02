@@ -132,50 +132,26 @@ export function BuyerInfoForm({
           )}
         </div>
 
-        {/* Phone numbers */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="mobilePayment" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-              M-Pesa Number *
-            </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <Phone className="h-4 w-4 text-slate-400" />
-              </div>
-              <Input
-                id="mobilePayment"
-                name="mobilePayment"
-                type="tel"
-                autoComplete="tel"
-                placeholder="07..."
-                value={buyerInfo.mobilePayment}
-                onChange={(e) => setBuyerInfo(prev => ({ ...prev, mobilePayment: e.target.value }))}
-                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.mobilePayment ? 'border-red-500' : ''}`}
-                disabled={isLoading}
-              />
+        {/* Phone number */}
+        <div className="space-y-1.5">
+          <Label htmlFor="mobilePayment" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
+            M-Pesa Number *
+          </Label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+              <Phone className="h-4 w-4 text-slate-400" />
             </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="whatsappNumber" className={`text-xs font-semibold uppercase tracking-wider ${themeClasses.label}`}>
-              WhatsApp (Optional)
-            </Label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                <Phone className="h-4 w-4 text-slate-400" />
-              </div>
-              <Input
-                id="whatsappNumber"
-                name="whatsappNumber"
-                type="tel"
-                autoComplete="tel"
-                placeholder="Same as M-Pesa"
-                value={buyerInfo.whatsappNumber}
-                onChange={(e) => setBuyerInfo(prev => ({ ...prev, whatsappNumber: e.target.value }))}
-                className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input}`}
-                disabled={isLoading}
-              />
-            </div>
+            <Input
+              id="mobilePayment"
+              name="mobilePayment"
+              type="tel"
+              autoComplete="tel"
+              placeholder="07..."
+              value={buyerInfo.mobilePayment}
+              onChange={(e) => setBuyerInfo(prev => ({ ...prev, mobilePayment: e.target.value }))}
+              className={`!pl-12 h-11 text-sm rounded-xl ${themeClasses.input} ${errors.mobilePayment ? 'border-red-500' : ''}`}
+              disabled={isLoading}
+            />
           </div>
         </div>
 

@@ -34,7 +34,7 @@ export default function MarketingLogin() {
     };
 
     return (
-        <div className="auth-page flex min-h-[100svh] items-start justify-center overflow-x-hidden bg-[#f8f7f2] px-4 py-6 text-stone-950 sm:items-center sm:py-8">
+        <div className="auth-page flex min-h-screen min-h-[100dvh] min-h-[100svh] items-start justify-center overflow-x-hidden bg-[#f8f7f2] px-4 py-6 pb-safe-bottom text-stone-950 sm:items-center sm:py-8">
             <div className="w-full max-w-md">
                 <div className="mb-8 text-center">
                     <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-yellow-200 bg-yellow-100 text-black">

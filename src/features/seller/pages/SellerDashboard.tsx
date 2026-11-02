@@ -22,8 +22,10 @@ import { SellerDashboardHeader } from '../components/dashboard/widgets/SellerDas
 import { SellerDashboardErrorState } from '../components/dashboard/widgets/SellerDashboardState';
 import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
 import { SellerDashboardTabs } from '../components/dashboard/widgets/SellerDashboardTabs';
+import { RequiredBusinessPhotoModal } from '../components/dashboard/widgets/RequiredBusinessPhotoModal';
 import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
 import { copyLinkedTextToClipboard, getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
+import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUtils';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { useShopAccentOnly } from '@/shared/hooks/useShopTheme';
 import { useSellerProfileQuery } from '@/features/seller/hooks/useSellerProfile';
@@ -59,6 +61,8 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   // immediately instead of only after a full reload.
   const { data: liveSellerProfile } = useSellerProfileQuery(!!sellerProfile);
   const { data: creatorDashboardData } = useSellerCreatorsQuery(!!sellerProfile);
+  const activeProfile = (liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile;
+  const hasBusinessPhoto = Boolean(activeProfile?.avatarUrl);
   useShopAccentOnly(((liveSellerProfile?.theme ?? sellerProfile?.theme) as Theme) || 'default');
 
   const pendingCreatorsCount = creatorDashboardData?.incomingRequests?.length || 0;
@@ -100,7 +104,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   }, [isProfileOpen]);
 
   const sellerFirstName = useMemo(
-    () => sellerProfile?.fullName?.trim().split(/\s+/)[0] || sellerProfile?.shopName?.trim().split(/\s+/)[0] || 'Seller',
+    () => sellerProfile?.fullName?.trim().split(/\s+/)[0] || (sellerProfile?.shopName ? normalizeShopName(sellerProfile.shopName).split(/\s+/)[0] : '') || 'Seller',
     [sellerProfile?.fullName, sellerProfile?.shopName]
   );
 
@@ -341,6 +345,15 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
         hasUnreadOrders={hasUnreadOrders}
         pendingCreatorsCount={pendingCreatorsCount}
         onSelectTab={handleSelectTab}
+      />
+
+      <RequiredBusinessPhotoModal
+        open={!hasBusinessPhoto}
+        sellerProfile={activeProfile}
+        onLogout={handleLogout}
+        onPhotoUploaded={(newAvatarUrl) => {
+          void updateSellerProfile({ avatarUrl: newAvatarUrl });
+        }}
       />
     </div>
   );

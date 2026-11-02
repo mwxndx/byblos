@@ -31,6 +31,7 @@ describe('SellerRegistration Navigation & Back Logic', () => {
       physicalAddress: '',
       latitude: undefined,
       longitude: undefined,
+      businessPhoto: '',
     },
     setFormData: vi.fn(),
     handleInputChange: vi.fn(),
@@ -213,6 +214,94 @@ describe('SellerRegistration Navigation & Back Logic', () => {
 
     expect(setCurrentStep).toHaveBeenCalledWith(2);
     expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  test('Step 4: Next button is blocked when business photo is missing', () => {
+    const setCurrentStep = vi.fn();
+
+    vi.spyOn(sellerRegHook, 'useSellerRegistration').mockReturnValue({
+      ...defaultHookState,
+      currentStep: 4,
+      formData: {
+        ...defaultHookState.formData,
+        businessPhoto: '',
+      },
+      setCurrentStep,
+    });
+
+    render(
+      <MemoryRouter>
+        <SellerRegistration />
+      </MemoryRouter>
+    );
+
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    fireEvent.click(nextButton);
+
+    expect(setCurrentStep).not.toHaveBeenCalled();
+  });
+
+  test('Step 4: Next button advances to Step 5 when business photo is provided', () => {
+    const setCurrentStep = vi.fn();
+
+    vi.spyOn(sellerRegHook, 'useSellerRegistration').mockReturnValue({
+      ...defaultHookState,
+      currentStep: 4,
+      formData: {
+        ...defaultHookState.formData,
+        businessPhoto: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      },
+      setCurrentStep,
+    });
+
+    render(
+      <MemoryRouter>
+        <SellerRegistration />
+      </MemoryRouter>
+    );
+
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    fireEvent.click(nextButton);
+
+    expect(setCurrentStep).toHaveBeenCalledWith(5);
+  });
+
+  test('Step 5: Back button navigates back to Step 4', () => {
+    const setCurrentStep = vi.fn();
+
+    vi.spyOn(sellerRegHook, 'useSellerRegistration').mockReturnValue({
+      ...defaultHookState,
+      currentStep: 5,
+      setCurrentStep,
+    });
+
+    render(
+      <MemoryRouter>
+        <SellerRegistration />
+      </MemoryRouter>
+    );
+
+    const backButtons = screen.getAllByRole('button', { name: /back/i });
+    const bottomBackButton = backButtons[1];
+    fireEvent.click(bottomBackButton);
+
+    expect(setCurrentStep).toHaveBeenCalledWith(4);
+  });
+
+  test('Step 5: Renders Register button instead of Next button', () => {
+    vi.spyOn(sellerRegHook, 'useSellerRegistration').mockReturnValue({
+      ...defaultHookState,
+      currentStep: 5,
+    });
+
+    render(
+      <MemoryRouter>
+        <SellerRegistration />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('button', { name: /register/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /next/i })).toBeNull();
   });
 });
 

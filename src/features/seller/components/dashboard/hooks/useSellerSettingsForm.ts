@@ -4,6 +4,7 @@ import { checkShopNameAvailability } from '@/features/seller/api';
 import { useUpdateProfileMutation } from '@/features/seller/hooks/useSellerProfile';
 import { sellerQueryKeys } from '@/features/seller/api/queryKeys';
 import { classifyApiError } from '@/shared/utils/errorClassification';
+import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUtils';
 import type { SellerSettingsFormData } from '../types';
 import type { ApiSeller } from '@/shared/types';
 import type { LocationCoordinates } from '@/infrastructure/location/location';
@@ -33,7 +34,7 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
 
   useEffect(() => {
     const checkShopName = async () => {
-      const trimmedShopName = formData.shopName.trim();
+      const trimmedShopName = normalizeShopName(formData.shopName);
 
       if (!trimmedShopName || trimmedShopName === sellerProfile?.shopName) {
         setShopNameAvailable(null);
@@ -176,7 +177,8 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
   }, [sellerProfile]);
 
   const handleSaveProfile = useCallback(async () => {
-    if (!formData.city || !formData.location || !formData.shopName) {
+    const normalizedShopName = normalizeShopName(formData.shopName);
+    if (!formData.city || !formData.location || !normalizedShopName) {
       toast({
         title: 'Error',
         description: 'Please fill in all required fields',
@@ -185,7 +187,7 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
       return;
     }
 
-    if (formData.shopName !== sellerProfile?.shopName && shopNameAvailable === false) {
+    if (normalizedShopName !== sellerProfile?.shopName && shopNameAvailable === false) {
       toast({
         title: 'Error',
         description: 'Shop name is not available. Please choose another.',
@@ -218,7 +220,7 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
     try {
       const payload: Record<string, unknown> = {
         fullName: formData.fullName,
-        shopName: formData.shopName,
+        shopName: normalizedShopName,
         city: formData.city,
         location: formData.location,
         physicalAddress: formData.physicalAddress,

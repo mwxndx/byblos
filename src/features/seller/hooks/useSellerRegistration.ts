@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/shared/hooks/use-toast';
 import { checkShopNameAvailability } from '@/features/seller/api';
 import { useSellerResendVerificationMutation } from '@/features/seller/hooks/mutations/useSellerAuthMutations';
-import { checkPasswordStrength, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
+import { checkPasswordStrength, normalizeShopName, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
 
 interface SellerRegistrationProps {
   onSuccess?: () => void;
@@ -32,7 +32,8 @@ export function useSellerRegistration(onSuccess?: () => void) {
     location: '',
     physicalAddress: '',
     latitude: undefined as number | undefined,
-    longitude: undefined as number | undefined
+    longitude: undefined as number | undefined,
+    businessPhoto: ''
   });
   // Pre-fill fields for an already logged-in user adding seller access
   useEffect(() => {
@@ -130,7 +131,7 @@ export function useSellerRegistration(onSuccess?: () => void) {
   // Check shop name availability when shopName changes
   useEffect(() => {
     const checkShopName = async () => {
-      const trimmedShopName = formData.shopName.trim();
+      const trimmedShopName = normalizeShopName(formData.shopName);
 
       if (!trimmedShopName) {
         setShopNameAvailable(null);
@@ -163,7 +164,7 @@ export function useSellerRegistration(onSuccess?: () => void) {
     };
 
     const timer = setTimeout(() => {
-      void checkShopName().catch(() => {});
+      void checkShopName().catch(() => { });
     }, 500);
 
     return () => clearTimeout(timer);
@@ -173,9 +174,14 @@ export function useSellerRegistration(onSuccess?: () => void) {
     const { name } = e.target;
     let { value } = e.target;
 
-    // Disallow spaces in shop name
+    // Format shop name:
+    // - Underscores denote separation between words and are converted to spaces (never shown)
+    // - Shop name must always start with a capital letter
     if (name === 'shopName') {
-      value = value.replace(/\s/g, '');
+      value = value.replace(/_/g, ' ');
+      if (value.length > 0) {
+        value = value.charAt(0).toUpperCase() + value.slice(1);
+      }
     }
 
     setFormData(prev => ({
@@ -245,13 +251,23 @@ export function useSellerRegistration(onSuccess?: () => void) {
       return;
     }
 
+    // Validate business profile photo
+    if (!formData.businessPhoto) {
+      toast({
+        title: "Business Photo Required",
+        description: "Please upload your shop's profile photo to complete registration.",
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       // Use the unified auth system register for seller profile creation.
       const result = await registerSeller({
         fullName: `${formData.firstName} ${formData.lastName}`.trim(),
-        shopName: formData.shopName.trim(),
+        shopName: normalizeShopName(formData.shopName),
         email: formData.email,
         whatsappNumber: formData.whatsappNumber,
         password: formData.password,
@@ -261,6 +277,7 @@ export function useSellerRegistration(onSuccess?: () => void) {
         physicalAddress: formData.physicalAddress,
         latitude: formData.latitude,
         longitude: formData.longitude,
+        businessPhoto: formData.businessPhoto,
         referralCode,
         termsAccepted: true
       });

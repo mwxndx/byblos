@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
-import { Edit3, LogOut, Mail, MapPin, MessageCircle, Phone, UserRound } from '@/shared/ui/icons';
+import { Edit3, LogOut, Mail, MapPin, Phone, UserRound } from '@/shared/ui/icons';
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
 import { BuyerMembershipCard } from './BuyerMembershipCard';
@@ -18,13 +18,11 @@ interface BuyerProfileContentProps {
   mobilePayment: string;
   area: string;
   user: import("@/features/auth/types/authTypes").UserProfile | null;
-  whatsappNumber: string;
   onLogout: () => void;
   onMobilePaymentChange: (value: string) => void;
   onAreaChange: (value: string) => void;
   onSaveProfile: () => void;
   onToggleEdit: () => void;
-  onWhatsappNumberChange: (value: string) => void;
 }
 
 function displayValue(value?: string | null) {
@@ -109,13 +107,11 @@ export function BuyerProfileContent({
   mobilePayment,
   area,
   user,
-  whatsappNumber,
   onLogout,
   onMobilePaymentChange,
   onAreaChange,
   onSaveProfile,
   onToggleEdit,
-  onWhatsappNumberChange
 }: BuyerProfileContentProps) {
   const navigate = useNavigate();
   const { theme, setTheme } = useThemeScope('buyer');
@@ -208,7 +204,7 @@ export function BuyerProfileContent({
           <div>
             <h3 className="text-sm font-bold text-slate-950 dark:text-white">Account Details</h3>
             <p className="mt-1 text-xs text-slate-600 dark:text-white/80">
-              {isEditingProfile ? 'Update your payment and WhatsApp numbers.' : 'Your saved buyer information.'}
+              {isEditingProfile ? 'Update your mobile payment number and area.' : 'Your saved buyer information.'}
             </p>
           </div>
           <Button
@@ -239,26 +235,15 @@ export function BuyerProfileContent({
               autoComplete="address-level2"
             />
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <ProfileDetail
-              icon={Phone}
-              label="Mobile payment"
-              value={mobilePayment}
-              editable
-              editing={isEditingProfile}
-              placeholder="Mobile payment number"
-              onChange={onMobilePaymentChange}
-            />
-            <ProfileDetail
-              icon={MessageCircle}
-              label="WhatsApp"
-              value={whatsappNumber}
-              editable
-              editing={isEditingProfile}
-              placeholder="WhatsApp number"
-              onChange={onWhatsappNumberChange}
-            />
-          </div>
+          <ProfileDetail
+            icon={Phone}
+            label="Mobile payment"
+            value={mobilePayment}
+            editable
+            editing={isEditingProfile}
+            placeholder="Mobile payment number"
+            onChange={onMobilePaymentChange}
+          />
         </div>
 
         {isEditingProfile && (

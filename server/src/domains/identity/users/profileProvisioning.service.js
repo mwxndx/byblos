@@ -191,7 +191,8 @@ class ProfileProvisioningService {
                 latitude,
                 longitude,
                 userId: existingUser.id,
-                termsAccepted
+                termsAccepted,
+                avatarUrl: data.avatarUrl || data.businessPhoto || null
             }, client);
 
             await ensureRole(client, existingUser.id, 'seller');

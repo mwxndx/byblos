@@ -10,6 +10,7 @@ import { pool } from '../../../infrastructure/database/database.js';
 import PendingRegistration from '../../../shared/utils/pendingRegistration.model.js';
 import ReferralService from '../../growth/referrals/referral.service.js';
 import ProfileProvisioningService from '../users/profileProvisioning.service.js';
+import ImageService from '../../../infrastructure/storage/image.service.js';
 import refundAccountingService from '../../payments/refunds/refundAccounting.service.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import {
@@ -207,6 +208,21 @@ class AuthService {
             throw new AppError('You must accept the terms and conditions to create an account.', 400);
         }
 
+        // Process seller business photo if provided
+        let avatarUrl = data.avatarUrl || null;
+        if (type === 'seller' && data.businessPhoto) {
+            if (ImageService.isBase64Image(data.businessPhoto)) {
+                try {
+                    avatarUrl = await ImageService.base64ToFile(data.businessPhoto, 'seller_business_photo');
+                } catch (e) {
+                    logger.warn(`[AUTH] Failed to save seller business photo: ${e.message}`);
+                    avatarUrl = null;
+                }
+            } else {
+                avatarUrl = data.businessPhoto;
+            }
+        }
+
         // 1. Check if user already exists in unified users table
         const existingUser = await User.findByEmail(normalizedEmail);
 
@@ -224,7 +240,8 @@ class AuthService {
                     const seller = await ProfileProvisioningService.createSellerProfileForExistingUser({
                         ...data,
                         email: normalizedEmail,
-                        termsAccepted
+                        termsAccepted,
+                        avatarUrl
                     });
                     return { status: 'created', user: seller };
                 }
@@ -252,6 +269,10 @@ class AuthService {
         const registrationData = { ...data };
         delete registrationData.password;
         delete registrationData.confirmPassword;
+        if (avatarUrl) {
+            registrationData.avatarUrl = avatarUrl;
+            registrationData.businessPhoto = avatarUrl;
+        }
 
         await PendingRegistration.create({
             email: normalizedEmail,
@@ -439,7 +460,8 @@ class AuthService {
                 longitude: (pending.longitude ?? regData.longitude) != null ? Number(pending.longitude ?? regData.longitude) : null,
                 userId: newUser.id,
                 termsAccepted: pending.terms_accepted ?? true,
-                referralCode: regData.referralCode || regData.referral_code || null
+                referralCode: regData.referralCode || regData.referral_code || null,
+                avatarUrl: regData.avatarUrl || regData.avatar_url || regData.businessPhoto || null
             };
             let profile = null;
 
@@ -609,7 +631,7 @@ class AuthService {
             if (shouldManageTx) await client.query('COMMIT');
             return { linkedCount: linkResult.rowCount, creditedAmount: uncreditedRefund };
         } catch (err) {
-            if (shouldManageTx) await client.query('ROLLBACK').catch(() => {});
+            if (shouldManageTx) await client.query('ROLLBACK').catch(() => { });
             logger.error('[AUTH] Failed to link guest orders and credit refunds:', err.message);
             throw err;
         } finally {

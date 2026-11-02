@@ -4,6 +4,7 @@ import SellerBrandCard from '@/features/shop/components/SellerBrandCard';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { usePublicSellersQuery } from '@/features/shop/hooks/useShopQueries';
 import { isDeletedSeller } from '@/features/shop/utils/sellerTransforms';
+import { compareSellersByPriority } from '@/features/shop/utils/shopPrioritization';
 
 interface SellersGridProps {
     filterCity: string;
@@ -59,7 +60,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     const filteredSellers = useMemo(() => {
         const query = deferredSearchQuery.trim().toLowerCase();
 
-        return sellers.filter(seller => {
+        const filtered = sellers.filter(seller => {
             if (isDeletedSeller(seller)) return false;
             if (filterCity && seller.city !== filterCity) return false;
             if (filterArea && seller.location !== filterArea) return false;
@@ -71,6 +72,8 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
             }
             return true;
         });
+
+        return [...filtered].sort(compareSellersByPriority);
     }, [sellers, filterCity, filterArea, deferredSearchQuery]);
 
     const visibleSellers = useMemo(

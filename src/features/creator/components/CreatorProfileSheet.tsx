@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogOut, Mail, MessageCircle, Phone, UserRound, Loader2, Lock } from '@/shared/ui/icons';
+import { LogOut, Mail, Phone, UserRound, Loader2, Lock } from '@/shared/ui/icons';
 import { toast } from 'sonner';
 import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
 import { Button } from '@/shared/ui/button';
@@ -37,24 +37,20 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
   const updateMutation = useUpdateCreatorProfileMutation();
 
   const [mpesa, setMpesa] = useState(creator.mpesaNumber || '');
-  const [whatsapp, setWhatsapp] = useState(creator.whatsappNumber || '');
 
   useEffect(() => {
     setMpesa(creator.mpesaNumber || '');
-    setWhatsapp(creator.whatsappNumber || '');
-  }, [creator.mpesaNumber, creator.whatsappNumber]);
+  }, [creator.mpesaNumber]);
 
   const contactChanged =
-    (mpesa.trim() || '') !== (creator.mpesaNumber || '') ||
-    (whatsapp.trim() || '') !== (creator.whatsappNumber || '');
+    (mpesa.trim() || '') !== (creator.mpesaNumber || '');
 
   const fullName = [creator.firstName, creator.lastName].filter(Boolean).join(' ').trim();
 
   const handleSaveContact = async () => {
     try {
       await updateMutation.mutateAsync({
-        mpesaNumber: mpesa.trim() || undefined,
-        whatsappNumber: whatsapp.trim() || null
+        mpesaNumber: mpesa.trim() || undefined
       });
       toast.success('Details saved.');
     } catch (err: unknown) {
@@ -97,19 +93,6 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
                 className="mt-2 h-9"
               />
               <p className="mt-1 text-[11px] text-label-3">Where your withdrawals are paid.</p>
-            </div>
-
-            <div className="rounded-control border border-separator bg-surface-2 p-3">
-              <label className="flex items-center gap-2 text-xs font-medium text-label-2">
-                <MessageCircle className="h-3.5 w-3.5 text-brand-text" />WhatsApp number
-              </label>
-              <Input
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="0712345678"
-                inputMode="tel"
-                className="mt-2 h-9"
-              />
             </div>
 
             <Button

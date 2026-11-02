@@ -4,7 +4,6 @@ import { DeleteAccountButton } from '@/shared/components/DeleteAccountButton';
 import { deleteSellerAccount } from '@/features/seller/api/profileApi';
 import type { Theme } from '@/features/seller/api';
 import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
 import { ThemeSelector } from '../../ThemeSelector';
 
 import type { SellerSettingsFormData } from '../types';
@@ -158,23 +157,6 @@ export function SettingsTab({
             <p className="text-sm sm:text-base lg:text-lg font-semibold text-slate-900 dark:text-white truncate" title={sellerProfile?.email || 'Not set'}>
               {sellerProfile?.email || 'Not set'}
             </p>
-          </div>
-
-          <div className="seller-card-soft p-4">
-            <p className="text-[10px] sm:text-xs font-medium text-slate-500 dark:text-white/50 mb-1">WhatsApp Number</p>
-            {isEditingContacts ? (
-              <Input
-                name="whatsappNumber"
-                value={formData.whatsappNumber}
-                onChange={(e) => setFormData(prev => ({ ...prev, whatsappNumber: e.target.value }))}
-                placeholder="e.g. 0712345678"
-                className="seller-field text-xs"
-              />
-            ) : (
-              <p className="text-sm sm:text-base lg:text-lg font-semibold text-slate-900 dark:text-white">
-                {sellerProfile?.whatsappNumber || sellerProfile?.phone || 'Not set'}
-              </p>
-            )}
           </div>
 
           <SocialInput

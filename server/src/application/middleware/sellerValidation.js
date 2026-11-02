@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { validate as validateMiddleware } from './validate.js';
+import { normalizeShopName } from '../../domains/commerce/sellers/seller.model.js';
 
 /**
  * Validation schemas for Seller Authentication
@@ -9,10 +10,11 @@ export const sellerRegistrationSchema = z.object({
     fullName: z.string().min(1, 'Full name is required').trim(),
 
     shopName: z.string()
-        .min(3, 'Shop name must be at least 3 characters')
-        .max(30, 'Shop name must be at most 30 characters')
-        .regex(/^[a-zA-Z0-9._-]+$/, 'Shop name can only contain letters, numbers, dots, dashes, and underscores')
-        .trim(),
+        .min(1, 'Shop name is required')
+        .regex(/^[a-zA-Z0-9._\s-]+$/, 'Shop name can only contain letters, numbers, spaces, dots, dashes, and underscores')
+        .transform(val => normalizeShopName(val))
+        .refine(val => val.length >= 3, 'Shop name must be at least 3 characters')
+        .refine(val => val.length <= 30, 'Shop name must be at most 30 characters'),
 
     email: z.string().email('Please provide a valid email address').trim().toLowerCase(),
 
@@ -33,6 +35,8 @@ export const sellerRegistrationSchema = z.object({
     physicalAddress: z.string().optional(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
+    businessPhoto: z.string().optional(),
+    avatarUrl: z.string().optional(),
     referralCode: z.string().regex(/^BY[A-Z0-9]{6}$/i, 'Invalid referral code').optional(),
     referral_code: z.string().regex(/^BY[A-Z0-9]{6}$/i, 'Invalid referral code').optional(),
     termsAccepted: z.literal(true, { errorMap: () => ({ message: 'You must accept the terms and conditions' }) }).optional()

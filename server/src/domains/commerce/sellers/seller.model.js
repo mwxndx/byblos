@@ -17,6 +17,19 @@ function trimHyphens(str) {
   return str.slice(start, end);
 }
 
+export function normalizeShopName(name) {
+  if (!name || typeof name !== 'string') return '';
+  return name
+    .trim()
+    .replace(/_+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .split(' ')
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 function slugifyShopName(name) {
   if (!name) return null;
   const replaced = String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-');
@@ -25,14 +38,15 @@ function slugifyShopName(name) {
 }
 
 export const createSeller = async (sellerData, externalClient = null) => {
-  const { fullName, shopName, email, whatsappNumber, city, location, physicalAddress, latitude, longitude, userId = null, termsAccepted = false } = sellerData;
-  const slug = slugifyShopName(shopName);
+  const { fullName, shopName, email, whatsappNumber, city, location, physicalAddress, latitude, longitude, userId = null, termsAccepted = false, avatarUrl = null } = sellerData;
+  const normalizedShopName = normalizeShopName(shopName);
+  const slug = slugifyShopName(normalizedShopName);
 
   const result = await (externalClient || pool).query(
-    `INSERT INTO sellers (full_name, shop_name, slug, email, whatsapp_number, city, location, physical_address, latitude, longitude, user_id, terms_accepted, terms_accepted_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CASE WHEN $12 = true THEN NOW() ELSE NULL END)
+    `INSERT INTO sellers (full_name, shop_name, slug, email, whatsapp_number, city, location, physical_address, latitude, longitude, user_id, terms_accepted, terms_accepted_at, avatar_url)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CASE WHEN $12 = true THEN NOW() ELSE NULL END, $13)
      RETURNING *`,
-    [fullName, shopName, slug, email, whatsappNumber, city, location, physicalAddress, latitude, longitude, userId, termsAccepted]
+    [fullName, normalizedShopName, slug, email, whatsappNumber, city, location, physicalAddress, latitude, longitude, userId, termsAccepted, avatarUrl]
   );
   return toCamelCase(result.rows[0]);
 };
@@ -102,6 +116,7 @@ export const findSellerByShopName = async (shopName) => {
 
   logger.debug('Executing findSellerByShopName query', { shopName: rawInput.replace(/[\n\r]/g, '') });
 
+  const normalized = normalizeShopName(rawInput);
   const slugified = slugifyShopName(rawInput) || '';
   const unslugified = rawInput.replaceAll('-', ' ');
 
@@ -137,17 +152,19 @@ export const findSellerByShopName = async (shopName) => {
         OR (slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($1)))
         OR (slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($2)))
         OR LOWER(TRIM(shop_name)) = LOWER(TRIM($3))
+        OR LOWER(TRIM(shop_name)) = LOWER(TRIM($4))
       )
     ORDER BY 
       CASE 
         WHEN LOWER(TRIM(shop_name)) = LOWER(TRIM($1)) THEN 1
-        WHEN slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($1)) THEN 2
-        ELSE 3
+        WHEN LOWER(TRIM(shop_name)) = LOWER(TRIM($4)) THEN 2
+        WHEN slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($1)) THEN 3
+        ELSE 4
       END
     LIMIT 1
   `;
 
-  const result = await query(queryText, [rawInput, slugified, unslugified]);
+  const result = await query(queryText, [rawInput, slugified, unslugified, normalized]);
 
   logger.debug('Query result details', {
     rowCount: result.rowCount
@@ -157,8 +174,15 @@ export const findSellerByShopName = async (shopName) => {
 };
 
 export const isShopNameAvailable = async (shopName) => {
-  // Basic check
-  const result = await query("SELECT 1 FROM sellers WHERE LOWER(shop_name) = LOWER($1)", [shopName]);
+  if (!shopName || typeof shopName !== 'string') return false;
+  const normalized = normalizeShopName(shopName);
+  const slug = slugifyShopName(normalized);
+  const result = await query(
+    `SELECT 1 FROM sellers 
+     WHERE LOWER(TRIM(shop_name)) = LOWER(TRIM($1)) 
+        OR (slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($2)))`,
+    [normalized, slug]
+  );
   return result.rowCount === 0;
 };
 
@@ -224,9 +248,16 @@ export const updateSeller = async (id, updates) => {
   }
 
   if (shopName) {
+    const normalizedShopName = normalizeShopName(shopName);
+    const slug = slugifyShopName(normalizedShopName);
     paramCount++;
     updatesList.push(`shop_name = $${paramCount}`);
-    values.push(shopName);
+    values.push(normalizedShopName);
+    if (slug) {
+      paramCount++;
+      updatesList.push(`slug = $${paramCount}`);
+      values.push(slug);
+    }
   }
 
   if (whatsappNumber) {

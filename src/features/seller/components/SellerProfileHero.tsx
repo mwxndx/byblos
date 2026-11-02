@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link2, Pencil } from '@/shared/ui/icons';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
+import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUtils';
 import { SellerMediaEditDialog } from './SellerMediaEditDialog';
 
 interface SellerProfileHeroProps {
@@ -17,7 +18,8 @@ interface SellerProfileHeroProps {
  */
 export function SellerProfileHero({ sellerProfile, shopUsername, onCopyShopLink, canEdit }: Readonly<SellerProfileHeroProps>) {
   const [isEditingMedia, setIsEditingMedia] = useState(false);
-  const shopName = sellerProfile?.shopName?.trim() || 'Your shop';
+  const rawShopName = sellerProfile?.shopName?.trim();
+  const shopName = (rawShopName ? normalizeShopName(rawShopName) : '') || 'Your shop';
   const avatar = sellerProfile?.avatarUrl;
   const bio = sellerProfile?.bio?.trim();
   const initial = shopName.charAt(0).toUpperCase();

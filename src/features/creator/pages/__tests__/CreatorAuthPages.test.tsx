@@ -85,7 +85,11 @@ describe('Creator Authentication Pages UI Specifications', () => {
     expect(backBtn).toBeInTheDocument();
     expect(backBtn.className).toContain('hover:bg-white');
 
-    // 4. Submit button is white
+    // 4. WhatsApp number input is removed
+    expect(screen.queryByPlaceholderText(/whatsapp/i)).toBeNull();
+    expect(screen.queryByLabelText(/whatsapp/i)).toBeNull();
+
+    // 5. Submit button is white
     const createBtn = screen.getByRole('button', { name: /create creator account/i });
     expect(createBtn).toBeInTheDocument();
     expect(createBtn.className).toContain('btn-white');

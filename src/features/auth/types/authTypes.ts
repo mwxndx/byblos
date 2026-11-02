@@ -36,11 +36,13 @@ export interface SellerProfile extends BaseUser {
   latitude?: number;
   longitude?: number;
   bannerImage?: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   bio?: string;
   theme?: string;
   balance?: number;
   totalSales?: number;
+  netRevenue?: number;
+  termsAccepted?: boolean;
   instagramLink?: string;
   tiktokLink?: string;
   facebookLink?: string;
@@ -98,6 +100,7 @@ export interface SellerRegistrationData {
   physicalAddress?: string;
   latitude?: number;
   longitude?: number;
+  businessPhoto?: string;
   referralCode?: string;
   termsAccepted: boolean;
 }

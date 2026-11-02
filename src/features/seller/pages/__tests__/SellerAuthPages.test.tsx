@@ -112,4 +112,26 @@ describe('SellerLogin and SellerRegistration UI Specifications', () => {
     expect(resendBtn.className).toContain('text-black');
     expect(resendBtn.className).not.toContain('bg-yellow');
   });
+
+  it('SellerRegistration and SellerLogin enforce viewport height and safe area bottom classes', () => {
+    const { container: loginContainer } = render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <SellerLogin />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+    const loginMain = loginContainer.querySelector('main');
+    expect(loginMain).toHaveClass('min-h-[100dvh]', 'pb-safe-bottom', 'auth-page');
+
+    const { container: regContainer } = render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <SellerRegistration />
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+    const regMain = regContainer.querySelector('main');
+    expect(regMain).toHaveClass('min-h-[100dvh]', 'pb-safe-bottom', 'auth-page');
+  });
 });

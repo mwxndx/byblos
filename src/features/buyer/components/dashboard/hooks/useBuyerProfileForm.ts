@@ -17,32 +17,21 @@ export function useBuyerProfileForm() {
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [mobilePayment, setMobilePayment] = useState<string>(user?.mobilePayment || '');
-  const [whatsappNumber, setWhatsappNumber] = useState<string>(user?.whatsappNumber || '');
   // Area only (the buyer's `location` field). City stays read-only.
   const [area, setArea] = useState<string>(user?.location || '');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
-  // useAuthRevalidation refetches the profile on tab focus / TTL expiry and
-  // calls setUser with fresh data while this component stays mounted across
-  // in-app navigation -- without this, the form's local state was set once
-  // at mount and never resynced, so a background refresh (another device, an
-  // admin edit, or simply a slow initial fetch resolving late) left the form
-  // showing stale values. Saving from that stale form would then PATCH the
-  // old value back over the newer one. Only resync while NOT actively
-  // editing, so this can't clobber an in-progress edit -- same pattern as
-  // useSellerSettingsForm.ts.
   useEffect(() => {
     if (!isEditingProfile) {
       setMobilePayment(user?.mobilePayment || '');
-      setWhatsappNumber(user?.whatsappNumber || '');
       setArea(user?.location || '');
     }
-  }, [isEditingProfile, user?.mobilePayment, user?.whatsappNumber, user?.location]);
+  }, [isEditingProfile, user?.mobilePayment, user?.location]);
 
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
     try {
-      await updateProfile({ mobilePayment, whatsappNumber, location: area }, 'buyer');
+      await updateProfile({ mobilePayment, location: area }, 'buyer');
 
       toast({
         title: 'Profile Updated',
@@ -65,7 +54,6 @@ export function useBuyerProfileForm() {
   return {
     isEditingProfile, setIsEditingProfile,
     mobilePayment, setMobilePayment,
-    whatsappNumber, setWhatsappNumber,
     area, setArea,
     isSavingProfile, handleSaveProfile,
   };

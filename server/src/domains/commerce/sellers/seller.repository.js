@@ -71,7 +71,22 @@ export async function findActiveWithStats({ limit, offset }) {
       AND (s.status IS NULL OR s.status NOT IN ('deleted', 'suspended'))
       AND (s.is_active = true OR s.is_active IS NULL)
     GROUP BY s.id, k.knock_count
-    ORDER BY total_wishlist_count DESC, s.id ASC
+    ORDER BY
+      (
+        CASE 
+          WHEN (s.avatar_url IS NOT NULL AND TRIM(s.avatar_url) != '')
+           AND (s.instagram_link IS NOT NULL AND TRIM(s.instagram_link) != '')
+           AND (s.tiktok_link IS NOT NULL AND TRIM(s.tiktok_link) != '')
+          THEN 1000
+          ELSE 0
+        END +
+        CASE WHEN s.avatar_url IS NOT NULL AND TRIM(s.avatar_url) != '' THEN 100 ELSE 0 END +
+        CASE WHEN s.instagram_link IS NOT NULL AND TRIM(s.instagram_link) != '' THEN 50 ELSE 0 END +
+        CASE WHEN s.tiktok_link IS NOT NULL AND TRIM(s.tiktok_link) != '' THEN 50 ELSE 0 END
+      ) DESC,
+      total_wishlist_count DESC,
+      COALESCE(k.knock_count, 0) DESC,
+      s.id ASC
     LIMIT $1 OFFSET $2
   `;
   const { rows } = await query(sql, [limit, offset]);

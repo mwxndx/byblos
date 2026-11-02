@@ -46,7 +46,9 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
   } = useSellerRegistration(onSuccess);
 
   const handleBack = () => {
-    if (currentStep === 4) {
+    if (currentStep === 5) {
+      setCurrentStep(4);
+    } else if (currentStep === 4) {
       setCurrentStep(3);
       setHasPhysicalShop(null);
       setFormData(prev => ({
@@ -72,7 +74,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
 
   return (
     <main
-      className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200"
+      className="auth-page min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200"
       style={{
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
@@ -110,27 +112,31 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
       </header>
 
       {/* Main Content */}
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
+      <div className="mx-auto flex flex-1 w-full max-w-md flex-col px-4 py-5 min-h-[calc(100dvh-4rem)] min-h-[calc(100svh-4rem)] sm:min-h-[calc(100dvh-5rem)]">
         <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
 
             {/* Progress Indicator */}
-            <div className="pt-2 flex items-center justify-center gap-2">
+            <div className="pt-2 flex items-center justify-center gap-1.5 sm:gap-2">
               <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 1 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                 1
               </div>
-              <div className={`h-0.5 w-6 ${currentStep >= 2 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
+              <div className={`h-0.5 w-4 sm:w-6 ${currentStep >= 2 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
               <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 2 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                 2
               </div>
-              <div className={`h-0.5 w-6 ${currentStep >= 3 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
+              <div className={`h-0.5 w-4 sm:w-6 ${currentStep >= 3 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
               <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 3 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                 3
               </div>
-              <div className={`h-0.5 w-6 ${currentStep >= 4 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
+              <div className={`h-0.5 w-4 sm:w-6 ${currentStep >= 4 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
               <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 4 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
                 4
+              </div>
+              <div className={`h-0.5 w-4 sm:w-6 ${currentStep >= 5 ? 'auth-step-line-active bg-white' : 'auth-step-line-inactive bg-white/10'}`} />
+              <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${currentStep >= 5 ? 'auth-step-active bg-white text-black shadow-sm' : 'auth-step-inactive bg-white/10 text-white/50'}`}>
+                5
               </div>
             </div>
           </div>
@@ -199,7 +205,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                     Back
                   </Button>
                 )}
-                {currentStep < 4 && (currentStep !== 3 || hasPhysicalShop !== null) ? (
+                {currentStep < 5 && (currentStep !== 3 || hasPhysicalShop !== null) ? (
                   <Button
                     type="button"
                     onClick={() => {
@@ -233,6 +239,15 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                             physicalAddress: prev.location ? `${prev.location} (Pinned on map)` : 'Pinned on map',
                           }));
                         }
+                      } else if (currentStep === 4) {
+                        if (!formData.businessPhoto) {
+                          toast({
+                            title: "Business Photo Required",
+                            description: "Please upload your shop's profile photo to continue.",
+                            variant: 'destructive',
+                          });
+                          return;
+                        }
                       }
                       setCurrentStep(currentStep + 1);
                     }}
@@ -240,7 +255,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
                   >
                     Next
                   </Button>
-                ) : currentStep === 4 ? (
+                ) : currentStep === 5 ? (
                   <Button
                     type="submit"
                     className="btn-white h-12 flex-1 rounded-2xl bg-white font-semibold text-black hover:bg-gray-100 border border-gray-200 shadow-sm transition"

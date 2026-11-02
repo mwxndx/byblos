@@ -19,6 +19,9 @@ body,
 #root {
     width: 100%;
     height: 100%;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
+    min-height: 100dvh;
     overflow-x: hidden;
     overscroll-behavior: none;
     overscroll-behavior-y: none;
@@ -53,11 +56,13 @@ body,
 @media (display-mode: standalone), (display-mode: fullscreen) {
     :root {
         --sat: max(env(safe-area-inset-top, 0px), 0px);
+        --sab: max(env(safe-area-inset-bottom, 0px), 0px);
     }
 }
 
 html.pwa-standalone {
     --sat: max(env(safe-area-inset-top, 0px), 0px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 0px);
 }
 
 /* ── Capacitor Native Mobile (Android & iOS) Safe Area Overrides ── */
@@ -80,7 +85,7 @@ body.android-native {
     padding-top: var(--sat) !important;
 }
 .pb-safe-bottom {
-    padding-bottom: max(var(--sab, 0px), env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: max(var(--sab, 0px), env(safe-area-inset-bottom, 0px), 8px) !important;
 }
 
 /* Fixed bottom navigation bars: solid themed background, zero bottom gap */
@@ -327,8 +332,11 @@ nav.fixed.bottom-0 {
     /* Auth pages: always dark background, always full safe-area coverage */
     .auth-page {
         min-height: 100%;
-        min-height: calc(100% + var(--sat) + var(--sab));
-        padding-bottom: var(--sab);
+        min-height: 100vh;
+        min-height: 100dvh;
+        min-height: 100svh;
+        padding-bottom: max(var(--sab, 0px), env(safe-area-inset-bottom, 0px), 16px);
+        background: var(--byblos-bg, #000000) !important;
     }
 
     .mobile-compact {

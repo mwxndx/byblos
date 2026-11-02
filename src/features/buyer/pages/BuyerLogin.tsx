@@ -114,7 +114,7 @@ export function BuyerLogin() {
   };
 
   return (
-    <main className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+    <main className="auth-page min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
@@ -141,7 +141,7 @@ export function BuyerLogin() {
         </div>
       </header>
 
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
+      <div className="mx-auto flex flex-1 w-full max-w-md flex-col px-4 py-5 min-h-[calc(100dvh-4rem)] min-h-[calc(100svh-4rem)] sm:min-h-[calc(100dvh-5rem)]">
         <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
 

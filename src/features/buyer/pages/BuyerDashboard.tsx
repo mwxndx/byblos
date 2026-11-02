@@ -51,7 +51,6 @@ function BuyerDashboard() {
   const {
     isEditingProfile, setIsEditingProfile,
     mobilePayment, setMobilePayment,
-    whatsappNumber, setWhatsappNumber,
     area, setArea,
     isSavingProfile, handleSaveProfile,
   } = useBuyerProfileForm();
@@ -213,13 +212,11 @@ function BuyerDashboard() {
           mobilePayment={mobilePayment}
           area={area}
           user={user}
-          whatsappNumber={whatsappNumber}
           onLogout={handleLogout}
           onMobilePaymentChange={setMobilePayment}
           onAreaChange={setArea}
           onSaveProfile={handleSaveProfile}
           onToggleEdit={() => setIsEditingProfile(!isEditingProfile)}
-          onWhatsappNumberChange={setWhatsappNumber}
         />
       </div>
 

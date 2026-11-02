@@ -35,7 +35,7 @@ export function BuyerRegister() {
 
   return (
     <main
-      className="auth-page min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200"
+      className="auth-page min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200"
       style={{
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
@@ -73,7 +73,7 @@ export function BuyerRegister() {
       </header>
 
       {/* Main Content */}
-      <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-md flex-col px-4 py-5 sm:min-h-[calc(100svh-5rem)]">
+      <div className="mx-auto flex flex-1 w-full max-w-md flex-col px-4 py-5 min-h-[calc(100dvh-4rem)] min-h-[calc(100svh-4rem)] sm:min-h-[calc(100dvh-5rem)]">
         <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">

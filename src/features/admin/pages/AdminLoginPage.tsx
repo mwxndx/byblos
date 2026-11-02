@@ -44,7 +44,7 @@ export const AdminLoginPage = () => {
   };
 
   return (
-    <div className="auth-page flex min-h-[100svh] items-start justify-center overflow-x-hidden bg-[var(--byblos-bg,#000000)] px-4 py-6 text-[var(--byblos-text,#f5f5f5)] sm:items-center sm:p-6 transition-colors duration-200">
+    <div className="auth-page flex min-h-screen min-h-[100dvh] min-h-[100svh] items-start justify-center overflow-x-hidden bg-[var(--byblos-bg,#000000)] px-4 py-6 pb-safe-bottom text-[var(--byblos-text,#f5f5f5)] sm:items-center sm:p-6 transition-colors duration-200">
       <div className="w-full max-w-md animate-in fade-in zoom-in-95 duration-500">
         <Card className="overflow-hidden rounded-[2rem] border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-xl dark:shadow-[0_22px_60px_rgba(0,0,0,0.45)]">
           <CardHeader className="px-6 pb-7 pt-10 text-center md:px-10">

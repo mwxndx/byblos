@@ -5,7 +5,7 @@ import { invalidateAuthCache } from '../../../shared/utils/authCache.js';
 import logger from '../../../shared/utils/logger.js';
 import ImageService from '../../../infrastructure/storage/image.service.js';
 import { getTokenFromRequest } from '../../../shared/utils/jwt.js';
-import { findSellerByUserId, findSellerById, isShopNameAvailable, updateSeller } from './seller.model.js';
+import { findSellerByUserId, findSellerById, isShopNameAvailable, updateSeller, normalizeShopName } from './seller.model.js';
 import { sanitizeSeller } from '../../../shared/utils/sanitize.js';
 import cacheService from '../../../shared/utils/cache.service.js';
 
@@ -93,8 +93,11 @@ export const updateProfile = async (req, res) => {
     }
 
     if (req.body.shopName) {
-      const shopNameRegex = /^[a-zA-Z0-9._-]+$/;
-      const shopName = req.body.shopName;
+      const rawShopName = req.body.shopName;
+      const normalizedShopName = normalizeShopName(rawShopName);
+      req.body.shopName = normalizedShopName;
+      const shopNameRegex = /^[a-zA-Z0-9._\s-]+$/;
+      const shopName = normalizedShopName;
 
       if (shopName.length < 3) {
         return res.status(400).json({ status: 'error', message: 'Shop name must be at least 3 characters' });
@@ -102,8 +105,8 @@ export const updateProfile = async (req, res) => {
       if (shopName.length > 30) {
         return res.status(400).json({ status: 'error', message: 'Shop name must be at most 30 characters' });
       }
-      if (!shopNameRegex.test(shopName)) {
-        return res.status(400).json({ status: 'error', message: 'Shop name can only contain letters, numbers, dots, dashes, and underscores' });
+      if (!shopNameRegex.test(rawShopName)) {
+        return res.status(400).json({ status: 'error', message: 'Shop name can only contain letters, numbers, spaces, dots, dashes, and underscores' });
       }
 
       const currentSeller = await findSellerById(sellerId);
