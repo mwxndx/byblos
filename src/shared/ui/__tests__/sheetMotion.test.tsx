@@ -9,13 +9,12 @@ describe('Profile Sheet Slide Motion & Animation Configuration', () => {
     const sheetFilePath = path.resolve(__dirname, '../sheet.tsx');
     const sheetSource = fs.readFileSync(sheetFilePath, 'utf-8');
 
-    // duration-280 is not a valid Tailwind CSS class (must be duration-300 or duration-[280ms])
-    // Having duration-280 causes Tailwind to ignore it, defaulting animation-duration to 150ms (too fast/glitchy).
+    // duration-280 is not a valid Tailwind CSS class (must be duration-300)
     expect(sheetSource).not.toContain('duration-280');
   });
 
   it('renders SheetContent with a valid, non-default animation duration class', () => {
-    const { container } = render(
+    render(
       <Sheet open={true}>
         <SheetContent side="right">
           <SheetHeader className="sr-only">
@@ -35,12 +34,7 @@ describe('Profile Sheet Slide Motion & Animation Configuration', () => {
     // Must not have invalid token
     expect(classList).not.toContain('duration-280');
 
-    // Must have a valid duration token for opening (e.g., duration-300 or duration-[280ms])
-    const hasValidOpenDuration =
-      classList.includes('data-[state=open]:duration-300') ||
-      classList.includes('data-[state=open]:duration-[280ms]') ||
-      classList.includes('data-[state=open]:duration-[300ms]');
-
-    expect(hasValidOpenDuration).toBe(true);
+    // Must have a valid duration token for opening (duration-300)
+    expect(classList).toContain('data-[state=open]:duration-300');
   });
 });

@@ -18,9 +18,9 @@ interface DashboardProfilePanelProps {
  * global Sheet primitive, it does not portal to document.body, so a dashboard
  * header and bottom navigation remain visible and interactive above it.
  *
- * Implements smooth hardware-accelerated slide-in and slide-out transitions
- * with iOS-calibrated easing curves, ensuring no visual glitch or abrupt cutoff
- * across buyer, seller, and creator dashboards.
+ * Implements smooth hardware-accelerated slide transitions at 100% solid opacity
+ * over an independently fading backdrop, eliminating visual ghosting, blur jitter,
+ * and compositor jank across buyer, seller, and creator dashboards.
  */
 export function DashboardProfilePanel({
   open,
@@ -34,8 +34,7 @@ export function DashboardProfilePanel({
   const panelRef = useRef<HTMLElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  // Synchronous presence initialization: when open becomes true, render immediately
-  // without triggering a second render in useEffect (which causes animation restart/double-play).
+  // Synchronous presence initialization: mount immediately when open becomes true
   const [shouldRender, setShouldRender] = useState(open);
 
   if (open && !shouldRender) {
@@ -44,10 +43,10 @@ export function DashboardProfilePanel({
 
   useEffect(() => {
     if (!open && shouldRender) {
-      // 200ms slide-out animation + 20ms buffer before unmounting from DOM
+      // 200ms slide-out animation + 50ms buffer before cleanly unmounting from DOM
       const timer = window.setTimeout(() => {
         setShouldRender(false);
-      }, 220);
+      }, 250);
       return () => window.clearTimeout(timer);
     }
   }, [open, shouldRender]);
@@ -88,15 +87,23 @@ export function DashboardProfilePanel({
     <div
       data-state={state}
       className={cn(
-        'dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 flex justify-end overflow-hidden transform-gpu',
-        'data-[state=open]:animate-in data-[state=closed]:animate-out',
-        'data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0',
-        'data-[state=open]:duration-[280ms] data-[state=closed]:duration-200',
+        'dashboard-profile-backdrop absolute inset-x-0 top-0 z-40 overflow-hidden',
         !open && 'pointer-events-none',
       )}
       style={{ bottom: bottomInset }}
       data-testid="dashboard-profile-panel"
     >
+      {/* Translucent backdrop overlay: smoothly fades in/out independently without ghosting the drawer */}
+      <div
+        aria-hidden="true"
+        data-state={state}
+        className={cn(
+          'absolute inset-0 bg-black/35 dark:bg-black/60 transition-opacity duration-300 ease-out',
+          open ? 'opacity-100' : 'opacity-0 duration-200 ease-in',
+        )}
+      />
+
+      {/* Backdrop click dismiss button */}
       <button
         type="button"
         aria-label={`Close ${title}`}
@@ -104,6 +111,8 @@ export function DashboardProfilePanel({
         onClick={() => onOpenChange(false)}
         tabIndex={open ? 0 : -1}
       />
+
+      {/* Drawer aside: hardware-accelerated slide-in at 100% solid opacity with smooth easing */}
       <aside
         ref={panelRef}
         role="complementary"
@@ -111,11 +120,12 @@ export function DashboardProfilePanel({
         tabIndex={-1}
         data-state={state}
         className={cn(
-          'relative z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-[var(--shadow-pop)] border-l border-separator',
-          'transform-gpu will-change-transform [animation-timing-function:var(--ease-ios,cubic-bezier(0.32,0.72,0,1))]',
+          'absolute top-0 right-0 z-10 flex h-full w-full max-w-md flex-col overflow-y-auto overscroll-contain bg-surface-1 text-label shadow-[var(--shadow-pop)] border-l border-separator',
+          'transform-gpu will-change-transform',
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=open]:slide-in-from-right data-[state=closed]:slide-out-to-right',
-          'data-[state=open]:duration-[280ms] data-[state=closed]:duration-200',
+          'data-[state=open]:duration-300 data-[state=closed]:duration-200',
+          'data-[state=open]:ease-out data-[state=closed]:ease-in',
           className,
         )}
       >

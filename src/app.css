@@ -1062,19 +1062,6 @@ button.btn-white:hover,
     background-color: #ffffff !important;
 }
 
-/* Dashboard Profile Panel Backdrop: ensure translucent overlay so dashboard remains visible on desktop */
-.dashboard-profile-backdrop,
-[data-testid="dashboard-profile-panel"] {
-    background-color: rgba(0, 0, 0, 0.45) !important;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-}
-
-[data-theme="light"] .dashboard-profile-backdrop,
-[data-theme="light"] [data-testid="dashboard-profile-panel"] {
-    background-color: rgba(0, 0, 0, 0.3) !important;
-}
-
 [data-theme="light"] .dashboard-layout [class*="border-white"],
 [data-theme="light"] .dashboard-layout [class*="border-gray-"],
 [data-theme="light"] .dashboard-layout [class*="border-zinc-"] {
