@@ -87,7 +87,9 @@ describe('AppUpdateGate Component', () => {
     expect(logos.some((img) => img.getAttribute('src') === '/byblos-logo-light.png')).toBe(true);
 
     // Verify back button interceptor was registered to prevent bypass
-    expect(modalBackHandler.registerModalDismiss).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(modalBackHandler.registerModalDismiss).toHaveBeenCalled();
+    });
 
     // Verify clicking "Update on Google Play" triggers store redirect
     const updateButton = screen.getByRole('button', { name: /update on google play/i });
