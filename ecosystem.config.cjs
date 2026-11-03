@@ -11,7 +11,7 @@ module.exports = {
   apps: [
     {
       name: 'byblos-api',
-      script: 'server/src/app.js',
+      script: 'server/src/index.js',
       cwd: './',
       instances: 1,
       exec_mode: 'fork',
