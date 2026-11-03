@@ -13,7 +13,7 @@ import NotificationService from '../src/domains/communication/notifications/noti
 import { pool } from '../src/infrastructure/database/database.js';
 
 async function main() {
-    const minVersionCode = Number.parseInt(process.argv[2] || process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
+    const minVersionCode = Number.parseInt(process.argv[2] || process.env.MIN_ANDROID_VERSION_CODE || '74', 10);
     const title = process.argv[3] || '🚀 New Byblos Update Available';
     const body = process.argv[4] || "We've released important updates. Tap to download the latest version from Google Play.";
 

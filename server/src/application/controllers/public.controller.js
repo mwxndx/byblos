@@ -632,9 +632,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '73', 10);
-  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '73', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.73';
+  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '74', 10);
+  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '74', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.74';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -650,9 +650,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Hardened authentication token grace caching, order cancellations, and public payment status lookups against unauthorized cross-account access.',
-        'Polished profile drawer slide gestures across seller, creator, and buyer dashboards with fluid single-pass hardware-accelerated animations.',
-        'Strengthened guest checkout order claiming with email ownership validation and decoupled seller analytics from background cron jobs.'
+        'Enhanced app stability with memory cap management, event loop protections, and staggered background worker cadences.',
+        'Refined mobile storefront responsiveness and optimized client-side navigation transitions across buyer and seller flows.',
+        'Strengthened security verification, session validation, and reliable hardware back button modal interceptors.'
       ]
     }
   });
