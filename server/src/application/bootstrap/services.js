@@ -9,14 +9,15 @@ export default async () => {
     });
 
     if (process.env.ENABLE_WITHDRAWAL_RETRY_CRON !== 'false') {
-        cron.schedule('*/5 * * * *', async () => {
+        const withdrawalRetrySchedule = process.env.WITHDRAWAL_RETRY_CRON_SCHEDULE || '4-59/5 * * * *';
+        cron.schedule(withdrawalRetrySchedule, async () => {
             try {
                 await WithdrawalService.retryPendingApiCalls();
             } catch (err) {
                 logger.error('Withdrawal scheduled retry failed:', err.message);
             }
         });
-        logger.info('Withdrawal retry worker scheduled (5-minute cadence).');
+        logger.info(`Withdrawal retry worker scheduled (${withdrawalRetrySchedule} cadence).`);
     }
 
     if (process.env.ENABLE_EVENT_OUTBOX_REPLAY !== 'false') {

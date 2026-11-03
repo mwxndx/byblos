@@ -154,8 +154,9 @@ export async function cleanOrphanedTempFiles(maxAgeMs = 60 * 60 * 1000, customDi
 }
 
 export const scheduleCleanupJobs = () => {
-    // Every 5 minutes: release expired unpaid inventory reservations.
-    cron.schedule('*/5 * * * *', async () => {
+    // Every 5 minutes (offset to minute 3): release expired unpaid inventory reservations.
+    const inventoryTtlSchedule = process.env.INVENTORY_TTL_CRON_SCHEDULE || '3-58/5 * * * *';
+    cron.schedule(inventoryTtlSchedule, async () => {
         const client = await pool.connect();
         try {
             await releaseExpiredUnpaidReservations(client);

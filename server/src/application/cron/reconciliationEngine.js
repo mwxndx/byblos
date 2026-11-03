@@ -34,15 +34,18 @@ class ReconciliationEngine {
     }
 
     static async start() {
-        cron.schedule('*/5 * * * *', async () => {
+        const schedule = process.env.RECONCILIATION_CRON_SCHEDULE || '2-57/5 * * * *';
+        cron.schedule(schedule, async () => {
             await this.runOnce();
         });
 
-        setImmediate(() => {
+        // Delay the startup run by 30s to allow server to boot and DB pool to settle
+        const startupDelayMs = Number.parseInt(process.env.RECONCILIATION_STARTUP_DELAY_MS || '30000', 10);
+        setTimeout(() => {
             this.runOnce().catch(err => logger.error('[RECON] Initial startup run failed:', err));
-        });
+        }, startupDelayMs).unref();
 
-        logger.info('[RECON] Reconciliation Engine initialized (5-minute schedule + startup run).');
+        logger.info(`[RECON] Reconciliation Engine initialized (${schedule} schedule + delayed startup run).`);
     }
 
     static async runOnce() {
