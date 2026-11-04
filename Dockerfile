@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 COPY package*.json ./
 # Install all dependencies using lockfile for 100% deterministic builds
 RUN npm ci
@@ -24,6 +25,7 @@ RUN npm ci
 # Build stage
 FROM deps AS builder
 WORKDIR /app
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 COPY . .
 RUN npm run build
 
