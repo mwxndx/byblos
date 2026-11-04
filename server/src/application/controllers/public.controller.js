@@ -632,9 +632,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '75', 10);
-  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '75', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.75';
+  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '76', 10);
+  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '76', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.76';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -650,9 +650,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Resolved light theme status bar visibility and contrast across mobile devices and standalone PWA displays with safe-area scrim protections.',
-        'Synchronized native Android and iOS status bar styling, keyboard styling, and dynamic theme tokens across all buyer and seller views.',
-        'Hardened platform startup stability, cold launch splash contracts, and continuous verification audit safeguards.'
+        'Hardened platform security and native device identification using Web Crypto cryptographically secure PRNG standards.',
+        'Optimized compilation pipelines and build heap memory headroom for production and low-memory server environments.',
+        'Refined mobile status bar theme transitions, ambient type resilience, and continuous verification reliability safeguards.'
       ]
     }
   });
