@@ -45,9 +45,29 @@ export function applyResolvedTheme(resolved: 'light' | 'dark'): void {
     statusMeta.setAttribute('content', resolved === 'light' ? 'default' : 'black-translucent');
   }
 
-  // Keep the native (Android) keyboard accessory bar in step with the app theme,
-  // rather than the static Keyboard.style in capacitor.config.ts. No-op on web.
+  // Keep the native (Android/iOS) status bar icons & background and keyboard
+  // accessory bar in step with the app theme. No-op on web.
   void syncNativeKeyboardStyle(resolved);
+  void syncNativeStatusBarStyle(resolved);
+}
+
+/**
+ * Match the native status bar icons and background to the resolved app theme.
+ * In Capacitor's StatusBar API:
+ * - Style.Light = Light content (white text/icons) on dark background.
+ * - Style.Dark = Dark content (black/dark icons) on light background.
+ * Lazily loads the Capacitor plugin so web builds never pull it in.
+ */
+async function syncNativeStatusBarStyle(resolved: 'light' | 'dark'): Promise<void> {
+  try {
+    const { isNativeApp } = await import('@/infrastructure/navigation/mobileApp');
+    if (!isNativeApp()) return;
+    const { StatusBar, Style } = await import('@capacitor/status-bar');
+    await StatusBar.setStyle({ style: resolved === 'light' ? Style.Dark : Style.Light });
+    await StatusBar.setBackgroundColor({ color: resolved === 'light' ? '#FFFFFF' : '#000000' });
+  } catch {
+    // Web build or plugin unavailable — nothing to sync.
+  }
 }
 
 /**
