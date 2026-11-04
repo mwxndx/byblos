@@ -42,18 +42,29 @@ export const isAppInstalled = (): boolean => {
 
 export const APP_DOWNLOAD_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
 
+const generateSecureDeviceId = (): string => {
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+  if (typeof globalThis.crypto?.getRandomValues === 'function') {
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  return `device-${Date.now()}-${performance.now().toString(36).replace('.', '')}`;
+};
+
 export const getStableDeviceId = (): string => {
   const storageKey = 'byblosNativeDeviceId';
   try {
     const existing = localStorage.getItem(storageKey);
     if (existing) return existing;
 
-    const generated = globalThis.crypto?.randomUUID?.()
-      || `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const generated = generateSecureDeviceId();
     localStorage.setItem(storageKey, generated);
     return generated;
   } catch {
-    return `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return generateSecureDeviceId();
   }
 };
 
