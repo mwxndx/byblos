@@ -11,7 +11,10 @@ describe('useAppTheme & Theme Synchronization', () => {
     localStorage.clear();
     document.documentElement.className = '';
     document.documentElement.removeAttribute('data-theme');
-    document.head.innerHTML = '<meta name="theme-color" content="#000000" id="theme-color-meta">';
+    document.head.innerHTML = `
+      <meta name="theme-color" content="#000000" id="theme-color-meta">
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    `;
   });
 
   it('resolves explicit light and dark themes accurately', () => {
@@ -27,6 +30,9 @@ describe('useAppTheme & Theme Synchronization', () => {
 
     const meta = document.querySelector('meta[name="theme-color"]');
     expect(meta?.getAttribute('content')).toBe('#ffffff');
+
+    const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    expect(statusMeta?.getAttribute('content')).toBe('black-translucent');
   });
 
   it('applies dark theme with pure black #000000 status bar and html attributes', () => {
@@ -37,6 +43,9 @@ describe('useAppTheme & Theme Synchronization', () => {
 
     const meta = document.querySelector('meta[name="theme-color"]');
     expect(meta?.getAttribute('content')).toBe('#000000');
+
+    const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    expect(statusMeta?.getAttribute('content')).toBe('black-translucent');
   });
 
   it('synchronizes all scopes when writeScopePref is called and dispatches byblos-theme-change', () => {

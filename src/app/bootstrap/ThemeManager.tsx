@@ -58,7 +58,11 @@ export function ThemeManager() {
           document.documentElement.classList.add('android-native');
         }
       }
-      if ((window.navigator as unknown as { standalone?: boolean })?.standalone) {
+      const isStandalone = Boolean(
+        (window.navigator as unknown as { standalone?: boolean })?.standalone ||
+        (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches)
+      );
+      if (isStandalone) {
         document.documentElement.classList.add('pwa-standalone');
       }
     }

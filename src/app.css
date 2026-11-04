@@ -65,6 +65,26 @@ html.pwa-standalone {
     --sab: max(env(safe-area-inset-bottom, 0px), 0px);
 }
 
+/* ── iOS Standalone PWA Status Bar Scrim for Light Mode ──
+   iOS standalone PWAs with apple-mobile-web-app-status-bar-style="black-translucent"
+   force the status bar icons (clock, battery, Wi-Fi) to white. When light theme is active,
+   the white header background leaks underneath the status bar, rendering the white icons
+   invisible.
+   A fixed dark status bar scrim over the top safe area ensures the white system icons
+   remain 100% crisp and readable while the light-themed UI sits cleanly below it. */
+html[data-theme="light"].pwa-standalone:not(.native-app):not(.capacitor-native)::before,
+html.light.pwa-standalone:not(.native-app):not(.capacitor-native)::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--sat, env(safe-area-inset-top, 0px));
+    background-color: #000000;
+    z-index: 9999;
+    pointer-events: none;
+}
+
 /* ── Capacitor Native Mobile (Android & iOS) Safe Area Overrides ── */
 html.native-app,
 html.capacitor-native,
