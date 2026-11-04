@@ -632,9 +632,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '74', 10);
-  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '74', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.74';
+  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '75', 10);
+  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '75', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.75';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -650,9 +650,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Enhanced app stability with memory cap management, event loop protections, and staggered background worker cadences.',
-        'Refined mobile storefront responsiveness and optimized client-side navigation transitions across buyer and seller flows.',
-        'Strengthened security verification, session validation, and reliable hardware back button modal interceptors.'
+        'Resolved light theme status bar visibility and contrast across mobile devices and standalone PWA displays with safe-area scrim protections.',
+        'Synchronized native Android and iOS status bar styling, keyboard styling, and dynamic theme tokens across all buyer and seller views.',
+        'Hardened platform startup stability, cold launch splash contracts, and continuous verification audit safeguards.'
       ]
     }
   });
