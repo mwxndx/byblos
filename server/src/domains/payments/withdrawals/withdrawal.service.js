@@ -289,6 +289,28 @@ class WithdrawalService {
                 await client.query('BEGIN');
             }
 
+            // CANONICAL LOCK ORDERING POLICY (Level 1: Entity -> Level 2: Withdrawal Request):
+            // The wallet owner entity (seller / creator / buyer) MUST ALWAYS be locked BEFORE
+            // child withdrawal_requests to prevent deadlock cycles with createWithdrawalRequest.
+            const { rows: [preview] } = await client.query(
+                `SELECT id, seller_id, creator_id, buyer_id, status FROM withdrawal_requests WHERE id = $1`,
+                [requestId]
+            );
+
+            if (!preview) throw new AppError('Withdrawal request not found', 404);
+
+            // 1. Lock wallet owner entity FIRST if transitioning or modifying balances
+            if (['completed', 'failed'].includes(newStatus) || preview.status === 'processing') {
+                if (preview.seller_id) {
+                    await client.query('SELECT id FROM sellers WHERE id = $1 FOR UPDATE', [preview.seller_id]);
+                } else if (preview.creator_id) {
+                    await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [preview.creator_id]);
+                } else if (preview.buyer_id) {
+                    await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [preview.buyer_id]);
+                }
+            }
+
+            // 2. Lock child withdrawal_requests row SECOND
             const { rows: [request] } = await client.query(
                 `SELECT wr.*,
                         COALESCE(s.whatsapp_number, c.whatsapp_number, c.mpesa_number, b.whatsapp_number, b.mobile_payment) as entity_phone
@@ -301,17 +323,6 @@ class WithdrawalService {
             );
 
             if (!request) throw new AppError('Withdrawal request not found', 404);
-
-            // Lock wallet owner row to prevent race conditions during balance updates.
-            if (['completed', 'failed'].includes(newStatus)) {
-                if (request.seller_id) {
-                    await client.query('SELECT id FROM sellers WHERE id = $1 FOR UPDATE', [request.seller_id]);
-                } else if (request.creator_id) {
-                    await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [request.creator_id]);
-                } else if (request.buyer_id) {
-                    await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [request.buyer_id]);
-                }
-            }
 
             // Prevent re-processing terminal states (CRITICAL FIX: STATE-TRANSITIONS)
             if (['completed', 'failed', 'compensation_required'].includes(request.status)) {
@@ -727,6 +738,28 @@ class WithdrawalService {
             try {
                 await client.query('BEGIN');
 
+                // CANONICAL LOCK ORDERING POLICY (Level 1: Entity -> Level 2: Withdrawal Request):
+                const { rows: [preview] } = await client.query(
+                    `SELECT id, seller_id, creator_id, buyer_id, status FROM withdrawal_requests WHERE id = $1`,
+                    [request.id]
+                );
+
+                if (!preview) {
+                    await client.query('ROLLBACK');
+                    logger.error(`[WithdrawalService] Request ${request.id} disappeared before API failure handling.`);
+                    return;
+                }
+
+                // 1. Lock wallet owner entity FIRST
+                if (preview.seller_id) {
+                    await client.query('SELECT id FROM sellers WHERE id = $1 FOR UPDATE', [preview.seller_id]);
+                } else if (preview.creator_id) {
+                    await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [preview.creator_id]);
+                } else if (preview.buyer_id) {
+                    await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [preview.buyer_id]);
+                }
+
+                // 2. Lock withdrawal request row SECOND
                 const { rows: [currentRequest] } = await client.query(
                     `SELECT *
                      FROM withdrawal_requests
@@ -772,14 +805,6 @@ class WithdrawalService {
                     await client.query('COMMIT');
                     logger.warn(`[WithdrawalService] Request ${request.id} has ambiguous payout provider result; left processing for callback/manual review.`);
                     return;
-                }
-
-                if (currentRequest.seller_id) {
-                    await client.query('SELECT id FROM sellers WHERE id = $1 FOR UPDATE', [currentRequest.seller_id]);
-                } else if (currentRequest.creator_id) {
-                    await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [currentRequest.creator_id]);
-                } else if (currentRequest.buyer_id) {
-                    await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [currentRequest.buyer_id]);
                 }
                 const newBalance = await payoutService.refundToWallet(client, currentRequest);
 

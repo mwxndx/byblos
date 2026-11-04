@@ -93,8 +93,7 @@ class PayoutCallbackStateMachineService {
                  LEFT JOIN sellers s ON s.id = wr.seller_id
                  LEFT JOIN creators c ON c.id = wr.creator_id
                  LEFT JOIN buyers b ON b.id = wr.buyer_id
-                 ORDER BY matched_ids.match_priority ASC, wr.created_at DESC
-                 FOR UPDATE OF wr`,
+                 ORDER BY matched_ids.match_priority ASC, wr.created_at DESC`,
                 [transactionReference || null, clientReference || null]
             );
 
@@ -118,12 +117,37 @@ class PayoutCallbackStateMachineService {
                 };
             }
 
-            const request = matchedRequests[0];
+            const initialMatch = matchedRequests[0];
 
-            if (!request) {
+            if (!initialMatch) {
                 await client.query('COMMIT');
                 return { status: 'unmatched', httpStatus: 202 };
             }
+
+            // CANONICAL LOCK ORDERING POLICY (Level 1: Entity -> Level 2: Withdrawal Request):
+            // 1. Lock wallet owner entity FIRST
+            if (initialMatch.seller_id) {
+                await client.query('SELECT id FROM sellers WHERE id = $1 FOR UPDATE', [initialMatch.seller_id]);
+            } else if (initialMatch.creator_id) {
+                await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [initialMatch.creator_id]);
+            } else if (initialMatch.buyer_id) {
+                await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [initialMatch.buyer_id]);
+            }
+
+            // 2. Lock child withdrawal_requests row SECOND
+            const { rows: [lockedMatchedRequest] } = await client.query(
+                `SELECT wr.*,
+                        COALESCE(s.whatsapp_number, c.whatsapp_number, c.mpesa_number, b.whatsapp_number, b.mobile_payment) AS entity_phone
+                 FROM withdrawal_requests wr
+                 LEFT JOIN sellers s ON s.id = wr.seller_id
+                 LEFT JOIN creators c ON c.id = wr.creator_id
+                 LEFT JOIN buyers b ON b.id = wr.buyer_id
+                 WHERE wr.id = $1
+                 FOR UPDATE OF wr`,
+                [initialMatch.id]
+            );
+
+            const request = lockedMatchedRequest || initialMatch;
 
             withdrawalId = request.id;
             const dbAmount = Number.parseFloat(request.amount || 0);
@@ -252,13 +276,6 @@ class PayoutCallbackStateMachineService {
             }
 
             let newBalance = null;
-            if (request.seller_id) {
-                await client.query('SELECT id FROM sellers WHERE id = $1 FOR UPDATE', [request.seller_id]);
-            } else if (request.creator_id) {
-                await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [request.creator_id]);
-            } else if (request.buyer_id) {
-                await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [request.buyer_id]);
-            }
 
             const { rows: [updatedRequest] } = await client.query(
                 `UPDATE withdrawal_requests

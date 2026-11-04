@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { isNativeApp } from '@/infrastructure/navigation/platformDetection';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/infrastructure/http/apiClient';
 import { useGlobalAuth } from '@/features/auth/contexts';
@@ -94,7 +95,6 @@ export function useNotifications(variant: NotificationVariant = 'default', enabl
     let cancelled = false;
     void (async () => {
       try {
-        const { isNativeApp } = await import('@/infrastructure/navigation/mobileApp');
         if (!isNativeApp()) return;
         const { PushNotifications } = await import('@capacitor/push-notifications');
         const handle = await PushNotifications.addListener('pushNotificationReceived', () => {

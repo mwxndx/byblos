@@ -7,7 +7,7 @@ import { GlobalAuthContext } from '@/features/auth/contexts/authContextObjects';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
 
-export const isPwaStandalone = (): boolean => {
+const isPwaStandalone = (): boolean => {
   if (typeof window === 'undefined') return false;
   return Boolean(
     (window.navigator as unknown as { standalone?: boolean })?.standalone ||

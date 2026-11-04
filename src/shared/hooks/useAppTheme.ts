@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { isNativeApp } from '@/infrastructure/navigation/platformDetection';
 
 export type AppTheme = 'system' | 'light' | 'dark';
 export type ThemeScope = 'buyer' | 'seller' | 'creator' | 'shop' | 'default';
@@ -61,7 +62,6 @@ export function applyResolvedTheme(resolved: 'light' | 'dark'): void {
  */
 async function syncNativeStatusBarStyle(resolved: 'light' | 'dark'): Promise<void> {
   try {
-    const { isNativeApp } = await import('@/infrastructure/navigation/mobileApp');
     if (!isNativeApp()) return;
     const { StatusBar, Style } = await import('@capacitor/status-bar');
     await StatusBar.setStyle({ style: resolved === 'light' ? Style.Dark : Style.Light });
@@ -78,7 +78,6 @@ async function syncNativeStatusBarStyle(resolved: 'light' | 'dark'): Promise<voi
  */
 async function syncNativeKeyboardStyle(resolved: 'light' | 'dark'): Promise<void> {
   try {
-    const { isNativeApp } = await import('@/infrastructure/navigation/mobileApp');
     if (!isNativeApp()) return;
     const { Keyboard, KeyboardStyle } = await import('@capacitor/keyboard');
     await Keyboard.setStyle({ style: resolved === 'dark' ? KeyboardStyle.Dark : KeyboardStyle.Light });

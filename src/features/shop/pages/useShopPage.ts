@@ -6,7 +6,7 @@ import type { ApiSellerProduct } from '@/shared/types/api/product';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { useShopAccentOnly, getShopThemeAccentVars, type Theme } from '@/shared/hooks/useShopTheme';
-import { useShopPageTheme } from '../components/ShopPageThemePicker';
+import { useShopPageTheme } from '../hooks/useShopPageTheme';
 import { isAesthetic, getSellerInitials, type ShopProduct, type ShopSeller } from '../utils/shopPage.shared';
 
 export function useShopPage() {
@@ -163,10 +163,10 @@ export function useShopPage() {
 
   const visibleProducts = isNativeApp()
     ? products.filter(product => {
-        const p = product as unknown as { productType?: string; product_type?: string; isDigital?: boolean; is_digital?: boolean };
-        const pType = String(p.productType || p.product_type || '').toLowerCase();
-        return pType !== 'digital' && !p.isDigital && !p.is_digital;
-      })
+      const p = product as unknown as { productType?: string; product_type?: string; isDigital?: boolean; is_digital?: boolean };
+      const pType = String(p.productType || p.product_type || '').toLowerCase();
+      return pType !== 'digital' && !p.isDigital && !p.is_digital;
+    })
     : products;
 
   // Filter products based on search query

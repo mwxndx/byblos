@@ -7,27 +7,30 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-  ignores: [
-    "dist/**",
-    "node_modules/**",
-    "coverage/**",
+    ignores: [
+      "dist/**",
+      "node_modules/**",
+      "coverage/**",
+      ".agents/**",
+      "scratch/**",
 
-    // Python virtual environment
-    "Lib/**",
-    "Include/**",
-    "Scripts/pip.exe",
-    "Scripts/pip3.exe",
-    "Scripts/pip3.13.exe",
-    "Scripts/playwright.exe",
+      // Python virtual environment
+      "Lib/**",
+      "Include/**",
+      "Scripts/pip.exe",
+      "Scripts/pip3.exe",
+      "Scripts/pip3.13.exe",
+      "Scripts/playwright.exe",
 
-    // Native builds
-    "android/**",
-    "ios/**",
+      // Native builds
+      "android/**",
+      "ios/**",
+      "server/**",
 
-    // Backend dependencies
-    "server/node_modules/**",
-  ],
-},
+      // Backend dependencies
+      "server/node_modules/**",
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -50,6 +53,17 @@ export default tseslint.config(
       // Auto-removable on --fix; keeps unused imports out going forward
       // (matches SonarCloud S1128). Unused *variables* stay off above.
       "unused-imports/no-unused-imports": "error",
+    },
+  },
+  {
+    // Route definition manifests and utility modules export data structures/helpers
+    // rather than Fast Refresh component trees.
+    files: [
+      "src/app/router/**/*.{ts,tsx}",
+      "src/**/utils/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
     },
   }
 );

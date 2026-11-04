@@ -11,6 +11,7 @@ import { AppUpdateGate } from "@/features/app-update/components/AppUpdateGate";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { isNativeApp } from "@/infrastructure/navigation/mobileApp";
+import { isVercelTelemetryEnabled } from "@/shared/utils/telemetry";
 
 // Register router delegation so shared mobile back handler doesn't import app router directly
 registerNavigationDelegate({
@@ -26,6 +27,7 @@ function App() {
   useNativeDeepLinkHandler((path) => router.navigate(path));
 
   const isNative = isNativeApp();
+  const enableTelemetry = isVercelTelemetryEnabled();
 
   return (
     <ErrorBoundary>
@@ -35,12 +37,16 @@ function App() {
       />
       <InstallPrompt />
       <AppUpdateGate />
-      <Analytics
-        endpoint={isNative ? "https://byblosafrica.site/_vercel/insights" : undefined}
-      />
-      <SpeedInsights
-        endpoint={isNative ? "https://byblosafrica.site/_vercel/speed-insights/vitals" : undefined}
-      />
+      {enableTelemetry && (
+        <>
+          <Analytics
+            endpoint={isNative ? "https://byblosafrica.site/_vercel/insights" : undefined}
+          />
+          <SpeedInsights
+            endpoint={isNative ? "https://byblosafrica.site/_vercel/speed-insights/vitals" : undefined}
+          />
+        </>
+      )}
     </ErrorBoundary>
   );
 }

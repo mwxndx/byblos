@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Instagram, Loader2, MessageCircle, ShieldCheck, Sparkles } from '@/shared/ui/icons';
 import { Dialog, DialogContent, DialogTitle } from '@/shared/ui/dialog';
 import { useToast } from '@/shared/hooks/use-toast';
-import { ScaledFounderCard, StoryShareFrame, exportCardAsPng } from './FounderCard';
+import { ScaledFounderCard, StoryShareFrame } from './FounderCard';
+import { exportCardAsPng } from '../utils/exportCard';
 import { useMembership, useJoinMembership } from '../hooks/useMembership';
 import { shareCardToInstagram, shareCardToWhatsApp } from '@/shared/utils/socialShare';
 

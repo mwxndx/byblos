@@ -879,18 +879,30 @@ class AdminService {
     try {
       await client.query('BEGIN');
 
+      // CANONICAL LOCK ORDERING POLICY (Level 1: Entity -> Level 2: Withdrawal Request):
+      const { rows: [preview] } = await client.query(
+        'SELECT id, seller_id, creator_id, buyer_id, status FROM withdrawal_requests WHERE id = $1',
+        [id]
+      );
+      if (!preview) throw new AppError('Withdrawal request not found', 404);
+      if (['completed', 'failed'].includes(preview.status)) {
+        throw new AppError(`Already finalized as "${preview.status}" — cannot override`, 400);
+      }
+
+      // 1. Lock wallet owner entity FIRST
+      if (preview.seller_id) {
+        await sellerRepository.lockById(preview.seller_id, client);
+      } else if (preview.creator_id) {
+        await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [preview.creator_id]);
+      } else if (preview.buyer_id) {
+        await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [preview.buyer_id]);
+      }
+
+      // 2. Lock withdrawal request row SECOND
       const lockedRequest = await withdrawalRequestRepository.findByIdWithSellerForUpdate(id, client);
       if (!lockedRequest) throw new AppError('Withdrawal request not found', 404);
       if (['completed', 'failed'].includes(lockedRequest.status)) {
         throw new AppError(`Already finalized as "${lockedRequest.status}" — cannot override`, 400);
-      }
-
-      if (lockedRequest.seller_id) {
-        await sellerRepository.lockById(lockedRequest.seller_id, client);
-      } else if (lockedRequest.creator_id) {
-        await client.query('SELECT id FROM creators WHERE id = $1 FOR UPDATE', [lockedRequest.creator_id]);
-      } else if (lockedRequest.buyer_id) {
-        await client.query('SELECT id FROM buyers WHERE id = $1 FOR UPDATE', [lockedRequest.buyer_id]);
       }
 
       request = lockedRequest;

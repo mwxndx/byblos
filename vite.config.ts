@@ -13,12 +13,16 @@ export default defineConfig(({ command, mode }) => {
 
   // Base URL for the application - always use relative paths to avoid CORS
   const base = '/';
+  const proxyTarget = (env.VITE_API_URL && env.VITE_API_URL.startsWith('http'))
+    ? env.VITE_API_URL
+    : (env.BACKEND_URL || 'http://localhost:3003');
 
   return {
     base,
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV || 'production'),
       'process.env.NODE_ENV': JSON.stringify(isProduction ? 'production' : 'development'),
+      'import.meta.env.VITE_VERCEL': JSON.stringify(process.env.VERCEL ? '1' : (env.VITE_VERCEL || '')),
     },
     plugins: [
       react(),
@@ -35,7 +39,7 @@ export default defineConfig(({ command, mode }) => {
       },
       proxy: {
         '^/api': {
-          target: env.VITE_API_URL || 'http://localhost:3002',
+          target: proxyTarget,
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, '/api'),
@@ -109,6 +113,13 @@ export default defineConfig(({ command, mode }) => {
     preview: {
       port: 3000,
       strictPort: true,
+      proxy: {
+        '^/api': {
+          target: proxyTarget,
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
     test: {
       include: ['src/**/*.{test,spec}.{ts,tsx}', 'src/**/*.integration.test.{ts,tsx}'],

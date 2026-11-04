@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { toPng } from 'html-to-image';
+
 
 // LOCKED DESIGN — mirrors byblos_card_locked_spec.html. The Byblos founder card
 // is a literal card at a FIXED 900x566 (real card proportions, ~1.59:1). It must
@@ -252,21 +252,4 @@ export function ScaledFounderCard(props: Readonly<FounderCardProps>) {
       </div>
     </div>
   );
-}
-
-/**
- * Renders the story frame off-screen at full 1080x1920 resolution (ignoring the
- * preview scale) and returns a PNG data URL, ready for the native share bridge.
- * Always call this against a dedicated hidden full-scale <StoryShareFrame> node.
- */
-export async function exportCardAsPng(node: HTMLElement): Promise<string> {
-  // Give the logo a chance to load so it is inlined into the raster.
-  await new Promise((r) => setTimeout(r, 60));
-  return toPng(node, {
-    width: STORY_WIDTH,
-    height: STORY_HEIGHT,
-    pixelRatio: 1,
-    cacheBust: true,
-    style: { transform: 'none' },
-  });
 }

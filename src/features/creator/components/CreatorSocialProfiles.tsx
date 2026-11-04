@@ -19,12 +19,13 @@ export function CreatorSocialProfiles({ profile }: Readonly<CreatorSocialProfile
   const [tiktok, setTiktok] = useState(profile?.tiktokLink || '');
   const updateMutation = useUpdateCreatorProfileMutation();
 
+  const profileInstagram = profile?.instagramLink || '';
+  const profileTiktok = profile?.tiktokLink || '';
+
   useEffect(() => {
-    if (profile) {
-      setInstagram(profile.instagramLink || '');
-      setTiktok(profile.tiktokLink || '');
-    }
-  }, [profile?.instagramLink, profile?.tiktokLink]);
+    setInstagram(profileInstagram);
+    setTiktok(profileTiktok);
+  }, [profileInstagram, profileTiktok]);
 
   const hasChanges =
     (instagram.trim() || null) !== (profile?.instagramLink || null) ||
