@@ -69,7 +69,9 @@ class EventDispatcher {
 
     async dispatchEvent(event, payload, listeners = this.listeners(event), extraArgs = []) {
         const errors = [];
-        const results = await Promise.allSettled(listeners.map(listener => listener(payload, ...extraArgs)));
+        const results = await Promise.allSettled(
+            listeners.map(async listener => listener(payload, ...extraArgs))
+        );
         results.forEach((res) => {
             if (res.status === 'rejected') {
                 errors.push(res.reason);
@@ -114,6 +116,29 @@ class EventDispatcher {
         }
 
         return { retryable: true, errorType: 'transient_delivery_failure' };
+    }
+
+    async dispatchOutboxRow(row) {
+        if (!row) return { completed: 0, failed: 0 };
+
+        const listeners = this.listeners(row.event_name);
+        const payload = {
+            ...(row.payload || {}),
+            eventId: row.event_id
+        };
+        if (this.criticalEvents.has(row.event_name) && listeners.length === 0) {
+            await this.markOutboxFailed(row.event_id, new Error(`Critical event ${row.event_name} has no registered listeners`), row.attempts);
+            return { completed: 0, failed: 1 };
+        }
+
+        const errors = await this.dispatchEvent(row.event_name, payload, listeners);
+        if (errors.length === 0) {
+            await this.markOutboxCompleted(row.event_id, row.attempts);
+            return { completed: 1, failed: 0 };
+        }
+
+        await this.markOutboxFailed(row.event_id, errors[0], row.attempts);
+        return { completed: 0, failed: 1 };
     }
 
     async replayPendingOutbox(limit = 50) {
