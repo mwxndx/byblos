@@ -210,6 +210,7 @@ export default async (app) => {
 
         const isExcluded =
             req.path.startsWith('/api/payments/webhook') ||
+            req.path.startsWith('/api/payment/webhook') ||
             req.path.startsWith('/api/callbacks/') ||
             req.path.startsWith('/api/webhooks/') ||
             req.path.includes('/login') ||

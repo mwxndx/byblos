@@ -72,11 +72,16 @@ const createTransporter = () => {
 let transporter = null;
 
 // Whitelisted email template names to prevent dynamic template injection
-const ALLOWED_TEMPLATES = new Set([
+export const ALLOWED_TEMPLATES = new Set([
   'verify-email',
   'reset-password',
+  'welcome',
   'welcome-buyer',
   'welcome-seller',
+  'product-order-confirmation',
+  'new-order-notification',
+  'product-payment-receipt',
+  'ticket-confirmation',
   'order-confirmation',
   'order-shipped',
   'order-delivered',
@@ -88,7 +93,7 @@ const ALLOWED_TEMPLATES = new Set([
 
 // Email template paths cached for the lifetime of the process
 const templatePathCache = new Map();
-const readTemplate = async (templateName, data) => {
+export const readTemplate = async (templateName, data) => {
   if (!ALLOWED_TEMPLATES.has(templateName)) {
     throw new Error(`Unauthorized email template: ${templateName}`);
   }
