@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { AdminBroadcastModal } from '../AdminBroadcastModal';
-import { adminApi } from '@/features/admin/api';
+import { adminApi } from '../../api';
 
 vi.mock('@/features/admin/api', () => ({
   adminApi: {
