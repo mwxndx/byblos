@@ -33,18 +33,20 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
 
   useEffect(() => {
     let isMounted = true;
-    adminApi.getAppVersionPolicy()
-      .then((policy) => {
-        if (isMounted && policy?.latestVersionName && policy?.latestAndroidVersionCode) {
-          setAppPolicy({
-            versionName: policy.latestVersionName,
-            versionCode: policy.latestAndroidVersionCode,
-          });
-        }
-      })
-      .catch(() => {
-        // Fallback default is 76 (1.0.76)
-      });
+    if (typeof adminApi?.getAppVersionPolicy === 'function') {
+      adminApi.getAppVersionPolicy()
+        .then((policy) => {
+          if (isMounted && policy?.latestVersionName && policy?.latestAndroidVersionCode) {
+            setAppPolicy({
+              versionName: policy.latestVersionName,
+              versionCode: policy.latestAndroidVersionCode,
+            });
+          }
+        })
+        .catch(() => {
+          // Fallback default is 76 (1.0.76)
+        });
+    }
     return () => {
       isMounted = false;
     };

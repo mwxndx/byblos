@@ -3,6 +3,16 @@ import { render, screen } from '@testing-library/react';
 import { AdminOverviewTab } from '../AdminOverviewTab';
 import { GeoDistributionChart } from '../AdminDashboardCharts';
 
+vi.mock('@/features/admin/api', () => ({
+  adminApi: {
+    getAppVersionPolicy: vi.fn().mockResolvedValue({
+      minAndroidVersionCode: 76,
+      latestAndroidVersionCode: 76,
+      latestVersionName: '1.0.76',
+    }),
+  },
+}));
+
 // Mock Recharts
 vi.mock('recharts', async () => {
   const original = await vi.importActual<Record<string, unknown>>('recharts');

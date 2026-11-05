@@ -53,8 +53,9 @@ jobs:
       - name: Execute automated staging smoke suite
         env:
           STAGING_URL: ${{ inputs.staging_url || vars.STAGING_URL || 'https://staging.byblosafrica.site' }}
-          TIMEOUT_MS: ${{ (inputs.timeout_seconds || 15) * 1000 }}
+          TIMEOUT_SECONDS: ${{ inputs.timeout_seconds || '15' }}
         run: |
+          TIMEOUT_MS=$(( TIMEOUT_SECONDS * 1000 ))
           node scripts/staging-smoke-test.mjs --target="${STAGING_URL}" --timeout="${TIMEOUT_MS}"
 
       - name: Upload smoke test summary artifact

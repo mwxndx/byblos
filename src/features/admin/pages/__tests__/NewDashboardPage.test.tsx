@@ -93,6 +93,11 @@ vi.mock('../../hooks/useAdminDashboard', () => ({
 vi.mock('../../api', () => ({
   adminApi: {
     getLogisticsRequests: vi.fn().mockResolvedValue([]),
+    getAppVersionPolicy: vi.fn().mockResolvedValue({
+      minAndroidVersionCode: 76,
+      latestAndroidVersionCode: 76,
+      latestVersionName: '1.0.76',
+    }),
   },
 }));
 
