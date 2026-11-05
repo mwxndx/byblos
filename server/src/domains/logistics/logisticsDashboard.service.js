@@ -306,13 +306,25 @@ class LogisticsDashboardService {
         );
 
         if (legs.length === 0) {
+            const { rows: reqRows } = await client.query(
+                `SELECT lr.status, lr.metadata, po.status AS order_status, po.payment_status
+                 FROM logistics_requests lr
+                 JOIN product_orders po ON po.id = lr.order_id
+                 WHERE lr.id = $1`,
+                [requestId]
+            );
+            const req = reqRows[0];
+            const isCompleted = req && (req.order_status === 'COMPLETED' || req.status === 'completed');
+            const fallbackStatus = isCompleted ? 'completed' : (req?.status || 'active');
+
             const { rows } = await client.query(
                 `UPDATE logistics_requests
-                 SET status = 'payment_pending',
+                 SET status = $2,
+                     completed_at = CASE WHEN $3 THEN COALESCE(completed_at, NOW()) ELSE completed_at END,
                      updated_at = NOW()
                  WHERE id = $1
                  RETURNING status, completed_at`,
-                [requestId]
+                [requestId, fallbackStatus, fallbackStatus === 'completed']
             );
             return rows[0];
         }
@@ -1052,11 +1064,15 @@ class LogisticsDashboardService {
                 ) e
              ) events ON TRUE
              WHERE lr.partner_id = $1
-               AND lr.status = ANY($2::text[])
+               AND (lr.status = ANY($2::text[]) OR po.status = 'COMPLETED')
                AND (
                     (pl.id IS NOT NULL AND (pl.status <> 'payment_pending' OR pp.status::text = ANY($3::text[])))
                  OR (dl.id IS NOT NULL AND (dl.status <> 'payment_pending' OR dp.status::text = ANY($3::text[])))
-                 OR (pl.id IS NULL AND dl.id IS NULL AND lr.metadata->>'seller_handoff_method' = 'seller_dropoff')
+                 OR (pl.id IS NULL AND dl.id IS NULL AND (
+                     lr.metadata->>'seller_handoff_method' = 'seller_dropoff'
+                  OR po.payment_status::text = ANY($3::text[])
+                  OR po.status = 'COMPLETED'
+                 ))
                )
              ORDER BY ${orderBy}
              LIMIT $4 OFFSET $5`,
@@ -1098,11 +1114,15 @@ class LogisticsDashboardService {
         ];
 
         const filters = [
-            `lr.status = ANY($1::text[])`,
+            `(lr.status = ANY($1::text[]) OR po.status = 'COMPLETED')`,
             `(
                 (pl.id IS NOT NULL AND (pl.status <> 'payment_pending' OR pp.status::text = ANY($2::text[])))
              OR (dl.id IS NOT NULL AND (dl.status <> 'payment_pending' OR dp.status::text = ANY($2::text[])))
-             OR (pl.id IS NULL AND dl.id IS NULL AND lr.metadata->>'seller_handoff_method' = 'seller_dropoff')
+             OR (pl.id IS NULL AND dl.id IS NULL AND (
+                 lr.metadata->>'seller_handoff_method' = 'seller_dropoff'
+              OR po.payment_status::text = ANY($2::text[])
+              OR po.status = 'COMPLETED'
+             ))
             )`
         ];
 
@@ -1113,7 +1133,11 @@ class LogisticsDashboardService {
         } else if (normalizedStatus === 'manual_review') {
             filters.push(`(lr.status = 'manual_review' OR lr.metadata->'admin_dispute_resolution'->>'resolution' = 'manual_review')`);
         } else if (normalizedStatus === 'overdue') {
-            filters.push(`COALESCE(pl.deadline_at, dl.deadline_at, lr.deadline_at) < NOW()`, `lr.status NOT IN ('completed', 'cancelled')`);
+            filters.push(`COALESCE(pl.deadline_at, dl.deadline_at, lr.deadline_at) < NOW()`, `lr.status NOT IN ('completed', 'cancelled') AND po.status <> 'COMPLETED'`);
+        } else if (normalizedStatus === 'completed') {
+            filters.push(`(lr.status = 'completed' OR po.status = 'COMPLETED')`);
+        } else if (normalizedStatus === 'active') {
+            filters.push(`(lr.status IN ('active', 'awaiting_seller_choice', 'in_progress') AND po.status <> 'COMPLETED')`);
         } else if (normalizedStatus !== 'all') {
             params.push(normalizedStatus);
             filters.push(`lr.status = $${params.length}`);

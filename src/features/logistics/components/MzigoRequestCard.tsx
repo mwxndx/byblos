@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, Truck, UserRound } from '@/shared/ui/icons';
+import { ChevronDown, ChevronUp, History, Loader2, MapPin, Navigation, Phone, ShoppingBag, Store, Truck, UserRound } from '@/shared/ui/icons';
 import { LogisticsLegType, LogisticsRequestCard, LogisticsStatusUpdate } from '@/features/logistics/api';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { deadlineText, formatCurrency, formatDate, statusLabel, validateHandoverCode } from '../utils/mzigoDashboard.utils';
@@ -271,11 +271,30 @@ export function RequestCard({
             </span>
           </div>
 
-          {request.events[0]?.message && (
-            <p className="rounded-xl border border-separator bg-black/40 p-3 text-xs text-label-2">
-              Latest update: {request.events[0].message}
-            </p>
-          )}
+          {/* Tracking History timeline */}
+          <div className="rounded-xl border border-separator bg-black/40 p-3">
+            <div className="mb-2.5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-label-2">
+              <History size={13} className="text-yellow-300" />
+              Tracking history
+            </div>
+            <div className="space-y-2.5">
+              {!request.events || request.events.length === 0 ? (
+                <p className="text-xs text-label-2">No tracking events recorded yet.</p>
+              ) : (
+                request.events.map((event) => (
+                  <div key={event.id} className="border-l-2 border-yellow-400/40 pl-2.5 text-xs">
+                    <p className="font-semibold capitalize text-label">
+                      {statusLabel(event.status || event.type)}
+                    </p>
+                    {event.message && <p className="mt-0.5 text-label-2">{event.message}</p>}
+                    <p className="mt-0.5 text-[10px] text-label-2/70">
+                      {formatDate(event.createdAt)} · {event.actorLabel || event.source || 'system'}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
       )}
     </article>

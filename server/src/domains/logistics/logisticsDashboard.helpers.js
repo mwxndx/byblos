@@ -14,7 +14,8 @@ const LOGISTICS_VISIBLE_REQUEST_STATUSES = new Set([
     'in_progress',
     'completed',
     'failed',
-    'manual_review'
+    'manual_review',
+    'awaiting_seller_choice'
 ]);
 
 // nosemgrep: generic.secrets.security.detected-bcrypt-hash.detected-bcrypt-hash
