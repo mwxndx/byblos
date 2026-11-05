@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { UploadCloud, Send } from '@/shared/ui/icons';
+import { adminApi } from '@/features/admin/api';
 import {
   ChartContainer,
   GeoDistributionChart,
@@ -24,6 +26,30 @@ interface AdminOverviewTabProps {
 }
 
 export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Readonly<AdminOverviewTabProps>) {
+  const [appPolicy, setAppPolicy] = useState<{ versionName: string; versionCode: number }>({
+    versionName: '1.0.76',
+    versionCode: 76,
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    adminApi.getAppVersionPolicy()
+      .then((policy) => {
+        if (isMounted && policy?.latestVersionName && policy?.latestAndroidVersionCode) {
+          setAppPolicy({
+            versionName: policy.latestVersionName,
+            versionCode: policy.latestAndroidVersionCode,
+          });
+        }
+      })
+      .catch(() => {
+        // Fallback default is 76 (1.0.76)
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const analytics = (dashboardState.analytics ?? {}) as Record<string, unknown>;
   const asChartData = (value: unknown): Record<string, unknown>[] =>
     Array.isArray(value) ? (value as Record<string, unknown>[]) : [];
@@ -38,9 +64,9 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-sm sm:text-base font-bold text-label">Android Release v1.0.73</h3>
+              <h3 className="text-sm sm:text-base font-bold text-label">Android Release v{appPolicy.versionName}</h3>
               <Badge className="bg-green-500/10 text-green-400 border-none text-[10px] uppercase font-semibold">
-                Active Gate (Code: 73)
+                Active Gate (Code: {appPolicy.versionCode})
               </Badge>
             </div>
             <p className="text-[11px] sm:text-xs text-label-2 mt-0.5 leading-relaxed">

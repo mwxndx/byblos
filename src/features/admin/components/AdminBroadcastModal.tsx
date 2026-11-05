@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -22,8 +22,8 @@ interface AdminBroadcastModalProps {
 }
 
 export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcastModalProps>) {
-  const [minVersionCode, setMinVersionCode] = useState<number>(73);
-  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.73');
+  const [minVersionCode, setMinVersionCode] = useState<number>(76);
+  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.76');
   const [body, setBody] = useState<string>(
     'A new version of Byblos is available. Please update now to continue using all features.'
   );
@@ -33,10 +33,32 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
 
   useModalBackDismiss(isOpen, onClose);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    let isMounted = true;
+    adminApi.getAppVersionPolicy?.()
+      .then((policy) => {
+        if (!isMounted || !policy) return;
+        if (policy.latestAndroidVersionCode) {
+          setMinVersionCode(policy.latestAndroidVersionCode);
+        }
+        if (policy.latestVersionName) {
+          setTitle(`Update Available: Byblos ${policy.latestVersionName}`);
+        }
+        if (policy.storeUrl) {
+          setStoreUrl(policy.storeUrl);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen]);
+
   const handleReset = () => {
     setResult(null);
-    setMinVersionCode(73);
-    setTitle('Update Available: Byblos 1.0.73');
+    setMinVersionCode(76);
+    setTitle('Update Available: Byblos 1.0.76');
     setBody('A new version of Byblos is available. Please update now to continue using all features.');
     setStoreUrl('');
   };
@@ -167,7 +189,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isSubmitting}
                 className="h-10 text-sm bg-fill border-separator rounded-xl"
-                placeholder="Update Available: Byblos 1.0.73"
+                placeholder="Update Available: Byblos 1.0.76"
                 required
               />
             </div>

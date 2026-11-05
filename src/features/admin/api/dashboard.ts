@@ -31,10 +31,26 @@ export async function broadcastAppUpdate(payload?: BroadcastUpdatePayload): Prom
   const res = data?.data || {};
   return {
     success: res.success ?? true,
-    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 71,
+    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 76,
     targetedDevices: res.targetedDevices ?? res.targeted ?? 0,
     fcmSent: res.fcmSent ?? res.sent ?? 0,
     fcmFailed: res.fcmFailed ?? res.failed ?? 0,
     inAppNotificationsCreated: res.inAppNotificationsCreated ?? res.inAppSent ?? 0,
   };
+}
+
+export interface AppVersionPolicy {
+  platform: 'android' | 'web';
+  minAndroidVersionCode: number;
+  latestAndroidVersionCode: number;
+  latestVersionName: string;
+  forceUpdate: boolean;
+  storeUrl: string;
+  webStoreUrl: string;
+  releaseNotes?: string[];
+}
+
+export async function getAppVersionPolicy(): Promise<AppVersionPolicy> {
+  const { data } = await api.get('/public/app-version');
+  return data?.data;
 }
