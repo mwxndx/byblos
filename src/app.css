@@ -954,18 +954,6 @@ button.btn-white:hover,
                 0 4px 10px -6px rgba(0, 0, 0, 0.55) !important;
 }
 
-/* Balance hero — the single most important number, tinted with the shop
-   accent and given a stronger lift so it clearly outranks every other card. */
-.seller-surface .seller-balance-hero {
-    background: linear-gradient(135deg,
-        rgba(var(--theme-accent-rgb, 245, 158, 11), 0.22),
-        rgba(var(--theme-accent-rgb, 245, 158, 11), 0.05) 55%,
-        #141414 100%) !important;
-    border-color: rgba(var(--theme-accent-rgb, 245, 158, 11), 0.32) !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset,
-                0 24px 50px -20px rgba(0, 0, 0, 0.95),
-                0 0 42px -12px rgba(var(--theme-accent-rgb, 245, 158, 11), 0.38) !important;
-}
 
 @layer components {
   /* Seller dashboard surface vocabulary — one source of truth, THEME-AWARE.
@@ -1181,18 +1169,6 @@ button.btn-white:hover,
     color: #0f0f0e !important;
 }
 
-/* Balance hero in light mode */
-[data-theme="light"] .seller-surface .seller-balance-hero {
-    background: linear-gradient(135deg,
-        rgba(var(--theme-accent-rgb, 198, 155, 25), 0.14),
-        rgba(var(--theme-accent-rgb, 198, 155, 25), 0.04) 55%,
-        #ffffff 100%) !important;
-    border-color: rgba(var(--theme-accent-rgb, 198, 155, 25), 0.22) !important;
-    box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.95) inset,
-        0 12px 28px -8px rgba(15, 23, 42, 0.10),
-        0 0 28px -8px rgba(var(--theme-accent-rgb, 198, 155, 25), 0.20) !important;
-}
 
 /* Service Charge Notice in light mode */
 [data-theme="light"] .seller-service-charge-notice {
