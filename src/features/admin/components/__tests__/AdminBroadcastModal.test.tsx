@@ -7,9 +7,9 @@ vi.mock('@/features/admin/api', () => ({
   adminApi: {
     broadcastAppUpdate: vi.fn(),
     getAppVersionPolicy: vi.fn().mockResolvedValue({
-      minAndroidVersionCode: 76,
-      latestAndroidVersionCode: 76,
-      latestVersionName: '1.0.76',
+      minAndroidVersionCode: 77,
+      latestAndroidVersionCode: 77,
+      latestVersionName: '1.0.77',
     }),
   },
 }));
@@ -30,15 +30,15 @@ describe('AdminBroadcastModal', () => {
     render(<AdminBroadcastModal isOpen={true} onClose={vi.fn()} />);
 
     expect(screen.getByRole('heading', { name: /Broadcast App Update/i })).toBeDefined();
-    expect(screen.getByDisplayValue('76')).toBeDefined();
-    expect(screen.getByDisplayValue('Update Available: Byblos 1.0.76')).toBeDefined();
+    expect(screen.getByDisplayValue('77')).toBeDefined();
+    expect(screen.getByDisplayValue('Update Available: Byblos 1.0.77')).toBeDefined();
     expect(screen.getByRole('button', { name: /Broadcast Update/i })).toBeDefined();
   });
 
   it('dispatches broadcast update and shows results grid', async () => {
     vi.mocked(adminApi.broadcastAppUpdate).mockResolvedValueOnce({
       success: true,
-      minVersionCode: 76,
+      minVersionCode: 77,
       targetedDevices: 12,
       fcmSent: 10,
       fcmFailed: 2,
@@ -52,8 +52,8 @@ describe('AdminBroadcastModal', () => {
 
     await waitFor(() => {
       expect(adminApi.broadcastAppUpdate).toHaveBeenCalledWith({
-        minVersionCode: 76,
-        title: 'Update Available: Byblos 1.0.76',
+        minVersionCode: 77,
+        title: 'Update Available: Byblos 1.0.77',
         body: 'A new version of Byblos is available. Please update now to continue using all features.',
         storeUrl: undefined,
       });

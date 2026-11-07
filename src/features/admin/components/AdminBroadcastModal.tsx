@@ -22,8 +22,8 @@ interface AdminBroadcastModalProps {
 }
 
 export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcastModalProps>) {
-  const [minVersionCode, setMinVersionCode] = useState<number>(76);
-  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.76');
+  const [minVersionCode, setMinVersionCode] = useState<number>(77);
+  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.77');
   const [body, setBody] = useState<string>(
     'A new version of Byblos is available. Please update now to continue using all features.'
   );
@@ -57,8 +57,8 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
 
   const handleReset = () => {
     setResult(null);
-    setMinVersionCode(76);
-    setTitle('Update Available: Byblos 1.0.76');
+    setMinVersionCode(77);
+    setTitle('Update Available: Byblos 1.0.77');
     setBody('A new version of Byblos is available. Please update now to continue using all features.');
     setStoreUrl('');
   };

@@ -632,9 +632,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '76', 10);
-  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '76', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.76';
+  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '77', 10);
+  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '77', 10);
+  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.77';
   const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
   const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
   const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -650,9 +650,9 @@ export const getAppVersion = async (req, res) => {
       storeUrl,
       webStoreUrl,
       releaseNotes: [
-        'Hardened platform security and native device identification using Web Crypto cryptographically secure PRNG standards.',
-        'Optimized compilation pipelines and build heap memory headroom for production and low-memory server environments.',
-        'Refined mobile status bar theme transitions, ambient type resilience, and continuous verification reliability safeguards.'
+        'Refined seller shop cards and product cards to seamlessly match buyer background colors in both light and dark themes.',
+        'Harmonized card borders across Creator, Logistics (Mzigo), Admin, and Marketing dashboards with transparent, theme-blended edges.',
+        'Enhanced optical depth and surface contrast across all dashboard views, improving visual hierarchy and readability on mobile.'
       ]
     }
   });
