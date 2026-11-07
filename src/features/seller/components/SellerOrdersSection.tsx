@@ -148,7 +148,7 @@ export default function SellerOrdersSection() {
 
                 <div className="space-y-4">
                     {filteredOrders.length === 0 ? (
-                        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-transparent shadow-sm">
                             <p className="text-slate-600">No orders found matching "{searchQuery}"</p>
                         </div>
                     ) : (

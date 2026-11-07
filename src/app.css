@@ -930,7 +930,7 @@ button.btn-white:hover,
  * ------------------------------------------------------------------ */
 .seller-surface :is([class*="rounded-2xl"], [class*="rounded-3xl"]):is([class*="bg-white/["], [class*="bg-black"], [class*="bg-[#0a0a0a]"], [class*="bg-[#0A0A0A]"]) {
     background-color: #161616 !important;
-    border-color: rgba(255, 255, 255, 0.09) !important;
+    border-color: transparent !important;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset,
                 0 14px 30px -16px rgba(0, 0, 0, 0.95),
                 0 4px 10px -6px rgba(0, 0, 0, 0.55) !important;
@@ -954,8 +954,8 @@ button.btn-white:hover,
      Light base + dark: override so these classes flip with the seller theme
      (System/Light/Dark) instead of being locked dark. The accent stays
      theme-agnostic (driven by --theme-accent regardless of light/dark). */
-  .seller-card       { @apply rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-[#0a0a0a]; }
-  .seller-card-soft  { @apply rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/[0.03]; }
+  .seller-card       { @apply rounded-2xl border border-transparent bg-white shadow-sm dark:bg-[#0a0a0a]; }
+  .seller-card-soft  { @apply rounded-2xl border border-transparent bg-slate-50 dark:bg-white/[0.03]; }
   .seller-field      { @apply h-10 rounded-xl border border-slate-200 bg-white text-slate-950 placeholder:text-slate-400
                                focus:border-[var(--theme-accent,#f5c518)] focus:ring-[var(--theme-accent,#f5c518)]
                                dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/40; }
@@ -1131,7 +1131,7 @@ button.btn-white:hover,
     section
 ) {
     background-color: #ffffff !important;
-    border-color: rgba(0, 0, 0, 0.07) !important;
+    border-color: transparent !important;
     box-shadow:
         0 1px 0 rgba(255, 255, 255, 0.95) inset,
         0 10px 28px -6px rgba(15, 23, 42, 0.07),
@@ -1146,7 +1146,7 @@ button.btn-white:hover,
 [data-theme="light"] .seller-surface div.sticky,
 [data-theme="light"] .seller-surface div.lg\:rounded-2xl {
     background-color: #ffffff !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
+    border-color: transparent !important;
     box-shadow:
         0 1px 0 rgba(255, 255, 255, 0.95) inset,
         0 12px 32px -8px rgba(15, 23, 42, 0.09) !important;
