@@ -3,17 +3,17 @@ import { UserRound } from '@/shared/ui/icons';
 import { AppHeader } from '@/shared/ui/AppHeader';
 
 interface SellerDashboardHeaderProps {
-  sellerFirstName: string;
+  shopName: string;
   onOpenProfile: () => void;
 }
 
-export function SellerDashboardHeader({ sellerFirstName, onOpenProfile }: Readonly<SellerDashboardHeaderProps>) {
+export function SellerDashboardHeader({ shopName, onOpenProfile }: Readonly<SellerDashboardHeaderProps>) {
   return (
     <AppHeader
       left={<NotificationBell role="seller" />}
       center={
         <h1 className="text-sm sm:text-lg font-semibold text-slate-900 dark:text-white tracking-tight truncate">
-          Welcome, {sellerFirstName}
+          {shopName}
         </h1>
       }
       right={

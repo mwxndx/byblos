@@ -103,9 +103,11 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
     });
   }, [isProfileOpen]);
 
-  const sellerFirstName = useMemo(
-    () => sellerProfile?.fullName?.trim().split(/\s+/)[0] || (sellerProfile?.shopName ? normalizeShopName(sellerProfile.shopName).split(/\s+/)[0] : '') || 'Seller',
-    [sellerProfile?.fullName, sellerProfile?.shopName]
+  const currentProfile = (liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile;
+  const rawShopName = currentProfile?.shopName?.trim();
+  const shopName = useMemo(
+    () => (rawShopName ? normalizeShopName(rawShopName) : '') || 'Your shop',
+    [rawShopName]
   );
 
   const {
@@ -255,7 +257,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
 
   return (
     <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ minHeight: '100%', height: '100%', overflowY: 'hidden' } as React.CSSProperties}>
-      <SellerDashboardHeader sellerFirstName={sellerFirstName} onOpenProfile={() => setIsProfileOpen(true)} />
+      <SellerDashboardHeader shopName={shopName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       {/* Main Content Area */}
       <div className="relative flex-1 min-h-0 overflow-hidden">
@@ -274,14 +276,16 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
             style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
           >
-          <div className="mb-5 mt-1 sm:mb-6">
-            <SellerProfileHero
-              sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
-              shopUsername={getShopUsername(sellerProfile?.shopName)}
-              onCopyShopLink={handleCopyShopLink}
-              canEdit
-            />
-          </div>
+          {activeTab !== 'overview' && (
+            <div className="mb-5 mt-1 sm:mb-6">
+              <SellerProfileHero
+                sellerProfile={currentProfile}
+                shopUsername={getShopUsername(sellerProfile?.shopName)}
+                onCopyShopLink={handleCopyShopLink}
+                canEdit
+              />
+            </div>
+          )}
 
           {activeTab === 'orders' && <OrdersTab />}
 
@@ -302,7 +306,9 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             <OverviewTab
               analytics={analytics}
               pendingOverviewOrders={pendingOverviewOrders}
-              sellerProfile={(liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile}
+              sellerProfile={currentProfile}
+              shopUsername={getShopUsername(sellerProfile?.shopName)}
+              onCopyShopLink={handleCopyShopLink}
               onSelectTab={handleSelectTab}
             />
           )}

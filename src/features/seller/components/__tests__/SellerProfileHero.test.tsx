@@ -29,7 +29,7 @@ describe('SellerProfileHero', () => {
     location: 'CBD',
   };
 
-  it('normalizes lowercase shop name to Title Case', () => {
+  it('normalizes lowercase shop name to Title Case in avatar alt text', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <SellerProfileHero
@@ -41,8 +41,9 @@ describe('SellerProfileHero', () => {
       </QueryClientProvider>
     );
 
-    // Should display 'Eris' instead of raw lowercase 'eris'
-    expect(screen.getByRole('heading', { level: 2, name: 'Eris' })).toBeInTheDocument();
+    // Should display 'Eris' in avatar alt text
+    expect(screen.getByAltText('Eris')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Shop link/i })).toBeInTheDocument();
   });
 
   it('normalizes shop name with underscores by replacing them with spaces and capitalizing each word', () => {
@@ -62,13 +63,14 @@ describe('SellerProfileHero', () => {
       </QueryClientProvider>
     );
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Eris Fashion Shop' })).toBeInTheDocument();
+    expect(screen.getByAltText('Eris Fashion Shop')).toBeInTheDocument();
   });
 
-  it('falls back to "Your shop" when shop name is missing', () => {
+  it('falls back to "Your shop" initial when shop name and avatar are missing', () => {
     const emptyProfile: SellerProfile = {
       ...baseProfile,
       shopName: '',
+      avatarUrl: '',
     };
 
     render(
@@ -82,6 +84,24 @@ describe('SellerProfileHero', () => {
       </QueryClientProvider>
     );
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Your shop' })).toBeInTheDocument();
+    expect(screen.getByText('Y')).toBeInTheDocument();
+  });
+
+  it('renders children alongside the profile photo and shop link button', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+        >
+          <div data-testid="metrics-container">Balance and Revenue</div>
+        </SellerProfileHero>
+      </QueryClientProvider>
+    );
+
+    expect(screen.getByTestId('metrics-container')).toBeInTheDocument();
+    expect(screen.getByAltText('Eris')).toBeInTheDocument();
   });
 });
