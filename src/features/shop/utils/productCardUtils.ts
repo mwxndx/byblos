@@ -80,7 +80,7 @@ export const getProductCardThemeVars = (theme: Theme): ProductCardThemeVars => {
     '--product-card-bg': 'var(--byblos-surface, #ffffff)',
     '--product-card-text': 'var(--byblos-text, #0f0f0e)',
     '--product-card-muted': 'var(--byblos-muted, #64748b)',
-    '--product-card-border': 'var(--byblos-border, rgba(0, 0, 0, 0.1))',
+    '--product-card-border': 'transparent',
     '--product-card-accent': selected.accent,
     '--product-card-button-bg': selected.buttonBg,
     '--product-card-button-text': selected.buttonText,

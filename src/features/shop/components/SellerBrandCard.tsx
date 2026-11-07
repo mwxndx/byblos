@@ -98,7 +98,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border bg-black p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70',
+                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-transparent bg-black p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -107,7 +107,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             onKeyDown={handleCardKeyDown}
             aria-label={`Open ${shopName}`}
             style={{
-                borderColor: palette.border,
+                borderColor: 'transparent',
                 boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 24px ${palette.accentSoft}`,
             }}
         >

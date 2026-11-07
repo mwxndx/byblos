@@ -40,11 +40,11 @@ export function RefundHistory() {
           ))}
         </div>
       ) : isError ? (
-        <p className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 text-sm text-slate-500 dark:text-white/60">
+        <p className="rounded-xl border border-transparent bg-slate-50 dark:bg-surface-1 p-4 text-sm text-slate-500 dark:text-white/60">
           Couldn’t load your refund history. Please try again.
         </p>
       ) : requests.length === 0 ? (
-        <p className="rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 text-sm text-slate-500 dark:text-white/60">
+        <p className="rounded-xl border border-transparent bg-slate-50 dark:bg-surface-1 p-4 text-sm text-slate-500 dark:text-white/60">
           No refund withdrawals yet.
         </p>
       ) : (
@@ -54,7 +54,7 @@ export function RefundHistory() {
             return (
               <li
                 key={request.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-transparent bg-slate-50 dark:bg-surface-1 p-3"
               >
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-slate-950 dark:text-white">{formatKsh(request.amount)}</p>

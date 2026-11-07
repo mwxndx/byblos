@@ -67,7 +67,7 @@ export function BuyerMembershipCard() {
   if (isLoading) return null;
 
   return (
-    <section className="mt-4 space-y-3 rounded-2xl border border-separator bg-surface-1 p-4 shadow-sm">
+    <section className="mt-4 space-y-3 rounded-2xl border border-transparent bg-surface-1 p-4 shadow-sm">
       <div className="flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-[#F5C518]" />
         <h3 className="text-sm font-semibold text-label">Founder card</h3>

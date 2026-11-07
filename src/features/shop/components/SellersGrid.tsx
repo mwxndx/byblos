@@ -23,7 +23,7 @@ const SellerGridSkeleton = () => (
             <div
                 key={index}
                 aria-hidden="true"
-                className="h-[184px] overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-3 shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-colors duration-200"
+                className="h-[184px] overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-[#0a0a0a] p-3 shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-colors duration-200"
             >
                 <div className="mb-3 flex items-start gap-3">
                     <Skeleton className="h-14 w-14 rounded-2xl" />

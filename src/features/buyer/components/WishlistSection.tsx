@@ -14,7 +14,7 @@ export default function WishlistSection() {
   if (wishlist.length === 0) {
     return (
       <div className="text-center py-16 sm:py-20 lg:py-24">
-        <div className="max-w-2xl mx-auto rounded-3xl p-10 sm:p-12 bg-white dark:bg-black border border-slate-200/80 dark:border-separator shadow-xl dark:shadow-2xl transition-colors duration-200">
+        <div className="max-w-2xl mx-auto rounded-3xl p-10 sm:p-12 bg-white dark:bg-black border border-transparent shadow-xl dark:shadow-2xl transition-colors duration-200">
           <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-yellow-400/15 dark:bg-yellow-400/10 border border-yellow-400/20 rounded-3xl flex items-center justify-center shadow-sm">
             <Heart className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 text-yellow-500 dark:text-yellow-400 fill-current" />
           </div>
@@ -51,7 +51,7 @@ export default function WishlistSection() {
       </div>
 
       {filteredWishlist.length === 0 && searchQuery ? (
-        <div className="text-center py-12 px-4 bg-slate-100 dark:bg-fill rounded-2xl border border-slate-200 dark:border-separator">
+        <div className="text-center py-12 px-4 bg-slate-100 dark:bg-fill rounded-2xl border border-transparent">
           <p className="text-slate-500 dark:text-slate-400">No items found matching "{searchQuery}"</p>
         </div>
       ) : (

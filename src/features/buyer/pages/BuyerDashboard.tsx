@@ -107,7 +107,7 @@ function BuyerDashboard() {
   });
 
   return (
-    <div className="page-enter dashboard-layout min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
+    <div className="page-enter dashboard-layout buyer-surface min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
       display: 'flex', flexDirection: 'column',
       minHeight: '100%',
       height: '100%',
@@ -151,10 +151,10 @@ function BuyerDashboard() {
                   variant="default"
                   role="buyer"
                   scrollClassName=""
-                  className="overflow-hidden rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+                  className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
                 />
               ) : (
-                <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-6 text-center space-y-3">
+                <div className="rounded-2xl border border-transparent bg-white dark:bg-surface-1 p-6 text-center space-y-3">
                   <Bell className="mx-auto h-8 w-8 text-yellow-400" />
                   <h3 className="text-base font-bold text-slate-950 dark:text-white">Alerts & Notifications</h3>
                   <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
@@ -190,7 +190,7 @@ function BuyerDashboard() {
             user ? (
               <BuyerRefundsTab refundAmount={refundAmount} />
             ) : (
-              <div className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-6 text-center space-y-3">
+              <div className="rounded-2xl border border-transparent bg-white dark:bg-surface-1 p-6 text-center space-y-3">
                 <WalletCards className="mx-auto h-8 w-8 text-yellow-400" />
                 <h3 className="text-base font-bold text-slate-950 dark:text-white">Refunds</h3>
                 <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">

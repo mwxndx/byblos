@@ -78,7 +78,7 @@ function ProfileDetail({
 }) {
   const isInput = Boolean(editable && editing);
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100/70 dark:bg-white/[0.04] p-3 transition-colors">
+    <div className="rounded-xl border border-transparent bg-slate-100/70 dark:bg-white/[0.04] p-3 transition-colors">
       <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-white/70">
         <Icon className="h-3.5 w-3.5 text-[#F5C518]" />
         {label}
@@ -122,7 +122,7 @@ export function BuyerProfileContent({
     return (
       <div className="w-full space-y-4">
         {/* Welcome & Sign-In Card */}
-        <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-5 shadow-sm text-center">
+        <section className="space-y-3 rounded-2xl border border-transparent bg-slate-50 dark:bg-surface-1 p-5 shadow-sm text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-yellow-400/20 text-yellow-600 dark:text-yellow-400">
             <UserRound className="h-6 w-6" />
           </div>
@@ -151,7 +151,7 @@ export function BuyerProfileContent({
         </section>
 
         {/* Theme Preference */}
-        <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+        <section className="space-y-3 rounded-2xl border border-transparent bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">
               Theme
@@ -161,7 +161,7 @@ export function BuyerProfileContent({
         </section>
 
         {/* Portals: Become a Seller or Creator */}
-        <section className="space-y-2 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+        <section className="space-y-2 rounded-2xl border border-transparent bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-white/60">Partner with Byblos</h4>
           <div className="grid grid-cols-2 gap-2 pt-1">
             <Button
@@ -193,13 +193,13 @@ export function BuyerProfileContent({
   return (
     <div className="w-full space-y-4">
       {/* App theme + account switcher - one equal row above account details */}
-      <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+      <section className="space-y-3 rounded-2xl border border-transparent bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
         <BuyerPreferencesRow />
         <IosNotificationProfileRow />
       </section>
 
       {/* Account Details Section */}
-      <section className="space-y-3 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
+      <section className="space-y-3 rounded-2xl border border-transparent bg-slate-50 dark:bg-surface-1 p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <div>
             <h3 className="text-sm font-bold text-slate-950 dark:text-white">Account Details</h3>
@@ -264,7 +264,7 @@ export function BuyerProfileContent({
         <LegalLinks />
       </section>
 
-      <div className="space-y-2 rounded-2xl border border-slate-200 dark:border-separator bg-slate-50 dark:bg-black p-4">
+      <div className="space-y-2 rounded-2xl border border-transparent bg-slate-50 dark:bg-black p-4">
         <Button
           onClick={onLogout}
           className="h-10 w-full justify-center gap-2 bg-red-600 font-bold text-slate-900 dark:text-white hover:bg-red-500"

@@ -244,7 +244,7 @@ const ShopPage = () => {
             })}
           </div>
         ) : (
-          <div className="shop-products-card text-center py-16 rounded-3xl p-8 transition-all duration-300 border border-[var(--byblos-border)]">
+          <div className="shop-products-card text-center py-16 rounded-3xl p-8 transition-all duration-300 border border-transparent">
             <Package className="h-16 w-16 mx-auto text-[var(--byblos-muted)] mb-4" />
             <h3 className="text-xl font-bold text-[var(--byblos-text)] mb-2">
               No products found

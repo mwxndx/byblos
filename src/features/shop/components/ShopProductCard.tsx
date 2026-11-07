@@ -109,10 +109,10 @@ export function ShopProductCard({
           ...themeVars,
           backgroundColor: 'var(--product-card-bg, var(--byblos-surface, #ffffff))',
           color: 'var(--product-card-text, var(--byblos-text, #0f0f0e))',
-          borderColor: 'var(--product-card-border, var(--byblos-border, rgba(0, 0, 0, 0.1)))',
+          borderColor: 'var(--product-card-border, transparent)',
         }}
         className={cn(
-          'product-card-item group relative flex h-full flex-col overflow-hidden rounded-xl border transition-all duration-300 sm:rounded-2xl',
+          'product-card-item group relative flex h-full flex-col overflow-hidden rounded-xl border border-transparent transition-all duration-300 sm:rounded-2xl',
           'shadow-[0_4px_16px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.45),0_1px_2px_rgba(255,255,255,0.05)]',
           isSold
             ? 'cursor-not-allowed opacity-70'

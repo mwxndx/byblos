@@ -928,7 +928,7 @@ button.btn-white:hover,
  * line top highlight and a real drop shadow so they read as physical  *
  * surfaces. Nested rows use rounded-xl and are intentionally skipped. *
  * ------------------------------------------------------------------ */
-.seller-surface :is([class*="rounded-2xl"], [class*="rounded-3xl"]):is([class*="bg-white/["], [class*="bg-black"], [class*="bg-[#0a0a0a]"], [class*="bg-[#0A0A0A]"]) {
+:is(.seller-surface, .buyer-surface) :is([class*="rounded-2xl"], [class*="rounded-3xl"]):is([class*="bg-white/["], [class*="bg-black"], [class*="bg-[#0a0a0a]"], [class*="bg-[#0A0A0A]"]) {
     background-color: #161616 !important;
     border-color: transparent !important;
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset,
@@ -1124,7 +1124,7 @@ button.btn-white:hover,
 }
 
 /* ── Seller surface cards — light mode physical elevation ──────────────── */
-[data-theme="light"] .seller-surface :is(
+[data-theme="light"] :is(.seller-surface, .buyer-surface) :is(
     [class*="rounded-xl"]:not(.theme-swatch),
     [class*="rounded-2xl"]:not(.theme-swatch),
     [class*="rounded-3xl"]:not(.theme-swatch),
@@ -1138,13 +1138,13 @@ button.btn-white:hover,
         0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
 }
 
-[data-theme="light"] .seller-surface .theme-swatch {
+[data-theme="light"] :is(.seller-surface, .buyer-surface) .theme-swatch {
     background-color: var(--theme-swatch-color) !important;
 }
 
 /* Dashboard navigation tabs bar in light mode */
-[data-theme="light"] .seller-surface div.sticky,
-[data-theme="light"] .seller-surface div.lg\:rounded-2xl {
+[data-theme="light"] :is(.seller-surface, .buyer-surface) div.sticky,
+[data-theme="light"] :is(.seller-surface, .buyer-surface) div.lg\:rounded-2xl {
     background-color: #ffffff !important;
     border-color: transparent !important;
     box-shadow:

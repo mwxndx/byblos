@@ -41,7 +41,7 @@ function deriveBuyerOrderProductType(order: ApiOrder, isService: boolean, isDigi
 function getBuyerOrderCardBorder(isService: boolean, isDigital: boolean): string {
   if (isService) return 'border-purple-400/45';
   if (isDigital) return 'border-red-400/45';
-  return 'border-white/15';
+  return 'border-transparent';
 }
 
 function getBuyerOrderItemClass(isService: boolean, isDigital: boolean): string {
@@ -76,7 +76,7 @@ export function BuyerOrderCard({
     fulfillmentType: order.fulfillment_type,
   });
   const cardClasses = [
-    'overflow-hidden transition-all duration-300 bg-black border shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40',
+    'overflow-hidden transition-all duration-300 bg-black border border-transparent shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40',
     getBuyerOrderCardBorder(isService, isDigital)
   ].join(' ');
   const itemClasses = [
