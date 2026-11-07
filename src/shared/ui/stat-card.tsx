@@ -22,12 +22,12 @@ export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const colorClasses: Record<StatCardColor, string> = {
-  yellow: "border-brand/30 bg-brand/10",
-  green: "border-sys-green/30 bg-sys-green/10",
-  blue: "border-sys-blue/30 bg-sys-blue/10",
-  purple: "border-purple-400/30 bg-purple-400/10",
-  red: "border-sys-red/30 bg-sys-red/10",
-  gray: "border-separator bg-surface-1",
+  yellow: "border-transparent bg-brand/10",
+  green: "border-transparent bg-sys-green/10",
+  blue: "border-transparent bg-sys-blue/10",
+  purple: "border-transparent bg-purple-400/10",
+  red: "border-transparent bg-sys-red/10",
+  gray: "border-transparent bg-surface-1",
 };
 
 function formatStatValue(value: string | number, prefix: string, suffix: string): string {

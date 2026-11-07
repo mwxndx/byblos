@@ -62,7 +62,7 @@ const MzigoDashboardPage = () => {
   ];
 
   return (
-    <main className="dashboard-layout mzigo-light-dashboard min-h-full overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, env(safe-area-inset-bottom, 0px)))' } as React.CSSProperties}>
+    <main className="dashboard-layout mzigo-surface mzigo-light-dashboard min-h-full overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, env(safe-area-inset-bottom, 0px)))' } as React.CSSProperties}>
       {/* ── Header ─────────────────────────────────────────────── */}
       <AppHeader
         left={<NotificationBell variant="logistics" />}
@@ -119,7 +119,7 @@ const MzigoDashboardPage = () => {
           </div>
         ) : view === 'done' ? (
           done.length === 0 ? (
-            <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
+            <div className="rounded-2xl border border-transparent bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
               No completed deliveries yet.
             </div>
           ) : (
@@ -128,7 +128,7 @@ const MzigoDashboardPage = () => {
                 <RequestCard
                   key={request.id}
                   request={request}
-                  tone="border-emerald-500/20 bg-emerald-50/30 dark:bg-white/[0.02] shadow-sm"
+                  tone="border-transparent bg-emerald-50/30 dark:bg-white/[0.02] shadow-sm"
                   now={now}
                   onStatusUpdate={handleStatusUpdate}
                   updatingStatusKey={updatingStatusKey}
@@ -138,7 +138,7 @@ const MzigoDashboardPage = () => {
             </div>
           )
         ) : !hasStageCards ? (
-          <div className="rounded-2xl border border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
+          <div className="rounded-2xl border border-transparent bg-white dark:bg-white/[0.03] p-6 text-sm text-slate-500 dark:text-white/50 shadow-sm">
             {view === 'late' ? 'Nothing is running late right now.' : 'Nothing to do right now. New deliveries appear here automatically.'}
           </div>
         ) : (
@@ -159,7 +159,7 @@ const MzigoDashboardPage = () => {
                       <RequestCard
                         key={request.id}
                         request={request}
-                        tone="border-black/10 dark:border-separator bg-white dark:bg-white/[0.03] shadow-sm"
+                        tone="border-transparent bg-white dark:bg-white/[0.03] shadow-sm"
                         now={now}
                         onStatusUpdate={handleStatusUpdate}
                         updatingStatusKey={updatingStatusKey}

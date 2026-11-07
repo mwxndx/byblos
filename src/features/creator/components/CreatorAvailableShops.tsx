@@ -108,7 +108,7 @@ export function CreatorAvailableShops() {
         </div>
       )}
       {!isLoading && shops.length === 0 && (
-        <div className="rounded-card border border-separator bg-surface-1 p-8 text-center">
+        <div className="rounded-card border border-transparent bg-surface-1 p-8 text-center">
           <Store className="mx-auto mb-2 h-10 w-10 text-label-3" />
           <p className="text-sm font-medium text-label">No shops currently listed</p>
           <p className="mx-auto mt-1 max-w-sm text-xs text-label-3">
@@ -126,7 +126,7 @@ export function CreatorAvailableShops() {
             return (
               <div
                 key={shop.id}
-                className="flex flex-col justify-between rounded-card border border-separator bg-surface-1 p-4 transition-colors hover:border-separator-strong sm:p-5"
+                className="flex flex-col justify-between rounded-card border border-transparent bg-surface-1 p-4 transition-colors hover:border-separator-strong sm:p-5"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">

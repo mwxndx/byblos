@@ -98,7 +98,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-transparent bg-black p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70',
+                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-transparent bg-[var(--byblos-bg,#ffffff)] dark:bg-[var(--byblos-bg,#000000)] p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -114,7 +114,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             {/* Center circular business profile photo directly on the card without extra split background shape */}
             <div className="flex flex-1 items-center justify-center py-1">
                 <div
-                    className="flex aspect-square h-20 w-20 sm:h-24 sm:w-24 items-center justify-center overflow-hidden rounded-full border-2 bg-black shadow-lg transition-transform duration-200 group-hover:scale-105"
+                    className="flex aspect-square h-20 w-20 sm:h-24 sm:w-24 items-center justify-center overflow-hidden rounded-full border-2 bg-[var(--byblos-bg,#ffffff)] dark:bg-[var(--byblos-bg,#000000)] shadow-lg transition-transform duration-200 group-hover:scale-105"
                     style={{ borderColor: palette.border }}
                 >
                     {hasAvatar ? (
@@ -127,7 +127,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                            <Store className="h-8 w-8 text-white/90 sm:h-10 sm:w-10" strokeWidth={1.6} />
+                            <Store className="h-8 w-8 text-slate-700 dark:text-white/90 sm:h-10 sm:w-10" strokeWidth={1.6} />
                         </div>
                     )}
                 </div>
@@ -135,7 +135,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
 
             {/* Shop name placed slightly above, bold, +3px font size (15px / 17px) */}
             <div className="flex min-h-0 flex-col items-start gap-1 sm:gap-1.5 pt-1">
-                <h3 className="w-full truncate text-[15px] sm:text-[17px] font-bold tracking-tight text-white" title={shopName}>
+                <h3 className="w-full truncate text-[15px] sm:text-[17px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
                     {shopName}
                 </h3>
 
@@ -156,9 +156,9 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                         <span
                             aria-label="Location not available"
                             aria-disabled="true"
-                            className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-white/10 bg-white/[0.03] p-1.5 opacity-35"
+                            className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-1.5 opacity-35"
                         >
-                            <MapPin className="h-4 w-4 text-white/60" />
+                            <MapPin className="h-4 w-4 text-slate-400 dark:text-white/60" />
                         </span>
                     )}
                 </div>
@@ -171,7 +171,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                             event.stopPropagation();
                             handleUnfollow();
                         }}
-                        className="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-semibold text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
+                        className="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-semibold text-red-600 dark:text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
                         aria-label={`Unfollow ${shopName}`}
                     >
                         <UserMinus className="h-3.5 w-3.5" />

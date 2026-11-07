@@ -130,8 +130,8 @@ export default function MarketingDashboard() {
     if (loading) return <DashboardSkeleton />;
 
     if (error) return (
-        <div className="flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4">
-            <div className="text-red-400 text-center rounded-3xl border border-separator bg-surface-1 p-8 shadow-xl">
+        <div className="marketing-surface flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4">
+            <div className="text-red-400 text-center rounded-3xl border border-transparent bg-surface-1 p-8 shadow-xl">
                 <p>{error}</p>
                 <button onClick={fetchAll} className="mt-4 text-yellow-500 underline text-sm">Try again</button>
             </div>
@@ -139,7 +139,7 @@ export default function MarketingDashboard() {
     );
 
     return (
-        <div className="min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
+        <div className="marketing-surface min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
             <AppHeader
                 className="!bg-white border-b border-gray-200"
                 left={
@@ -321,7 +321,7 @@ export default function MarketingDashboard() {
             {/* Section 3: Top Performers & Referrals */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 {Array.isArray(topPerfs?.sellers) && (topPerfs.sellers as MarketingRecord[]).length > 0 && (
-                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-transparent rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Top Performing Shops" subtitle="Highest GMV sellers this month" />
                         <div className="divide-y divide-separator">
                             {(topPerfs.sellers as MarketingRecord[]).map((s: MarketingRecord, idx: number) => (
@@ -341,7 +341,7 @@ export default function MarketingDashboard() {
                 )}
 
                 {Array.isArray(referrals?.creators) && (referrals.creators as MarketingRecord[]).length > 0 && (
-                    <div className="bg-surface-1 border border-separator rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-transparent rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
                         <SectionTitle title="Creator Referrals" subtitle="Top performing creators" />
                         <div className="divide-y divide-separator">
                             {(referrals.creators as MarketingRecord[]).map((c: MarketingRecord, idx: number) => (

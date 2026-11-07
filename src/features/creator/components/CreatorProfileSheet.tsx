@@ -62,7 +62,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
     <DashboardProfilePanel open={open} onOpenChange={onOpenChange} title="Profile">
       <div className="space-y-4 px-4 py-4 pb-8">
           {/* Theme + account switcher — one equal row */}
-          <section className="rounded-card border border-separator bg-surface-1 p-4">
+          <section className="rounded-card border border-transparent bg-surface-1 p-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <span className="text-sm font-medium text-label-2">Theme</span>
@@ -76,7 +76,7 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
           </section>
 
           {/* Personal details */}
-          <section className="space-y-3 rounded-card border border-separator bg-surface-1 p-4">
+          <section className="space-y-3 rounded-card border border-transparent bg-surface-1 p-4">
             <h3 className="text-sm font-semibold text-label">Personal details</h3>
             <ReadOnlyDetail icon={UserRound} label="Full name" value={fullName} />
             <ReadOnlyDetail icon={Mail} label="Email" value={creator.email} />

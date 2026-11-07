@@ -76,7 +76,7 @@ export function CreatorEarningsHero({
   const [showExplain, setShowExplain] = useState(false);
 
   return (
-    <section className="rounded-card border border-separator bg-surface-1 p-5 text-label sm:p-6">
+    <section className="rounded-card border border-transparent bg-surface-1 p-5 text-label sm:p-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs font-medium text-label-2">Creator · {name}</p>
 
@@ -126,7 +126,7 @@ export function CreatorEarningsHero({
       )}
 
       {/* Seller invite link · lifetime referral */}
-      <div className="mt-5 rounded-card border border-separator bg-surface-2 p-4">
+      <div className="mt-5 rounded-card border border-transparent bg-surface-2 p-4">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-fill text-brand-text">
             <Store className="h-5 w-5" />

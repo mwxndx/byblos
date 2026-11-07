@@ -107,7 +107,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
 
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                             {/* Section 1: Core Identity */}
-                            <Card className="bg-white/[0.02] border border-separator rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl">
+                            <Card className="bg-white/[0.02] border border-transparent rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl">
                               <h4 className="text-xs font-semibold text-label-3 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <UserCircle className="h-4 w-4 text-yellow-500" />
                                 Merchant Identity
@@ -132,7 +132,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
                             </Card>
 
                             {/* Section 2: Marketplace Profile */}
-                            <Card className="bg-white/[0.02] border border-separator rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl">
+                            <Card className="bg-white/[0.02] border border-transparent rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl">
                               <h4 className="text-xs font-semibold text-label-3 uppercase tracking-widest mb-6 flex items-center gap-2">
                                 <Globe className="h-4 w-4 text-blue-500" />
                                 Digital Presence
@@ -183,7 +183,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatD
 
                             {/* Section 3: Engagement Metrics */}
                             <div className="grid grid-cols-2 lg:grid-cols-1 gap-6">
-                              <Card className="bg-white/[0.02] border border-separator rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl flex flex-col justify-between">
+                              <Card className="bg-white/[0.02] border border-transparent rounded-2xl md:rounded-[2rem] p-5 md:p-6 shadow-2xl flex flex-col justify-between">
                                 <h4 className="text-xs font-semibold text-label-3 uppercase tracking-widest mb-4 flex items-center gap-2">
                                   <Activity className="h-4 w-4 text-purple-500" />
                                   Growth & Engagement

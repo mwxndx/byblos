@@ -112,7 +112,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Read
   };
 
   return (
-    <div className="rounded-card border border-separator bg-surface-1 p-4 text-label sm:p-5">
+    <div className="rounded-card border border-transparent bg-surface-1 p-4 text-label sm:p-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-control bg-fill text-brand-text">

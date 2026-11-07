@@ -23,11 +23,11 @@ export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, ma
       </div>
 
       {shops.length === 0 ? (
-        <div className="rounded-card border border-separator bg-surface-1 p-4 text-sm text-label-2">
+        <div className="rounded-card border border-transparent bg-surface-1 p-4 text-sm text-label-2">
           Accept a shop request to get your first shareable link.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-card border border-separator bg-surface-1">
+        <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
           {shops.map((shop, i) => {
             const isPaused = Boolean(shop.sellerCreatorModeOff || shop.status === 'paused');
             const link = isPaused ? '' : getCreatorShopUrl(shop.slug || shop.shop_name, shop.code);

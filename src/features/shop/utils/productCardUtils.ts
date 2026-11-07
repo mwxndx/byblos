@@ -77,7 +77,7 @@ export const getProductCardThemeVars = (theme: Theme): ProductCardThemeVars => {
   const selected = accentVars[theme] || accentVars.default;
 
   return {
-    '--product-card-bg': 'var(--byblos-surface, #ffffff)',
+    '--product-card-bg': 'var(--byblos-bg, #ffffff)',
     '--product-card-text': 'var(--byblos-text, #0f0f0e)',
     '--product-card-muted': 'var(--byblos-muted, #64748b)',
     '--product-card-border': 'transparent',

@@ -928,6 +928,24 @@ button.btn-white:hover,
  * line top highlight and a real drop shadow so they read as physical  *
  * surfaces. Nested rows use rounded-xl and are intentionally skipped. *
  * ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ *
+ * Universal Dashboard Card Borders (Seller, Buyer, Creator, Mzigo,   *
+ * Admin, Marketing) — Card borders match dashboard background in      *
+ * both light and dark themes.                                        *
+ * ------------------------------------------------------------------ */
+:is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard) :is(
+    [class*="rounded-card"],
+    [class*="rounded-xl"],
+    [class*="rounded-2xl"],
+    [class*="rounded-3xl"],
+    [class*="rounded-[2rem]"],
+    article,
+    .stat-card,
+    .chart-card
+):not(button):not(input):not(select):not(textarea):not(img):not(.theme-swatch):not([role="tab"]):not(nav) {
+    border-color: transparent !important;
+}
+
 :is(.seller-surface, .buyer-surface) :is([class*="rounded-2xl"], [class*="rounded-3xl"]):is([class*="bg-white/["], [class*="bg-black"], [class*="bg-[#0a0a0a]"], [class*="bg-[#0A0A0A]"]) {
     background-color: #161616 !important;
     border-color: transparent !important;
@@ -1123,8 +1141,8 @@ button.btn-white:hover,
     color: var(--byblos-muted) !important;
 }
 
-/* ── Seller surface cards — light mode physical elevation ──────────────── */
-[data-theme="light"] :is(.seller-surface, .buyer-surface) :is(
+/* ── Dashboard surface cards — light mode physical elevation & background-matching borders ──────────────── */
+[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard) :is(
     [class*="rounded-xl"]:not(.theme-swatch),
     [class*="rounded-2xl"]:not(.theme-swatch),
     [class*="rounded-3xl"]:not(.theme-swatch),
@@ -1138,7 +1156,7 @@ button.btn-white:hover,
         0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
 }
 
-[data-theme="light"] :is(.seller-surface, .buyer-surface) .theme-swatch {
+[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard) .theme-swatch {
     background-color: var(--theme-swatch-color) !important;
 }
 

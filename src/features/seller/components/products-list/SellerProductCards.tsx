@@ -74,7 +74,7 @@ export const SellerProductCards = memo(function SellerProductCards({
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
       {products.map((product) => (
-        <Card key={product.id} className="relative group bg-white dark:bg-surface-1 border border-transparent text-slate-900 dark:text-white rounded-2xl hover:border-emerald-500/50 transition-all shadow-sm">
+        <Card key={product.id} className="relative group bg-[var(--byblos-bg,#ffffff)] dark:bg-[var(--byblos-bg,#000000)] border border-transparent text-slate-900 dark:text-white rounded-2xl hover:border-emerald-500/50 transition-all shadow-sm">
           <div className="absolute right-2 top-2 z-10">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

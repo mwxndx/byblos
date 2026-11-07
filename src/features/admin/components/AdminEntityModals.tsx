@@ -81,7 +81,7 @@ export function AdminEntityModals({
                         </div>
                       ) : (
                         <>
-                          <Card className="bg-white/[0.02] border border-separator rounded-[2rem] p-8">
+                          <Card className="bg-white/[0.02] border border-transparent rounded-[2rem] p-8">
                             <h4 className="text-xs font-semibold text-label-3 uppercase tracking-widest mb-8">Identity Protocol</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                               {[

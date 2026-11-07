@@ -126,28 +126,28 @@ export function AdminLogisticsTab() {
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-        <Card className="border-separator bg-surface-1 text-label">
+        <Card className="border-transparent bg-surface-1 text-label">
           <CardContent className="p-3 sm:p-4">
             <Truck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300" />
             <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Total</p>
             <p className="text-xl sm:text-2xl font-semibold">{dashboard?.count || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-red-300/20 bg-red-500/10 text-label">
+        <Card className="border-transparent bg-red-500/10 text-label">
           <CardContent className="p-3 sm:p-4">
             <AlertTriangle className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-red-300" />
             <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Failed</p>
             <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.failed || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-yellow-300/20 bg-yellow-300/10 text-label">
+        <Card className="border-transparent bg-yellow-300/10 text-label">
           <CardContent className="p-3 sm:p-4">
             <Clock className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-yellow-300" />
             <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Delayed</p>
             <p className="text-xl sm:text-2xl font-semibold">{dashboard?.summary?.delayed || 0}</p>
           </CardContent>
         </Card>
-        <Card className="border-cyan-300/20 bg-cyan-300/10 text-label">
+        <Card className="border-transparent bg-cyan-300/10 text-label">
           <CardContent className="p-3 sm:p-4">
             <ShieldCheck className="mb-2 sm:mb-3 h-4 w-4 sm:h-5 sm:w-5 text-cyan-200" />
             <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Review</p>
@@ -157,7 +157,7 @@ export function AdminLogisticsTab() {
       </div>
 
       {/* Reconciliation: fees owed to Mzigo across the requests in this view. */}
-      <Card className="border-separator bg-surface-1 text-label">
+      <Card className="border-transparent bg-surface-1 text-label">
         <CardContent className="p-3 sm:p-4">
           <p className="text-[10px] sm:text-xs uppercase tracking-widest text-label-2">Owed to Mzigo — this view</p>
           <div className="mt-2 flex flex-wrap items-baseline gap-x-4 sm:gap-x-8 gap-y-2 text-xs sm:text-sm">
@@ -169,7 +169,7 @@ export function AdminLogisticsTab() {
         </CardContent>
       </Card>
 
-      <Card className="border-separator bg-surface-1 text-label">
+      <Card className="border-transparent bg-surface-1 text-label">
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <CardTitle className="text-2xl text-label">Logistics Oversight</CardTitle>

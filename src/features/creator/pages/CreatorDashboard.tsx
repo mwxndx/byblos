@@ -193,7 +193,7 @@ export default function CreatorDashboard() {
   };
 
   return (
-    <main className="dashboard-layout text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
+    <main className="dashboard-layout creator-surface text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
       <AppHeader
         left={<NotificationBell triggerClassName="text-label hover:bg-fill" role="creator" />}
         right={
@@ -255,11 +255,11 @@ export default function CreatorDashboard() {
                 Businesses you invited earn you KSh 3 per sale. Leaving cancels only pending (still-clearing) earnings.
               </p>
               {invitedBusinesses.length === 0 ? (
-                <div className="rounded-card border border-separator bg-surface-1 p-4 text-sm text-label-2">
+                <div className="rounded-card border border-transparent bg-surface-1 p-4 text-sm text-label-2">
                   Share your referral link (in the earnings card above) to invite up to {MAX_INVITED_BUSINESSES} businesses.
                 </div>
               ) : (
-                <div className="overflow-hidden rounded-card border border-separator bg-surface-1">
+                <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
                   {invitedBusinesses.map((biz, i) => {
                     const sid = Number(biz.id);
                     const isLeaving = leavingBusinessSellerId === sid;
@@ -301,7 +301,7 @@ export default function CreatorDashboard() {
                   <h2 className="text-base font-semibold text-label">Shop requests</h2>
                   <p className="mt-0.5 text-xs text-label-3">Accept a seller request to start earning on that shop.</p>
                 </div>
-                <div className="overflow-hidden rounded-card border border-separator bg-surface-1">
+                <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
                   {shopRequests.map((request, i) => (
                     <div key={request.id}>
                       {i > 0 && <div className="ml-4 h-px bg-separator" />}

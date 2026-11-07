@@ -107,7 +107,7 @@ export function ShopProductCard({
         }}
         style={{
           ...themeVars,
-          backgroundColor: 'var(--product-card-bg, var(--byblos-surface, #ffffff))',
+          backgroundColor: 'var(--product-card-bg, var(--byblos-bg, #ffffff))',
           color: 'var(--product-card-text, var(--byblos-text, #0f0f0e))',
           borderColor: 'var(--product-card-border, transparent)',
         }}

@@ -50,7 +50,7 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
   }, [periods, businessEarnings, selectedBusiness]);
 
   return (
-    <section className="rounded-card border border-separator bg-surface-1 p-4 text-label">
+    <section className="rounded-card border border-transparent bg-surface-1 p-4 text-label">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-base font-semibold">Performance</h2>
         <div className="grid grid-cols-4 gap-1 rounded-control bg-fill p-1 text-xs font-medium">
@@ -70,7 +70,7 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
         </div>
       </div>
 
-      <div className="mt-4 h-56 rounded-control border border-separator bg-surface-2 p-3">
+      <div className="mt-4 h-56 rounded-control border border-transparent bg-surface-2 p-3">
         <p className="mb-2 text-xs font-medium text-label-3">Commission earnings</p>
         <ResponsiveContainer width="100%" height="88%">
           <LineChart data={commissionData}>
@@ -83,7 +83,7 @@ export function CreatorAnalysisCharts({ analysis, businessEarnings, analysisPeri
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 h-64 rounded-control border border-separator bg-surface-2 p-3">
+      <div className="mt-4 h-64 rounded-control border border-transparent bg-surface-2 p-3">
         <div className="mb-2 flex items-center justify-between gap-2">
           <p className="text-xs font-medium text-label-3">Invited-business earnings</p>
           <select

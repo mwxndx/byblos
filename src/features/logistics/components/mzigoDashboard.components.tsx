@@ -4,7 +4,7 @@ export function DashboardStat({
   label,
   value,
   icon,
-  tone = 'border-separator bg-white/[0.03]',
+  tone = 'border-transparent bg-white/[0.03]',
 }: Readonly<{
   label: string;
   value: number | string;

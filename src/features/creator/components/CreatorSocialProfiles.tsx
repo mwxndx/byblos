@@ -62,7 +62,7 @@ export function CreatorSocialProfiles({ profile }: Readonly<CreatorSocialProfile
   };
 
   return (
-    <section className="rounded-card border border-separator bg-surface-1 p-5 sm:p-6">
+    <section className="rounded-card border border-transparent bg-surface-1 p-5 sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">

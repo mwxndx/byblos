@@ -126,8 +126,8 @@ const NewAdminDashboard = () => {
 
   if (error) {
     return (
-      <div className="flex min-h-full items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4 text-center sm:p-6">
-        <div className="max-w-md space-y-6 rounded-3xl border border-separator bg-surface-1 p-8 shadow-xl">
+      <div className="admin-surface flex min-h-full items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4 text-center sm:p-6">
+        <div className="max-w-md space-y-6 rounded-3xl border border-transparent bg-surface-1 p-8 shadow-xl">
           <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto border border-red-500/20">
             <XCircle className="h-10 w-10 text-red-500" />
           </div>
@@ -144,7 +144,7 @@ const NewAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-full overflow-x-hidden bg-[var(--bg)] text-label font-sans">
+    <div className="admin-surface min-h-full overflow-x-hidden bg-[var(--bg)] text-label font-sans">
       <AppHeader
         className="!bg-white border-b border-gray-200"
         left={
@@ -237,7 +237,7 @@ const NewAdminDashboard = () => {
               <p className="mb-2 text-sm font-semibold text-label-2">At a glance</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
                 {metrics.map((m) => (
-                  <div key={m.label} className="rounded-xl border border-separator bg-surface-1 p-3">
+                  <div key={m.label} className="rounded-xl border border-transparent bg-surface-1 p-3">
                     <p className="text-[11px] text-label-3">{m.label}</p>
                     <p className="mt-1 text-base font-semibold tabular-nums text-label">{m.value}</p>
                   </div>
@@ -278,13 +278,13 @@ const NewAdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="refunds" className="space-y-6">
-            <div className="bg-surface-1 border border-separator rounded-card p-5 md:p-8 shadow-xl">
+            <div className="bg-surface-1 border border-transparent rounded-card p-5 md:p-8 shadow-xl">
               <RefundRequestsPage />
             </div>
           </TabsContent>
 
           <TabsContent value="detections" className="space-y-6">
-            <div className="bg-surface-1 border border-separator rounded-card p-5 md:p-8 shadow-xl">
+            <div className="bg-surface-1 border border-transparent rounded-card p-5 md:p-8 shadow-xl">
               <DetectionsPage />
             </div>
           </TabsContent>
