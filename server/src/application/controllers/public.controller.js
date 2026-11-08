@@ -150,7 +150,6 @@ export const getProducts = async (req, res) => {
         physicalAddress: row.physical_address,
         avatarUrl: row.seller_avatar_url,
         bio: row.seller_bio,
-        theme: row.seller_theme,
       });
 
       return product;
@@ -209,7 +208,6 @@ export const getProduct = async (req, res) => {
       shopName: row.shop_name,
       city: row.seller_city,
       location: row.seller_location,
-      theme: row.seller_theme,
       physicalAddress: row.physical_address
     });
 
@@ -304,7 +302,6 @@ export const getSellers = async (req, res) => {
       shopLink: row.shop_name, // Use shop_name as the link slug
       avatarUrl: row.avatar_url,
       bio: row.bio,
-      theme: row.theme, // Mapped from theme
       physicalAddress: row.physical_address,
       hasPhysicalShop: Boolean(row.physical_address || (row.latitude && row.longitude)),
       latitude: row.latitude,
