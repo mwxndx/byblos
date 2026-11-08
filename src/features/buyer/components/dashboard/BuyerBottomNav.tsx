@@ -35,18 +35,18 @@ export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<Buyer
             >
               <item.Icon
                 size={18}
-                className={isActive ? 'text-[#F5C518]' : 'text-slate-500 dark:text-white/50 transition-colors'}
+                className={isActive ? 'text-black dark:text-white' : 'text-slate-500 dark:text-white/50 transition-colors'}
               />
-              <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'text-[#F5C518] font-bold' : 'text-slate-500 dark:text-white/50'}`}>
+              <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'text-black dark:text-white font-bold' : 'text-slate-500 dark:text-white/50'}`}>
                 {item.label}
               </span>
               {item.badge && (
                 item.count && item.count > 0 ? (
-                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[15px] h-[15px] px-1 rounded-full text-[9px] font-semibold flex items-center justify-center bg-[#F5C518] text-black shadow-sm">
+                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[15px] h-[15px] px-1 rounded-full text-[9px] font-semibold flex items-center justify-center bg-black text-white dark:bg-white dark:text-black shadow-sm">
                     {item.count > 99 ? '99+' : item.count}
                   </span>
                 ) : (
-                  <div className="absolute top-1.5 right-[50%] translate-x-[10px] w-2 h-2 rounded-full bg-[#F5C518] ring-2 ring-black" />
+                  <div className="absolute top-1.5 right-[50%] translate-x-[10px] w-2 h-2 rounded-full bg-black dark:bg-white ring-2 ring-white dark:ring-black" />
                 )
               )}
             </button>

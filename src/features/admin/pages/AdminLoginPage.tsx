@@ -112,7 +112,7 @@ export const AdminLoginPage = () => {
               <Button
                 type="submit"
                 disabled={loading}
-                className="h-12 w-full rounded-2xl bg-yellow-400 text-sm font-semibold text-black shadow-none transition hover:bg-yellow-300 disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 w-full rounded-2xl bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-semibold shadow-none transition disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? (
                   <>

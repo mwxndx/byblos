@@ -1,14 +1,14 @@
-import { Bell, Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
+import { BellSimple, Receipt, Tote, UsersThree, Wallet, type LucideIcon } from '@/shared/ui/icons';
 import type { SellerTabId } from '../types';
 
 type SellerNavTabId = Exclude<SellerTabId, 'settings'>;
 
 const tabIcons: Record<SellerNavTabId, LucideIcon> = {
-  products: Package,
-  orders: ShoppingBag,
+  products: Tote,
+  orders: Receipt,
   withdrawals: Wallet,
-  creators: Users,
-  notifications: Bell,
+  creators: UsersThree,
+  notifications: BellSimple,
 };
 
 // Settings/profile is reached from the header profile icon, not the nav.
@@ -64,27 +64,28 @@ export function SellerDashboardTabs({
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
               className={`relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl py-1 transition-all duration-150 active:scale-95 ${
-                isActive ? 'text-[#F5C518]' : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
+                isActive ? 'text-black dark:text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
               }`}
             >
               <Icon
                 size={18}
-                className={isActive ? 'text-[#F5C518]' : 'text-current transition-colors'}
+                weight={isActive ? "fill" : "regular"}
+                className={isActive ? 'text-black dark:text-white' : 'text-current transition-colors'}
               />
               <span
                 className={`text-[10px] font-semibold transition-colors ${
-                  isActive ? 'font-bold text-[#F5C518]' : 'text-slate-500 dark:text-white/50'
+                  isActive ? 'font-bold text-black dark:text-white' : 'text-slate-500 dark:text-white/50'
                 }`}
               >
                 {label}
               </span>
 
               {count > 0 ? (
-                <span className="absolute top-0.5 right-[50%] flex h-[15px] min-w-[15px] translate-x-[13px] items-center justify-center rounded-full bg-[#F5C518] px-1 text-[9px] font-semibold text-black shadow-sm">
+                <span className="absolute top-0.5 right-[50%] flex h-[15px] min-w-[15px] translate-x-[13px] items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black px-1 text-[9px] font-semibold shadow-sm">
                   {count > 99 ? '99+' : count}
                 </span>
               ) : showDot ? (
-                <div className="absolute top-1 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-[#F5C518] ring-2 ring-white dark:ring-[#121212]" />
+                <div className="absolute top-1 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-black dark:bg-white ring-2 ring-white dark:ring-[#121212]" />
               ) : null}
             </button>
           );

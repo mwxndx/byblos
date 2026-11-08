@@ -54,7 +54,7 @@ export function ProductEditPhysicalOptions({ formData, onFormDataChange }: Reado
                           </SelectTrigger>
                           <SelectContent className="bg-white dark:bg-surface-1 border-slate-200 dark:border-separator text-slate-900 dark:text-white z-[110]">
                             {[1, 2, 3, 4, 5].map(day => (
-                              <SelectItem key={day} value={String(day)} className="text-slate-900 dark:text-white focus:bg-[var(--theme-button-bg,#f5c518)] focus:text-[var(--theme-button-text,#000000)]">
+                              <SelectItem key={day} value={String(day)} className="text-slate-900 dark:text-white focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black">
                                 {day} {day === 1 ? 'day' : 'days'}
                               </SelectItem>
                             ))}
@@ -85,7 +85,7 @@ export function ProductEditPhysicalOptions({ formData, onFormDataChange }: Reado
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-surface-1 border-slate-200 dark:border-separator text-slate-900 dark:text-white z-[110]">
                           {[7, 14, 21, 30].map(day => (
-                            <SelectItem key={day} value={String(day)} className="text-slate-900 dark:text-white focus:bg-[var(--theme-button-bg,#f5c518)] focus:text-[var(--theme-button-text,#000000)]">
+                            <SelectItem key={day} value={String(day)} className="text-slate-900 dark:text-white focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black">
                               {day} days
                             </SelectItem>
                           ))}

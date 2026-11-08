@@ -93,7 +93,7 @@ export function ProductsTab({
 
       {/* Single controlled add-product dialog, opened from the action button or the empty-state plus. */}
       <Dialog open={isAddProductModalOpen} onOpenChange={setIsAddProductModalOpen}>
-        <DialogContent className="flex flex-col w-[92vw] max-w-lg sm:max-w-[540px] h-[85dvh] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
+        <DialogContent disableAnimation className="flex flex-col w-[92vw] max-w-lg sm:max-w-[540px] h-[85dvh] max-h-[85dvh] sm:h-[min(84dvh,640px)] p-0 overflow-hidden border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 rounded-3xl sm:rounded-[2rem] shadow-2xl [&>button]:z-30">
           <DialogHeader className="sr-only">
             <DialogTitle>Add New Product</DialogTitle>
             <DialogDescription>Create and publish a new product to your Byblos shop</DialogDescription>
@@ -117,7 +117,7 @@ export function ProductsTab({
           data-testid="active-products-pill"
           className="inline-flex items-center gap-1.5 rounded-full border border-transparent bg-slate-100 dark:bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-white/80"
         >
-          <Package className="h-3.5 w-3.5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+          <Package className="h-3.5 w-3.5 text-black dark:text-white" />
           <span>{activeProductsCount} active {activeProductsCount === 1 ? 'product' : 'products'}</span>
         </span>
 
@@ -126,7 +126,7 @@ export function ProductsTab({
           <Button
             size="sm"
             onClick={() => setIsAddProductModalOpen(true)}
-            className="gap-1.5 bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md px-3.5 py-1.5 rounded-lg font-semibold text-xs h-8 transition-transform active:scale-95"
+            className="gap-1.5 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-md px-3.5 py-1.5 rounded-lg font-semibold text-xs h-8 transition-transform active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
             Add product
@@ -209,7 +209,7 @@ export function ProductsTab({
             type="button"
             onClick={() => setIsAddProductModalOpen(true)}
             aria-label="Add your first product"
-            className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] shadow-lg transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-button-bg,#f5c518)]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="flex h-20 w-20 items-center justify-center rounded-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-lg transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/50 dark:focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <Plus className="h-10 w-10" strokeWidth={2.5} />
           </button>

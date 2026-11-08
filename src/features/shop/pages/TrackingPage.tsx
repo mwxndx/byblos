@@ -112,7 +112,7 @@ export default function TrackingPage() {
             <p className="mt-2 text-sm text-stone-600">
               This link is invalid, expired, or the delivery has not been activated yet.
             </p>
-            <Button onClick={() => navigate('/')} className="mt-5 bg-yellow-400 text-black hover:bg-yellow-300">
+            <Button onClick={() => navigate('/')} className="mt-5 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
               Back to Home
             </Button>
           </div>

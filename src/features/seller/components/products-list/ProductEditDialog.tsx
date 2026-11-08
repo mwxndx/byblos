@@ -49,7 +49,10 @@ export function ProductEditDialog({
 }: ProductEditDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white w-[90vw] max-w-sm sm:max-w-[400px] max-h-[78dvh] overflow-y-auto p-3 sm:p-4 rounded-xl shadow-2xl">
+      <DialogContent
+        disableAnimation
+        className="bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-900 dark:text-white w-[90vw] max-w-sm sm:max-w-[400px] max-h-[78dvh] overflow-y-auto overflow-x-hidden overscroll-x-none touch-pan-y p-3 sm:p-4 rounded-xl shadow-2xl"
+      >
         <DialogHeader className="flex flex-row items-center gap-2 space-y-0 text-left mb-2">
           <IconButton
             variant="ghost"
@@ -72,7 +75,7 @@ export function ProductEditDialog({
             <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
           </div>
         ) : (
-          <div className="space-y-3 py-2">
+          <div className="space-y-3 py-2 w-full max-w-full overflow-x-hidden">
             <ProductEditFormFields
               formData={formData}
               onFormDataChange={onFormDataChange}
@@ -90,7 +93,7 @@ export function ProductEditDialog({
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
-            className="border-slate-200 dark:border-white/20 bg-transparent text-slate-900 dark:text-white hover:bg-white/10 font-semibold"
+            className="border-slate-200 dark:border-white/20 bg-transparent text-slate-900 dark:text-white hover:bg-black/5 dark:hover:bg-white/10 font-semibold"
             disabled={isSaving}
           >
             Cancel
@@ -98,7 +101,7 @@ export function ProductEditDialog({
           <Button
             onClick={onSave}
             disabled={isSaving || isLoading}
-            className="bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] hover:opacity-90 font-bold shadow-md"
+            className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 font-bold shadow-md"
           >
             {isSaving ? (
               <>

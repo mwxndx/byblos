@@ -4,7 +4,6 @@ import { DeleteAccountButton } from '@/shared/components/DeleteAccountButton';
 import { deleteSellerAccount } from '@/features/seller/api/profileApi';
 import type { Theme } from '@/features/seller/api';
 import { Button } from '@/shared/ui/button';
-import { ThemeSelector } from '../../ThemeSelector';
 
 import type { SellerSettingsFormData } from '../types';
 import { SectionHeader, SocialInput } from './settingsTab.parts';
@@ -95,7 +94,7 @@ export function SettingsTab({
           setIsEditingContacts(false);
         }}
         disabled={isSaving}
-        className="h-8 rounded-lg bg-[var(--theme-button-bg,#f5c518)] text-xs font-semibold text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md"
+        className="h-8 rounded-lg bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-xs font-semibold shadow-md"
       >
         {isSaving ? (
           <>
@@ -136,13 +135,7 @@ export function SettingsTab({
         </div>
       </section>
 
-      {/* Shop accent colour */}
-      <section className="seller-card p-4 sm:p-5 lg:p-6">
-        <ThemeSelector
-          currentTheme={(sellerProfile?.theme as Theme) || 'default'}
-          onThemeChange={onThemeChange || (() => undefined)}
-        />
-      </section>
+      {/* Theme / ThemeSelector: seller shop theme section removed; standardized role styling is used instead */}
 
       {/* Contact & Socials */}
       <section className="seller-card p-4 sm:p-5 lg:p-6">

@@ -81,7 +81,7 @@ const ShopPage = () => {
             <p className="text-[var(--byblos-muted)] text-lg font-medium mb-6">{error}</p>
             <Button
               asChild
-              className="bg-yellow-400 hover:bg-yellow-300 text-black shadow-lg px-8 py-3 rounded-xl font-bold transition-colors duration-200"
+              className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-lg px-8 py-3 rounded-xl font-bold transition-colors duration-200"
             >
               <Link to="/">Return to Home</Link>
             </Button>

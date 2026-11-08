@@ -19,8 +19,7 @@ export function SellerDashboardErrorState({ error, onRetry }: Readonly<SellerDas
         </p>
         <Button
           onClick={onRetry}
-          className="px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
-          style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+          className="px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
         >
           <RefreshCw className="h-5 w-5 mr-2" />
           Try Again

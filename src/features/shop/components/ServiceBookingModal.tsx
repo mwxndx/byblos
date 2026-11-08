@@ -205,7 +205,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                         onClick={handleConfirm}
                         disabled={!isValid}
                         aria-describedby={!isValid ? 'booking-disabled-reason' : undefined}
-                        className="w-full h-12 rounded-xl bg-yellow-400 text-black font-bold text-sm hover:bg-yellow-500 shadow-[0_0_20px_rgba(250,204,21,0.1)] disabled:opacity-50 transition-all active:scale-[0.98]"
+                        className="w-full h-12 rounded-xl bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 font-bold text-sm shadow-md disabled:opacity-50 transition-all active:scale-[0.98]"
                     >
                         Confirm Booking
                     </Button>
@@ -253,7 +253,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                         <Button
                             onClick={saveLocationToProfile}
                             disabled={isUpdatingProfile || !buyerLocation?.address}
-                            className="w-full h-12 rounded-xl bg-yellow-400 text-black font-bold text-sm hover:bg-yellow-500 shadow-[0_0_20px_rgba(250,204,21,0.1)] disabled:opacity-50 transition-all active:scale-[0.98]"
+                            className="w-full h-12 rounded-xl bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 font-bold text-sm shadow-md disabled:opacity-50 transition-all active:scale-[0.98]"
                         >
                             {isUpdatingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Save & Use Location

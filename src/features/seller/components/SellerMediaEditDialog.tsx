@@ -87,15 +87,13 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
           {/* Business photo */}
           <div className="flex items-center gap-4">
             <div
-              className="h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white dark:bg-[#141414]"
-              style={{ border: '3px solid var(--theme-accent, #f5c518)' }}
+              className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-slate-300 dark:border-white/20 bg-white dark:bg-[#141414]"
             >
               {photoPreview ? (
                 <img src={photoPreview} alt="Business photo" className="h-full w-full object-cover" />
               ) : (
                 <div
-                  className="flex h-full w-full items-center justify-center text-xl font-semibold"
-                  style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+                  className="flex h-full w-full items-center justify-center text-xl font-semibold bg-black text-white dark:bg-white dark:text-black"
                 >
                   {fallbackInitial}
                 </div>
@@ -106,8 +104,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
               <div className="mt-2 flex flex-wrap gap-2">
                 <Button
                   size="sm"
-                  className="relative h-8 font-bold"
-                  style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+                  className="relative h-8 font-bold bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                   disabled={busy === 'photo'}
                 >
                   <input

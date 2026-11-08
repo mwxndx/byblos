@@ -54,8 +54,7 @@ function ReminderCard({ icon: Icon, title, description, ctaLabel, onCta, onDismi
             <button
               type="button"
               onClick={onCta}
-              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform active:scale-95 sm:text-sm"
-              style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+              className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold shadow-[0_10px_24px_rgba(0,0,0,0.4)] transition-transform active:scale-95 sm:text-sm bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
             >
               {ctaLabel}
               <ArrowRight className="h-3.5 w-3.5" />

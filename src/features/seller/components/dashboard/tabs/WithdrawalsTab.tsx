@@ -83,8 +83,7 @@ export function WithdrawalsTab({
             <div className="w-full sm:w-auto shrink-0">
               <Button
                 onClick={() => setShowWithdrawalForm(true)}
-                className="gap-2 shadow-lg px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-12"
-                style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+                className="gap-2 shadow-lg px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-12 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                 disabled={balance < MIN_WITHDRAWAL_AMOUNT}
               >
                 <Wallet className="h-4 w-4" />

@@ -26,11 +26,9 @@ import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel
 import { copyLinkedTextToClipboard, getShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
 import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUtils';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-import { useShopAccentOnly } from '@/shared/hooks/useShopTheme';
 import { useSellerProfileQuery } from '@/features/seller/hooks/useSellerProfile';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { registerSubNavigation, registerModalDismiss } from '@/shared/utils/modalBackHandler';
-import type { Theme } from '@/shared/types';
 import type { SellerDashboardProps, SellerTabId } from '../components/dashboard/types';
 
 // Swipeable nav tabs only — 'settings' is reached via the header profile icon,
@@ -53,16 +51,10 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   const isAuthLoading = false; // globalAuth loading is handled by AppProtectedRoute
   const updateSellerProfile = (updates: Partial<SellerProfile>) => updateProfile(updates, 'seller');
 
-  // Drive the whole dashboard's accent from the seller's chosen shop theme
-  // (sets --theme-accent / --theme-button-* CSS vars on :root). Read from the
-  // live seller-profile query (not the auth-context snapshot) so a theme change
-  // in Settings — which invalidates ['seller-profile'] — updates the accent
-  // immediately instead of only after a full reload.
   const { data: liveSellerProfile } = useSellerProfileQuery(!!sellerProfile);
   const { data: creatorDashboardData } = useSellerCreatorsQuery(!!sellerProfile);
   const activeProfile = (liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile;
   const hasBusinessPhoto = Boolean(activeProfile?.avatarUrl);
-  useShopAccentOnly(((liveSellerProfile?.theme ?? sellerProfile?.theme) as Theme) || 'default');
 
   const pendingCreatorsCount = creatorDashboardData?.incomingRequests?.length || 0;
   const { unreadCount: unreadNotificationsCount = 0 } = useNotifications('default', true, 'seller');

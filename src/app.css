@@ -175,6 +175,8 @@ nav.fixed.bottom-0 {
     --chrome: rgba(0, 0, 0, 0.75);
     --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.8), 0 2px 6px -1px rgba(0, 0, 0, 0.6);
     --shadow-pop: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 64px -12px rgba(0, 0, 0, 0.95), 0 8px 24px -4px rgba(0, 0, 0, 0.8);
+    --theme-button-bg: #ffffff;
+    --theme-button-text: #000000;
 }
 
 .page-enter {
@@ -824,7 +826,7 @@ body.dashboard-active .seller-tab-selected {
     color: #f8fafc !important;
 }
 
-/* ── Explicit solid white controls & indicators ────────────────────────────── */
+/* ── Standardized role buttons: white in dark mode, black in light mode ────────── */
 .btn-white,
 button.btn-white,
 .auth-page .btn-white,
@@ -832,7 +834,7 @@ button.btn-white,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
     background-color: #ffffff !important;
     color: #000000 !important;
-    border-color: #e2e8f0 !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .btn-white:hover,
@@ -842,6 +844,25 @@ button.btn-white:hover,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
     background-color: #f1f5f9 !important;
     color: #000000 !important;
+}
+
+[data-theme="light"] .btn-white,
+[data-theme="light"] button.btn-white,
+[data-theme="light"] .auth-page .btn-white,
+[data-theme="light"] .auth-page button.btn-white,
+[data-theme="light"] .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="light"] .btn-white:hover,
+[data-theme="light"] button.btn-white:hover,
+[data-theme="light"] .auth-page .btn-white:hover,
+[data-theme="light"] .auth-page button.btn-white:hover,
+[data-theme="light"] .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
 }
 
 .auth-step-active {
@@ -1054,6 +1075,8 @@ button.btn-white:hover,
     --chrome: rgba(255, 255, 255, 0.85);
     --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.06);
     --shadow-pop: 0 20px 48px -12px rgba(0, 0, 0, 0.16), 0 8px 24px -6px rgba(0, 0, 0, 0.08);
+    --theme-button-bg: #000000;
+    --theme-button-text: #ffffff;
 }
 
 /* html/body background in light mode */

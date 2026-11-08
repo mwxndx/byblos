@@ -81,8 +81,7 @@ export function SellerProfileHero({
               <img src={avatar} alt={shopName} className="h-full w-full object-cover" />
             ) : (
               <div
-                className="flex h-full w-full items-center justify-center text-2xl font-semibold"
-                style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+                className="flex h-full w-full items-center justify-center text-2xl font-semibold bg-black text-white dark:bg-white dark:text-black"
               >
                 {initial}
               </div>
@@ -95,7 +94,7 @@ export function SellerProfileHero({
               onClick={() => setIsEditingMedia(true)}
               aria-label="Edit profile photo"
               title="Edit profile photo"
-              className="absolute bottom-0 right-0 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[var(--bg)] bg-yellow-400 text-black shadow-sm transition-transform hover:bg-yellow-300 active:scale-95"
+              className="absolute bottom-0 right-0 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[var(--bg)] bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-sm transition-transform active:scale-95"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -108,8 +107,7 @@ export function SellerProfileHero({
             <button
               type="button"
               onClick={() => onCopyShopLink()}
-              className="inline-flex w-24 items-center justify-center gap-1.5 rounded-full px-2 py-1.5 text-xs font-semibold shadow-sm transition-transform active:scale-95 shrink-0"
-              style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+              className="inline-flex w-24 items-center justify-center gap-1.5 rounded-full px-2 py-1.5 text-xs font-semibold shadow-sm transition-transform active:scale-95 shrink-0 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
             >
               <Link2 className="h-3.5 w-3.5" />
               Shop link

@@ -29,24 +29,37 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+    disableAnimation?: boolean;
+  }
+>(({ className, children, disableAnimation, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    <DialogOverlay
+      className={
+        disableAnimation
+          ? "animate-none transition-none duration-0 data-[state=open]:animate-none data-[state=closed]:animate-none"
+          : undefined
+      }
+    />
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
         // Base Layout (Centered Floating Card on all screens: Web Desktop, Web Mobile, Android)
-        "fixed left-[50%] top-[50%] z-[101] grid w-[92vw] max-w-lg max-h-[85dvh] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-sheet border border-separator bg-surface-1 p-6 text-label shadow-[var(--shadow-pop)] duration-200",
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-        "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        "fixed left-[50%] top-[50%] z-[101] grid w-[92vw] max-w-lg max-h-[85dvh] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-sheet border border-separator bg-surface-1 p-6 text-label shadow-[var(--shadow-pop)]",
+        !disableAnimation && [
+          "duration-200",
+          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          "data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+        ],
+        disableAnimation &&
+          "animate-none transition-none duration-0 data-[state=open]:animate-none data-[state=closed]:animate-none",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1.5 text-label-2 transition-colors hover:bg-fill hover:text-label focus:outline-none focus:ring-2 focus:ring-yellow-400/60 focus:ring-offset-2 focus:ring-offset-[var(--bg)] disabled:pointer-events-none data-[state=open]:bg-fill">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1.5 text-label-2 transition-colors hover:bg-fill hover:text-label focus:outline-none focus:ring-2 focus:ring-black/60 dark:focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-[var(--bg)] disabled:pointer-events-none data-[state=open]:bg-fill">
         <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>

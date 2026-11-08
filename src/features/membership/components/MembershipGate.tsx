@@ -134,7 +134,7 @@ export function MembershipGate({ enabled }: Readonly<MembershipGateProps>) {
                 type="button"
                 onClick={handleJoin}
                 disabled={joinMutation.isPending}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#f5c518] text-sm font-bold text-black transition hover:bg-[#f5c518]/90 disabled:opacity-70"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-bold transition disabled:opacity-70"
               >
                 {joinMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -172,7 +172,7 @@ export function MembershipGate({ enabled }: Readonly<MembershipGateProps>) {
                 type="button"
                 onClick={() => share('ig')}
                 disabled={sharing !== null}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#f5c518] text-sm font-bold text-black transition hover:bg-[#f5c518]/90 disabled:opacity-70"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-sm font-bold transition disabled:opacity-70"
               >
                 {sharing === 'ig' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Instagram className="h-4 w-4" />}
                 Share to Instagram Stories

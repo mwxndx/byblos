@@ -63,7 +63,7 @@ export function ProductEditFormFields({
           </SelectTrigger>
           <SelectContent className="bg-white dark:bg-surface-1 border-slate-200 dark:border-separator text-slate-900 dark:text-white z-[110]">
             {aestheticCategories.map((category) => (
-              <SelectItem key={category.id} value={category.id} className="text-slate-900 dark:text-white focus:bg-[var(--theme-button-bg,#f5c518)] focus:text-[var(--theme-button-text,#000000)]">
+              <SelectItem key={category.id} value={category.id} className="text-slate-900 dark:text-white focus:bg-black focus:text-white dark:focus:bg-white dark:focus:text-black">
                 {category.title}
               </SelectItem>
             ))}
