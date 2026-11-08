@@ -119,9 +119,9 @@ export function SellerProfileHero({
         )}
       </div>
 
-      {/* Balance, Sales and Revenue: compact spacing between figures, comfortable gap from photo */}
+      {/* Balance, Sales and Revenue: keep balance in current position, increased spacing between balance, sales and revenue */}
       {hasMetrics && (
-        <div className="flex flex-1 items-start justify-start gap-3 min-[380px]:gap-4 sm:gap-6 lg:gap-8 min-w-0 pt-1.5 sm:pt-3">
+        <div className="flex flex-1 items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0 pt-1.5 sm:pt-3">
           {/* Balance */}
           <div className="flex flex-col min-w-0">
             {renderMetricValue('balance', balance)}
