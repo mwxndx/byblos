@@ -17,7 +17,7 @@ const INITIAL_VISIBLE_SELLERS = 24;
 const VISIBLE_SELLERS_STEP = 24;
 
 const SellerGridSkeleton = () => (
-    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-5xl mx-auto">
+    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
         <span className="sr-only">Loading shops…</span>
         {Array.from({ length: 8 }).map((_, index) => (
             <div
@@ -101,7 +101,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     }
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
             {visibleSellers.map((seller) => (
                 <SellerBrandCard key={seller.id} seller={seller} isBuyer={isBuyer} />
             ))}
