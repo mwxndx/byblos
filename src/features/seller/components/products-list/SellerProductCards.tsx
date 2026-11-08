@@ -36,7 +36,7 @@ export const SellerProductCards = memo(function SellerProductCards({
   onInventoryEdit,
 }: SellerProductCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+    <div className="grid grid-cols-1 gap-3.5 sm:gap-4">
       {products.map((product) => {
         const isSold = product.status === 'sold';
         const isDeleting = deletingId === product.id;
@@ -46,7 +46,7 @@ export const SellerProductCards = memo(function SellerProductCards({
           <div
             key={product.id}
             data-testid={`product-card-${product.id}`}
-            className="relative flex flex-col justify-between rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3.5 sm:p-4 shadow-sm hover:border-[var(--theme-accent,#f5c518)]/40 transition-colors"
+            className="relative flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3.5 sm:p-4 md:px-5 md:py-4 md:pr-16 shadow-sm hover:border-[var(--theme-accent,#f5c518)]/40 transition-colors gap-3.5 md:gap-6 lg:gap-8"
           >
             {/* Top right corner: Pencil icon */}
             <button
@@ -75,8 +75,8 @@ export const SellerProductCards = memo(function SellerProductCards({
               )}
             </button>
 
-            {/* Top section: square product image with name, description, and stock button next to it */}
-            <div className="flex items-start gap-3 sm:gap-4 pr-9">
+            {/* Product image, name, description, and stock button */}
+            <div className="flex flex-1 items-start md:items-center gap-3 sm:gap-4 md:gap-6 min-w-0 pr-9 md:pr-0">
               {/* Square frame product image */}
               <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/5">
                 {product.image_url ? (
@@ -93,18 +93,20 @@ export const SellerProductCards = memo(function SellerProductCards({
               </div>
 
               {/* Product name, description, and stock button */}
-              <div className="flex flex-1 flex-col min-w-0">
-                <h4 className="font-semibold text-sm sm:text-base text-slate-900 dark:text-white truncate">
-                  {product.name}
-                </h4>
-                {product.description && (
-                  <p className="mt-0.5 text-xs text-slate-500 dark:text-white/60 line-clamp-2 leading-relaxed">
-                    {product.description}
-                  </p>
-                )}
+              <div className="flex flex-1 flex-col md:flex-row md:items-center md:justify-between min-w-0 gap-2 md:gap-6 lg:gap-8">
+                <div className="flex flex-col min-w-0 md:max-w-xs lg:max-w-md">
+                  <h4 className="font-semibold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                    {product.name}
+                  </h4>
+                  {product.description && (
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-white/60 line-clamp-2 leading-relaxed">
+                      {product.description}
+                    </p>
+                  )}
+                </div>
 
                 {/* Stock button allowing the seller to edit their stock instead of the edit button */}
-                <div className="mt-2 flex items-center">
+                <div className="mt-1 md:mt-0 flex items-center shrink-0">
                   <button
                     type="button"
                     onClick={() => onInventoryEdit(product)}
@@ -124,9 +126,9 @@ export const SellerProductCards = memo(function SellerProductCards({
               </div>
             </div>
 
-            {/* Bottom section: Price and Mark as sold out / Mark as available on the same row below image and description */}
-            <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center gap-3 pr-10">
-              <span className="font-semibold text-sm sm:text-base tabular-nums text-slate-900 dark:text-white shrink-0">
+            {/* Bottom section on mobile / same row on desktop: Price and Mark as sold out / Mark as available */}
+            <div className="mt-3.5 pt-3 md:mt-0 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-white/5 flex items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 pr-10 md:pr-0 shrink-0">
+              <span className="font-semibold text-sm sm:text-base lg:text-lg tabular-nums text-slate-900 dark:text-white shrink-0">
                 {formatCurrency(product.price)}
               </span>
 
@@ -137,7 +139,7 @@ export const SellerProductCards = memo(function SellerProductCards({
                   onClick={() => onStatusUpdate(product.id, isSold ? 'available' : 'sold')}
                   disabled={isUpdating}
                   className={cn(
-                    "h-7 sm:h-8 px-2.5 sm:px-3 text-xs font-semibold rounded-lg transition-colors",
+                    "h-7 sm:h-8 px-2.5 sm:px-3 text-xs font-semibold rounded-lg transition-colors shrink-0",
                     isSold
                       ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
                       : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"

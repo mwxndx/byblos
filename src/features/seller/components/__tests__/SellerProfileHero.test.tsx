@@ -241,5 +241,11 @@ describe('SellerProfileHero', () => {
     const balanceLabel = screen.getByText('Balance');
     expect(salesLabel.compareDocumentPosition(revenueLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(revenueLabel.compareDocumentPosition(balanceLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // Verify clicks count is inside the sales column and wishlist count is inside the revenue column
+    const clicksText = screen.getByText('clicks');
+    const wishlistText = screen.getByText('wishlist');
+    expect(salesLabel.closest('.flex-col')).toContainElement(clicksText);
+    expect(revenueLabel.closest('.flex-col')).toContainElement(wishlistText);
   });
 });

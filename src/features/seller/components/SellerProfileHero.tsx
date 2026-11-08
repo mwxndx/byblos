@@ -72,7 +72,7 @@ export function SellerProfileHero({
   };
 
   return (
-    <div className="flex flex-row items-start gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10">
+    <div className="flex flex-row items-start gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10 w-full md:w-auto">
       {/* Business profile photo and shop link button aligned to the left */}
       <div className="flex shrink-0 flex-col items-start text-left">
         <div className="relative">
@@ -123,12 +123,12 @@ export function SellerProfileHero({
         )}
       </div>
 
-      {/* Metrics container on the right of the photo: Top row = Sales, Revenue, Balance. Center row = Clicks, Wishlist */}
+      {/* Metrics container on the right of the photo: Top row = Sales, Revenue, Balance. Below: Clicks under Sales, Wishlist under Revenue */}
       {hasMetrics && (
-        <div className="flex flex-1 flex-col min-w-0 pt-1.5 sm:pt-2 gap-3 sm:gap-4">
-          {/* Top row: Sales, Revenue, Balance */}
-          <div className="flex w-full items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
-            {/* Sales */}
+        <div className="flex flex-1 md:flex-initial flex-col min-w-0 pt-1.5 sm:pt-2">
+          {/* Top row: Sales, Revenue, Balance with Clicks under Sales and Wishlist under Revenue */}
+          <div className="flex w-full md:w-auto items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
+            {/* Sales (Clicks below) */}
             <div className="flex flex-col min-w-0">
               {renderMetricValue('sales', totalSales)}
               <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
@@ -149,9 +149,25 @@ export function SellerProfileHero({
                   </PopoverContent>
                 </Popover>
               </div>
+
+              {/* Clicks count below Sales */}
+              {clicks !== undefined && (
+                <div
+                  className="mt-2.5 sm:mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-white/60"
+                  title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}
+                >
+                  <MousePointerClick className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
+                  <span className="font-bold tabular-nums text-slate-900 dark:text-white">
+                    {(clicks ?? 0).toLocaleString()}
+                  </span>
+                  <span className="text-[11px] min-[380px]:text-xs">
+                    {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Revenue */}
+            {/* Revenue (Wishlist below) */}
             <div className="flex flex-col min-w-0">
               {renderMetricValue('revenue', revenue)}
               <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
@@ -172,37 +188,11 @@ export function SellerProfileHero({
                   </PopoverContent>
                 </Popover>
               </div>
-            </div>
 
-            {/* Balance */}
-            <div className="flex flex-col min-w-0">
-              {renderMetricValue('balance', balance)}
-              <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-                Balance
-              </span>
-            </div>
-          </div>
-
-          {/* Center row: Clicks and Wishlist */}
-          {(clicks !== undefined || wishlist !== undefined) && (
-            <div className="flex items-center gap-5 sm:gap-7 text-xs text-slate-500 dark:text-white/60">
-              {clicks !== undefined && (
-                <div
-                  className="flex items-center gap-1.5"
-                  title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}
-                >
-                  <MousePointerClick className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
-                  <span className="font-bold tabular-nums text-slate-900 dark:text-white">
-                    {(clicks ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-[11px] min-[380px]:text-xs">
-                    {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
-                  </span>
-                </div>
-              )}
+              {/* Wishlist count below Revenue */}
               {wishlist !== undefined && (
                 <div
-                  className="flex items-center gap-1.5"
+                  className="mt-2.5 sm:mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-white/60"
                   title={`${(wishlist ?? 0).toLocaleString()} items saved by buyers`}
                 >
                   <Heart className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
@@ -215,7 +205,15 @@ export function SellerProfileHero({
                 </div>
               )}
             </div>
-          )}
+
+            {/* Balance */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('balance', balance)}
+              <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                Balance
+              </span>
+            </div>
+          </div>
         </div>
       )}
 

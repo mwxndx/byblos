@@ -66,22 +66,24 @@ export function ProductsTab({
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      {/* Shop profile hero with Sales (clicks below), Revenue (wishlist below), and Balance */}
-      <SellerProfileHero
-        sellerProfile={sellerProfile}
-        shopUsername={shopUsername}
-        onCopyShopLink={onCopyShopLink}
-        canEdit
-        balance={currentBalance}
-        revenue={currentRevenue}
-        totalSales={currentTotalSales}
-        clicks={currentClicks}
-        wishlist={currentWishlist}
-      />
+      {/* Shop profile hero with Sales (clicks below), Revenue (wishlist below), and Balance - centered in desktop mode */}
+      <div className="w-full flex md:justify-center">
+        <SellerProfileHero
+          sellerProfile={sellerProfile}
+          shopUsername={shopUsername}
+          onCopyShopLink={onCopyShopLink}
+          canEdit
+          balance={currentBalance}
+          revenue={currentRevenue}
+          totalSales={currentTotalSales}
+          clicks={currentClicks}
+          wishlist={currentWishlist}
+        />
+      </div>
 
       {/* Creator sales recognition pill (only visible when creator sales exist) */}
       {currentCreatorSales > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center md:justify-center gap-2">
           <span className="inline-flex items-center gap-1 rounded-full border border-transparent bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:text-white/80">
             <Megaphone className="h-3 w-3" style={{ color: 'var(--theme-accent, #f5c518)' }} />
             {formatCurrency(currentCreatorSales)} creator sales

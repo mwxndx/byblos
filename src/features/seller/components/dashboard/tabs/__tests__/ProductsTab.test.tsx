@@ -178,5 +178,21 @@ describe('ProductsTab', () => {
     expect(screen.getByText(/KSh 4,500/i)).toBeInTheDocument();
     const markSoldOutBtn = screen.getByRole('button', { name: /Mark as sold out/i });
     expect(markSoldOutBtn).toBeInTheDocument();
+
+    // Verify card accommodates desktop row layout and parent grid is 1-column extending full width
+    expect(card).toHaveClass('md:flex-row', 'md:items-center');
+    expect(card.parentElement).toHaveClass('grid-cols-1');
+  });
+
+  it('aligns seller profile hero at the top center in desktop mode', () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <ProductsTab {...defaultProps} />
+      </QueryClientProvider>
+    );
+
+    const heroWrapper = container.querySelector('.md\\:justify-center');
+    expect(heroWrapper).toBeInTheDocument();
+    expect(heroWrapper).toHaveClass('w-full', 'flex', 'md:justify-center');
   });
 });
