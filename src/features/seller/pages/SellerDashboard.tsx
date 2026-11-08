@@ -268,7 +268,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
         >
           <div
             className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
-            style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+            style={{ paddingBottom: 'calc(5.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
           >
           {activeTab === 'orders' && <OrdersTab />}
 

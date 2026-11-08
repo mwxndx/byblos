@@ -242,10 +242,40 @@ describe('SellerProfileHero', () => {
     expect(salesLabel.compareDocumentPosition(revenueLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(revenueLabel.compareDocumentPosition(balanceLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
-    // Verify clicks count is inside the sales column and wishlist count is inside the revenue column
+    // Verify clicks count and wishlist count are rendered under sales and revenue
     const clicksText = screen.getByText('clicks');
     const wishlistText = screen.getByText('wishlist');
-    expect(salesLabel.closest('.flex-col')).toContainElement(clicksText);
-    expect(revenueLabel.closest('.flex-col')).toContainElement(wishlistText);
+    expect(salesLabel.closest('.grid')).toContainElement(clicksText);
+    expect(revenueLabel.closest('.grid')).toContainElement(wishlistText);
+  });
+
+  it('arranges clicks, wishlist, shop link button, and metrics on the same row with items-center in desktop mode', () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+          balance={500}
+          revenue={90}
+          totalSales={100}
+          clicks={42}
+          wishlist={7}
+        />
+      </QueryClientProvider>
+    );
+
+    const root = container.firstElementChild;
+    expect(root).toHaveClass('md:items-center');
+
+    const shopLinkBtn = screen.getByRole('button', { name: /Shop link/i });
+    expect(shopLinkBtn.parentElement).toHaveClass('md:order-7');
+
+    const clicksElement = screen.getByText('clicks').closest('[class*="md:order-5"]');
+    expect(clicksElement).toBeInTheDocument();
+
+    const wishlistElement = screen.getByText('wishlist').closest('[class*="md:order-6"]');
+    expect(wishlistElement).toBeInTheDocument();
   });
 });

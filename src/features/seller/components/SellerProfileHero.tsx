@@ -72,10 +72,10 @@ export function SellerProfileHero({
   };
 
   return (
-    <div className="flex flex-row items-start gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10 w-full md:w-auto">
+    <div className="flex flex-row items-start md:items-center gap-5 min-[380px]:gap-6 sm:gap-8 md:gap-8 lg:gap-10 w-full md:w-auto">
       {/* Business profile photo and shop link button aligned to the left */}
-      <div className="flex shrink-0 flex-col items-start text-left">
-        <div className="relative">
+      <div className="flex shrink-0 flex-col items-start text-left md:contents">
+        <div className="relative md:order-1 shrink-0">
           <div className="h-24 w-24 overflow-hidden rounded-full bg-surface-2">
             {avatar ? (
               <img src={avatar} alt={shopName} className="h-full w-full object-cover" />
@@ -102,34 +102,36 @@ export function SellerProfileHero({
           )}
         </div>
 
-        {/* Shop link button aligned to the left with matching width */}
+        {/* Shop link button: below avatar on mobile, part of the center row on desktop */}
         {shopUsername && onCopyShopLink && (
-          <button
-            type="button"
-            onClick={() => onCopyShopLink()}
-            className="mt-2.5 inline-flex w-24 items-center justify-center gap-1.5 rounded-full px-2 py-1.5 text-xs font-semibold shadow-sm transition-transform active:scale-95 shrink-0"
-            style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
-          >
-            <Link2 className="h-3.5 w-3.5" />
-            Shop link
-          </button>
+          <div className="mt-2.5 md:mt-0 flex shrink-0 md:order-7">
+            <button
+              type="button"
+              onClick={() => onCopyShopLink()}
+              className="inline-flex w-24 items-center justify-center gap-1.5 rounded-full px-2 py-1.5 text-xs font-semibold shadow-sm transition-transform active:scale-95 shrink-0"
+              style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+            >
+              <Link2 className="h-3.5 w-3.5" />
+              Shop link
+            </button>
+          </div>
         )}
 
         {/* Shop bio */}
         {bio && (
-          <p className="mt-2 max-w-[120px] sm:max-w-xs text-xs font-medium leading-4 sm:leading-5 text-label-2 [overflow-wrap:anywhere]">
+          <p className="mt-2 max-w-[120px] sm:max-w-xs text-xs font-medium leading-4 sm:leading-5 text-label-2 [overflow-wrap:anywhere] md:hidden">
             {bio}
           </p>
         )}
       </div>
 
-      {/* Metrics container on the right of the photo: Top row = Sales, Revenue, Balance. Below: Clicks under Sales, Wishlist under Revenue */}
+      {/* Metrics container on the right of the photo on mobile; dissolved into parent center row on desktop */}
       {hasMetrics && (
-        <div className="flex flex-1 md:flex-initial flex-col min-w-0 pt-1.5 sm:pt-2">
-          {/* Top row: Sales, Revenue, Balance with Clicks under Sales and Wishlist under Revenue */}
-          <div className="flex w-full md:w-auto items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
-            {/* Sales (Clicks below) */}
-            <div className="flex flex-col min-w-0">
+        <div className="flex flex-1 md:contents flex-col min-w-0 pt-1.5 sm:pt-2">
+          {/* Mobile grid: 3 cols (Sales, Revenue, Balance on row 1; Clicks, Wishlist on row 2). Desktop: dissolved into parent flex center row */}
+          <div className="grid grid-cols-3 md:contents gap-x-4 min-[380px]:gap-x-5 sm:gap-x-8 lg:gap-x-10 gap-y-2.5 sm:gap-y-3 min-w-0">
+            {/* Sales */}
+            <div className="col-start-1 row-start-1 md:order-2 flex flex-col min-w-0 shrink-0">
               {renderMetricValue('sales', totalSales)}
               <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
                 <span>Sales</span>
@@ -149,26 +151,10 @@ export function SellerProfileHero({
                   </PopoverContent>
                 </Popover>
               </div>
-
-              {/* Clicks count below Sales */}
-              {clicks !== undefined && (
-                <div
-                  className="mt-2.5 sm:mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-white/60"
-                  title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}
-                >
-                  <MousePointerClick className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
-                  <span className="font-bold tabular-nums text-slate-900 dark:text-white">
-                    {(clicks ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-[11px] min-[380px]:text-xs">
-                    {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
-                  </span>
-                </div>
-              )}
             </div>
 
-            {/* Revenue (Wishlist below) */}
-            <div className="flex flex-col min-w-0">
+            {/* Revenue */}
+            <div className="col-start-2 row-start-1 md:order-3 flex flex-col min-w-0 shrink-0">
               {renderMetricValue('revenue', revenue)}
               <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
                 <span>Revenue</span>
@@ -188,31 +174,47 @@ export function SellerProfileHero({
                   </PopoverContent>
                 </Popover>
               </div>
-
-              {/* Wishlist count below Revenue */}
-              {wishlist !== undefined && (
-                <div
-                  className="mt-2.5 sm:mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-white/60"
-                  title={`${(wishlist ?? 0).toLocaleString()} items saved by buyers`}
-                >
-                  <Heart className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
-                  <span className="font-bold tabular-nums text-slate-900 dark:text-white">
-                    {(wishlist ?? 0).toLocaleString()}
-                  </span>
-                  <span className="text-[11px] min-[380px]:text-xs">
-                    wishlist
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Balance */}
-            <div className="flex flex-col min-w-0">
+            <div className="col-start-3 row-start-1 md:order-4 flex flex-col min-w-0 shrink-0">
               {renderMetricValue('balance', balance)}
               <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
                 Balance
               </span>
             </div>
+
+            {/* Clicks count: below Sales on mobile, beside metrics on desktop */}
+            {clicks !== undefined && (
+              <div
+                className="col-start-1 row-start-2 md:order-5 flex items-center md:flex-col md:items-start gap-1.5 md:gap-0.5 text-xs text-slate-500 dark:text-white/60 shrink-0"
+                title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}
+              >
+                <div className="flex items-center gap-1.5 font-bold tabular-nums text-slate-900 dark:text-white text-xs min-[380px]:text-sm sm:text-base lg:text-lg">
+                  <MousePointerClick className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 dark:text-white/45" />
+                  <span>{(clicks ?? 0).toLocaleString()}</span>
+                </div>
+                <span className="text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                  {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
+                </span>
+              </div>
+            )}
+
+            {/* Wishlist count: below Revenue on mobile, beside metrics on desktop */}
+            {wishlist !== undefined && (
+              <div
+                className="col-start-2 row-start-2 md:order-6 flex items-center md:flex-col md:items-start gap-1.5 md:gap-0.5 text-xs text-slate-500 dark:text-white/60 shrink-0"
+                title={`${(wishlist ?? 0).toLocaleString()} items saved by buyers`}
+              >
+                <div className="flex items-center gap-1.5 font-bold tabular-nums text-slate-900 dark:text-white text-xs min-[380px]:text-sm sm:text-base lg:text-lg">
+                  <Heart className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 dark:text-white/45" />
+                  <span>{(wishlist ?? 0).toLocaleString()}</span>
+                </div>
+                <span className="text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                  wishlist
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
