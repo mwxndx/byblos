@@ -15,8 +15,8 @@ module.exports = {
       cwd: './',
       instances: 1,
       exec_mode: 'fork',
-      node_args: '--max-old-space-size=512',
-      max_memory_restart: '450M',
+      node_args: '--max-old-space-size=384',
+      max_memory_restart: '400M',
       exp_backoff_restart_delay: 1000,
       restart_delay: 2000,
       max_restarts: 50,
@@ -25,7 +25,26 @@ module.exports = {
       listen_timeout: 8000,
       env: {
         NODE_ENV: 'production',
-        BYBLOS_PROCESS_ROLE: 'all'
+        BYBLOS_PROCESS_ROLE: 'api'
+      }
+    },
+    {
+      name: 'byblos-worker',
+      script: 'server/src/worker.js',
+      cwd: './',
+      instances: 1,
+      exec_mode: 'fork',
+      node_args: '--max-old-space-size=384',
+      max_memory_restart: '350M',
+      exp_backoff_restart_delay: 1000,
+      restart_delay: 2000,
+      max_restarts: 50,
+      min_uptime: '10s',
+      kill_timeout: 5000,
+      listen_timeout: 8000,
+      env: {
+        NODE_ENV: 'production',
+        BYBLOS_PROCESS_ROLE: 'worker'
       }
     }
   ]
