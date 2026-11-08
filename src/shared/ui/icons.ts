@@ -62,6 +62,7 @@ export {
   ChatText as MessageSquare,
   Minus,
   Moon,
+  DotsThree as MoreHorizontal,
   DotsThreeVertical as MoreVertical,
   CursorClick as MousePointerClick,
   MusicNote as Music,

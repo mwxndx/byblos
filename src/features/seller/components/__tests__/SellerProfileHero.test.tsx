@@ -206,7 +206,7 @@ describe('SellerProfileHero', () => {
     expect(rootContainer).toHaveClass('flex', 'flex-row');
   });
 
-  it('renders clicks and wishlist counters below balance, sales, and revenue', () => {
+  it('renders metrics starting with sales, revenue, and balance with clicks under sales and wishlist under revenue', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <SellerProfileHero
@@ -214,7 +214,7 @@ describe('SellerProfileHero', () => {
           shopUsername="eris"
           onCopyShopLink={vi.fn()}
           canEdit={true}
-          balance={0}
+          balance={500}
           revenue={90}
           totalSales={100}
           clicks={42}
@@ -223,9 +223,23 @@ describe('SellerProfileHero', () => {
       </QueryClientProvider>
     );
 
+    expect(screen.getByText(/KSh 100/i)).toBeInTheDocument();
+    expect(screen.getByText('Sales')).toBeInTheDocument();
+    expect(screen.getByText(/KSh 90/i)).toBeInTheDocument();
+    expect(screen.getByText('Revenue')).toBeInTheDocument();
+    expect(screen.getByText(/KSh 500/i)).toBeInTheDocument();
+    expect(screen.getByText('Balance')).toBeInTheDocument();
+
     expect(screen.getByText('42')).toBeInTheDocument();
     expect(screen.getByText('clicks')).toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
     expect(screen.getByText('wishlist')).toBeInTheDocument();
+
+    // Verify ordering in DOM: Sales before Revenue before Balance
+    const salesLabel = screen.getByText('Sales');
+    const revenueLabel = screen.getByText('Revenue');
+    const balanceLabel = screen.getByText('Balance');
+    expect(salesLabel.compareDocumentPosition(revenueLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(revenueLabel.compareDocumentPosition(balanceLabel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

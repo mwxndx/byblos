@@ -6,7 +6,7 @@ describe('SellerDashboardTabs', () => {
   it('renders with solid theme background and sticks to bottom without translucency', () => {
     render(
       <SellerDashboardTabs
-        activeTab="overview"
+        activeTab="products"
         hasUnreadOrders={false}
         pendingCreatorsCount={0}
         onSelectTab={vi.fn()}

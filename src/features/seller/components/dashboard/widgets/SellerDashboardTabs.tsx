@@ -1,10 +1,9 @@
-import { BarChart3, Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
+import { Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
 import type { SellerTabId } from '../types';
 
 type SellerNavTabId = Exclude<SellerTabId, 'settings'>;
 
 const tabIcons: Record<SellerNavTabId, LucideIcon> = {
-  overview: BarChart3,
   products: Package,
   orders: ShoppingBag,
   withdrawals: Wallet,
@@ -13,7 +12,6 @@ const tabIcons: Record<SellerNavTabId, LucideIcon> = {
 
 // Settings/profile is reached from the header profile icon, not the nav.
 const tabs: Array<{ id: SellerNavTabId; label: string }> = [
-  { id: 'overview', label: 'Overview' },
   { id: 'products', label: 'Products' },
   { id: 'orders', label: 'Orders' },
   { id: 'withdrawals', label: 'Withdrawals' },

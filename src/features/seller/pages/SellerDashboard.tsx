@@ -6,7 +6,6 @@ import { useSwipeTabs } from '@/shared/hooks/useSwipeTabs';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 import { SellerProfileHero } from '../components/SellerProfileHero';
-import { pendingOverviewStatuses } from '../components/dashboard/dashboardUtils';
 import { useSellerDashboardData } from '../components/dashboard/hooks/useSellerDashboardData';
 import { useSellerOrders } from '../components/dashboard/hooks/useSellerOrders';
 import { useSellerSettingsForm } from '../components/dashboard/hooks/useSellerSettingsForm';
@@ -14,7 +13,6 @@ import { useSellerWithdrawals } from '../components/dashboard/hooks/useSellerWit
 import { CreatorsTab } from '../components/dashboard/tabs/CreatorsTab';
 import { useSellerCreatorsQuery } from '@/features/seller/hooks/useSellerCreators';
 import { OrdersTab } from '../components/dashboard/tabs/OrdersTab';
-import { OverviewTab } from '../components/dashboard/tabs/OverviewTab';
 import { ProductsTab } from '../components/dashboard/tabs/ProductsTab';
 import { SettingsTab } from '../components/dashboard/tabs/SettingsTab';
 import { WithdrawalsTab } from '../components/dashboard/tabs/WithdrawalsTab';
@@ -37,7 +35,6 @@ import type { SellerDashboardProps, SellerTabId } from '../components/dashboard/
 // Swipeable nav tabs only — 'settings' is reached via the header profile icon,
 // not the bottom nav, so it is not part of the swipe cycle.
 const SELLER_TABS_ORDER: readonly SellerTabId[] = [
-  'overview',
   'products',
   'orders',
   'withdrawals',
@@ -66,7 +63,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   useShopAccentOnly(((liveSellerProfile?.theme ?? sellerProfile?.theme) as Theme) || 'default');
 
   const pendingCreatorsCount = creatorDashboardData?.incomingRequests?.length || 0;
-  const [activeTab, setActiveTab] = useState<SellerTabId>('overview');
+  const [activeTab, setActiveTab] = useState<SellerTabId>('products');
   const [hasUnreadOrders, setHasUnreadOrders] = useState(false);
   const [lastViewedOrdersTime, setLastViewedOrdersTime] = useState<string | null>(
     localStorage.getItem('seller_last_viewed_orders')
@@ -76,10 +73,10 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
 
   // Hook non-root tab navigation into native Android back stack
   useEffect(() => {
-    if (!isNativeApp() || activeTab === 'overview') return;
+    if (!isNativeApp() || activeTab === 'products') return;
 
     return registerSubNavigation(() => {
-      setActiveTab('overview');
+      setActiveTab('products');
       return true;
     });
   }, [activeTab]);
@@ -135,12 +132,6 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
     toast
   });
   const ordersQuery = useSellerOrders();
-
-  const pendingOverviewOrders = useMemo(() => {
-    return (analytics?.recentOrders || [])
-      .filter(order => pendingOverviewStatuses.has(order.status))
-      .slice(0, 8);
-  }, [analytics?.recentOrders]);
 
   const handleLogout = useCallback(() => {
     logout();
@@ -276,7 +267,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
             style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
           >
-          {activeTab !== 'overview' && (
+          {activeTab !== 'products' && (
             <div className="mb-5 mt-1 sm:mb-6">
               <SellerProfileHero
                 sellerProfile={currentProfile}
@@ -302,17 +293,6 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
 
           {activeTab === 'creators' && <CreatorsTab />}
 
-          {activeTab === 'overview' && (
-            <OverviewTab
-              analytics={analytics}
-              pendingOverviewOrders={pendingOverviewOrders}
-              sellerProfile={currentProfile}
-              shopUsername={getShopUsername(sellerProfile?.shopName)}
-              onCopyShopLink={handleCopyShopLink}
-              onSelectTab={handleSelectTab}
-            />
-          )}
-
           {activeTab === 'products' && (
             <ProductsTab
               fetchProducts={fetchProducts}
@@ -321,6 +301,10 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
               onStatusUpdate={handleStatusUpdate}
               products={products}
               setIsAddProductModalOpen={setIsAddProductModalOpen}
+              sellerProfile={currentProfile}
+              shopUsername={getShopUsername(sellerProfile?.shopName)}
+              onCopyShopLink={handleCopyShopLink}
+              analytics={analytics}
             />
           )}
           </div>

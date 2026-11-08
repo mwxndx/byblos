@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type SellerTabId = 'overview' | 'products' | 'orders' | 'withdrawals' | 'creators' | 'settings';
+export type SellerTabId = 'products' | 'orders' | 'withdrawals' | 'creators' | 'settings';
 
 
 
