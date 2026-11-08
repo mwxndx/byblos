@@ -46,3 +46,4 @@ describe('CreatorDashboardTabs — Floating Navigation Bar', () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
+
