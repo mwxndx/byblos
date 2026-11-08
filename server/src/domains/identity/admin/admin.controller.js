@@ -657,7 +657,7 @@ const resolveFlaggedCreatorEarning = async (req, res, next) => {
 const broadcastAppUpdate = async (req, res, next) => {
   try {
     const { minVersionCode, title, body, storeUrl } = req.body || {};
-    const defaultMinVersion = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '77', 10);
+    const defaultMinVersion = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '78', 10);
     const parsedMinVersion = minVersionCode ? Number(minVersionCode) : defaultMinVersion;
     const result = await NotificationService.broadcastAppUpdate({
       minVersionCode: parsedMinVersion,
