@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Info, Link2, Pencil } from '@/shared/ui/icons';
-import { formatCurrency } from '@/shared/utils/formatting';
+import { formatCurrency, formatCompactCurrency } from '@/shared/utils/formatting';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUtils';
@@ -20,7 +20,8 @@ interface SellerProfileHeroProps {
 /**
  * Shop identity block for the seller dashboard: the business profile photo (no border,
  * sized to match the shop link button) with pencil edit overlay, a "Shop link" action,
- * and the balance, sales, and revenue stats aligned to the right of the photo.
+ * and the balance, sales, and revenue stats aligned to the right of the photo with
+ * compact currency notation (1k, 10k, 130.1k) and click-to-expand full figures.
  */
 export function SellerProfileHero({
   sellerProfile,
@@ -33,6 +34,12 @@ export function SellerProfileHero({
   children
 }: Readonly<SellerProfileHeroProps>) {
   const [isEditingMedia, setIsEditingMedia] = useState(false);
+  const [expandedMetrics, setExpandedMetrics] = useState<Record<string, boolean>>({});
+
+  const toggleMetric = (key: 'balance' | 'sales' | 'revenue') => {
+    setExpandedMetrics((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const rawShopName = sellerProfile?.shopName?.trim();
   const shopName = (rawShopName ? normalizeShopName(rawShopName) : '') || 'Your shop';
   const avatar = sellerProfile?.avatarUrl;
@@ -41,8 +48,27 @@ export function SellerProfileHero({
 
   const hasMetrics = balance !== undefined || revenue !== undefined || totalSales !== undefined;
 
+  const renderMetricValue = (key: 'balance' | 'sales' | 'revenue', value: number | undefined) => {
+    const val = value ?? 0;
+    const isExpanded = expandedMetrics[key];
+    const displayVal = isExpanded ? formatCurrency(val) : formatCompactCurrency(val);
+    const isCompactable = Math.abs(val) >= 1000;
+
+    return (
+      <button
+        type="button"
+        onClick={() => toggleMetric(key)}
+        className="text-left text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate transition-transform active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-yellow-400 rounded cursor-pointer"
+        title={isCompactable ? (isExpanded ? 'Click to show compact' : 'Click to show full amount') : undefined}
+        aria-label={`${key}: ${formatCurrency(val)}`}
+      >
+        {displayVal}
+      </button>
+    );
+  };
+
   return (
-    <div className="flex flex-row items-start gap-3 sm:gap-6 lg:gap-8">
+    <div className="flex flex-row items-start gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10">
       {/* Business profile photo and shop link button aligned to the left */}
       <div className="flex shrink-0 flex-col items-start text-left">
         <div className="relative">
@@ -93,14 +119,12 @@ export function SellerProfileHero({
         )}
       </div>
 
-      {/* Balance, Sales and Revenue: aligned to the right of the photo on mobile and desktop */}
+      {/* Balance, Sales and Revenue: compact spacing between figures, comfortable gap from photo */}
       {hasMetrics && (
-        <div className="flex flex-1 items-start justify-between sm:justify-start gap-2 sm:gap-8 lg:gap-12 min-w-0 pt-1.5 sm:pt-3">
+        <div className="flex flex-1 items-start justify-start gap-3 min-[380px]:gap-4 sm:gap-6 lg:gap-8 min-w-0 pt-1.5 sm:pt-3">
           {/* Balance */}
           <div className="flex flex-col min-w-0">
-            <span className="text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
-              {formatCurrency(balance ?? 0)}
-            </span>
+            {renderMetricValue('balance', balance)}
             <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
               Balance
             </span>
@@ -108,9 +132,7 @@ export function SellerProfileHero({
 
           {/* Sales */}
           <div className="flex flex-col min-w-0">
-            <span className="text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
-              {formatCurrency(totalSales ?? 0)}
-            </span>
+            {renderMetricValue('sales', totalSales)}
             <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
               <span>Sales</span>
               <Popover>
@@ -133,9 +155,7 @@ export function SellerProfileHero({
 
           {/* Revenue */}
           <div className="flex flex-col min-w-0">
-            <span className="text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
-              {formatCurrency(revenue ?? 0)}
-            </span>
+            {renderMetricValue('revenue', revenue)}
             <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
               <span>Revenue</span>
               <Popover>

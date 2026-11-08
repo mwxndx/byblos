@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SellerProfileHero } from '../SellerProfileHero';
 import type { SellerProfile } from '../../../auth/types/authTypes';
@@ -105,7 +105,7 @@ describe('SellerProfileHero', () => {
     expect(screen.getByAltText('Eris')).toBeInTheDocument();
   });
 
-  it('renders balance, revenue, and sales stats with figures on top and text below, without cards', () => {
+  it('renders compact figures (1k, 1.5k, etc.) above 1000 and expands to full amount on click', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <SellerProfileHero
@@ -120,15 +120,24 @@ describe('SellerProfileHero', () => {
       </QueryClientProvider>
     );
 
-    // Figures
-    expect(screen.getByText(/KSh 1,500/i)).toBeInTheDocument();
-    expect(screen.getByText(/KSh 1,200/i)).toBeInTheDocument();
-    expect(screen.getByText(/KSh 2,000/i)).toBeInTheDocument();
+    // Initial compact figures (1500 -> 1.5k, 1200 -> 1.2k, 2000 -> 2k)
+    expect(screen.getByText(/KSh 1\.5k/i)).toBeInTheDocument();
+    expect(screen.getByText(/KSh 1\.2k/i)).toBeInTheDocument();
+    expect(screen.getByText(/KSh 2k/i)).toBeInTheDocument();
 
     // Labels below figures
     expect(screen.getByText('Balance')).toBeInTheDocument();
     expect(screen.getByText('Revenue')).toBeInTheDocument();
     expect(screen.getByText('Sales')).toBeInTheDocument();
+
+    // Click balance to toggle to full amount
+    const balanceBtn = screen.getByText(/KSh 1\.5k/i);
+    fireEvent.click(balanceBtn);
+    expect(screen.getByText(/KSh 1,500/i)).toBeInTheDocument();
+
+    // Click again to toggle back to compact
+    fireEvent.click(screen.getByText(/KSh 1,500/i));
+    expect(screen.getByText(/KSh 1\.5k/i)).toBeInTheDocument();
 
     // Withdraw button is not next to balance
     expect(screen.queryByRole('button', { name: /Withdraw/i })).not.toBeInTheDocument();
@@ -136,6 +145,26 @@ describe('SellerProfileHero', () => {
     // Popover description buttons for Revenue and Sales
     expect(screen.getByRole('button', { name: /Revenue description/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sales description/i })).toBeInTheDocument();
+  });
+
+  it('renders standard full figures for values below 1000', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+          balance={0}
+          revenue={90}
+          totalSales={100}
+        />
+      </QueryClientProvider>
+    );
+
+    expect(screen.getByText(/KSh 0/i)).toBeInTheDocument();
+    expect(screen.getByText(/KSh 90/i)).toBeInTheDocument();
+    expect(screen.getByText(/KSh 100/i)).toBeInTheDocument();
   });
 
   it('matches photo width and height with shop link button width and has no border', () => {

@@ -60,6 +60,45 @@ export function formatCurrency(amount: number | string | null | undefined, curre
   }
 }
 
+/**
+ * Format currency with compact notation (e.g. 1k, 10k, 100k, 130.1k) after passing 1000.
+ * Values below 1000 display standard currency formatting (e.g. KSh 0, KSh 950).
+ * Values >= 1000 display at most one decimal place, omitting .0 for clean whole numbers.
+ */
+export function formatCompactCurrency(amount: number | string | null | undefined, currency?: string): string {
+  const prefix = (!currency || currency.toUpperCase() === 'KES' || currency.toUpperCase() === 'KSH') ? 'KSh' : currency;
+
+  if (amount === null || amount === undefined || amount === '') {
+    return `${prefix} 0`;
+  }
+
+  const num = typeof amount === 'number' ? amount : Number.parseFloat(String(amount).replace(/[^0-9.-]+/g, ''));
+  if (!Number.isFinite(num)) {
+    return `${prefix} 0`;
+  }
+
+  const abs = Math.abs(num);
+  const sign = num < 0 ? '-' : '';
+
+  if (abs < 1000) {
+    return formatCurrency(num, prefix);
+  }
+
+  const formatWithSuffix = (value: number, suffix: string) => {
+    const rounded = Math.round(value * 10) / 10;
+    const formatted = rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1);
+    return `${sign}${prefix} ${formatted}${suffix}`;
+  };
+
+  if (abs >= 1_000_000_000) {
+    return formatWithSuffix(abs / 1_000_000_000, 'B');
+  }
+  if (abs >= 1_000_000) {
+    return formatWithSuffix(abs / 1_000_000, 'M');
+  }
+  return formatWithSuffix(abs / 1000, 'k');
+}
+
 export function formatDate(dateInput: string | Date, format: 'full' | 'date' | 'time' = 'full'): string {
   try {
     // Handle different date input types
