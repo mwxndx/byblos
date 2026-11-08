@@ -1,4 +1,4 @@
-import { Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
+import { Bell, Package, ShoppingBag, Users, Wallet, type LucideIcon } from '@/shared/ui/icons';
 import type { SellerTabId } from '../types';
 
 type SellerNavTabId = Exclude<SellerTabId, 'settings'>;
@@ -8,6 +8,7 @@ const tabIcons: Record<SellerNavTabId, LucideIcon> = {
   orders: ShoppingBag,
   withdrawals: Wallet,
   creators: Users,
+  notifications: Bell,
 };
 
 // Settings/profile is reached from the header profile icon, not the nav.
@@ -16,19 +17,21 @@ const tabs: Array<{ id: SellerNavTabId; label: string }> = [
   { id: 'orders', label: 'Orders' },
   { id: 'withdrawals', label: 'Withdrawals' },
   { id: 'creators', label: 'Creators' },
+  { id: 'notifications', label: 'Notifications' },
 ];
 
 interface SellerDashboardTabsProps {
   activeTab: SellerTabId;
   hasUnreadOrders: boolean;
   pendingCreatorsCount?: number;
+  unreadNotificationsCount?: number;
   onSelectTab: (tab: SellerTabId) => void;
 }
 
 // Fixed bottom navigation, styled identically to the buyer bottom nav
 // (BuyerBottomNav): plain icons with a colour-only active state, a dot for
-// unread orders and a count pill for pending creators.
-export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreatorsCount = 0, onSelectTab }: Readonly<SellerDashboardTabsProps>) {
+// unread orders and a count pill for pending creators or notifications.
+export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreatorsCount = 0, unreadNotificationsCount = 0, onSelectTab }: Readonly<SellerDashboardTabsProps>) {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"
@@ -39,7 +42,11 @@ export function SellerDashboardTabs({ activeTab, hasUnreadOrders, pendingCreator
           const Icon = tabIcons[id];
           const isActive = activeTab === id;
           const showDot = id === 'orders' && hasUnreadOrders;
-          const count = id === 'creators' ? pendingCreatorsCount : 0;
+          const count = id === 'creators'
+            ? pendingCreatorsCount
+            : id === 'notifications'
+            ? unreadNotificationsCount
+            : 0;
 
           return (
             <button

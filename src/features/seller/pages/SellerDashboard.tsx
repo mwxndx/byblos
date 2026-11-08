@@ -5,7 +5,6 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { useSwipeTabs } from '@/shared/hooks/useSwipeTabs';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
-import { SellerProfileHero } from '../components/SellerProfileHero';
 import { useSellerDashboardData } from '../components/dashboard/hooks/useSellerDashboardData';
 import { useSellerOrders } from '../components/dashboard/hooks/useSellerOrders';
 import { useSellerSettingsForm } from '../components/dashboard/hooks/useSellerSettingsForm';
@@ -16,6 +15,8 @@ import { OrdersTab } from '../components/dashboard/tabs/OrdersTab';
 import { ProductsTab } from '../components/dashboard/tabs/ProductsTab';
 import { SettingsTab } from '../components/dashboard/tabs/SettingsTab';
 import { WithdrawalsTab } from '../components/dashboard/tabs/WithdrawalsTab';
+import { useNotifications } from '@/features/notifications/hooks/useNotifications';
+import { NotificationList } from '@/features/notifications/components/NotificationList';
 import { SellerDashboardHeader } from '../components/dashboard/widgets/SellerDashboardHeader';
 import { SellerDashboardErrorState } from '../components/dashboard/widgets/SellerDashboardState';
 import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
@@ -39,6 +40,7 @@ const SELLER_TABS_ORDER: readonly SellerTabId[] = [
   'orders',
   'withdrawals',
   'creators',
+  'notifications',
 ];
 
 export default function SellerDashboard({ children }: Readonly<SellerDashboardProps>) {
@@ -63,6 +65,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   useShopAccentOnly(((liveSellerProfile?.theme ?? sellerProfile?.theme) as Theme) || 'default');
 
   const pendingCreatorsCount = creatorDashboardData?.incomingRequests?.length || 0;
+  const { unreadCount: unreadNotificationsCount = 0 } = useNotifications('default', true, 'seller');
   const [activeTab, setActiveTab] = useState<SellerTabId>('products');
   const [hasUnreadOrders, setHasUnreadOrders] = useState(false);
   const [lastViewedOrdersTime, setLastViewedOrdersTime] = useState<string | null>(
@@ -267,17 +270,6 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             className="mx-auto w-full max-w-[1480px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6"
             style={{ paddingBottom: 'calc(4.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
           >
-          {activeTab !== 'products' && (
-            <div className="mb-5 mt-1 sm:mb-6">
-              <SellerProfileHero
-                sellerProfile={currentProfile}
-                shopUsername={getShopUsername(sellerProfile?.shopName)}
-                onCopyShopLink={handleCopyShopLink}
-                canEdit
-              />
-            </div>
-          )}
-
           {activeTab === 'orders' && <OrdersTab />}
 
           {activeTab === 'withdrawals' && (
@@ -292,6 +284,17 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
           )}
 
           {activeTab === 'creators' && <CreatorsTab />}
+
+          {activeTab === 'notifications' && (
+            <div className="mx-auto w-full max-w-[760px]">
+              <NotificationList
+                variant="default"
+                role="seller"
+                scrollClassName=""
+                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1 shadow-sm"
+              />
+            </div>
+          )}
 
           {activeTab === 'products' && (
             <ProductsTab
@@ -334,6 +337,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
         activeTab={activeTab}
         hasUnreadOrders={hasUnreadOrders}
         pendingCreatorsCount={pendingCreatorsCount}
+        unreadNotificationsCount={unreadNotificationsCount}
         onSelectTab={handleSelectTab}
       />
 

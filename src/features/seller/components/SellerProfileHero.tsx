@@ -72,7 +72,7 @@ export function SellerProfileHero({
   };
 
   return (
-    <div className="flex flex-row items-center gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10">
+    <div className="flex flex-row items-start gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10">
       {/* Business profile photo and shop link button aligned to the left */}
       <div className="flex shrink-0 flex-col items-start text-left">
         <div className="relative">
@@ -123,90 +123,99 @@ export function SellerProfileHero({
         )}
       </div>
 
-      {/* Metrics container on the right of the photo: Column 1 = Sales (Clicks below), Column 2 = Revenue (Wishlist below), Column 3 = Balance */}
+      {/* Metrics container on the right of the photo: Top row = Sales, Revenue, Balance. Center row = Clicks, Wishlist */}
       {hasMetrics && (
-        <div className="flex flex-1 items-center justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
-          {/* Sales + Clicks */}
-          <div className="flex flex-col min-w-0">
-            {renderMetricValue('sales', totalSales)}
-            <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-              <span>Sales</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Sales description"
-                    title="Sales description"
-                    className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
-                  >
-                    <Info className="h-3 w-3" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
-                  Total product price value (excludes 2% customer service charge).
-                </PopoverContent>
-              </Popover>
-            </div>
-            {clicks !== undefined && (
-              <div
-                className="mt-2 sm:mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 dark:text-white/60"
-                title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}
-              >
-                <MousePointerClick className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
-                <span className="font-bold tabular-nums text-slate-900 dark:text-white">
-                  {(clicks ?? 0).toLocaleString()}
-                </span>
-                <span className="text-[11px] min-[380px]:text-xs">
-                  {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
-                </span>
+        <div className="flex flex-1 flex-col min-w-0 pt-1.5 sm:pt-2 gap-3 sm:gap-4">
+          {/* Top row: Sales, Revenue, Balance */}
+          <div className="flex w-full items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
+            {/* Sales */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('sales', totalSales)}
+              <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                <span>Sales</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Sales description"
+                      title="Sales description"
+                      className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
+                    Total product price value (excludes 2% customer service charge).
+                  </PopoverContent>
+                </Popover>
               </div>
-            )}
+            </div>
+
+            {/* Revenue */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('revenue', revenue)}
+              <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                <span>Revenue</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Revenue description"
+                      title="Revenue description"
+                      className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
+                    Net earnings after KSh 10 platform fee per sale.
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Balance */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('balance', balance)}
+              <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                Balance
+              </span>
+            </div>
           </div>
 
-          {/* Revenue + Wishlist */}
-          <div className="flex flex-col min-w-0">
-            {renderMetricValue('revenue', revenue)}
-            <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-              <span>Revenue</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Revenue description"
-                    title="Revenue description"
-                    className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
-                  >
-                    <Info className="h-3 w-3" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
-                  Net earnings after KSh 10 platform fee per sale.
-                </PopoverContent>
-              </Popover>
+          {/* Center row: Clicks and Wishlist */}
+          {(clicks !== undefined || wishlist !== undefined) && (
+            <div className="flex items-center gap-5 sm:gap-7 text-xs text-slate-500 dark:text-white/60">
+              {clicks !== undefined && (
+                <div
+                  className="flex items-center gap-1.5"
+                  title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}
+                >
+                  <MousePointerClick className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
+                  <span className="font-bold tabular-nums text-slate-900 dark:text-white">
+                    {(clicks ?? 0).toLocaleString()}
+                  </span>
+                  <span className="text-[11px] min-[380px]:text-xs">
+                    {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
+                  </span>
+                </div>
+              )}
+              {wishlist !== undefined && (
+                <div
+                  className="flex items-center gap-1.5"
+                  title={`${(wishlist ?? 0).toLocaleString()} items saved by buyers`}
+                >
+                  <Heart className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
+                  <span className="font-bold tabular-nums text-slate-900 dark:text-white">
+                    {(wishlist ?? 0).toLocaleString()}
+                  </span>
+                  <span className="text-[11px] min-[380px]:text-xs">
+                    wishlist
+                  </span>
+                </div>
+              )}
             </div>
-            {wishlist !== undefined && (
-              <div
-                className="mt-2 sm:mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 dark:text-white/60"
-                title={`${(wishlist ?? 0).toLocaleString()} items saved by buyers`}
-              >
-                <Heart className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
-                <span className="font-bold tabular-nums text-slate-900 dark:text-white">
-                  {(wishlist ?? 0).toLocaleString()}
-                </span>
-                <span className="text-[11px] min-[380px]:text-xs">
-                  wishlist
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Balance */}
-          <div className="flex flex-col min-w-0">
-            {renderMetricValue('balance', balance)}
-            <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-              Balance
-            </span>
-          </div>
+          )}
         </div>
       )}
 

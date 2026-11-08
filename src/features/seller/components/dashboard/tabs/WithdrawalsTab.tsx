@@ -65,11 +65,6 @@ export function WithdrawalsTab({
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div className="text-center px-2 sm:px-0">
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-slate-900 dark:text-white mb-1.5">Withdrawal Management</h2>
-        <p className="text-slate-500 dark:text-white/60 text-xs sm:text-sm lg:text-base font-medium">Request and track your withdrawal requests</p>
-      </div>
-
       {/* ── Primary Hero Balance ────────────────────────────────────────── */}
       <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-transparent bg-white dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -29,4 +29,26 @@ describe('SellerDashboardTabs', () => {
     // Safe area bottom inset class is applied
     expect(nav).toHaveClass('pb-safe-bottom');
   });
+
+  it('renders notifications tab next to creators tab with unread count badge', () => {
+    render(
+      <SellerDashboardTabs
+        activeTab="products"
+        hasUnreadOrders={false}
+        pendingCreatorsCount={0}
+        unreadNotificationsCount={5}
+        onSelectTab={vi.fn()}
+      />
+    );
+
+    const creatorsButton = screen.getByRole('button', { name: /Creators/i });
+    const notificationsButton = screen.getByRole('button', { name: /Notifications/i });
+
+    expect(creatorsButton).toBeInTheDocument();
+    expect(notificationsButton).toBeInTheDocument();
+    expect(creatorsButton.compareDocumentPosition(notificationsButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    // Badge showing 5 unread notifications
+    expect(screen.getByText('5')).toBeInTheDocument();
+  });
 });

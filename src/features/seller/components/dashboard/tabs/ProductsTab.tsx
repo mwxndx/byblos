@@ -109,7 +109,7 @@ export function ProductsTab({
       </Dialog>
 
       {/* Action row with active products pill on the left, and Add product, Search icon, Three dots vertically aligned on the right */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 sm:pt-4">
         {/* Number of active products pill */}
         <span
           data-testid="active-products-pill"
