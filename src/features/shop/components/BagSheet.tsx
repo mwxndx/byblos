@@ -243,7 +243,7 @@ export function BagSheet() {
 
             {/* Pinned Pay. */}
             <div className="shrink-0 border-t px-5 pb-4 pt-3" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
-              <button type="submit" disabled={checkout.isProcessingPurchase} className="flex h-12 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold shadow-lg transition-transform active:scale-[0.99] disabled:opacity-60 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90">
+              <button type="submit" disabled={checkout.isProcessingPurchase} className="btn-standard flex h-12 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold shadow-lg transition-transform active:scale-[0.99] disabled:opacity-60 bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90">
                 {checkout.isProcessingPurchase ? <Loader2 className="h-5 w-5 animate-spin" /> : `Pay ${formatCurrency(phoneCheck.displayedTotal)}`}
               </button>
             </div>

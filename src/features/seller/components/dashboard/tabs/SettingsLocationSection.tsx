@@ -56,7 +56,7 @@ export function SettingsLocationSection({
           size="sm"
           onClick={onSave}
           disabled={isSaving}
-          className="h-8 rounded-lg bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-xs font-semibold shadow-md"
+          className="btn-standard h-8 rounded-lg bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 text-xs font-semibold shadow-md"
         >
           {isSaving ? (
             <>

@@ -829,6 +829,10 @@ body.dashboard-active .seller-tab-selected {
 /* ── Standardized role buttons: white in dark mode, black in light mode ────────── */
 .btn-white,
 button.btn-white,
+.btn-standard,
+button.btn-standard,
+.btn-primary,
+button.btn-primary,
 .auth-page .btn-white,
 .auth-page button.btn-white,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
@@ -839,6 +843,10 @@ button.btn-white,
 
 .btn-white:hover,
 button.btn-white:hover,
+.btn-standard:hover,
+button.btn-standard:hover,
+.btn-primary:hover,
+button.btn-primary:hover,
 .auth-page .btn-white:hover,
 .auth-page button.btn-white:hover,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
@@ -848,6 +856,10 @@ button.btn-white:hover,
 
 [data-theme="light"] .btn-white,
 [data-theme="light"] button.btn-white,
+[data-theme="light"] .btn-standard,
+[data-theme="light"] button.btn-standard,
+[data-theme="light"] .btn-primary,
+[data-theme="light"] button.btn-primary,
 [data-theme="light"] .auth-page .btn-white,
 [data-theme="light"] .auth-page button.btn-white,
 [data-theme="light"] .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
@@ -858,6 +870,10 @@ button.btn-white:hover,
 
 [data-theme="light"] .btn-white:hover,
 [data-theme="light"] button.btn-white:hover,
+[data-theme="light"] .btn-standard:hover,
+[data-theme="light"] button.btn-standard:hover,
+[data-theme="light"] .btn-primary:hover,
+[data-theme="light"] button.btn-primary:hover,
 [data-theme="light"] .auth-page .btn-white:hover,
 [data-theme="light"] .auth-page button.btn-white:hover,
 [data-theme="light"] .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
@@ -1181,16 +1197,6 @@ button.btn-white:hover,
         0 12px 32px -8px rgba(15, 23, 42, 0.09) !important;
 }
 
-/* Interactive unselected tabs in light mode */
-[data-theme="light"] .seller-surface button:not(.seller-tab-selected):not([style*="background-color"]) {
-    border-color: transparent !important;
-    color: #64748b !important;
-}
-
-[data-theme="light"] .seller-surface button:not(.seller-tab-selected):not([style*="background-color"]):hover {
-    background-color: rgba(0, 0, 0, 0.04) !important;
-    color: #0f0f0e !important;
-}
 
 
 /* Service Charge Notice in light mode */

@@ -126,7 +126,7 @@ export function ProductsTab({
           <Button
             size="sm"
             onClick={() => setIsAddProductModalOpen(true)}
-            className="gap-1.5 bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-md px-3.5 py-1.5 rounded-lg font-semibold text-xs h-8 transition-transform active:scale-95"
+            className="btn-standard gap-1.5 bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 shadow-md px-3.5 py-1.5 rounded-lg font-semibold text-xs h-8 transition-transform active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
             Add product
@@ -209,7 +209,7 @@ export function ProductsTab({
             type="button"
             onClick={() => setIsAddProductModalOpen(true)}
             aria-label="Add your first product"
-            className="flex h-20 w-20 items-center justify-center rounded-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-lg transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/50 dark:focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+            className="btn-standard flex h-20 w-20 items-center justify-center rounded-full bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 shadow-lg transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/50 dark:focus-visible:ring-white/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
           >
             <Plus className="h-10 w-10" strokeWidth={2.5} />
           </button>

@@ -176,7 +176,7 @@ export function RequiredBusinessPhotoModal({
               type="button"
               onClick={handleSavePhoto}
               disabled={!selectedPhoto || isUploading}
-              className="btn-white h-12 w-full rounded-2xl bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 font-bold shadow-md transition disabled:opacity-50"
+              className="btn-white btn-standard h-12 w-full rounded-2xl bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 font-bold shadow-md transition disabled:opacity-50"
             >
               {isUploading ? (
                 <>

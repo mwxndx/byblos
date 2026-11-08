@@ -43,7 +43,7 @@ export function WithdrawalRequestForm({
         {!showWithdrawalForm ? (
           <Button
             onClick={() => setShowWithdrawalForm(true)}
-            className="gap-1.5 sm:gap-2 shadow-lg px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-auto bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+            className="btn-standard gap-1.5 sm:gap-2 shadow-lg px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-auto bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
             disabled={balance < MIN_WITHDRAWAL_AMOUNT}
           >
             <Wallet className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -118,7 +118,7 @@ export function WithdrawalRequestForm({
                 <Button
                   type="submit"
                   disabled={isRequestingWithdrawal || totalDeducted > balance}
-                  className="shadow-lg px-4 py-2 h-10 sm:h-8 text-xs rounded-lg font-semibold w-full sm:w-auto bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                  className="btn-standard shadow-lg px-4 py-2 h-10 sm:h-8 text-xs rounded-lg font-semibold w-full sm:w-auto bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
                   size="sm"
                 >
                   {isRequestingWithdrawal ? (

@@ -104,7 +104,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
               <div className="mt-2 flex flex-wrap gap-2">
                 <Button
                   size="sm"
-                  className="relative h-8 font-bold bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                  className="btn-standard relative h-8 font-bold bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
                   disabled={busy === 'photo'}
                 >
                   <input

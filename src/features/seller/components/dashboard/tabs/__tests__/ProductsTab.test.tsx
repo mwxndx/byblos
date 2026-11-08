@@ -195,4 +195,19 @@ describe('ProductsTab', () => {
     expect(heroWrapper).toBeInTheDocument();
     expect(heroWrapper).toHaveClass('w-full', 'flex', 'md:justify-center');
   });
+
+  it('styles Add product button with white background and black text in dark theme, and black in light theme', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ProductsTab {...defaultProps} />
+      </QueryClientProvider>
+    );
+
+    const addProductBtn = screen.getByRole('button', { name: /Add product/i });
+    expect(addProductBtn).toBeInTheDocument();
+    expect(addProductBtn.className).toContain('bg-white');
+    expect(addProductBtn.className).toContain('text-black');
+    expect(addProductBtn.className).toMatch(/\[data-theme=light\]_&:bg-black/);
+    expect(addProductBtn.className).toMatch(/\[data-theme=light\]_&:text-white/);
+  });
 });

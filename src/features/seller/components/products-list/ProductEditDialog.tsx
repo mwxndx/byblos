@@ -101,7 +101,7 @@ export function ProductEditDialog({
           <Button
             onClick={onSave}
             disabled={isSaving || isLoading}
-            className="bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 font-bold shadow-md"
+            className="btn-standard bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 font-bold shadow-md"
           >
             {isSaving ? (
               <>

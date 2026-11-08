@@ -63,29 +63,25 @@ export function SellerDashboardTabs({
               onClick={() => onSelectTab(id)}
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-xl py-1 transition-all duration-150 active:scale-95 ${
+              className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-xl py-2 transition-all duration-150 active:scale-95 ${
                 isActive ? 'text-black dark:text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
               }`}
             >
               <Icon
-                size={18}
+                size={22}
                 weight={isActive ? "fill" : "regular"}
                 className={isActive ? 'text-black dark:text-white' : 'text-current transition-colors'}
               />
-              <span
-                className={`text-[10px] font-semibold transition-colors ${
-                  isActive ? 'font-bold text-black dark:text-white' : 'text-slate-500 dark:text-white/50'
-                }`}
-              >
+              <span className="sr-only">
                 {label}
               </span>
 
               {count > 0 ? (
-                <span className="absolute top-0.5 right-[50%] flex h-[15px] min-w-[15px] translate-x-[13px] items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black px-1 text-[9px] font-semibold shadow-sm">
+                <span className="absolute top-1 right-[50%] flex h-[15px] min-w-[15px] translate-x-[12px] items-center justify-center rounded-full bg-white text-black dark:bg-white dark:text-black [data-theme=light]_&:bg-black [data-theme=light]_&:text-white px-1 text-[9px] font-semibold shadow-sm">
                   {count > 99 ? '99+' : count}
                 </span>
               ) : showDot ? (
-                <div className="absolute top-1 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-black dark:bg-white ring-2 ring-white dark:ring-[#121212]" />
+                <div className="absolute top-1.5 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-white dark:bg-white [data-theme=light]_&:bg-black ring-2 ring-white dark:ring-[#121212]" />
               ) : null}
             </button>
           );

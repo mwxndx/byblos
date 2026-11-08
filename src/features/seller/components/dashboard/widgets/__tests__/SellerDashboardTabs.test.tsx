@@ -47,4 +47,21 @@ describe('SellerDashboardTabs', () => {
     // Badge showing 5 unread notifications
     expect(screen.getByText('5')).toBeInTheDocument();
   });
+
+  it('renders tab icons with visually hidden labels for accessibility without visible text labels', () => {
+    const { container } = render(
+      <SellerDashboardTabs
+        activeTab="products"
+        hasUnreadOrders={false}
+        pendingCreatorsCount={0}
+        onSelectTab={vi.fn()}
+      />
+    );
+
+    // Visible text spans should have sr-only class
+    const labels = container.querySelectorAll('button span.sr-only');
+    expect(labels.length).toBe(5);
+    const visibleSpans = container.querySelectorAll('button span:not(.sr-only)');
+    expect(visibleSpans.length).toBe(0);
+  });
 });
