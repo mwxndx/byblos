@@ -17,19 +17,20 @@ const INITIAL_VISIBLE_SELLERS = 24;
 const VISIBLE_SELLERS_STEP = 24;
 
 const SellerGridSkeleton = () => (
-    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
+    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-5xl mx-auto">
         <span className="sr-only">Loading shops…</span>
         {Array.from({ length: 8 }).map((_, index) => (
             <div
                 key={index}
                 aria-hidden="true"
-                className="flex items-center justify-between h-[72px] sm:h-[80px] rounded-2xl border border-transparent bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] transition-colors duration-200"
+                className="flex items-center justify-between h-[72px] sm:h-[80px] rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200"
             >
-                <div className="flex items-center gap-3">
-                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
-                    <Skeleton className="h-4 w-32 rounded" />
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full" />
+                    <Skeleton className="h-4 w-28 sm:w-36 rounded-md" />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-row-reverse">
+                    <Skeleton className="h-4 w-4 rounded" />
                     <Skeleton className="h-7 w-7 rounded-full" />
                     <Skeleton className="h-7 w-7 rounded-full" />
                 </div>
@@ -100,7 +101,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     }
 
     return (
-        <div className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-5xl mx-auto">
             {visibleSellers.map((seller) => (
                 <SellerBrandCard key={seller.id} seller={seller} isBuyer={isBuyer} />
             ))}

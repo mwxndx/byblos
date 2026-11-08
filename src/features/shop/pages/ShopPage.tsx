@@ -9,7 +9,6 @@ import type { Product, Seller } from '@/shared/types';
 import { isAesthetic } from '../utils/shopPage.shared';
 import { SEOHead } from '@/shared/components/SEOHead';
 import { ShopHero } from '../components/ShopHero';
-import { ShopPageThemePicker } from '../components/ShopPageThemePicker';
 import { useShopPage } from './useShopPage';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { getShopUrl } from '@/shared/utils/shopLinks';
@@ -19,11 +18,6 @@ const ShopPage = () => {
   const {
     sellerInfo,
     creatorModeNotice,
-
-    themeAccentVars,
-    shopPageTheme,
-    setShopPageTheme,
-    resolvedShopTheme,
 
     hasDigitalProducts,
     filteredProducts,
@@ -50,8 +44,7 @@ const ShopPage = () => {
   if (isLoading) {
     return (
       <div
-        className="shop-page-root min-h-screen flex items-center justify-center bg-[var(--byblos-bg,#f5f4f0)] text-[var(--byblos-text,#0f0f0e)] transition-colors duration-300"
-        data-shop-theme={resolvedShopTheme}
+        className="shop-page-root min-h-screen flex items-center justify-center bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200"
       >
         <div className="text-center space-y-6 p-8">
           <div className="w-24 h-24 mx-auto bg-yellow-100 dark:bg-yellow-950/40 rounded-3xl flex items-center justify-center border border-yellow-200 dark:border-yellow-900/40 shadow-sm">
@@ -69,8 +62,7 @@ const ShopPage = () => {
   if (error) {
     return (
       <div
-        className="shop-page-root min-h-screen flex items-center justify-center p-4 bg-[var(--byblos-bg,#f5f4f0)] text-[var(--byblos-text,#0f0f0e)] transition-colors duration-300"
-        data-shop-theme={resolvedShopTheme}
+        className="shop-page-root min-h-screen flex items-center justify-center p-4 bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200"
       >
         <div className="text-center space-y-6 p-8">
           <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-950/40 rounded-3xl flex items-center justify-center border border-red-200 dark:border-red-900/40 shadow-sm">
@@ -94,9 +86,7 @@ const ShopPage = () => {
   return (
     <BagProvider seedProduct={bagAdd} shopSlug={routeShopName || sellerInfo?.slug || sellerInfo?.shopName}>
     <div
-      className="shop-page-root min-h-screen transition-colors duration-300"
-      data-shop-theme={resolvedShopTheme}
-      style={themeAccentVars}
+      className="shop-page-root min-h-screen transition-colors duration-200 bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)]"
     >
       <SEOHead
         title={sellerInfo?.shopName || sellerInfo?.fullName || 'Shop'}
@@ -146,8 +136,6 @@ const ShopPage = () => {
           </div>
         </div>
       )}
-      {/* Light/Dark/System theme picker — top-right, small, no border touching */}
-      <ShopPageThemePicker theme={shopPageTheme} onThemeChange={setShopPageTheme} />
       <ShopHero
         sellerInfo={sellerInfo}
         showSellerAvatar={showSellerAvatar}

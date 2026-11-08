@@ -1,5 +1,4 @@
 import type { Product, Seller, Aesthetic } from '@/shared/types';
-import type { Theme } from '@/shared/hooks/useShopTheme';
 
 // Type guard to check if a string is a valid Aesthetic
 export function isAesthetic(value: string): value is Aesthetic {
@@ -33,7 +32,6 @@ export interface ShopProduct extends Omit<BaseProduct, 'seller'> {
 // Shop-specific seller type that extends the base Seller type
 export interface ShopSeller extends Omit<Seller, 'bannerUrl'> {
   slug?: string;
-  theme?: Theme;
   city?: string;
   instagramLink?: string;
   tiktokLink?: string;

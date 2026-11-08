@@ -55,11 +55,7 @@ export function useSelectHubDropoffMutation() {
     mutationFn: (orderId: string) => sellerApi.selectHubDropoff(orderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.orders() });
-      toast.success('Dropoff method set to Hub Dropoff');
     },
-    onError: (error) => {
-      toast.error(classifyApiError(error, 'Failed to select hub dropoff').message);
-    }
   });
 }
 
@@ -69,11 +65,7 @@ export function useMarkDroppedAtHubMutation() {
     mutationFn: (orderId: string) => sellerApi.markDroppedAtHub(orderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.orders() });
-      toast.success('Order status updated');
     },
-    onError: (error) => {
-      toast.error(classifyApiError(error, 'Failed to update order status').message);
-    }
   });
 }
 
@@ -84,11 +76,7 @@ export function useUpdateOrderStatusMutation() {
       sellerApi.updateOrderStatus(args.orderId, args.status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.orders() });
-      toast.success('Order status updated');
     },
-    onError: (error) => {
-      toast.error(classifyApiError(error, 'Failed to update order status').message);
-    }
   });
 }
 
@@ -98,11 +86,7 @@ export function useConfirmBookingMutation() {
     mutationFn: (orderId: string) => sellerApi.confirmBooking(orderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.orders() });
-      toast.success('Booking confirmed');
     },
-    onError: (error) => {
-      toast.error(classifyApiError(error, 'Failed to confirm booking').message);
-    }
   });
 }
 
@@ -112,11 +96,7 @@ export function useCancelSellerOrderMutation() {
     mutationFn: (orderId: string) => sellerApi.cancelOrder(orderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.orders() });
-      toast.success('Order cancelled successfully');
     },
-    onError: (error) => {
-      toast.error(classifyApiError(error, 'Failed to cancel order').message);
-    }
   });
 }
 

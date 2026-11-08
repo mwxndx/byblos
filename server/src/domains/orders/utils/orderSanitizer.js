@@ -146,7 +146,6 @@ export const sanitizeOrder = (order, userType = 'buyer') => {
         seller: orderObj.seller ? {
             id: orderObj.seller.id,
             shopName: orderObj.seller.shopName,
-            theme: orderObj.seller.theme,
             isClient: orderObj.seller.isClient || false,
         } : null,
     };

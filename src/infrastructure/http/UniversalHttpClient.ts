@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
-import { toast } from 'sonner';
+import { toast } from '@/shared/hooks/use-toast';
 import { buildApiBaseUrl } from './apiBaseUrl';
 import { isNativeApp } from '../navigation/mobileApp';
 import { AuthStrategy, AppRole, StorageAdapter } from '../auth/types';

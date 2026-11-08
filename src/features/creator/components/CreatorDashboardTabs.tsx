@@ -72,7 +72,7 @@ export function CreatorDashboardTabs({
               <span className="sr-only">{label}</span>
 
               {count > 0 ? (
-                <span className="absolute top-1 right-[50%] flex h-[15px] min-w-[15px] translate-x-[12px] items-center justify-center rounded-full bg-white text-black dark:bg-white dark:text-black [data-theme=light]_&:bg-black [data-theme=light]_&:text-white px-1 text-[9px] font-semibold shadow-sm">
+                <span className="absolute top-0 right-[50%] translate-x-[14px] text-[10px] font-bold leading-none text-black dark:text-white [data-theme=light]_&:text-black [data-theme=dark]_&:text-white">
                   {count > 99 ? '99+' : count}
                 </span>
               ) : null}

@@ -22,7 +22,7 @@ export async function findReferralInfoById(sellerId) {
  */
 export async function findPublicById(sellerId) {
   const sql = `
-    SELECT id, shop_name, city, location, theme, created_at, updated_at
+    SELECT id, shop_name, city, location, created_at, updated_at
     FROM sellers
     WHERE id = $1
   `;
@@ -48,7 +48,6 @@ export async function findActiveWithStats({ limit, offset }) {
       s.slug,
       s.avatar_url,
       s.bio,
-      s.theme,
       s.physical_address,
       s.latitude,
       s.longitude,
@@ -151,9 +150,9 @@ export async function lockById(sellerId, executor = DEFAULT_EXECUTOR) {
  * @returns {Promise<{theme: string, shop_name: string}|undefined>}
  */
 export async function updateSellerTheme(sellerId, theme) {
-  const sql = `UPDATE sellers SET theme = $1 WHERE id = $2 RETURNING theme, shop_name`;
-  const { rows } = await query(sql, [theme, sellerId]);
-  return rows[0];
+  const sql = `SELECT shop_name FROM sellers WHERE id = $1`;
+  const { rows } = await query(sql, [sellerId]);
+  return rows[0] ? { theme: 'default', shop_name: rows[0].shop_name } : undefined;
 }
 
 /**
@@ -192,7 +191,6 @@ export async function findSellersByLocation({ city, location = null, limit = 50,
       shop_name AS "shopName", 
       city, 
       location,
-      theme,
       created_at AS "createdAt"
     FROM sellers 
     WHERE LOWER(city) = LOWER($1)

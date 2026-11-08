@@ -28,11 +28,10 @@ export function NotificationBell({ variant = 'default', triggerClassName, role, 
           )}
           aria-label="Notifications"
         >
-          <Bell className={cn('h-5 w-5', iconClassName)} style={iconStyle ?? { color: 'var(--theme-accent, #f5c518)' }} />
+          <Bell className={cn('h-5 w-5', iconClassName)} style={iconStyle} />
           {unreadCount > 0 && (
             <span
-              className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full text-[11px] font-bold flex items-center justify-center"
-              style={{ backgroundColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+              className="absolute -top-1 -right-1 text-[10px] font-bold leading-none text-black dark:text-white [data-theme=light]_&:text-black [data-theme=dark]_&:text-white"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>

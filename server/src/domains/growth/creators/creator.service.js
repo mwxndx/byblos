@@ -1744,7 +1744,6 @@ class CreatorService {
               s.location,
               s.physical_address,
               s.creator_commission_rate,
-              s.theme,
               COALESCE(p_count.total_products, 0) AS product_count,
               COALESCE(scl.status, csr.status, 'none') AS collaboration_status,
               scl.code AS link_code
@@ -1779,7 +1778,6 @@ class CreatorService {
       physicalAddress: r.physical_address,
       creatorCommissionRate: Number(r.creator_commission_rate || 0.01),
       productCount: Number(r.product_count || 0),
-      theme: r.theme || 'default',
       collaborationStatus: r.collaboration_status,
       linkCode: r.link_code || null
     }));

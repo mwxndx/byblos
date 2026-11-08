@@ -81,11 +81,11 @@ export function SellerDashboardTabs({
               </span>
 
               {count > 0 ? (
-                <span className="absolute top-1 right-[50%] flex h-[15px] min-w-[15px] translate-x-[12px] items-center justify-center rounded-full bg-white text-black dark:bg-white dark:text-black [data-theme=light]_&:bg-black [data-theme=light]_&:text-white px-1 text-[9px] font-semibold shadow-sm">
+                <span className="absolute top-0 right-[50%] translate-x-[14px] text-[10px] font-bold leading-none text-black dark:text-white [data-theme=light]_&:text-black [data-theme=dark]_&:text-white">
                   {count > 99 ? '99+' : count}
                 </span>
               ) : showDot ? (
-                <div className="absolute top-1.5 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-white dark:bg-white [data-theme=light]_&:bg-black ring-2 ring-white dark:ring-[#121212]" />
+                <div className="absolute top-1.5 right-[50%] h-1.5 w-1.5 translate-x-[10px] rounded-full bg-black dark:bg-white [data-theme=light]_&:bg-black [data-theme=dark]_&:bg-white" />
               ) : null}
             </button>
           );

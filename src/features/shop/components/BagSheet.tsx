@@ -19,7 +19,7 @@ const SWIPE_DOWN_DISMISS_PX = 60;
  * The seller-shop bag: a collapsed count bar that expands into the full inline
  * checkout. Items + summary are pinned; everything from "Door delivery" down
  * scrolls, so the door-delivery location picker and (for services) the booking
- * flow fit comfortably. Themed with the shop theme (--theme-accent / --theme-card-bg / --theme-text / --theme-border).
+ * flow fit comfortably. Themed with standard surface tokens (--byblos-surface / --byblos-text / --byblos-border).
  */
 export function BagSheet() {
   const bag = useBag();
@@ -76,11 +76,11 @@ export function BagSheet() {
           className="fixed inset-x-0 bottom-0 z-40 flex flex-col items-center"
           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
-          <span className="relative z-10 -mb-4 flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-semibold shadow-lg" style={{ backgroundColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-button-text, #111)' }}>
+          <span className="relative z-10 -mb-4 flex h-9 min-w-9 items-center justify-center rounded-full px-3 text-sm font-semibold shadow-lg bg-yellow-400 text-black">
             {bag.count}
           </span>
           <span className="flex w-full items-center justify-center gap-2 rounded-t-3xl border-t px-6 pb-3 pt-5 text-sm font-semibold uppercase tracking-wide shadow-[0_-10px_30px_rgba(0,0,0,0.15)]" style={{ backgroundColor: 'var(--byblos-surface, #ffffff)', color: 'var(--byblos-text, #0f0f0e)', borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
-            <ShoppingBag className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+            <ShoppingBag className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
             Tap to view bag
           </span>
         </button>
@@ -99,7 +99,7 @@ export function BagSheet() {
             <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} className="shrink-0 cursor-grab px-5 pt-2.5">
               <span className="mx-auto block h-1.5 w-10 rounded-full bg-black/20 dark:bg-white/25" />
               <div className="mt-2 flex items-center justify-between">
-                <h3 className="flex items-center gap-2 text-base font-semibold"><ShoppingBag className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} /> Your bag</h3>
+                <h3 className="flex items-center gap-2 text-base font-semibold"><ShoppingBag className="h-4 w-4 text-yellow-500 dark:text-yellow-400" /> Your bag</h3>
                 <button type="button" onClick={bag.close} aria-label="Collapse bag" className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10"><ChevronDown className="h-5 w-5" /></button>
               </div>
             </div>
@@ -148,7 +148,7 @@ export function BagSheet() {
               {/* Service booking (single service in bag). */}
               {checkout.hasService && (
                 <div className="rounded-2xl border p-3" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.12))' }}>
-                  <div className="mb-2 flex items-center gap-2 text-sm font-bold"><Calendar className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} /> Service booking</div>
+                  <div className="mb-2 flex items-center gap-2 text-sm font-bold"><Calendar className="h-4 w-4 text-yellow-500 dark:text-yellow-400" /> Service booking</div>
                   {checkout.booking ? (
                     <div className="text-xs opacity-80">
                       <p className="font-semibold">{format(checkout.booking.date, 'EEE, d MMM yyyy')} at {checkout.booking.time}</p>
@@ -157,7 +157,7 @@ export function BagSheet() {
                   ) : (
                     <p className="text-xs opacity-70">Pick a date, time and location to book this service.</p>
                   )}
-                  <button type="button" onClick={() => checkout.setIsBookingModalOpen(true)} className="mt-2 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold" style={{ borderColor: 'var(--theme-accent, #f5c518)', color: 'var(--theme-accent, #f5c518)' }}>
+                  <button type="button" onClick={() => checkout.setIsBookingModalOpen(true)} className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-yellow-400/50 text-yellow-600 dark:text-yellow-400 px-3 py-1.5 text-xs font-bold">
                     {checkout.booking ? 'Change booking' : 'Set date, time & location'}
                   </button>
                 </div>
@@ -167,8 +167,8 @@ export function BagSheet() {
               {canDoorDeliver && (
                 <div className="space-y-3">
                   <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.12))' }}>
-                    <span className="flex items-center gap-2 text-sm font-bold"><Truck className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} /> Door delivery</span>
-                    <input type="checkbox" checked={phoneCheck.doorDeliveryEnabled} onChange={(e) => phoneCheck.setDoorDeliveryEnabled(e.target.checked)} className="h-4 w-4 accent-[var(--theme-accent,#f5c518)]" />
+                    <span className="flex items-center gap-2 text-sm font-bold"><Truck className="h-4 w-4 text-yellow-500 dark:text-yellow-400" /> Door delivery</span>
+                    <input type="checkbox" checked={phoneCheck.doorDeliveryEnabled} onChange={(e) => phoneCheck.setDoorDeliveryEnabled(e.target.checked)} className="h-4 w-4 accent-yellow-400" />
                   </label>
                   {phoneCheck.doorDeliveryEnabled && (
                     <div className="rounded-2xl border p-3" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.12))' }}>
@@ -197,8 +197,8 @@ export function BagSheet() {
                     <button
                       type="button"
                       onClick={() => setShowPhoneFallback(true)}
-                      className="text-xs font-bold underline-offset-2 hover:underline"
-                      style={{ color: 'var(--theme-accent, #f5c518)' }}
+                      className="text-xs font-bold underline-offset-2 hover:underline text-yellow-600 dark:text-yellow-400"
+
                     >
                       Change
                     </button>
@@ -215,8 +215,8 @@ export function BagSheet() {
                       <button
                         type="button"
                         onClick={() => setShowPhoneFallback(false)}
-                        className="text-xs font-bold underline-offset-2 hover:underline"
-                        style={{ color: 'var(--theme-accent, #f5c518)' }}
+                        className="text-xs font-bold underline-offset-2 hover:underline text-yellow-600 dark:text-yellow-400"
+  
                       >
                         Use registered number
                       </button>
@@ -236,7 +236,7 @@ export function BagSheet() {
               )}
 
               <p className="flex items-start gap-2 text-[11px] opacity-70">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-yellow-500 dark:text-yellow-400" />
                 Your money is held in escrow and only released to the seller after you confirm the order.
               </p>
             </div>

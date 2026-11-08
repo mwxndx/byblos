@@ -23,9 +23,9 @@ interface ShopProductCardProps {
 
 /**
  * Minimal product card (spec §17): image, product name, price, description, and images button.
- * The card surface follows the shop's dark/light theme (--theme-*), but the name, price, and the
+ * The card surface follows the app's clean dark/light theme, and the name, price, and the
  * image/description icons use the app's theme-aware label colour (text-label: near-black in light,
- * near-white in dark) rather than the seller's accent, so they stay readable across shop themes.
+ * near-white in dark), staying crisp and readable across all views.
  */
 export function ShopProductCard({
   product,

@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useSellerByShopNameQuery, usePublicSellerProductsQuery } from '@/features/shop/hooks/useShopQueries';
 import { useTrackCreatorLinkMutation } from '@/features/creator/hooks/mutations/useTrackCreatorLinkMutation';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 import { useGlobalAuth } from '@/features/auth/contexts';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-import { useShopAccentOnly, getShopThemeAccentVars, type Theme } from '@/shared/hooks/useShopTheme';
-import { useShopPageTheme } from '../hooks/useShopPageTheme';
 import { isAesthetic, getSellerInitials, type ShopProduct, type ShopSeller } from '../utils/shopPage.shared';
 
 export function useShopPage() {
@@ -20,9 +18,6 @@ export function useShopPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { isAuthenticated } = useGlobalAuth();
-
-  // Visitor-controlled page theme (light / dark / system)
-  const { theme: shopPageTheme, setTheme: setShopPageTheme, resolved: resolvedShopTheme } = useShopPageTheme();
 
   const [creatorModeNotice, setCreatorModeNotice] = useState<string | null>(null);
   const trackCreatorLink = useTrackCreatorLinkMutation();
@@ -63,12 +58,6 @@ export function useShopPage() {
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
   const { data: sellerProducts, isLoading: isProductsLoading } = usePublicSellerProductsQuery(seller?.id || '', !!seller?.id);
 
-  // Seller's saved colour theme drives accent/button vars only (not bg/text)
-  const [sellerTheme, setSellerTheme] = useState<Theme>('default');
-  const effectiveTheme: Theme = (seller?.theme as Theme) || sellerTheme;
-  const themeClasses = useShopAccentOnly(effectiveTheme);
-  const themeAccentVars = useMemo(() => getShopThemeAccentVars(effectiveTheme), [effectiveTheme]);
-
   useEffect(() => {
     if (sellerError) {
       const err = sellerError as { response?: { data?: { message?: string } }; message?: string };
@@ -101,7 +90,6 @@ export function useShopPage() {
       email: seller.email || '',
       city: seller.city,
       location: seller.location,
-      theme: (seller.theme as Theme) || 'default',
       instagramLink: seller.instagramLink || '',
       tiktokLink: seller.tiktokLink || '',
       facebookLink: seller.facebookLink || '',
@@ -127,8 +115,7 @@ export function useShopPage() {
       setCreatorModeNotice(`${sellerData.shopName || 'This seller'} has switched off creator mode.`);
     }
 
-    // Store seller's saved theme for accent/button colouring
-    setSellerTheme((sellerData.theme as Theme) || 'default');
+
 
     if (sellerProducts) {
       const availableProducts: ShopProduct[] = (sellerProducts as ApiSellerProduct[])
@@ -187,12 +174,6 @@ export function useShopPage() {
   return {
     sellerInfo,
     creatorModeNotice,
-    themeClasses,
-    sellerTheme: effectiveTheme,
-    themeAccentVars,
-    shopPageTheme,
-    setShopPageTheme,
-    resolvedShopTheme,
     products,
     hasDigitalProducts,
     filteredProducts,

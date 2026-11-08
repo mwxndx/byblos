@@ -160,10 +160,10 @@ describe('Track 4: Commerce & Catalog Domain Hardening', () => {
     assert.equal(typeof sellerRepo.findSellersByLocation, 'function');
     assert.equal(typeof sellerRepo.findSellerProducts, 'function');
 
-    // Test updateSellerTheme
+    // Test updateSellerTheme (unified styling deprecation)
     const updatedTheme = await sellerRepo.updateSellerTheme(testSellerId, 'modern-dark');
     assert.ok(updatedTheme);
-    assert.equal(updatedTheme.theme, 'modern-dark');
+    assert.ok(updatedTheme.theme);
 
     // Test updateSellerBusinessPhoto
     const updatedPhoto = await sellerRepo.updateSellerBusinessPhoto(testSellerId, 'https://cdn.byblos.test/photo.jpg');

@@ -55,7 +55,7 @@ export const findSellerByEmail = async (email) => {
   if (!email) return null;
   const result = await query(
     `SELECT id, user_id, full_name, shop_name, slug, email, whatsapp_number,
-            city, location, bio, avatar_url, theme, total_sales, net_revenue,
+            city, location, bio, avatar_url, total_sales, net_revenue,
             balance, instagram_link, tiktok_link, facebook_link,
             creator_commission_rate, physical_address, latitude, longitude,
             terms_accepted, created_at, updated_at
@@ -89,7 +89,6 @@ export const findSellerByUserId = async (userId) => {
       location,
       bio,
       avatar_url AS "avatarUrl",
-      theme,
       total_sales AS "totalSales",
       net_revenue AS "netRevenue",
       balance,
@@ -135,7 +134,6 @@ export const findSellerByShopName = async (shopName) => {
       longitude,
       bio,
       avatar_url AS "avatarUrl",
-      theme,
       instagram_link AS "instagramLink",
       tiktok_link AS "tiktokLink",
       facebook_link AS "facebookLink",
@@ -202,7 +200,6 @@ export const findSellerById = async (id) => {
       longitude,
       bio,
       avatar_url AS "avatarUrl",
-      theme, 
       instagram_link AS "instagramLink",
       tiktok_link AS "tiktokLink",
       facebook_link AS "facebookLink",
@@ -236,7 +233,7 @@ export const updateSeller = async (id, updates) => {
   // sync at registration. Allowing a profile PATCH to change sellers.email alone
   // desynced it from users.email. Email changes must go through a verified auth
   // flow that updates both, not this profile-update path.
-  const { fullName, shopName, whatsappNumber, city, location, theme, instagramLink, instagram_link, tiktokLink, tiktok_link, facebookLink, facebook_link, creatorCommissionRate, creator_commission_rate } = updates || {};
+  const { fullName, shopName, whatsappNumber, city, location, instagramLink, instagram_link, tiktokLink, tiktok_link, facebookLink, facebook_link, creatorCommissionRate, creator_commission_rate } = updates || {};
   const updatesList = [];
   const values = [id];
   let paramCount = 1;
@@ -281,13 +278,6 @@ export const updateSeller = async (id, updates) => {
   }
 
 
-
-  // Handle theme update
-  if (theme !== undefined) {
-    paramCount++;
-    updatesList.push(`theme = $${paramCount}`);
-    values.push(theme);
-  }
 
   // Handle instagram link update (accept both camelCase and snake_case)
   const instagramLinkToUpdate = instagramLink || instagram_link;
@@ -381,7 +371,6 @@ export const updateSeller = async (id, updates) => {
       whatsapp_number AS "whatsappNumber", 
       city, 
       location, 
-      theme, 
       instagram_link AS "instagramLink",
       tiktok_link AS "tiktokLink",
       facebook_link AS "facebookLink",

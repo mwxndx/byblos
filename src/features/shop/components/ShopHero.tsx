@@ -48,8 +48,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
         {/* Business Profile Photo Avatar */}
         <div className="relative mb-3">
           <div
-            className="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden border-4 bg-[var(--byblos-surface-soft)] shadow-xl flex items-center justify-center text-2xl sm:text-3xl font-semibold text-[var(--byblos-text)]"
-            style={{ borderColor: 'var(--theme-accent, #f5c518)' }}
+            className="h-20 w-20 sm:h-24 sm:w-24 rounded-full overflow-hidden bg-[var(--byblos-surface-soft)] shadow-md flex items-center justify-center text-2xl sm:text-3xl font-semibold text-[var(--byblos-text)]"
           >
             {showSellerAvatar ? (
               <img
@@ -88,7 +87,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
               aria-label="Open shop location on the map"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--byblos-surface-soft)] text-[var(--byblos-text)] border border-[var(--byblos-border)] shadow-sm transition-all hover:opacity-80"
             >
-              <MapPin className="h-4 w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+              <MapPin className="h-4 w-4 text-current" />
               <span>Location</span>
             </a>
           )}

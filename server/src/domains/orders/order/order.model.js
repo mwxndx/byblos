@@ -317,8 +317,7 @@ class Order {
         json_build_object(
           'id', s.id,
           'name', s.full_name,
-          'shopName', s.shop_name,
-          'theme', s.theme
+          'shopName', s.shop_name
         ) as seller,
         COALESCE(
           json_agg(
@@ -391,8 +390,7 @@ class Order {
         json_build_object(
           'id', s.id,
           'name', s.full_name,
-          'shopName', s.shop_name,
-          'theme', s.theme
+          'shopName', s.shop_name
         ) as seller,
         COALESCE(
           json_agg(
@@ -470,8 +468,7 @@ class Order {
         json_build_object(
           'id', s.id,
           'name', s.full_name,
-          'shopName', s.shop_name,
-          'theme', s.theme
+          'shopName', s.shop_name
         ) as seller,
         COALESCE(
           json_agg(

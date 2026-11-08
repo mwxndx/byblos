@@ -6,7 +6,7 @@ import { ShopHero } from '../ShopHero';
 import type { ShopSeller } from '../../utils/shopPage.shared';
 
 describe('ShopHero Component (TDD)', () => {
-  it('applies theme-accent variable to avatar border and map pin instead of hardcoded yellow', () => {
+  it('renders business profile photo without circular border or theme-accent styles', () => {
     const mockSeller: ShopSeller = {
       id: '123',
       fullName: 'Jane Doe',
@@ -14,7 +14,6 @@ describe('ShopHero Component (TDD)', () => {
       phone: '0712345678',
       whatsappNumber: '0712345678',
       email: 'jane@example.com',
-      theme: 'pink',
       bio: 'Quality goods',
       avatarUrl: '',
       latitude: -1.286389,
@@ -35,15 +34,16 @@ describe('ShopHero Component (TDD)', () => {
       </MemoryRouter>
     );
 
-    // Avatar wrapper should use var(--theme-accent, #f5c518)
+    // Avatar wrapper should not have circular border or theme-accent border style
     const initialsElement = screen.getByText('JB');
     const avatarWrapper = initialsElement.parentElement;
-    expect(avatarWrapper?.getAttribute('style')).toContain('border-color: var(--theme-accent, #f5c518)');
+    expect(avatarWrapper?.className).not.toContain('border-4');
+    expect(avatarWrapper?.getAttribute('style')).toBeNull();
 
-    // Location map link should be present and contain styled icon
+    // Location map link should be present without theme-accent inline style
     const locationLink = screen.getByRole('link', { name: /Open shop location on the map/i });
     expect(locationLink).toBeDefined();
     const svgIcon = locationLink.querySelector('svg');
-    expect(svgIcon?.getAttribute('style')).toContain('color: var(--theme-accent, #f5c518)');
+    expect(svgIcon?.getAttribute('style')).toBeNull();
   });
 });

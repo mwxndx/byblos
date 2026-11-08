@@ -14,7 +14,6 @@ const PRODUCT_LIST_SELECT = `
          s.longitude as longitude,
          s.avatar_url as seller_avatar_url,
          s.bio as seller_bio,
-         s.theme as seller_theme,
          s.created_at as seller_created_at,
          s.updated_at as seller_updated_at
   FROM products p
@@ -75,7 +74,6 @@ export async function findProductByIdWithSeller(productId) {
            s.shop_name,
            s.city as seller_city,
            s.location as seller_location,
-           s.theme as seller_theme,
            s.physical_address,
            s.latitude,
            s.longitude
