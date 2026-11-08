@@ -52,17 +52,17 @@ body,
     --dur: 0.28s;
 }
 
-/* ── Standalone PWA Safe Area Inset Override (iOS Home Screen / full-screen web app) ── */
+/* ── Standalone PWA Safe Area Inset Override (iOS Home Screen / Android full-screen web app) ── */
 @media (display-mode: standalone), (display-mode: fullscreen) {
     :root {
         --sat: max(env(safe-area-inset-top, 0px), 0px);
-        --sab: max(env(safe-area-inset-bottom, 0px), 0px);
+        --sab: max(env(safe-area-inset-bottom, 0px), 20px);
     }
 }
 
 html.pwa-standalone {
     --sat: max(env(safe-area-inset-top, 0px), 0px);
-    --sab: max(env(safe-area-inset-bottom, 0px), 0px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 20px);
 }
 
 /* ── iOS Standalone PWA Status Bar Scrim for Light Mode ──
@@ -105,7 +105,7 @@ body.android-native {
     padding-top: var(--sat) !important;
 }
 .pb-safe-bottom {
-    padding-bottom: max(var(--sab, 0px), env(safe-area-inset-bottom, 0px), 8px) !important;
+    padding-bottom: max(var(--sab, 0px), env(safe-area-inset-bottom, 0px), 16px) !important;
 }
 
 /* Fixed bottom navigation bars: solid themed background, zero bottom gap */

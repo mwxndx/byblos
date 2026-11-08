@@ -157,4 +157,23 @@ describe('SellerProfileHero', () => {
     const shopLinkButton = screen.getByRole('button', { name: /Shop link/i });
     expect(shopLinkButton).toHaveClass('w-24');
   });
+
+  it('aligns balance, sales, and revenue to the right of the profile photo using flex-row', () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+          balance={1500}
+          revenue={1200}
+          totalSales={2000}
+        />
+      </QueryClientProvider>
+    );
+
+    const rootContainer = container.firstElementChild;
+    expect(rootContainer).toHaveClass('flex', 'flex-row');
+  });
 });

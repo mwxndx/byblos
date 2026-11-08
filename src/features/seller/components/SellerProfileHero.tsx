@@ -20,7 +20,7 @@ interface SellerProfileHeroProps {
 /**
  * Shop identity block for the seller dashboard: the business profile photo (no border,
  * sized to match the shop link button) with pencil edit overlay, a "Shop link" action,
- * and the balance, sales, and revenue stats (below photo on mobile, next to it on desktop).
+ * and the balance, sales, and revenue stats aligned to the right of the photo.
  */
 export function SellerProfileHero({
   sellerProfile,
@@ -42,7 +42,7 @@ export function SellerProfileHero({
   const hasMetrics = balance !== undefined || revenue !== undefined || totalSales !== undefined;
 
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 lg:gap-8">
+    <div className="flex flex-row items-start gap-3 sm:gap-6 lg:gap-8">
       {/* Business profile photo and shop link button aligned to the left */}
       <div className="flex shrink-0 flex-col items-start text-left">
         <div className="relative">
@@ -87,31 +87,31 @@ export function SellerProfileHero({
 
         {/* Shop bio */}
         {bio && (
-          <p className="mt-2 max-w-[200px] sm:max-w-xs text-xs font-medium leading-4 sm:leading-5 text-label-2 [overflow-wrap:anywhere]">
+          <p className="mt-2 max-w-[120px] sm:max-w-xs text-xs font-medium leading-4 sm:leading-5 text-label-2 [overflow-wrap:anywhere]">
             {bio}
           </p>
         )}
       </div>
 
-      {/* Balance, Sales and Revenue: below the hero photo in mobile view, next to it in desktop view */}
+      {/* Balance, Sales and Revenue: aligned to the right of the photo on mobile and desktop */}
       {hasMetrics && (
-        <div className="flex w-full sm:w-auto flex-1 items-start justify-between sm:justify-start gap-4 sm:gap-8 lg:gap-12 min-w-0 pt-1 sm:pt-3">
+        <div className="flex flex-1 items-start justify-between sm:justify-start gap-2 sm:gap-8 lg:gap-12 min-w-0 pt-1.5 sm:pt-3">
           {/* Balance */}
           <div className="flex flex-col min-w-0">
-            <span className="text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
+            <span className="text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
               {formatCurrency(balance ?? 0)}
             </span>
-            <span className="mt-0.5 text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+            <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
               Balance
             </span>
           </div>
 
           {/* Sales */}
           <div className="flex flex-col min-w-0">
-            <span className="text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
+            <span className="text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
               {formatCurrency(totalSales ?? 0)}
             </span>
-            <div className="mt-0.5 flex items-center gap-1 text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+            <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
               <span>Sales</span>
               <Popover>
                 <PopoverTrigger asChild>
@@ -119,7 +119,7 @@ export function SellerProfileHero({
                     type="button"
                     aria-label="Sales description"
                     title="Sales description"
-                    className="flex h-4 w-4 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
+                    className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
                   >
                     <Info className="h-3 w-3" />
                   </button>
@@ -133,10 +133,10 @@ export function SellerProfileHero({
 
           {/* Revenue */}
           <div className="flex flex-col min-w-0">
-            <span className="text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
+            <span className="text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate">
               {formatCurrency(revenue ?? 0)}
             </span>
-            <div className="mt-0.5 flex items-center gap-1 text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+            <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
               <span>Revenue</span>
               <Popover>
                 <PopoverTrigger asChild>
@@ -144,7 +144,7 @@ export function SellerProfileHero({
                     type="button"
                     aria-label="Revenue description"
                     title="Revenue description"
-                    className="flex h-4 w-4 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
+                    className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
                   >
                     <Info className="h-3 w-3" />
                   </button>
