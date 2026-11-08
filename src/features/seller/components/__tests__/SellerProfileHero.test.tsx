@@ -132,8 +132,8 @@ describe('SellerProfileHero', () => {
     expect(screen.getByText('Revenue')).toBeInTheDocument();
     expect(screen.getByText('Sales')).toBeInTheDocument();
 
-    // Withdraw button next to balance
-    expect(screen.getByRole('button', { name: /Withdraw/i })).toBeInTheDocument();
+    // Withdraw button is not next to balance
+    expect(screen.queryByRole('button', { name: /Withdraw/i })).not.toBeInTheDocument();
 
     // Popover description buttons for Revenue and Sales
     expect(screen.getByRole('button', { name: /Revenue description/i })).toBeInTheDocument();

@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import { ArrowUpRight, Clock, Heart, Megaphone, MousePointerClick, Package, PackagePlus } from '@/shared/ui/icons';
+import { ArrowUpRight, Heart, Megaphone, MousePointerClick, Package, PackagePlus } from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
-import { Badge } from '@/shared/ui/badge';
-import { formatOrderStatusLabel, getPendingStatusStyles } from '../dashboardUtils';
 import { SellerReminders } from '../widgets/SellerReminders';
 import { SellerProfileHero } from '../../SellerProfileHero';
 import { IosNotificationBanner } from '@/features/notifications/components/IosNotificationBanner';
@@ -11,16 +9,14 @@ import type { AnalyticsData, RecentOrder, SellerTabId } from '../types';
 
 interface OverviewTabProps {
   analytics: AnalyticsData;
-  pendingOverviewOrders: RecentOrder[];
+  pendingOverviewOrders?: RecentOrder[];
   sellerProfile?: SellerProfile | null;
   shopUsername?: string | null;
   onCopyShopLink?: () => void | Promise<void>;
   onSelectTab: (tab: SellerTabId) => void;
 }
 
-export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, shopUsername, onCopyShopLink, onSelectTab }: Readonly<OverviewTabProps>) {
-  const recentOrders = (analytics.recentOrders || []).slice(0, 5);
-
+export function OverviewTab({ analytics, sellerProfile, shopUsername, onCopyShopLink, onSelectTab }: Readonly<OverviewTabProps>) {
   const balance = analytics.availableBalance ?? analytics.balance;
   const totalSales = analytics.totalSales || 0;
   const revenue = analytics.totalRevenue || 0;
@@ -30,7 +26,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, s
   const creatorSales = analytics.creatorGeneratedSales || 0;
 
   // "Nothing yet" — a brand-new shop with no numbers to show.
-  const hasActivity = revenue > 0 || balance > 0 || liveProducts > 0 || clicks > 0 || wishlist > 0 || pendingOverviewOrders.length > 0;
+  const hasActivity = revenue > 0 || balance > 0 || liveProducts > 0 || clicks > 0 || wishlist > 0;
   const [showMetrics, setShowMetrics] = useState(false);
 
   const secondaryStatsBlock = (
@@ -73,7 +69,7 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, s
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Profile photo section: left-aligned photo & button, with balance, revenue & sales stats */}
+      {/* Profile photo section: left-aligned photo & button, with balance, sales & revenue stats */}
       <SellerProfileHero
         sellerProfile={sellerProfile}
         shopUsername={shopUsername}
@@ -82,7 +78,6 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, s
         balance={balance}
         revenue={revenue}
         totalSales={totalSales}
-        onSelectTab={onSelectTab}
       />
 
       <IosNotificationBanner role="seller" className="mx-0 my-0" />
@@ -127,126 +122,6 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, s
           {showMetrics && secondaryStatsBlock}
         </>
       )}
-
-      <IosNotificationBanner role="seller" className="mx-0 my-0" />
-
-      <SellerReminders sellerProfile={sellerProfile} totalProducts={liveProducts} onSelectTab={onSelectTab} />
-
-      {hasActivity ? (
-        secondaryStatsBlock
-      ) : (
-        <>
-          <div className="rounded-2xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-6 text-center sm:p-8">
-            <span
-              className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.16)' }}
-            >
-              <PackagePlus className="h-6 w-6" style={{ color: 'var(--theme-accent, #f5c518)' }} />
-            </span>
-            <p className="mt-3 text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Add your first product to start getting clicks</p>
-            <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500 dark:text-white/60 sm:text-sm">
-              Once buyers start engaging, your balance, revenue and activity will show up right here.
-            </p>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => { onSelectTab('products'); }}
-                className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold shadow-[0_12px_28px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
-                style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
-              >
-                <PackagePlus className="h-4 w-4" />
-                Add a product
-              </button>
-              <button
-                type="button"
-                onClick={() => { setShowMetrics((v) => !v); }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-4 py-2.5 text-xs font-bold text-slate-500 dark:text-white/70 transition-colors hover:bg-white/10 hover:text-slate-900 dark:text-white sm:text-sm"
-              >
-                {showMetrics ? 'Hide metrics' : 'Show metrics'}
-                <ArrowUpRight className={`h-3.5 w-3.5 transition-transform ${showMetrics ? 'rotate-90' : ''}`} />
-              </button>
-            </div>
-          </div>
-          {showMetrics && secondaryStatsBlock}
-        </>
-      )}
-
-      <div className="grid gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
-        <div className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1">
-          <div className="flex items-center gap-3 p-4">
-            <span
-              className="flex h-9 w-9 items-center justify-center rounded-xl"
-              style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.14)' }}
-            >
-              <Clock className="h-5 w-5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
-            </span>
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Action Needed</h3>
-          </div>
-          <div className="space-y-2 px-4 pb-4">
-            {pendingOverviewOrders.length > 0 ? (
-              pendingOverviewOrders.map((order) => (
-                <div key={order.id} className="rounded-xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-3 transition-colors hover:bg-slate-100 dark:bg-white/[0.06]">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-bold text-slate-900 dark:text-white sm:text-base" title={order.orderNumber}>
-                          {order.orderNumber}
-                        </span>
-                        <Badge className={`border text-[10px] font-bold ${getPendingStatusStyles(order.status)}`}>
-                          {formatOrderStatusLabel(order.status)}
-                        </Badge>
-                      </div>
-                      <p className="mt-1 truncate text-xs text-slate-500 dark:text-white/60">
-                        {(order.items || []).map((item) => `${item.quantity}x ${item.product_name}`).join(', ') || 'Order items pending'}
-                      </p>
-                    </div>
-                    <div className="shrink-0 sm:text-right">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
-                      <p className="text-[11px] text-slate-500 dark:text-white/70">
-                        {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-5 text-center">
-                <p className="text-sm text-slate-500 dark:text-white/70">No paid orders need action right now.</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1">
-          <div className="p-4">
-            <h3 className="text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Recent Activity</h3>
-          </div>
-          <div className="space-y-2 px-4 pb-4">
-            {recentOrders.length > 0 ? (
-              recentOrders.map((order) => (
-                <div key={order.id} className="rounded-xl border border-transparent bg-slate-100 dark:bg-white/[0.03] px-3 py-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{order.orderNumber}</p>
-                    <p className="shrink-0 text-xs font-semibold text-slate-900 dark:text-white">{formatCurrency(order.totalAmount)}</p>
-                  </div>
-                  <div className="mt-1 flex items-center justify-between gap-2">
-                    <Badge className={`border text-[9px] font-bold ${getPendingStatusStyles(order.status)}`}>
-                      {formatOrderStatusLabel(order.status)}
-                    </Badge>
-                    <p className="shrink-0 text-[10px] text-slate-500 dark:text-white/40">
-                      {new Date(order.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="rounded-xl border border-transparent bg-slate-100 dark:bg-white/[0.03] px-3 py-4 text-center text-sm text-slate-500 dark:text-white/50">
-                No paid order activity yet.
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
