@@ -71,7 +71,7 @@ export function DashboardProfilePanel({
       ? document.activeElement
       : null;
     window.addEventListener('keydown', dismissOnEscape);
-    panelRef.current?.focus();
+    panelRef.current?.focus({ preventScroll: true });
     return () => {
       window.removeEventListener('keydown', dismissOnEscape);
       previousFocusRef.current?.focus();

@@ -26,6 +26,7 @@ interface SellerDashboardTabsProps {
   pendingCreatorsCount?: number;
   unreadNotificationsCount?: number;
   onSelectTab: (tab: SellerTabId) => void;
+  hidden?: boolean;
 }
 
 /**
@@ -38,10 +39,13 @@ export function SellerDashboardTabs({
   pendingCreatorsCount = 0,
   unreadNotificationsCount = 0,
   onSelectTab,
+  hidden = false,
 }: Readonly<SellerDashboardTabsProps>) {
+  if (hidden) return null;
+
   return (
     <nav
-      className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-2xl sm:rounded-full border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl dark:shadow-2xl px-2 py-1.5 transition-all duration-200"
+      className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-2xl sm:rounded-full border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl dark:shadow-2xl px-2 py-1.5 transition-colors duration-200"
       aria-label="Dashboard sections"
     >
       <div className="flex h-12 sm:h-13 items-center justify-between w-full">

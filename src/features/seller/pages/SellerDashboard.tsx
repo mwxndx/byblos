@@ -309,7 +309,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
           open={isProfileOpen}
           onOpenChange={setIsProfileOpen}
           title="Profile"
-          bottomInset="calc(3.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))"
+          bottomInset="0px"
           className="seller-surface"
         >
           <div className="px-4 py-4 pb-8">
@@ -331,6 +331,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
         pendingCreatorsCount={pendingCreatorsCount}
         unreadNotificationsCount={unreadNotificationsCount}
         onSelectTab={handleSelectTab}
+        hidden={isProfileOpen}
       />
 
       <RequiredBusinessPhotoModal

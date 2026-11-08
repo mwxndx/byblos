@@ -64,4 +64,33 @@ describe('SellerDashboardTabs', () => {
     const visibleSpans = container.querySelectorAll('button span:not(.sr-only)');
     expect(visibleSpans.length).toBe(0);
   });
+
+  it('hides the floating nav bar when hidden prop is true', () => {
+    const { container } = render(
+      <SellerDashboardTabs
+        activeTab="products"
+        hasUnreadOrders={false}
+        pendingCreatorsCount={0}
+        onSelectTab={vi.fn()}
+        hidden={true}
+      />
+    );
+
+    expect(container.querySelector('nav')).toBeNull();
+  });
+
+  it('uses transition-colors instead of transition-all to prevent position animation', () => {
+    render(
+      <SellerDashboardTabs
+        activeTab="products"
+        hasUnreadOrders={false}
+        pendingCreatorsCount={0}
+        onSelectTab={vi.fn()}
+      />
+    );
+
+    const nav = screen.getByRole('navigation', { name: /dashboard sections/i });
+    expect(nav).toHaveClass('transition-colors');
+    expect(nav.className).not.toContain('transition-all');
+  });
 });
