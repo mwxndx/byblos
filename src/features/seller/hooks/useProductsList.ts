@@ -12,9 +12,10 @@ interface UseProductsListParams {
   onDelete: (id: string) => Promise<void>;
   onStatusUpdate?: (productId: string, status: 'available' | 'sold', soldAt: string | null) => Promise<void> | void;
   onRefresh?: () => void;
+  searchQuery?: string;
 }
 
-export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh }: UseProductsListParams) {
+export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh, searchQuery: externalSearchQuery }: UseProductsListParams) {
   const { toast } = useToast();
   const { data: sellerProfile = null } = useSellerProfileQuery();
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -32,18 +33,20 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
   const [editFormData, setEditFormData] = useState<ProductEditFormData>(createInitialEditFormData);
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
+
+  const activeSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : internalSearchQuery;
 
   const filteredProducts = useMemo(() => {
-    if (!searchQuery.trim()) return products;
+    if (!activeSearchQuery.trim()) return products;
 
-    const query = searchQuery.toLowerCase();
+    const query = activeSearchQuery.toLowerCase();
     return products.filter(product =>
       product.name.toLowerCase().includes(query) ||
       product.description?.toLowerCase().includes(query) ||
       product.aesthetic?.toLowerCase().includes(query)
     );
-  }, [products, searchQuery]);
+  }, [products, activeSearchQuery]);
 
   const handleInventoryEdit = useCallback((product: Product) => {
     setSelectedProduct(product);
@@ -357,8 +360,8 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh 
     setShowDeleteDialog,
     setProductToDelete,
     confirmDelete,
-    searchQuery,
-    setSearchQuery,
+    searchQuery: activeSearchQuery,
+    setSearchQuery: setInternalSearchQuery,
     filteredProducts,
     handleEditClick,
     handleDeleteClick,

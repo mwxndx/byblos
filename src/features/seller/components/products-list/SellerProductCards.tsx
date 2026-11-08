@@ -1,56 +1,11 @@
 import { memo } from 'react';
 import { Button } from '@/shared/ui/button';
-import { IconButton } from '@/shared/ui/icon-button';
-import { Badge } from '@/shared/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/ui/dropdown-menu';
-import { Edit, EyeOff, Heart, Loader2, MoreVertical, Package, Trash2 } from '@/shared/ui/icons';
+import { EyeOff, Loader2, Package, Pencil, Trash2 } from '@/shared/ui/icons';
 import type { Product } from '@/shared/types';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
-type ProductWithApiFields = Product & Partial<ApiSellerProduct>;
 import { cn, formatCurrency } from '@/shared/utils/formatting';
-import { useWishlist } from '@/features/shop/wishlist/useWishlist';
-import { useIsProductWishlisted } from '@/features/shop/wishlist/wishlistStore';
 
-function ProductWishlistButton({ product }: Readonly<{ product: ProductWithApiFields }>) {
-  const { addToWishlist, removeFromWishlist } = useWishlist();
-  const wishlisted = useIsProductWishlisted(product.id);
-
-  return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        if (wishlisted) {
-          removeFromWishlist(String(product.id));
-        } else {
-          addToWishlist(product as Product);
-        }
-      }}
-      aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
-      className={cn(
-        'absolute right-1.5 top-1.5 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 active:scale-95',
-        wishlisted
-          ? 'bg-white/95 text-red-500 shadow-md dark:bg-zinc-900/90'
-          : 'bg-white/90 text-slate-400 hover:text-slate-600 dark:bg-black/60 dark:text-zinc-400 dark:hover:text-zinc-200 border border-black/5 dark:border-separator'
-      )}
-    >
-      <Heart
-        className={cn(
-          'h-3.5 w-3.5 transition-colors duration-200',
-          wishlisted
-            ? 'fill-red-500 text-red-500'
-            : 'fill-slate-400/20 text-slate-400 dark:text-zinc-400'
-        )}
-      />
-    </button>
-  );
-}
+type ProductWithApiFields = Product & Partial<ApiSellerProduct>;
 
 interface SellerProductCardsProps {
   products: ProductWithApiFields[];
@@ -62,6 +17,15 @@ interface SellerProductCardsProps {
   onInventoryEdit: (product: ProductWithApiFields) => void;
 }
 
+/**
+ * Rectangular product card for the seller dashboard:
+ * - Square frame for product image
+ * - Product name & description next to image
+ * - Stock button to edit inventory instead of old edit button
+ * - Pencil icon at top right corner to edit product
+ * - Delete icon at bottom right corner
+ * - Price & Mark as sold out / Mark as available button on the same row below image & description
+ */
 export const SellerProductCards = memo(function SellerProductCards({
   products,
   deletingId,
@@ -69,143 +33,129 @@ export const SellerProductCards = memo(function SellerProductCards({
   onEdit,
   onDelete,
   onStatusUpdate,
-  onInventoryEdit
+  onInventoryEdit,
 }: SellerProductCardsProps) {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:hidden">
-      {products.map((product) => (
-        <Card key={product.id} className="relative group bg-[var(--byblos-bg,#ffffff)] dark:bg-[var(--byblos-bg,#000000)] border border-transparent text-slate-900 dark:text-white rounded-2xl hover:border-emerald-500/50 transition-all shadow-sm">
-          <div className="absolute right-2 top-2 z-10">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <IconButton variant="ghost" aria-label="Product options" className="h-11 w-11 text-slate-500 dark:text-white/60 hover:bg-white/10 hover:text-slate-900 dark:text-white">
-                  <MoreVertical className="h-4 w-4" />
-                </IconButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white dark:bg-surface-1 border border-transparent text-slate-900 dark:text-white">
-                <DropdownMenuItem
-                  onClick={() => onEdit(product.id)}
-                  className="flex items-center gap-2 cursor-pointer text-slate-900 dark:text-white hover:bg-white/10"
-                >
-                  <Edit className="h-4 w-4 text-emerald-400" />
-                  <span>Edit</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onDelete(product.id)}
-                  className="flex items-center gap-2 cursor-pointer text-red-400 focus:text-red-400 focus:bg-red-500/10"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span>Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          <CardHeader className="p-3 pb-2 sm:p-4 sm:pb-2">
-            <div className="flex items-start justify-between pr-8">
-              <div className="flex-1">
-                <CardTitle className="text-xs sm:text-sm font-normal text-slate-900 dark:text-white mb-0.5 line-clamp-1 h-4">{product.name}</CardTitle>
-                <p className="text-[9px] text-slate-500 dark:text-white/60 capitalize mb-1">{product.aesthetic}</p>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+      {products.map((product) => {
+        const isSold = product.status === 'sold';
+        const isDeleting = deletingId === product.id;
+        const isUpdating = updatingId === product.id;
+
+        return (
+          <div
+            key={product.id}
+            data-testid={`product-card-${product.id}`}
+            className="relative flex flex-col justify-between rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3.5 sm:p-4 shadow-sm hover:border-[var(--theme-accent,#f5c518)]/40 transition-colors"
+          >
+            {/* Top right corner: Pencil icon */}
+            <button
+              type="button"
+              onClick={() => onEdit(product.id)}
+              aria-label="Edit product"
+              title="Edit product"
+              className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:text-white/40 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+
+            {/* Bottom right corner: Delete icon */}
+            <button
+              type="button"
+              onClick={() => onDelete(product.id)}
+              disabled={isDeleting}
+              aria-label="Delete product"
+              title="Delete product"
+              className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin text-red-500" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+            </button>
+
+            {/* Top section: square product image with name, description, and stock button next to it */}
+            <div className="flex items-start gap-3 sm:gap-4 pr-9">
+              {/* Square frame product image */}
+              <div className="relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-xl overflow-hidden bg-slate-100 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/5">
+                {product.image_url ? (
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-slate-400 dark:text-white/30">
+                    <EyeOff className="h-6 w-6" />
+                  </div>
+                )}
+              </div>
+
+              {/* Product name, description, and stock button */}
+              <div className="flex flex-1 flex-col min-w-0">
+                <h4 className="font-semibold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                  {product.name}
+                </h4>
                 {product.description && (
-                  <p className="text-[10px] text-slate-500 dark:text-white/60 line-clamp-2 h-6 leading-tight mb-2">
+                  <p className="mt-0.5 text-xs text-slate-500 dark:text-white/60 line-clamp-2 leading-relaxed">
                     {product.description}
                   </p>
                 )}
-              </div>
-            </div>
-            <div className="flex gap-1 mt-2 flex-wrap">
-              <Badge
-                variant={product.status === 'sold' ? 'destructive' : 'default'}
-                className={`w-fit text-[10px] px-1.5 py-0 ${product.status === 'sold'
-                  ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                  : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                  }`}
-              >
-                {product.status?.toUpperCase() || 'ACTIVE'}
-              </Badge>
-              {(product.product_type === 'digital' || product.productType === 'digital' || product.is_digital) && (
-                <Badge variant="outline" className="w-fit text-[10px] px-1.5 py-0 border-blue-500/30 text-blue-400 bg-blue-500/10">
-                  Digital
-                </Badge>
-              )}
-              {(product.product_type === 'service' || product.productType === 'service') && (
-                <Badge variant="outline" className="w-fit text-[10px] px-1.5 py-0 border-purple-500/30 text-purple-400 bg-purple-500/10">
-                  Service
-                </Badge>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="p-3 pt-0 sm:p-4 sm:pt-0 space-y-2">
-            <div className="relative h-24 w-full rounded-xl seller-card-soft overflow-hidden mb-3">
-              {product.image_url ? (
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <EyeOff className="h-6 w-6 text-zinc-400" />
-                </div>
-              )}
-              {/* Heart button on top right of seller product card */}
-              <ProductWishlistButton product={product} />
-            </div>
 
-            <div className="flex items-center justify-between py-1">
-              <span className="text-[10px] text-slate-500 dark:text-white/60">Stock:</span>
-              <div className="flex items-center gap-2">
-                {product.track_inventory ? (
-                  <Badge
-                    className={cn(
-                      'font-mono font-semibold text-[10px] px-1.5 py-0',
-                      product.quantity === 0
-                        ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                        : (product.quantity <= (product.low_stock_threshold || 5)
-                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                          : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30')
-                    )}
+                {/* Stock button allowing the seller to edit their stock instead of the edit button */}
+                <div className="mt-2 flex items-center">
+                  <button
+                    type="button"
+                    onClick={() => onInventoryEdit(product)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-white/80 transition-colors"
+                    title="Edit stock"
+                    aria-label="Edit stock"
                   >
-                    <Package className="h-2.5 w-2.5 mr-0.5" />
-                    {product.quantity ?? 0}
-                  </Badge>
-                ) : (
-                  <span className="text-[10px] text-slate-500 dark:text-white/60 italic">Not tracked</span>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onInventoryEdit(product)}
-                  className="h-5 px-1.5 text-[10px] text-slate-500 dark:text-white/60 hover:text-emerald-300 hover:bg-emerald-500/10"
-                >
-                  Edit
-                </Button>
+                    <Package className="h-3.5 w-3.5 text-slate-500 dark:text-white/60" />
+                    <span>
+                      {product.track_inventory
+                        ? `${product.quantity ?? 0} in stock`
+                        : 'Stock: Not tracked'}
+                    </span>
+                    <span className="text-[10px] text-slate-400 dark:text-white/40 ml-0.5">· Edit</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-1">
-              <span className="font-normal text-slate-900 dark:text-white text-sm sm:text-base">{formatCurrency(product.price)}</span>
-            </div>
+            {/* Bottom section: Price and Mark as sold out / Mark as available on the same row below image and description */}
+            <div className="mt-3.5 pt-3 border-t border-slate-100 dark:border-white/5 flex items-center gap-3 pr-10">
+              <span className="font-semibold text-sm sm:text-base tabular-nums text-slate-900 dark:text-white shrink-0">
+                {formatCurrency(product.price)}
+              </span>
 
-            {onStatusUpdate && (
-              <div className="pt-2">
+              {onStatusUpdate && (
                 <Button
-                  variant="outline"
                   size="sm"
-                  onClick={() => onStatusUpdate(product.id, product.status === 'sold' ? 'available' : 'sold')}
-                  disabled={updatingId === product.id}
-                  className={`w-full ${product.status === 'sold' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30'} h-11 px-3 text-xs font-semibold rounded-xl`}
+                  variant="outline"
+                  onClick={() => onStatusUpdate(product.id, isSold ? 'available' : 'sold')}
+                  disabled={isUpdating}
+                  className={cn(
+                    "h-7 sm:h-8 px-2.5 sm:px-3 text-xs font-semibold rounded-lg transition-colors",
+                    isSold
+                      ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                      : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20"
+                  )}
                 >
-                  {updatingId === product.id ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  {isUpdating ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : isSold ? (
+                    'Mark as available'
                   ) : (
-                    <span>{product.status === 'sold' ? 'Mark Available' : 'Mark as Sold Out'}</span>
+                    'Mark as sold out'
                   )}
                 </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 });

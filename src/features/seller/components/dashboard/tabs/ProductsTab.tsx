@@ -1,8 +1,10 @@
-import { Megaphone, MoreHorizontal, Plus } from '@/shared/ui/icons';
+import { useState } from 'react';
+import { Megaphone, MoreHorizontal, Package, Plus, Search, X } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
-import { formatCurrency } from '@/shared/utils/formatting';
+import { cn, formatCurrency } from '@/shared/utils/formatting';
 import { SellerProfileHero } from '../../SellerProfileHero';
 import { AddProductForm } from '../../AddProductForm';
 import { ProductsList } from '../../ProductsList';
@@ -49,7 +51,11 @@ export function ProductsTab({
   wishlist,
   creatorSales,
 }: Readonly<ProductsTabProps>) {
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const hasProducts = products.length > 0;
+  const activeProductsCount = products.length || analytics?.totalProducts || 0;
 
   const currentBalance = balance ?? analytics?.availableBalance ?? analytics?.balance;
   const currentTotalSales = totalSales ?? analytics?.totalSales ?? 0;
@@ -102,33 +108,87 @@ export function ProductsTab({
         </DialogContent>
       </Dialog>
 
-      {/* Action row with Add product button and three dots horizontally aligned on the same row */}
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          size="sm"
-          onClick={() => setIsAddProductModalOpen(true)}
-          className="gap-1.5 bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md px-3.5 py-1.5 rounded-lg font-semibold text-xs h-8 transition-transform active:scale-95"
+      {/* Action row with active products pill on the left, and Add product, Search icon, Three dots vertically aligned on the right */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Number of active products pill */}
+        <span
+          data-testid="active-products-pill"
+          className="inline-flex items-center gap-1.5 rounded-full border border-transparent bg-slate-100 dark:bg-white/[0.04] px-3.5 py-1.5 text-xs font-semibold text-slate-700 dark:text-white/80"
         >
-          <Plus className="h-3.5 w-3.5" />
-          Add product
-        </Button>
+          <Package className="h-3.5 w-3.5" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+          <span>{activeProductsCount} active {activeProductsCount === 1 ? 'product' : 'products'}</span>
+        </span>
 
-        <Popover>
-          <PopoverTrigger asChild>
+        {/* Action buttons: Add product, Search icon, Three dots (all vertically aligned) */}
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            onClick={() => setIsAddProductModalOpen(true)}
+            className="gap-1.5 bg-[var(--theme-button-bg,#f5c518)] text-[var(--theme-button-text,#000000)] hover:opacity-90 shadow-md px-3.5 py-1.5 rounded-lg font-semibold text-xs h-8 transition-transform active:scale-95"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Add product
+          </Button>
+
+          {/* Search icon button placed between Add product and Three dots */}
+          <button
+            type="button"
+            onClick={() => setIsSearchOpen((prev) => !prev)}
+            aria-label="Search products"
+            title="Search products"
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-lg border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]",
+              isSearchOpen
+                ? "border-[var(--theme-accent,#f5c518)] bg-[var(--theme-accent,#f5c518)]/10 text-slate-900 dark:text-white"
+                : "border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white"
+            )}
+          >
+            <Search className="h-4 w-4" />
+          </button>
+
+          {/* Three dots button */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label="Service charge description"
+                title="Service charge description"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+              >
+                <MoreHorizontal className="h-4 w-4" weight="bold" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-3.5 text-xs leading-relaxed text-slate-700 dark:text-white/90 shadow-xl rounded-xl">
+              Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
+      {/* On-demand Search bar shown when search icon is clicked */}
+      {isSearchOpen && (
+        <div className="relative max-w-md w-full animate-in fade-in-50 duration-200">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+          <Input
+            autoFocus
+            aria-label="Search products"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products..."
+            className="bg-white dark:bg-surface-1 border-slate-200 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-500 rounded-xl pl-10 pr-9 h-10"
+          />
+          {searchQuery && (
             <button
               type="button"
-              aria-label="Service charge description"
-              title="Service charge description"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 dark:border-white/10 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] text-slate-600 hover:text-slate-900 dark:text-white/60 dark:hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
             >
-              <MoreHorizontal className="h-4 w-4" weight="bold" />
+              <X className="h-4 w-4" />
             </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-80 p-3.5 text-xs leading-relaxed text-slate-700 dark:text-white/90 shadow-xl rounded-xl">
-            Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
-          </PopoverContent>
-        </Popover>
-      </div>
+          )}
+        </div>
+      )}
 
       {hasProducts ? (
         <ProductsList
@@ -137,6 +197,8 @@ export function ProductsTab({
           onEdit={onEditProduct}
           onStatusUpdate={onStatusUpdate}
           onRefresh={fetchProducts}
+          searchQuery={searchQuery}
+          onClearSearch={() => setSearchQuery('')}
         />
       ) : (
         /* Empty state: a single prominent plus that opens the creation flow. */

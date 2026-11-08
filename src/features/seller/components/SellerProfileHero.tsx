@@ -72,7 +72,7 @@ export function SellerProfileHero({
   };
 
   return (
-    <div className="flex flex-row items-start gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10">
+    <div className="flex flex-row items-center gap-5 min-[380px]:gap-6 sm:gap-8 lg:gap-10">
       {/* Business profile photo and shop link button aligned to the left */}
       <div className="flex shrink-0 flex-col items-start text-left">
         <div className="relative">
@@ -125,7 +125,7 @@ export function SellerProfileHero({
 
       {/* Metrics container on the right of the photo: Column 1 = Sales (Clicks below), Column 2 = Revenue (Wishlist below), Column 3 = Balance */}
       {hasMetrics && (
-        <div className="flex flex-1 items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0 pt-1.5 sm:pt-3">
+        <div className="flex flex-1 items-center justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
           {/* Sales + Clicks */}
           <div className="flex flex-col min-w-0">
             {renderMetricValue('sales', totalSales)}

@@ -1,12 +1,10 @@
-import { Plus, Search } from '@/shared/ui/icons';
+import { Plus } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
 import type { Product } from '@/shared/types';
 import { ProductDeleteDialog } from './products-list/ProductDeleteDialog';
 import { ProductEditDialog } from './products-list/ProductEditDialog';
 import { ProductInventoryDialog } from './products-list/ProductInventoryDialog';
 import { SellerProductCards } from './products-list/SellerProductCards';
-import { SellerProductsTable } from './products-list/SellerProductsTable';
 import { useProductsList } from '../hooks/useProductsList';
 
 interface ProductsListProps {
@@ -15,9 +13,11 @@ interface ProductsListProps {
   onEdit?: (id: string) => void;
   onStatusUpdate?: (productId: string, status: 'available' | 'sold', soldAt: string | null) => void;
   onRefresh?: () => void;
+  searchQuery?: string;
+  onClearSearch?: () => void;
 }
 
-export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: Readonly<ProductsListProps>) {
+export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh, searchQuery: externalSearchQuery, onClearSearch }: Readonly<ProductsListProps>) {
   const {
     deletingId,
     updatingId,
@@ -52,7 +52,7 @@ export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: 
     handleEditImageChange,
     removeEditImage,
     handleSaveEdit,
-  } = useProductsList({ products, onDelete, onStatusUpdate, onRefresh });
+  } = useProductsList({ products, onDelete, onStatusUpdate, onRefresh, searchQuery: externalSearchQuery });
 
   if (!products || products.length === 0) {
     return (
@@ -79,46 +79,23 @@ export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh }: 
         onConfirm={confirmDelete}
       />
 
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 pointer-events-none" />
-        <Input
-          aria-label="Search products"
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Search products..."
-          className="bg-white border-slate-200 text-slate-950 placeholder:text-slate-500 rounded-xl pl-10 h-10"
-        />
-      </div>
-
       {filteredProducts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-slate-700">No products match "{searchQuery}".</p>
-          <Button variant="link" className="mt-2 text-yellow-700" onClick={() => setSearchQuery('')}>
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1 p-8 text-center shadow-sm">
+          <p className="text-slate-700 dark:text-white/70">No products match &ldquo;{searchQuery}&rdquo;.</p>
+          <Button variant="link" className="mt-2 text-yellow-700 dark:text-yellow-400" onClick={onClearSearch || (() => setSearchQuery(''))}>
             Clear search
           </Button>
         </div>
       ) : (
-        <>
-          <SellerProductCards
-            products={filteredProducts}
-            deletingId={deletingId}
-            updatingId={updatingId}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            onStatusUpdate={onStatusUpdate ? handleStatusUpdate : undefined}
-            onInventoryEdit={handleInventoryEdit}
-          />
-
-          <SellerProductsTable
-            products={filteredProducts}
-            deletingId={deletingId}
-            updatingId={updatingId}
-            onEdit={handleEditClick}
-            onDelete={handleDeleteClick}
-            onStatusUpdate={onStatusUpdate ? handleStatusUpdate : undefined}
-            onInventoryEdit={handleInventoryEdit}
-          />
-        </>
+        <SellerProductCards
+          products={filteredProducts}
+          deletingId={deletingId}
+          updatingId={updatingId}
+          onEdit={handleEditClick}
+          onDelete={handleDeleteClick}
+          onStatusUpdate={onStatusUpdate ? handleStatusUpdate : undefined}
+          onInventoryEdit={handleInventoryEdit}
+        />
       )}
 
       <ProductInventoryDialog

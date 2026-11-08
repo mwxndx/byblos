@@ -18,6 +18,20 @@ const baseProfile: SellerProfile = {
   isApproved: true,
 };
 
+const mockProduct = {
+  id: 'prod-1',
+  name: 'Vintage Leather Bag',
+  description: 'Handcrafted full-grain leather shoulder bag',
+  price: 4500,
+  image_url: 'https://example.com/bag.jpg',
+  status: 'available' as const,
+  quantity: 12,
+  track_inventory: true,
+  seller_id: 'seller-1',
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+};
+
 describe('ProductsTab', () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -29,13 +43,13 @@ describe('ProductsTab', () => {
     onDeleteProduct: vi.fn().mockResolvedValue(undefined),
     onEditProduct: vi.fn(),
     onStatusUpdate: vi.fn().mockResolvedValue(undefined),
-    products: [],
+    products: [mockProduct],
     setIsAddProductModalOpen: vi.fn(),
     sellerProfile: baseProfile,
     shopUsername: 'eris',
     onCopyShopLink: vi.fn(),
     analytics: {
-      totalProducts: 0,
+      totalProducts: 1,
       totalSales: 100,
       totalRevenue: 90,
       totalPayout: 90,
@@ -70,20 +84,19 @@ describe('ProductsTab', () => {
     expect(screen.getByText('wishlist')).toBeInTheDocument();
   });
 
-  it('does not contain removed header text or banner descriptions', () => {
+  it('renders number of active products pill from database/analytics', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <ProductsTab {...defaultProps} />
       </QueryClientProvider>
     );
 
-    expect(screen.queryByText(/Product Management/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Manage all your products in one place/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/All Products/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Manage inventory and track stock levels/i)).not.toBeInTheDocument();
+    const pill = screen.getByTestId('active-products-pill');
+    expect(pill).toBeInTheDocument();
+    expect(pill).toHaveTextContent(/1 active product/i);
   });
 
-  it('renders add product button with horizontal three dots on the same row that display service charge description when clicked', () => {
+  it('places search icon between add product button and three dots with vertical alignment', () => {
     render(
       <QueryClientProvider client={queryClient}>
         <ProductsTab {...defaultProps} />
@@ -91,18 +104,79 @@ describe('ProductsTab', () => {
     );
 
     const addProductBtn = screen.getByRole('button', { name: /Add product/i });
-    expect(addProductBtn).toBeInTheDocument();
-
+    const searchBtn = screen.getByRole('button', { name: /Search products/i });
     const threeDotsBtn = screen.getByRole('button', { name: /Service charge description/i });
+
+    expect(addProductBtn).toBeInTheDocument();
+    expect(searchBtn).toBeInTheDocument();
     expect(threeDotsBtn).toBeInTheDocument();
 
-    // Both are siblings inside the same row container
-    expect(addProductBtn.parentElement).toBe(threeDotsBtn.parentElement);
+    // Verify ordering inside the buttons container
+    const container = addProductBtn.parentElement;
+    expect(container).toHaveClass('flex', 'items-center');
+    expect(searchBtn.parentElement).toBe(container);
+    expect(threeDotsBtn.parentElement).toBe(container);
 
-    // Click three dots to open description
-    fireEvent.click(threeDotsBtn);
-    expect(
-      screen.getByText(/Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance\./i)
-    ).toBeInTheDocument();
+    // Search button is positioned after Add product and before Three dots
+    expect(addProductBtn.compareDocumentPosition(searchBtn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(searchBtn.compareDocumentPosition(threeDotsBtn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('shows search bar input when search icon is clicked', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ProductsTab {...defaultProps} />
+      </QueryClientProvider>
+    );
+
+    // Search bar is not visible initially
+    expect(screen.queryByPlaceholderText(/Search products\.\.\./i)).not.toBeInTheDocument();
+
+    // Click search icon
+    const searchBtn = screen.getByRole('button', { name: /Search products/i });
+    fireEvent.click(searchBtn);
+
+    // Search bar is now visible
+    expect(screen.getByPlaceholderText(/Search products\.\.\./i)).toBeInTheDocument();
+  });
+
+  it('renders rectangular product card with square image, name, description, stock button, pencil top-right, delete bottom-right, and price/sold-out row', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ProductsTab {...defaultProps} />
+      </QueryClientProvider>
+    );
+
+    const card = screen.getByTestId('product-card-prod-1');
+    expect(card).toBeInTheDocument();
+
+    // Square product image
+    const img = screen.getByAltText('Vintage Leather Bag');
+    expect(img).toBeInTheDocument();
+    expect(img.parentElement).toHaveClass('h-20', 'w-20');
+
+    // Name and description
+    expect(screen.getByText('Vintage Leather Bag')).toBeInTheDocument();
+    expect(screen.getByText('Handcrafted full-grain leather shoulder bag')).toBeInTheDocument();
+
+    // Stock button allowing inventory editing
+    const stockBtn = screen.getByRole('button', { name: /Edit stock/i });
+    expect(stockBtn).toBeInTheDocument();
+    expect(stockBtn).toHaveTextContent(/12 in stock/i);
+
+    // Pencil icon at top right
+    const editBtn = screen.getByRole('button', { name: /Edit product/i });
+    expect(editBtn).toBeInTheDocument();
+    expect(editBtn).toHaveClass('absolute', 'top-3', 'right-3');
+
+    // Delete icon at bottom right
+    const deleteBtn = screen.getByRole('button', { name: /Delete product/i });
+    expect(deleteBtn).toBeInTheDocument();
+    expect(deleteBtn).toHaveClass('absolute', 'bottom-3', 'right-3');
+
+    // Price and Mark as sold out button
+    expect(screen.getByText(/KSh 4,500/i)).toBeInTheDocument();
+    const markSoldOutBtn = screen.getByRole('button', { name: /Mark as sold out/i });
+    expect(markSoldOutBtn).toBeInTheDocument();
   });
 });
