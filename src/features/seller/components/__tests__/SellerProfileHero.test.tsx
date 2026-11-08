@@ -205,4 +205,27 @@ describe('SellerProfileHero', () => {
     const rootContainer = container.firstElementChild;
     expect(rootContainer).toHaveClass('flex', 'flex-row');
   });
+
+  it('renders clicks and wishlist counters below balance, sales, and revenue', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+          balance={0}
+          revenue={90}
+          totalSales={100}
+          clicks={42}
+          wishlist={7}
+        />
+      </QueryClientProvider>
+    );
+
+    expect(screen.getByText('42')).toBeInTheDocument();
+    expect(screen.getByText('clicks')).toBeInTheDocument();
+    expect(screen.getByText('7')).toBeInTheDocument();
+    expect(screen.getByText('wishlist')).toBeInTheDocument();
+  });
 });

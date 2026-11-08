@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Info, Link2, Pencil } from '@/shared/ui/icons';
+import { Heart, Info, Link2, MousePointerClick, Pencil } from '@/shared/ui/icons';
 import { formatCurrency, formatCompactCurrency } from '@/shared/utils/formatting';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
@@ -14,14 +14,16 @@ interface SellerProfileHeroProps {
   balance?: number;
   revenue?: number;
   totalSales?: number;
+  clicks?: number;
+  wishlist?: number;
   children?: React.ReactNode;
 }
 
 /**
  * Shop identity block for the seller dashboard: the business profile photo (no border,
  * sized to match the shop link button) with pencil edit overlay, a "Shop link" action,
- * and the balance, sales, and revenue stats aligned to the right of the photo with
- * compact currency notation (1k, 10k, 130.1k) and click-to-expand full figures.
+ * the balance, sales, and revenue stats aligned to the right of the photo with
+ * compact currency notation (1k, 10k, 130.1k), and the clicks and wishlist counters below.
  */
 export function SellerProfileHero({
   sellerProfile,
@@ -31,6 +33,8 @@ export function SellerProfileHero({
   balance,
   revenue,
   totalSales,
+  clicks,
+  wishlist,
   children
 }: Readonly<SellerProfileHeroProps>) {
   const [isEditingMedia, setIsEditingMedia] = useState(false);
@@ -46,7 +50,7 @@ export function SellerProfileHero({
   const bio = sellerProfile?.bio?.trim();
   const initial = shopName.charAt(0).toUpperCase();
 
-  const hasMetrics = balance !== undefined || revenue !== undefined || totalSales !== undefined;
+  const hasMetrics = balance !== undefined || revenue !== undefined || totalSales !== undefined || clicks !== undefined || wishlist !== undefined;
 
   const renderMetricValue = (key: 'balance' | 'sales' | 'revenue', value: number | undefined) => {
     const val = value ?? 0;
@@ -119,62 +123,89 @@ export function SellerProfileHero({
         )}
       </div>
 
-      {/* Balance, Sales and Revenue: keep balance in current position, increased spacing between balance, sales and revenue */}
+      {/* Metrics container on the right of the photo: Row 1 = Balance, Sales, Revenue. Row 2 = Clicks, Wishlist */}
       {hasMetrics && (
-        <div className="flex flex-1 items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0 pt-1.5 sm:pt-3">
-          {/* Balance */}
-          <div className="flex flex-col min-w-0">
-            {renderMetricValue('balance', balance)}
-            <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-              Balance
-            </span>
-          </div>
+        <div className="flex flex-1 flex-col min-w-0 pt-1.5 sm:pt-3 gap-2.5 sm:gap-3.5">
+          {/* Row 1: Balance, Sales and Revenue */}
+          <div className="flex w-full items-start justify-between sm:justify-start gap-4 min-[380px]:gap-5 sm:gap-8 lg:gap-10 min-w-0">
+            {/* Balance */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('balance', balance)}
+              <span className="mt-0.5 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                Balance
+              </span>
+            </div>
 
-          {/* Sales */}
-          <div className="flex flex-col min-w-0">
-            {renderMetricValue('sales', totalSales)}
-            <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-              <span>Sales</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Sales description"
-                    title="Sales description"
-                    className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
-                  >
-                    <Info className="h-3 w-3" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
-                  Total product price value (excludes 2% customer service charge).
-                </PopoverContent>
-              </Popover>
+            {/* Sales */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('sales', totalSales)}
+              <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                <span>Sales</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Sales description"
+                      title="Sales description"
+                      className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
+                    Total product price value (excludes 2% customer service charge).
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Revenue */}
+            <div className="flex flex-col min-w-0">
+              {renderMetricValue('revenue', revenue)}
+              <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
+                <span>Revenue</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Revenue description"
+                      title="Revenue description"
+                      className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
+                    >
+                      <Info className="h-3 w-3" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
+                    Net earnings after KSh 10 platform fee per sale.
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
 
-          {/* Revenue */}
-          <div className="flex flex-col min-w-0">
-            {renderMetricValue('revenue', revenue)}
-            <div className="mt-0.5 flex items-center gap-1 text-[11px] min-[380px]:text-xs sm:text-sm font-medium text-slate-500 dark:text-white/60">
-              <span>Revenue</span>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    aria-label="Revenue description"
-                    title="Revenue description"
-                    className="flex h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white transition-colors focus:outline-none"
-                  >
-                    <Info className="h-3 w-3" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent side="top" align="center" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
-                  Net earnings after KSh 10 platform fee per sale.
-                </PopoverContent>
-              </Popover>
+          {/* Row 2: Clicks count and Wishlist count below Balance, Sales and Revenue */}
+          {(clicks !== undefined || wishlist !== undefined) && (
+            <div className="flex items-center gap-4 sm:gap-6 text-xs text-slate-500 dark:text-white/60">
+              <div className="flex items-center gap-1.5" title={`${(clicks ?? 0).toLocaleString()} clicks on your shop & products`}>
+                <MousePointerClick className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
+                <span className="font-bold tabular-nums text-slate-900 dark:text-white">
+                  {(clicks ?? 0).toLocaleString()}
+                </span>
+                <span className="text-[11px] min-[380px]:text-xs">
+                  {(clicks ?? 0) === 1 ? 'click' : 'clicks'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5" title={`${(wishlist ?? 0).toLocaleString()} items saved by buyers`}>
+                <Heart className="h-3.5 w-3.5 text-slate-400 dark:text-white/45" />
+                <span className="font-bold tabular-nums text-slate-900 dark:text-white">
+                  {(wishlist ?? 0).toLocaleString()}
+                </span>
+                <span className="text-[11px] min-[380px]:text-xs">
+                  wishlist
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
