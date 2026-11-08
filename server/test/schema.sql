@@ -489,10 +489,6 @@ CREATE TABLE public.buyers (
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     status character varying(30) DEFAULT 'active'::character varying NOT NULL,
     refund_withdrawal_reserved_balance numeric(15,2) DEFAULT 0 NOT NULL,
-    is_member boolean DEFAULT false NOT NULL,
-    member_number integer,
-    membership_joined_at timestamp with time zone,
-    membership_tier character varying(50) DEFAULT 'bronze'::character varying,
     refunds numeric(12,2) DEFAULT 0 NOT NULL,
     phone character varying(50),
     is_verified boolean DEFAULT false,
@@ -522,18 +518,6 @@ CREATE SEQUENCE public.buyers_id_seq
 --
 
 ALTER SEQUENCE public.buyers_id_seq OWNED BY public.buyers.id;
-
-
---
--- Name: byblos_member_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.byblos_member_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 --
@@ -2294,7 +2278,6 @@ CREATE TABLE public.sellers (
     physical_address text,
     latitude numeric(10,8),
     longitude numeric(11,8),
-    theme character varying(50),
     total_sales numeric(15,2) DEFAULT 0 NOT NULL,
     net_revenue numeric(15,2) DEFAULT 0 NOT NULL,
     instagram_link text,
@@ -3903,13 +3886,6 @@ ALTER TABLE ONLY public.wishlists
 
 ALTER TABLE ONLY public.withdrawal_requests
     ADD CONSTRAINT withdrawal_requests_pkey PRIMARY KEY (id);
-
-
---
--- Name: buyers_member_number_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX buyers_member_number_key ON public.buyers USING btree (member_number) WHERE (member_number IS NOT NULL);
 
 
 --
@@ -6137,6 +6113,8 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (114, '20261024131500_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (115, '20261025233000_sync_deleted_buyer_status', '2026-10-25 23:30:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (116, '20261027200000_make_refund_requests_buyer_id_nullable', '2026-10-27 20:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (117, '20261102160000_normalize_seller_shop_names', '2026-11-02 16:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (118, '20261108090000_remove_founder_card_and_membership', '2026-11-08 09:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (119, '20261108130000_remove_seller_shop_theme', '2026-11-08 13:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
