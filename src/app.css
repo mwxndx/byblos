@@ -34,6 +34,7 @@ body,
 }
 
 :root {
+    color-scheme: dark;
     /* ── Safe-area inset CSS variables (set by browser env or native fallback) ─────── */
     --sat: max(env(safe-area-inset-top, 0px), 0px);
     --sab: max(env(safe-area-inset-bottom, 0px), 0px);
@@ -1077,7 +1078,9 @@ button.btn-primary svg {
    that normally make white backgrounds charcoal.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-[data-theme="light"] {
+[data-theme="light"],
+html.light {
+    color-scheme: light;
     /* Byblos palette — clean pure white base, pure white surfaces, rich dark text */
     --byblos-bg: #ffffff;
     --byblos-surface: #ffffff;
@@ -1155,9 +1158,12 @@ button.btn-primary svg {
 }
 
 /* html/body background in light mode */
-[data-theme="light"] html,
-[data-theme="light"] body,
-[data-theme="light"] #root {
+html[data-theme="light"],
+html.light,
+html[data-theme="light"] body,
+html.light body,
+html[data-theme="light"] #root,
+html.light #root {
     background: var(--byblos-bg) !important;
     color: var(--byblos-text);
 }
