@@ -4,7 +4,6 @@ import { Input } from '@/shared/ui/input';
 import { Edit3, LogOut, Mail, MapPin, Phone, UserRound } from '@/shared/ui/icons';
 import { AccountSwitcher } from '@/features/auth/components/AccountSwitcher';
 import { DashboardProfilePanel } from '@/shared/components/DashboardProfilePanel';
-import { BuyerMembershipCard } from './BuyerMembershipCard';
 import { DeleteAccountButton } from '@/shared/components/DeleteAccountButton';
 import { deleteBuyerAccount } from '@/features/buyer/api/profile';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
@@ -256,8 +255,6 @@ export function BuyerProfileContent({
           </Button>
         )}
       </section>
-
-      <BuyerMembershipCard />
 
       <section className="space-y-3">
         <h3 className="text-sm font-bold text-slate-950 dark:text-white">Legal</h3>

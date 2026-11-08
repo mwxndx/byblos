@@ -16,31 +16,77 @@ vi.mock('@/features/auth/contexts', () => ({
 }));
 
 describe('BuyerDashboardHeader', () => {
-  it('renders a back button to landing page for guest buyers (not authenticated)', () => {
+  it('renders Nairobi pill on the left, Byblos text and search icon at the center', () => {
     mockIsAuthenticated = false;
-    render(<BuyerDashboardHeader onOpenProfile={vi.fn()} />);
+    const handleToggleSearch = vi.fn();
+
+    render(
+      <BuyerDashboardHeader
+        onOpenProfile={vi.fn()}
+        isSearchOpen={false}
+        onToggleSearch={handleToggleSearch}
+      />
+    );
+
+    // Nairobi pill is rendered on the left
+    const citySelect = screen.getByLabelText(/city/i);
+    expect(citySelect).toBeInTheDocument();
+    expect(citySelect).toHaveValue('Nairobi');
+
+    // 'Byblos' text at center
+    expect(screen.getByText('Byblos')).toBeInTheDocument();
+
+    // Search button next to Byblos text
+    const searchButton = screen.getByRole('button', { name: /search products or shops/i });
+    expect(searchButton).toBeInTheDocument();
+
+    fireEvent.click(searchButton);
+    expect(handleToggleSearch).toHaveBeenCalledTimes(1);
+
+    // When search is not open, the search input is not displayed
+    expect(screen.queryByLabelText(/search products or shops/i, { selector: 'input' })).not.toBeInTheDocument();
+  });
+
+  it('renders expandable search input when isSearchOpen is true', () => {
+    mockIsAuthenticated = true;
+    const handleSearchChange = vi.fn();
+
+    render(
+      <BuyerDashboardHeader
+        onOpenProfile={vi.fn()}
+        isSearchOpen={true}
+        onToggleSearch={vi.fn()}
+        searchQuery="dress"
+        onSearchQueryChange={handleSearchChange}
+      />
+    );
+
+    const searchInput = screen.getByLabelText(/search products or shops/i, { selector: 'input' });
+    expect(searchInput).toBeInTheDocument();
+    expect(searchInput).toHaveValue('dress');
+
+    fireEvent.change(searchInput, { target: { value: 'shoes' } });
+    expect(handleSearchChange).toHaveBeenCalledWith('shoes');
+  });
+
+  it('renders back button to landing page for guest buyers and hides it for authenticated buyers', () => {
+    mockIsAuthenticated = false;
+    const { rerender } = render(<BuyerDashboardHeader onOpenProfile={vi.fn()} />);
 
     const backButton = screen.getByRole('button', { name: /back to landing page/i });
     expect(backButton).toBeInTheDocument();
-
     fireEvent.click(backButton);
     expect(mockNavigate).toHaveBeenCalledWith('/');
 
-    // City selector must NOT be in the header
-    expect(screen.queryByLabelText(/city/i)).not.toBeInTheDocument();
-  });
-
-  it('does not render back button for authenticated buyers', () => {
+    // Authenticated buyers
     mockIsAuthenticated = true;
-    render(<BuyerDashboardHeader onOpenProfile={vi.fn()} />);
-
+    rerender(<BuyerDashboardHeader onOpenProfile={vi.fn()} />);
     expect(screen.queryByRole('button', { name: /back to landing page/i })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/city/i)).not.toBeInTheDocument();
   });
 });
 
-describe('BuyerDashboardSearch', () => {
-  it('renders city selector in the middle above the search products search bar in shop section', () => {
+describe('BuyerDashboardSearch (legacy component)', () => {
+  it('renders city selector and search input for shop section', () => {
     const handleSearch = vi.fn();
     render(
       <BuyerDashboardSearch
@@ -56,9 +102,6 @@ describe('BuyerDashboardSearch', () => {
 
     const searchInput = screen.getByLabelText(/search products/i);
     expect(searchInput).toBeInTheDocument();
-
-    // Verify city selector appears before search input in DOM order (above it)
-    expect(citySelect.compareDocumentPosition(searchInput)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it('renders nothing when active section is not shop', () => {

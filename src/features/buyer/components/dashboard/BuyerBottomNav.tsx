@@ -1,8 +1,8 @@
 import type { LucideIcon } from '@/shared/ui/icons';
 
-type BuyerSection = 'shop' | 'notifications' | 'wishlist' | 'orders' | 'profile' | 'refunds';
+export type BuyerSection = 'shop' | 'notifications' | 'wishlist' | 'orders' | 'profile' | 'refunds';
 
-interface BuyerNavItem {
+export interface BuyerNavItem {
   key: BuyerSection;
   label: string;
   Icon: LucideIcon;
@@ -15,40 +15,60 @@ interface BuyerBottomNavProps {
   activeNav: BuyerSection;
   navItems: readonly BuyerNavItem[];
   onSelect: (key: BuyerSection) => void;
+  hidden?: boolean;
 }
 
-export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<BuyerBottomNavProps>) {
+/**
+ * Floating bottom navigation bar with rounded corners and identical fixed width
+ * matching the seller dashboard floating navigation bar style.
+ */
+export function BuyerBottomNav({
+  activeNav,
+  navItems,
+  onSelect,
+  hidden = false,
+}: Readonly<BuyerBottomNavProps>) {
+  if (hidden) return null;
+
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#000000] pb-safe-bottom transition-colors duration-200"
+      className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-2xl sm:rounded-full border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl dark:shadow-2xl px-2 py-1.5 transition-colors duration-200"
       aria-label="Buyer navigation"
     >
-      <div className="flex items-center justify-around h-14 px-1">
-        {navItems.map(item => {
+      <div className="flex h-12 sm:h-13 items-center justify-between w-full">
+        {navItems.map((item) => {
           const isActive = activeNav === item.key;
+          const showDot = Boolean(item.badge && (!item.count || item.count <= 0));
+          const count = item.badge && item.count ? item.count : 0;
+
           return (
             <button
               key={item.key}
               type="button"
               onClick={() => onSelect(item.key)}
-              className="flex-1 flex flex-col items-center justify-center gap-0.5 bg-transparent border-none cursor-pointer relative py-1.5 transition-opacity duration-150 active:scale-95"
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
+              className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-xl py-2 transition-all duration-150 active:scale-95 ${
+                isActive
+                  ? 'text-black dark:text-white font-bold'
+                  : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
+              }`}
             >
               <item.Icon
-                size={18}
-                className={isActive ? 'text-black dark:text-white' : 'text-slate-500 dark:text-white/50 transition-colors'}
+                size={22}
+                className={isActive ? 'text-black dark:text-white' : 'text-current transition-colors'}
               />
-              <span className={`text-[10px] font-semibold transition-colors ${isActive ? 'text-black dark:text-white font-bold' : 'text-slate-500 dark:text-white/50'}`}>
+              <span className="sr-only">
                 {item.label}
               </span>
-              {item.badge && (
-                item.count && item.count > 0 ? (
-                  <span className="absolute top-1 right-[50%] translate-x-[12px] min-w-[15px] h-[15px] px-1 rounded-full text-[9px] font-semibold flex items-center justify-center bg-black text-white dark:bg-white dark:text-black shadow-sm">
-                    {item.count > 99 ? '99+' : item.count}
-                  </span>
-                ) : (
-                  <div className="absolute top-1.5 right-[50%] translate-x-[10px] w-2 h-2 rounded-full bg-black dark:bg-white ring-2 ring-white dark:ring-black" />
-                )
-              )}
+
+              {count > 0 ? (
+                <span className="absolute top-1 right-[50%] flex h-[15px] min-w-[15px] translate-x-[12px] items-center justify-center rounded-full bg-white text-black dark:bg-white dark:text-black [data-theme=light]_&:bg-black [data-theme=light]_&:text-white px-1 text-[9px] font-semibold shadow-sm">
+                  {count > 99 ? '99+' : count}
+                </span>
+              ) : showDot ? (
+                <div className="absolute top-1.5 right-[50%] h-2 w-2 translate-x-[10px] rounded-full bg-white dark:bg-white [data-theme=light]_&:bg-black ring-2 ring-white dark:ring-[#121212]" />
+              ) : null}
             </button>
           );
         })}
@@ -56,5 +76,3 @@ export function BuyerBottomNav({ activeNav, navItems, onSelect }: Readonly<Buyer
     </nav>
   );
 }
-
-

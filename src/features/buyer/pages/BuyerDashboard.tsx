@@ -17,11 +17,9 @@ import { BuyerRefundsTab } from '../components/BuyerRefundsTab';
 import SellersGrid from '@/features/shop/components/SellersGrid';
 import { BuyerBottomNav } from '../components/dashboard/BuyerBottomNav';
 import { BuyerDashboardHeader } from '../components/dashboard/BuyerDashboardHeader';
-import { BuyerDashboardSearch } from '../components/dashboard/BuyerDashboardSearch';
 import { BuyerProfileSheet } from '../components/dashboard/BuyerProfileSheet';
 import { NotificationList } from '@/features/notifications/components/NotificationList';
 import { useNotifications } from '@/features/notifications/hooks/useNotifications';
-import { MembershipGate } from '@/features/membership/components/MembershipGate';
 import { useSwipeTabs } from '@/shared/hooks/useSwipeTabs';
 import { useBuyerActiveSection } from '../components/dashboard/hooks/useBuyerActiveSection';
 import { useBuyerProfileForm } from '../components/dashboard/hooks/useBuyerProfileForm';
@@ -47,6 +45,7 @@ function BuyerDashboard() {
   const { activeSection } = useBuyerActiveSection();
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const {
     isEditingProfile, setIsEditingProfile,
@@ -113,25 +112,25 @@ function BuyerDashboard() {
       height: '100%',
       overflowY: 'hidden',
     }}>
-      <BuyerDashboardHeader onOpenProfile={() => setIsProfileOpen(true)} />
+      <BuyerDashboardHeader
+        onOpenProfile={() => setIsProfileOpen(true)}
+        isSearchOpen={isSearchOpen}
+        onToggleSearch={() => setIsSearchOpen(prev => !prev)}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+      />
 
       {/* Dashboard Body: establishes positioning context for drawer and overlay immediately below header */}
       <div
         className="relative flex-1 min-h-0 flex flex-col overflow-hidden"
       >
-        <BuyerDashboardSearch
-          activeSection={activeSection === 'refunds' ? 'shop' : activeSection}
-          productSearchQuery={searchQuery}
-          onProductSearchChange={setSearchQuery}
-        />
-
         {/* Main Content Area */}
         <div style={{
           flex: 1,
           overflowY: 'auto',
           overflowX: 'hidden',
           padding: 'clamp(10px, 4vw, 18px)',
-          paddingBottom: 'calc(4rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+          paddingBottom: 'calc(5.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
           WebkitOverflowScrolling: 'touch',
           scrollBehavior: 'smooth',
           overscrollBehavior: 'none',
@@ -220,10 +219,12 @@ function BuyerDashboard() {
         />
       </div>
 
-      <BuyerBottomNav activeNav={activeNav} navItems={navItems} onSelect={setActiveTab} />
-
-      {/* First-login Byblos membership card opt-in + share */}
-      <MembershipGate enabled={!!user} />
+      <BuyerBottomNav
+        activeNav={activeNav}
+        navItems={navItems}
+        onSelect={setActiveTab}
+        hidden={isProfileOpen}
+      />
     </div>
   );
 }

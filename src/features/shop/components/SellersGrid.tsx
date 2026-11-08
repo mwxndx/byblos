@@ -2,7 +2,7 @@ import { memo, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import type { ApiPublicSeller } from '@/shared/types/api/seller';
 import SellerBrandCard from '@/features/shop/components/SellerBrandCard';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { usePublicSellersQuery } from '@/features/shop/hooks/useShopQueries';
+import { usePublicSellersQuery, usePublicCatalogProductsQuery } from '@/features/shop/hooks/useShopQueries';
 import { isDeletedSeller } from '@/features/shop/utils/sellerTransforms';
 import { compareSellersByPriority } from '@/features/shop/utils/shopPrioritization';
 
@@ -50,8 +50,11 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_SELLERS);
     const deferredSearchQuery = useDeferredValue(searchQuery);
     const sellersQuery = usePublicSellersQuery({ page: 1, limit: 100 });
-    const sellers = sellersQuery.data?.sellers || EMPTY_SELLERS;
-    const loading = sellersQuery.isLoading;
+    const sellers = sellersQuery?.data?.sellers || EMPTY_SELLERS;
+    const loading = Boolean(sellersQuery?.isLoading);
+
+    const isSearchActive = Boolean(deferredSearchQuery.trim());
+    const productsQuery = usePublicCatalogProductsQuery(isSearchActive);
 
     useEffect(() => {
         setVisibleCount(INITIAL_VISIBLE_SELLERS);
@@ -60,21 +63,34 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     const filteredSellers = useMemo(() => {
         const query = deferredSearchQuery.trim().toLowerCase();
 
+        const matchingSellerIdsFromProducts = new Set<string>();
+        if (query && productsQuery.data) {
+            for (const product of productsQuery.data) {
+                const name = (product.name || '').toLowerCase();
+                const desc = (product.description || '').toLowerCase();
+                if (name.includes(query) || desc.includes(query)) {
+                    if (product.sellerId) matchingSellerIdsFromProducts.add(String(product.sellerId));
+                    if (product.seller?.id) matchingSellerIdsFromProducts.add(String(product.seller.id));
+                }
+            }
+        }
+
         const filtered = sellers.filter(seller => {
             if (isDeletedSeller(seller)) return false;
             if (filterCity && seller.city !== filterCity) return false;
             if (filterArea && seller.location !== filterArea) return false;
             if (query) {
-                return (
+                const matchesShop =
                     (seller.shopName || seller.shop_name || '').toLowerCase().includes(query) ||
-                    (seller.fullName || '').toLowerCase().includes(query)
-                );
+                    (seller.fullName || '').toLowerCase().includes(query);
+                const matchesProduct = matchingSellerIdsFromProducts.has(String(seller.id));
+                return matchesShop || matchesProduct;
             }
             return true;
         });
 
         return [...filtered].sort(compareSellersByPriority);
-    }, [sellers, filterCity, filterArea, deferredSearchQuery]);
+    }, [sellers, filterCity, filterArea, deferredSearchQuery, productsQuery.data]);
 
     const visibleSellers = useMemo(
         () => filteredSellers.slice(0, visibleCount),

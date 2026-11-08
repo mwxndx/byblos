@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react';
+import { memo, useCallback, useEffect, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Store, UserMinus } from '@/shared/ui/icons';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
@@ -25,20 +25,6 @@ const getNumber = (...values: unknown[]) => {
     return 0;
 };
 
-const getThemePalette = (theme?: string) => {
-    const palettes: Record<string, { border: string; accentSoft: string; avatarGradient: string }> = {
-        default: { border: 'rgba(248,250,252,0.22)', accentSoft: 'rgba(248,250,252,0.1)', avatarGradient: 'linear-gradient(135deg, #F8FAFC 0%, #CBD5E1 100%)' },
-        black: { border: 'rgba(255,255,255,0.18)', accentSoft: 'rgba(255,255,255,0.08)', avatarGradient: 'linear-gradient(135deg, #3F3F46 0%, #050505 100%)' },
-        pink: { border: 'rgba(244,114,182,0.35)', accentSoft: 'rgba(244,114,182,0.12)', avatarGradient: 'linear-gradient(135deg, #F9A8D4 0%, #DB2777 100%)' },
-        orange: { border: 'rgba(251,146,60,0.35)', accentSoft: 'rgba(251,146,60,0.12)', avatarGradient: 'linear-gradient(135deg, #FDBA74 0%, #EA580C 100%)' },
-        green: { border: 'rgba(52,211,153,0.35)', accentSoft: 'rgba(52,211,153,0.12)', avatarGradient: 'linear-gradient(135deg, #86EFAC 0%, #059669 100%)' },
-        red: { border: 'rgba(248,113,113,0.35)', accentSoft: 'rgba(248,113,113,0.12)', avatarGradient: 'linear-gradient(135deg, #FCA5A5 0%, #DC2626 100%)' },
-        yellow: { border: 'rgba(250,204,21,0.38)', accentSoft: 'rgba(250,204,21,0.14)', avatarGradient: 'linear-gradient(135deg, #FDE68A 0%, #EAB308 100%)' },
-        brown: { border: 'rgba(180,83,9,0.38)', accentSoft: 'rgba(180,83,9,0.14)', avatarGradient: 'linear-gradient(135deg, #D97706 0%, #78350F 100%)' },
-    };
-    return palettes[theme || 'default'] || palettes.default;
-};
-
 const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isUnfollowing = false, onUnfollow, onClickCountChange }: SellerBrandCardProps) => {
     const navigate = useNavigate();
     const knockSellerMutation = useKnockSellerMutation();
@@ -50,7 +36,6 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     const avatarUrl = String(seller.avatarUrl || (seller as unknown as { avatar_url?: string }).avatar_url || '');
     const [avatarFailed, setAvatarFailed] = useState(false);
     const [knockCount, setKnockCount] = useState(getNumber(seller.knockCount, seller.knock_count));
-    const palette = useMemo(() => getThemePalette(seller.theme), [seller.theme]);
     const hasAvatar = Boolean(avatarUrl && !avatarFailed);
 
     const instagramHref = socialUrl('instagram', seller.instagramLink);
@@ -98,7 +83,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-transparent bg-[var(--byblos-bg,#ffffff)] dark:bg-[var(--byblos-bg,#000000)] p-3 sm:p-3.5 shadow-sm transition-colors duration-200 hover:bg-slate-50 dark:hover:bg-zinc-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
+                'group relative flex aspect-[4/5] cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -106,61 +91,54 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             onClick={handleKnock}
             onKeyDown={handleCardKeyDown}
             aria-label={`Open ${shopName}`}
-            style={{
-                borderColor: 'transparent',
-                boxShadow: `0 16px 40px rgba(0,0,0,0.45), 0 0 24px ${palette.accentSoft}`,
-            }}
         >
-            {/* Center circular business profile photo directly on the card without extra split background shape */}
-            <div className="flex flex-1 items-center justify-center py-1">
-                <div
-                    className="flex aspect-square h-20 w-20 sm:h-24 sm:w-24 items-center justify-center overflow-hidden rounded-full border-2 bg-[var(--byblos-bg,#ffffff)] dark:bg-[var(--byblos-bg,#000000)] shadow-lg transition-transform duration-200 group-hover:scale-105"
-                    style={{ borderColor: palette.border }}
-                >
-                    {hasAvatar ? (
-                        <img
-                            src={getImageUrl(avatarUrl)}
-                            alt={`${shopName} business photo`}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                            onError={() => setAvatarFailed(true)}
-                        />
-                    ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                            <Store className="h-8 w-8 text-slate-700 dark:text-white/90 sm:h-10 sm:w-10" strokeWidth={1.6} />
-                        </div>
-                    )}
-                </div>
+            {/* Top half: square frame for business profile photo */}
+            <div className="relative w-full h-[52%] overflow-hidden bg-slate-100 dark:bg-zinc-900">
+                {hasAvatar ? (
+                    <img
+                        src={getImageUrl(avatarUrl)}
+                        alt={`${shopName} business photo`}
+                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                        loading="lazy"
+                        onError={() => setAvatarFailed(true)}
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-zinc-900">
+                        <Store className="h-10 w-10 text-slate-400 dark:text-white/50" strokeWidth={1.5} />
+                    </div>
+                )}
             </div>
 
-            {/* Shop name placed slightly above, bold, +3px font size (15px / 17px) */}
-            <div className="flex min-h-0 flex-col items-start gap-1 sm:gap-1.5 pt-1">
-                <h3 className="w-full truncate text-[15px] sm:text-[17px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
-                    {shopName}
-                </h3>
+            {/* Bottom half: Shop name and actions */}
+            <div className="flex flex-1 flex-col justify-between p-3 sm:p-3.5 min-h-0">
+                <div className="flex min-h-0 flex-col items-start gap-1">
+                    <h3 className="w-full truncate text-[15px] sm:text-[16px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
+                        {shopName}
+                    </h3>
 
-                <div className="flex items-center gap-1.5">
-                    <SocialButtons instagramHref={instagramHref} tiktokHref={tiktokHref} shopName={shopName} size="sm" />
-                    {mapHref ? (
-                        <a
-                            href={mapHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={stop}
-                            aria-label={`${shopName} location on the map`}
-                            className="inline-flex items-center justify-center rounded-full border border-[var(--byblos-border,rgba(255,255,255,0.14))] bg-[var(--byblos-surface-soft,rgba(255,255,255,0.06))] p-1.5 shadow-sm transition-all hover:opacity-80"
-                        >
-                            <MapPin className="h-4 w-4 text-yellow-400" />
-                        </a>
-                    ) : (
-                        <span
-                            aria-label="Location not available"
-                            aria-disabled="true"
-                            className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-1.5 opacity-35"
-                        >
-                            <MapPin className="h-4 w-4 text-slate-400 dark:text-white/60" />
-                        </span>
-                    )}
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                        <SocialButtons instagramHref={instagramHref} tiktokHref={tiktokHref} shopName={shopName} size="sm" />
+                        {mapHref ? (
+                            <a
+                                href={mapHref}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={stop}
+                                aria-label={`${shopName} location on the map`}
+                                className="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.06] p-1.5 shadow-sm transition-all hover:opacity-80"
+                            >
+                                <MapPin className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
+                            </a>
+                        ) : (
+                            <span
+                                aria-label="Location not available"
+                                aria-disabled="true"
+                                className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-1.5 opacity-35"
+                            >
+                                <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-white/60" />
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {showUnfollow && onUnfollow && (
@@ -171,7 +149,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                             event.stopPropagation();
                             handleUnfollow();
                         }}
-                        className="mt-2 flex h-9 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-semibold text-red-600 dark:text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
+                        className="mt-2 flex h-8 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-semibold text-red-600 dark:text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
                         aria-label={`Unfollow ${shopName}`}
                     >
                         <UserMinus className="h-3.5 w-3.5" />

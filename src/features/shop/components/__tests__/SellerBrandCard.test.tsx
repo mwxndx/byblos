@@ -33,34 +33,31 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(heading.className).toMatch(/text-\[15px\]/);
   });
 
-  it('removes extra background shape so the card is a single unified shape without top section background split', () => {
+  it('renders a square frame for business profile photo on the top half of the card', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
       </MemoryRouter>
     );
 
-    // No extra split background container dividing the card
-    expect(container.querySelector('.bg-zinc-900\\/60')).not.toBeInTheDocument();
-    expect(container.querySelector('.h-\\[66\\%\\]')).not.toBeInTheDocument();
-
-    // The business profile photo is still housed in a circular frame
+    // Business profile photo is housed in the top-half frame
     const businessImg = screen.getByAltText('Amani Styles business photo');
-    const circularFrame = businessImg.parentElement;
-    expect(circularFrame).toHaveClass('rounded-full');
-    expect(circularFrame).toHaveClass('aspect-square');
+    const squareFrame = businessImg.parentElement;
+    expect(squareFrame).toBeInTheDocument();
+    expect(squareFrame?.className).toContain('h-[52%]');
+    expect(squareFrame).not.toHaveClass('rounded-full');
   });
 
-  it('renders store fallback icon in circular frame when avatar is empty', () => {
+  it('renders store fallback icon in top-half square frame when avatar is empty', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
       </MemoryRouter>
     );
 
-    const circularFrame = container.querySelector('.rounded-full');
-    expect(circularFrame).toBeInTheDocument();
-    expect(circularFrame).toHaveClass('aspect-square');
-    expect(circularFrame?.querySelector('svg')).toBeInTheDocument();
+    const squareFrame = container.querySelector('.h-\\[52\\%\\]');
+    expect(squareFrame).toBeInTheDocument();
+    expect(squareFrame).not.toHaveClass('rounded-full');
+    expect(squareFrame?.querySelector('svg')).toBeInTheDocument();
   });
 });

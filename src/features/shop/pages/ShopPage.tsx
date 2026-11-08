@@ -54,7 +54,7 @@ const ShopPage = () => {
         data-shop-theme={resolvedShopTheme}
       >
         <div className="text-center space-y-6 p-8">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-3xl flex items-center justify-center shadow-lg">
+          <div className="w-24 h-24 mx-auto bg-yellow-100 dark:bg-yellow-950/40 rounded-3xl flex items-center justify-center border border-yellow-200 dark:border-yellow-900/40 shadow-sm">
             <Loader2 className="h-12 w-12 text-yellow-600 animate-spin" />
           </div>
           <div>
@@ -73,7 +73,7 @@ const ShopPage = () => {
         data-shop-theme={resolvedShopTheme}
       >
         <div className="text-center space-y-6 p-8">
-          <div className="w-24 h-24 mx-auto bg-gradient-to-br from-red-100 to-red-200 rounded-3xl flex items-center justify-center shadow-lg">
+          <div className="w-24 h-24 mx-auto bg-red-100 dark:bg-red-950/40 rounded-3xl flex items-center justify-center border border-red-200 dark:border-red-900/40 shadow-sm">
             <Store className="h-12 w-12 text-red-600" />
           </div>
           <div>

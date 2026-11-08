@@ -3,30 +3,38 @@ import { describe, expect, it, vi } from 'vitest';
 import { BuyerBottomNav } from '../BuyerBottomNav';
 import { ShoppingBag, Heart, User } from '@/shared/ui/icons';
 
-describe('BuyerBottomNav', () => {
+describe('BuyerBottomNav — Floating Navigation Bar', () => {
   const items = [
     { key: 'shop' as const, label: 'Shop', Icon: ShoppingBag, path: '/buyer/dashboard' },
     { key: 'wishlist' as const, label: 'Saved', Icon: Heart, path: '/buyer/dashboard/saved' },
     { key: 'profile' as const, label: 'Profile', Icon: User, path: '/buyer/dashboard/profile' },
   ];
 
-  it('renders with solid theme background and sticks to bottom without translucency', () => {
+  it('renders as a floating navigation bar matching seller dashboard style', () => {
     render(<BuyerBottomNav activeNav="shop" navItems={items} onSelect={vi.fn()} />);
 
     const nav = screen.getByRole('navigation', { name: /buyer navigation/i });
     expect(nav).toBeInTheDocument();
 
-    // Sticks to bottom
-    expect(nav).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'z-50');
+    // Floating bar centered at bottom
+    expect(nav).toHaveClass('fixed', 'bottom-4', 'sm:bottom-5', 'left-1/2', '-translate-x-1/2', 'z-50');
 
-    // Solid colors for light & dark themes
-    expect(nav).toHaveClass('bg-white', 'dark:bg-[#000000]');
+    // Fixed width with fluid boundary
+    expect(nav.className).toContain('w-[360px]');
 
-    // Must NOT have translucent /95 or backdrop-blur
-    expect(nav.className).not.toContain('/95');
-    expect(nav.className).not.toContain('backdrop-blur');
+    // Rounded pill styling with backdrop blur
+    expect(nav.className).toContain('rounded-2xl');
+    expect(nav.className).toContain('backdrop-blur-md');
 
-    // Safe area bottom inset class is applied
-    expect(nav).toHaveClass('pb-safe-bottom');
+    // Labels are sr-only (no visible text under icons)
+    const labelSpans = nav.querySelectorAll('span.sr-only');
+    expect(labelSpans.length).toBe(3);
+  });
+
+  it('renders nothing when hidden is true', () => {
+    const { container } = render(
+      <BuyerBottomNav activeNav="shop" navItems={items} onSelect={vi.fn()} hidden={true} />
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 });

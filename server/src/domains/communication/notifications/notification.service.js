@@ -303,72 +303,9 @@ class NotificationService {
         return rows[0]?.unread_count || 0;
     }
 
-    // One-time re-engagement blast inviting existing buyers to become members.
-    // Idempotent: skips buyers who already joined or already got the invite, so
-    // it is safe to re-run. Deep-links to the dashboard with ?membership=1 which
-    // force-opens the opt-in popup (see MembershipGate).
-    // Batched into chunks (default 50) to prevent event loop starvation and request timeouts.
-    async broadcastMembershipInvite({ dryRun = false, batchSize = 50 } = {}) {
-        const { rows: recipients } = await pool.query(
-            `SELECT b.user_id
-               FROM buyers b
-              WHERE b.user_id IS NOT NULL
-                AND b.is_member = FALSE
-                AND NOT EXISTS (
-                    SELECT 1 FROM app_notifications an
-                     WHERE an.recipient_user_id = b.user_id
-                       AND an.type = 'membership_invite'
-                )
-              GROUP BY b.user_id`
-        );
-
-        const title = 'You’re invited to become a Byblos member 🛡️';
-        const body = 'Claim your founder card and show you shop protected.';
-        const data = { path: '/buyer/dashboard?membership=1', type: 'membership_invite' };
-
-        if (dryRun) {
-            return { eligible: recipients.length, dryRun: true };
-        }
-
-        const safeBatchSize = Math.max(1, Math.min(Number.parseInt(batchSize, 10) || 50, 100));
-        let sent = 0;
-        let pushed = 0;
-        let failed = 0;
-
-        // Chunked batching intentional: throttles dispatch to avoid gateway rate limits
-        for (let i = 0; i < recipients.length; i += safeBatchSize) { // NOSONAR: javascript:S9382
-            const batch = recipients.slice(i, i + safeBatchSize);
-            const settled = await Promise.allSettled(
-                batch.map(recipient =>
-                    this.send({
-                        recipientUserId: recipient.user_id,
-                        recipientRole: 'buyer',
-                        type: 'membership_invite',
-                        title,
-                        body,
-                        data,
-                        channels: ['in_app', 'push'],
-                    }).catch(error => {
-                        logger.error('[NotificationService] Membership invite failed', {
-                            userId: recipient.user_id,
-                            error: error.message,
-                        });
-                        throw error;
-                    })
-                )
-            );
-
-            for (const item of settled) {
-                if (item.status === 'fulfilled') {
-                    sent += 1;
-                    if (item.value?.push?.delivered) pushed += 1;
-                } else {
-                    failed += 1;
-                }
-            }
-        }
-
-        return { eligible: recipients.length, sent, pushed, failed };
+    // Deprecated no-op: founder card & membership program retired.
+    async broadcastMembershipInvite({ dryRun = false } = {}) {
+        return { eligible: 0, sent: 0, pushed: 0, failed: 0, ...(dryRun ? { dryRun: true } : {}) };
     }
 
     /**

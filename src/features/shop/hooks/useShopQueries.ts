@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { sellerApi } from '@/features/seller/api';
 import { publicApiService } from '@/features/shop/api';
+import { getProducts } from '@/features/shop/api/products';
 import { commonQueryKeys } from '@/shared/types/queryKeys';
 
 export function useSellerByShopNameQuery(shopName: string, enabled = true) {
@@ -41,3 +42,14 @@ export function useKnockSellerMutation() {
     },
   });
 }
+
+export function usePublicCatalogProductsQuery(enabled = true) {
+  return useQuery({
+    queryKey: ['public-products-catalog'],
+    queryFn: () => getProducts({ limit: 100 }),
+    staleTime: 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+    enabled,
+  });
+}
+
