@@ -827,12 +827,19 @@ body.dashboard-active .seller-tab-selected {
 }
 
 /* ── Standardized role buttons: white in dark mode, black in light mode ────────── */
+/* ── Standardized role buttons: white in dark mode, black in light mode ────────── */
 .btn-white,
 button.btn-white,
 .btn-standard,
 button.btn-standard,
 .btn-primary,
 button.btn-primary,
+.dashboard-layout .btn-white,
+.dashboard-layout button.btn-white,
+.dashboard-layout .btn-standard,
+.dashboard-layout button.btn-standard,
+.dashboard-layout .btn-primary,
+.dashboard-layout button.btn-primary,
 .auth-page .btn-white,
 .auth-page button.btn-white,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
@@ -847,11 +854,27 @@ button.btn-white:hover,
 button.btn-standard:hover,
 .btn-primary:hover,
 button.btn-primary:hover,
+.dashboard-layout .btn-white:hover,
+.dashboard-layout button.btn-white:hover,
+.dashboard-layout .btn-standard:hover,
+.dashboard-layout button.btn-standard:hover,
+.dashboard-layout .btn-primary:hover,
+.dashboard-layout button.btn-primary:hover,
 .auth-page .btn-white:hover,
 .auth-page button.btn-white:hover,
 .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
     background-color: #f1f5f9 !important;
     color: #000000 !important;
+}
+
+.btn-white svg,
+button.btn-white svg,
+.btn-standard svg,
+button.btn-standard svg,
+.btn-primary svg,
+button.btn-primary svg {
+    color: inherit !important;
+    stroke: currentColor !important;
 }
 
 [data-theme="light"] .btn-white,
@@ -860,6 +883,24 @@ button.btn-primary:hover,
 [data-theme="light"] button.btn-standard,
 [data-theme="light"] .btn-primary,
 [data-theme="light"] button.btn-primary,
+.light .btn-white,
+.light button.btn-white,
+.light .btn-standard,
+.light button.btn-standard,
+.light .btn-primary,
+.light button.btn-primary,
+[data-theme="light"] .dashboard-layout .btn-white,
+[data-theme="light"] .dashboard-layout button.btn-white,
+[data-theme="light"] .dashboard-layout .btn-standard,
+[data-theme="light"] .dashboard-layout button.btn-standard,
+[data-theme="light"] .dashboard-layout .btn-primary,
+[data-theme="light"] .dashboard-layout button.btn-primary,
+.light .dashboard-layout .btn-white,
+.light .dashboard-layout button.btn-white,
+.light .dashboard-layout .btn-standard,
+.light .dashboard-layout button.btn-standard,
+.light .dashboard-layout .btn-primary,
+.light .dashboard-layout button.btn-primary,
 [data-theme="light"] .auth-page .btn-white,
 [data-theme="light"] .auth-page button.btn-white,
 [data-theme="light"] .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]) {
@@ -874,6 +915,24 @@ button.btn-primary:hover,
 [data-theme="light"] button.btn-standard:hover,
 [data-theme="light"] .btn-primary:hover,
 [data-theme="light"] button.btn-primary:hover,
+.light .btn-white:hover,
+.light button.btn-white:hover,
+.light .btn-standard:hover,
+.light button.btn-standard:hover,
+.light .btn-primary:hover,
+.light button.btn-primary:hover,
+[data-theme="light"] .dashboard-layout .btn-white:hover,
+[data-theme="light"] .dashboard-layout button.btn-white:hover,
+[data-theme="light"] .dashboard-layout .btn-standard:hover,
+[data-theme="light"] .dashboard-layout button.btn-standard:hover,
+[data-theme="light"] .dashboard-layout .btn-primary:hover,
+[data-theme="light"] .dashboard-layout button.btn-primary:hover,
+.light .dashboard-layout .btn-white:hover,
+.light .dashboard-layout button.btn-white:hover,
+.light .dashboard-layout .btn-standard:hover,
+.light .dashboard-layout button.btn-standard:hover,
+.light .dashboard-layout .btn-primary:hover,
+.light .dashboard-layout button.btn-primary:hover,
 [data-theme="light"] .auth-page .btn-white:hover,
 [data-theme="light"] .auth-page button.btn-white:hover,
 [data-theme="light"] .auth-page button:is([class*="bg-white"]):not([class*="dark:bg-"]):hover {
@@ -928,15 +987,15 @@ button.btn-primary:hover,
    neutral text utilities to light and light-surface utilities to charcoal so
    nothing renders black-on-black. Accent hues (yellow/green/red/…) and
    text-black (used on yellow buttons) are intentionally left untouched. */
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-"], [class*="text-stone-"], [class*="text-neutral-"]):not(.btn-white):not(.auth-step-active):not(.auth-step-inactive) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-"], [class*="text-stone-"], [class*="text-neutral-"]):not(.btn-white):not(.btn-standard):not(.btn-primary):not(.auth-step-active):not(.auth-step-inactive) {
     color: var(--byblos-text) !important;
 }
 
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-400"], [class*="text-slate-500"], [class*="text-stone-400"], [class*="text-stone-500"], [class*="text-neutral-400"], [class*="text-neutral-500"]):not(.btn-white):not(.auth-step-active):not(.auth-step-inactive) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="text-slate-400"], [class*="text-slate-500"], [class*="text-stone-400"], [class*="text-stone-500"], [class*="text-neutral-400"], [class*="text-neutral-500"]):not(.btn-white):not(.btn-standard):not(.btn-primary):not(.auth-step-active):not(.auth-step-inactive) {
     color: var(--byblos-muted) !important;
 }
 
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="bg-white"], [class*="bg-slate-50"], [class*="bg-slate-100"], [class*="bg-stone-50"], [class*="bg-stone-100"], [class*="bg-stone-200"], [class*="bg-gray-50"], [class*="bg-gray-100"], [class*="bg-neutral-50"], [class*="bg-neutral-100"]):not(.btn-white):not(.auth-step-active):not(.auth-step-line-active):not(.auth-step-inactive) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="bg-white"], [class*="bg-slate-50"], [class*="bg-slate-100"], [class*="bg-stone-50"], [class*="bg-stone-100"], [class*="bg-stone-200"], [class*="bg-gray-50"], [class*="bg-gray-100"], [class*="bg-neutral-50"], [class*="bg-neutral-100"]):not(.btn-white):not(.btn-standard):not(.btn-primary):not(.auth-step-active):not(.auth-step-line-active):not(.auth-step-inactive) {
     background-color: var(--byblos-surface) !important;
 }
 
@@ -946,7 +1005,7 @@ button.btn-primary:hover,
 
 /* Catch hardcoded arbitrary-hex light backgrounds (cream / near-white) the
    Tailwind-class remaps miss, so no light panels survive on the black theme. */
-:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="bg-[#f8f7f2]"], [class*="bg-[#f9fafb]"], [class*="bg-[#fafafa]"], [class*="bg-[#fefce8]"], [class*="bg-[#fff"], [class*="bg-[#FFF"]) {
+:where(.dashboard-layout, .byblos-light-page, .admin-light-dashboard, .marketing-light-dashboard, .mzigo-light-dashboard, .auth-page) :is([class*="bg-[#f8f7f2]"], [class*="bg-[#f9fafb]"], [class*="bg-[#fafafa]"], [class*="bg-[#fefce8]"], [class*="bg-[#fff"], [class*="bg-[#FFF"]):not(.btn-white):not(.btn-standard):not(.btn-primary) {
     background-color: var(--byblos-surface) !important;
 }
 
@@ -1126,11 +1185,11 @@ button.btn-primary:hover,
     border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Dark bg utilities → light surface in light mode (preserve transparent backdrops and overlays) */
-[data-theme="light"] .dashboard-layout [class*="bg-black"]:not([class*="bg-black/"]):not(.dashboard-profile-backdrop):not([data-testid="dashboard-profile-panel"]),
-[data-theme="light"] .dashboard-layout [class*="bg-gray-800"]:not([class*="bg-gray-800/"]),
-[data-theme="light"] .dashboard-layout [class*="bg-gray-900"]:not([class*="bg-gray-900/"]),
-[data-theme="light"] .dashboard-layout [class*="bg-zinc-"]:not([class*="bg-zinc-950/"]):not([class*="bg-zinc-900/"]):not([class*="bg-zinc-800/"]),
+/* Dark bg utilities → light surface in light mode (preserve transparent backdrops and overlays, do not invert buttons) */
+[data-theme="light"] .dashboard-layout [class*="bg-black"]:not([class*="bg-black/"]):not(.dashboard-profile-backdrop):not([data-testid="dashboard-profile-panel"]):not(.btn-standard):not(.btn-white):not(.btn-primary),
+[data-theme="light"] .dashboard-layout [class*="bg-gray-800"]:not([class*="bg-gray-800/"]):not(.btn-standard):not(.btn-white):not(.btn-primary),
+[data-theme="light"] .dashboard-layout [class*="bg-gray-900"]:not([class*="bg-gray-900/"]):not(.btn-standard):not(.btn-white):not(.btn-primary),
+[data-theme="light"] .dashboard-layout [class*="bg-zinc-"]:not([class*="bg-zinc-950/"]):not([class*="bg-zinc-900/"]):not([class*="bg-zinc-800/"]):not(.btn-standard):not(.btn-white):not(.btn-primary),
 [data-theme="light"] .dashboard-layout [class*="bg-white/["] {
     background-color: #ffffff !important;
 }
@@ -1141,15 +1200,15 @@ button.btn-primary:hover,
     border-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-/* White/near-white text → dark text in light mode */
-[data-theme="light"] .dashboard-layout [class*="text-white"]:not([class*="dark:text-white"]),
-[data-theme="light"] .dashboard-layout [class*="text-gray-"]:not([class*="dark:text-white"]),
-[data-theme="light"] .dashboard-layout [class*="text-zinc-"]:not([class*="dark:text-white"]) {
+/* White/near-white text → dark text in light mode (preserve buttons) */
+[data-theme="light"] .dashboard-layout [class*="text-white"]:not([class*="dark:text-white"]):not(.btn-standard):not(.btn-white):not(.btn-primary),
+[data-theme="light"] .dashboard-layout [class*="text-gray-"]:not([class*="dark:text-white"]):not(.btn-standard):not(.btn-white):not(.btn-primary),
+[data-theme="light"] .dashboard-layout [class*="text-zinc-"]:not([class*="dark:text-white"]):not(.btn-standard):not(.btn-white):not(.btn-primary) {
     color: var(--byblos-text) !important;
 }
 
 /* Muted/subdued text */
-[data-theme="light"] .dashboard-layout [class*="text-white/"]:not([class*="dark:text-white"]) {
+[data-theme="light"] .dashboard-layout [class*="text-white/"]:not([class*="dark:text-white"]):not(.btn-standard):not(.btn-white):not(.btn-primary) {
     color: var(--byblos-muted) !important;
 }
 
