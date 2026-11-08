@@ -96,12 +96,67 @@ describe('SellerProfileHero', () => {
           onCopyShopLink={vi.fn()}
           canEdit={true}
         >
-          <div data-testid="metrics-container">Balance and Revenue</div>
+          <div data-testid="metrics-container">Extra Content</div>
         </SellerProfileHero>
       </QueryClientProvider>
     );
 
     expect(screen.getByTestId('metrics-container')).toBeInTheDocument();
     expect(screen.getByAltText('Eris')).toBeInTheDocument();
+  });
+
+  it('renders balance, revenue, and sales stats with figures on top and text below, without cards', () => {
+    const handleSelectTab = vi.fn();
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+          balance={1500}
+          revenue={1200}
+          totalSales={2000}
+          onSelectTab={handleSelectTab}
+        />
+      </QueryClientProvider>
+    );
+
+    // Figures
+    expect(screen.getByText(/KSh 1,500/i)).toBeInTheDocument();
+    expect(screen.getByText(/KSh 1,200/i)).toBeInTheDocument();
+    expect(screen.getByText(/KSh 2,000/i)).toBeInTheDocument();
+
+    // Labels below figures
+    expect(screen.getByText('Balance')).toBeInTheDocument();
+    expect(screen.getByText('Revenue')).toBeInTheDocument();
+    expect(screen.getByText('Sales')).toBeInTheDocument();
+
+    // Withdraw button next to balance
+    expect(screen.getByRole('button', { name: /Withdraw/i })).toBeInTheDocument();
+
+    // Popover description buttons for Revenue and Sales
+    expect(screen.getByRole('button', { name: /Revenue description/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sales description/i })).toBeInTheDocument();
+  });
+
+  it('matches photo width and height with shop link button width and has no border', () => {
+    const { container } = render(
+      <QueryClientProvider client={queryClient}>
+        <SellerProfileHero
+          sellerProfile={baseProfile}
+          shopUsername="eris"
+          onCopyShopLink={vi.fn()}
+          canEdit={true}
+        />
+      </QueryClientProvider>
+    );
+
+    const photoWrapper = container.querySelector('.rounded-full.overflow-hidden');
+    expect(photoWrapper).toHaveClass('h-24', 'w-24');
+    expect(photoWrapper).not.toHaveStyle({ border: '3px solid' });
+
+    const shopLinkButton = screen.getByRole('button', { name: /Shop link/i });
+    expect(shopLinkButton).toHaveClass('w-24');
   });
 });

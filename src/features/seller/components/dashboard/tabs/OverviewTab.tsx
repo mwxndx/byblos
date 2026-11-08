@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { ArrowUpRight, BadgeDollarSign, Clock, Heart, Info, Megaphone, MousePointerClick, Package, PackagePlus, ShoppingBag, Wallet } from '@/shared/ui/icons';
+import { ArrowUpRight, Clock, Heart, Megaphone, MousePointerClick, Package, PackagePlus } from '@/shared/ui/icons';
 import { formatCurrency } from '@/shared/utils/formatting';
 import { Badge } from '@/shared/ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { formatOrderStatusLabel, getPendingStatusStyles } from '../dashboardUtils';
 import { SellerReminders } from '../widgets/SellerReminders';
 import { SellerProfileHero } from '../../SellerProfileHero';
@@ -33,100 +32,6 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, s
   // "Nothing yet" — a brand-new shop with no numbers to show.
   const hasActivity = revenue > 0 || balance > 0 || liveProducts > 0 || clicks > 0 || wishlist > 0 || pendingOverviewOrders.length > 0;
   const [showMetrics, setShowMetrics] = useState(false);
-
-  const heroMetricsCards = (
-    <div className="grid gap-2.5 sm:gap-3 lg:gap-4 grid-cols-1 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)]">
-      {/* Available balance card */}
-      <div className="relative overflow-hidden rounded-2xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 flex flex-col justify-between min-w-0">
-        <div className="flex items-center gap-2">
-          <span
-            className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl"
-            style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.14)' }}
-          >
-            <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} />
-          </span>
-          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-white/70 truncate">Available balance</p>
-        </div>
-        <div className="mt-2.5 sm:mt-3 flex items-center justify-between gap-3">
-          <p className="truncate text-xl font-semibold tracking-tight tabular-nums text-slate-900 dark:text-white sm:text-2xl lg:text-3xl">
-            {formatCurrency(balance)}
-          </p>
-          <button
-            type="button"
-            onClick={() => { onSelectTab('withdrawals'); }}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-semibold shadow-sm transition-transform active:scale-95"
-            style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
-          >
-            <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            Withdraw
-          </button>
-        </div>
-      </div>
-
-      {/* Total Sales & Total Revenue side-by-side */}
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-4 lg:col-span-2 lg:grid-cols-2">
-        <div className="flex flex-col justify-between rounded-2xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 min-w-0">
-          <div className="flex items-center justify-between gap-1.5">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span
-                className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl"
-                style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.14)' }}
-              >
-                <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} />
-              </span>
-              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-white/50 truncate">Total Sales</p>
-            </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="Total sales description"
-                  title="Total sales description"
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-black/5 dark:text-white/40 dark:hover:text-white dark:hover:bg-white/10 transition-colors focus:outline-none"
-                >
-                  <Info className="h-3.5 w-3.5" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent side="top" align="end" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
-                Total product price value (excludes 2% customer service charge).
-              </PopoverContent>
-            </Popover>
-          </div>
-          <p className="mt-2.5 sm:mt-3 truncate text-lg sm:text-2xl font-semibold tabular-nums text-slate-900 dark:text-white">{formatCurrency(totalSales)}</p>
-        </div>
-
-        <div className="flex flex-col justify-between rounded-2xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-3.5 sm:p-5 min-w-0">
-          <div className="flex items-center justify-between gap-1.5">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <span
-                className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl"
-                style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.14)' }}
-              >
-                <BadgeDollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4" style={{ color: 'var(--theme-accent, #f5c518)' }} />
-              </span>
-              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-white/50 truncate">Total Revenue</p>
-            </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  aria-label="Total revenue description"
-                  title="Total revenue description"
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-slate-600 hover:bg-black/5 dark:text-white/40 dark:hover:text-white dark:hover:bg-white/10 transition-colors focus:outline-none"
-                >
-                  <Info className="h-3.5 w-3.5" />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent side="top" align="end" className="w-60 p-3 text-xs leading-relaxed text-slate-700 dark:text-white/80">
-                Net earnings after KSh 10 platform fee per sale.
-              </PopoverContent>
-            </Popover>
-          </div>
-          <p className="mt-2.5 sm:mt-3 truncate text-lg sm:text-2xl font-semibold tabular-nums text-slate-900 dark:text-white">{formatCurrency(revenue)}</p>
-        </div>
-      </div>
-    </div>
-  );
 
   const secondaryStatsBlock = (
     <div className="space-y-3 sm:space-y-4">
@@ -168,15 +73,60 @@ export function OverviewTab({ analytics, pendingOverviewOrders, sellerProfile, s
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Profile photo and shop link button on the left, with balance, sales & revenue on the same line */}
+      {/* Profile photo section: left-aligned photo & button, with balance, revenue & sales stats */}
       <SellerProfileHero
         sellerProfile={sellerProfile}
         shopUsername={shopUsername}
         onCopyShopLink={onCopyShopLink}
         canEdit
-      >
-        {heroMetricsCards}
-      </SellerProfileHero>
+        balance={balance}
+        revenue={revenue}
+        totalSales={totalSales}
+        onSelectTab={onSelectTab}
+      />
+
+      <IosNotificationBanner role="seller" className="mx-0 my-0" />
+
+      <SellerReminders sellerProfile={sellerProfile} totalProducts={liveProducts} onSelectTab={onSelectTab} />
+
+      {hasActivity ? (
+        secondaryStatsBlock
+      ) : (
+        <>
+          <div className="rounded-2xl border border-transparent bg-slate-100 dark:bg-white/[0.03] p-6 text-center sm:p-8">
+            <span
+              className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: 'rgba(var(--theme-accent-rgb, 245, 158, 11), 0.16)' }}
+            >
+              <PackagePlus className="h-6 w-6" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+            </span>
+            <p className="mt-3 text-base font-semibold text-slate-900 dark:text-white sm:text-lg">Add your first product to start getting clicks</p>
+            <p className="mx-auto mt-1 max-w-sm text-xs text-slate-500 dark:text-white/60 sm:text-sm">
+              Once buyers start engaging, your balance, revenue and activity will show up right here.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => { onSelectTab('products'); }}
+                className="inline-flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold shadow-[0_12px_28px_rgba(0,0,0,0.45)] transition-transform active:scale-95"
+                style={{ backgroundColor: 'var(--theme-button-bg, #f5c518)', color: 'var(--theme-button-text, #000000)' }}
+              >
+                <PackagePlus className="h-4 w-4" />
+                Add a product
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowMetrics((v) => !v); }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-transparent px-4 py-2.5 text-xs font-bold text-slate-500 dark:text-white/70 transition-colors hover:bg-white/10 hover:text-slate-900 dark:text-white sm:text-sm"
+              >
+                {showMetrics ? 'Hide metrics' : 'Show metrics'}
+                <ArrowUpRight className={`h-3.5 w-3.5 transition-transform ${showMetrics ? 'rotate-90' : ''}`} />
+              </button>
+            </div>
+          </div>
+          {showMetrics && secondaryStatsBlock}
+        </>
+      )}
 
       <IosNotificationBanner role="seller" className="mx-0 my-0" />
 

@@ -21,3 +21,4 @@ describe('SellerDashboardHeader', () => {
     expect(screen.queryByText(/Welcome/i)).not.toBeInTheDocument();
   });
 });
+
