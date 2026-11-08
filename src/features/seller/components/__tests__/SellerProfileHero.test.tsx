@@ -106,7 +106,6 @@ describe('SellerProfileHero', () => {
   });
 
   it('renders balance, revenue, and sales stats with figures on top and text below, without cards', () => {
-    const handleSelectTab = vi.fn();
     render(
       <QueryClientProvider client={queryClient}>
         <SellerProfileHero
@@ -117,7 +116,6 @@ describe('SellerProfileHero', () => {
           balance={1500}
           revenue={1200}
           totalSales={2000}
-          onSelectTab={handleSelectTab}
         />
       </QueryClientProvider>
     );
