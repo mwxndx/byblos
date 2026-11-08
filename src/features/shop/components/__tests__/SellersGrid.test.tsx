@@ -146,4 +146,27 @@ describe('SellersGrid defense-in-depth', () => {
     // Shoe Palace does not match
     expect(screen.queryByText('Shoe Palace')).not.toBeInTheDocument();
   });
+
+  it('renders shop cards in a single column layout (one column and one row per card)', () => {
+    const mockSellers: Partial<ApiPublicSeller>[] = [
+      { id: '1', shopName: 'Shop A', fullName: 'Seller A', status: 'active', is_active: true },
+    ];
+
+    vi.mocked(usePublicSellersQuery).mockReturnValue({
+      data: {
+        sellers: mockSellers as ApiPublicSeller[],
+        pagination: { page: 1, pageSize: 24, total: 1, hasMore: false }
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof usePublicSellersQuery>);
+
+    const { container } = render(
+      <MemoryRouter>
+        <SellersGrid filterCity="" filterArea="" searchQuery="" isBuyer={true} />
+      </MemoryRouter>
+    );
+
+    const grid = container.querySelector('.grid-cols-1');
+    expect(grid).toBeInTheDocument();
+  });
 });

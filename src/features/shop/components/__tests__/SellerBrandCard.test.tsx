@@ -33,31 +33,36 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(heading.className).toMatch(/text-\[15px\]/);
   });
 
-  it('renders a square frame for business profile photo on the top half of the card', () => {
+  it('renders a rectangular card with circular frame for business profile photo on the left', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
       </MemoryRouter>
     );
 
-    // Business profile photo is housed in the top-half frame
+    // Business profile photo is housed in a circular frame
     const businessImg = screen.getByAltText('Amani Styles business photo');
-    const squareFrame = businessImg.parentElement;
-    expect(squareFrame).toBeInTheDocument();
-    expect(squareFrame?.className).toContain('h-[52%]');
-    expect(squareFrame).not.toHaveClass('rounded-full');
+    const circularFrame = businessImg.parentElement;
+    expect(circularFrame).toBeInTheDocument();
+    expect(circularFrame).toHaveClass('rounded-full');
+    expect(circularFrame).toHaveClass('aspect-square');
+
+    // Root card is full-width rectangular
+    const card = container.firstElementChild;
+    expect(card).toHaveClass('w-full');
+    expect(card).not.toHaveClass('aspect-[4/5]');
   });
 
-  it('renders store fallback icon in top-half square frame when avatar is empty', () => {
+  it('renders store fallback icon in circular frame when avatar is empty', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
       </MemoryRouter>
     );
 
-    const squareFrame = container.querySelector('.h-\\[52\\%\\]');
-    expect(squareFrame).toBeInTheDocument();
-    expect(squareFrame).not.toHaveClass('rounded-full');
-    expect(squareFrame?.querySelector('svg')).toBeInTheDocument();
+    const circularFrame = container.querySelector('.rounded-full');
+    expect(circularFrame).toBeInTheDocument();
+    expect(circularFrame).toHaveClass('aspect-square');
+    expect(circularFrame?.querySelector('svg')).toBeInTheDocument();
   });
 });

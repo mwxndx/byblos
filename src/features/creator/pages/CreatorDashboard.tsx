@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, LogOut, UserRound } from '@/shared/ui/icons';
-import { NotificationBell } from '@/features/notifications/components/NotificationBell';
+import { NotificationList } from '@/features/notifications/components/NotificationList';
+import { useNotifications } from '@/features/notifications/hooks/useNotifications';
 import { toast } from 'sonner';
 import { useCreatorDashboardQuery } from '@/features/creator/hooks/queries/useCreatorDashboardQuery';
 import { useCreatorReferralDashboardQuery } from '@/features/creator/hooks/queries/useCreatorReferralDashboardQuery';
@@ -31,8 +32,9 @@ import { CreatorLinkedShops } from '@/features/creator/components/CreatorLinkedS
 import { CreatorAvailableShops } from '@/features/creator/components/CreatorAvailableShops';
 import { CreatorProfileSheet } from '@/features/creator/components/CreatorProfileSheet';
 import { CreatorWithdrawalPanel } from '@/features/creator/components/CreatorWithdrawalPanel';
+import { CreatorDashboardTabs, type CreatorTabId } from '@/features/creator/components/CreatorDashboardTabs';
 
-type DashboardTab = 'performance' | 'withdrawals' | 'shops';
+type DashboardTab = CreatorTabId;
 
 export default function CreatorDashboard() {
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ export default function CreatorDashboard() {
 
   const dashboardQuery = useCreatorDashboardQuery(analysisPeriod);
   const referralQuery = useCreatorReferralDashboardQuery();
+  const { unreadCount: unreadNotificationsCount } = useNotifications('default', true, 'creator');
   const logoutMutation = useCreatorLogoutMutation();
   const acceptRequestMutation = useAcceptShopRequestMutation();
   const denyRequestMutation = useDenyShopRequestMutation();
@@ -170,55 +173,31 @@ export default function CreatorDashboard() {
     setSheetOpen(true);
   };
 
-  const tabButton = (value: DashboardTab, label: string, badge?: number) => {
-    const active = tab === value;
-    return (
-      <button
-        type="button"
-        role="tab"
-        aria-selected={active}
-        onClick={() => setTab(value)}
-        className={`flex flex-1 items-center justify-center gap-2 rounded-[7px] px-4 py-2 text-sm font-medium transition-colors ease-ios ${
-          active ? 'bg-surface-1 text-label shadow-sm' : 'text-label-2 hover:text-label'
-        }`}
-      >
-        {label}
-        {badge ? (
-          <span className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1.5 text-[11px] font-medium text-brand-on">
-            {badge}
-          </span>
-        ) : null}
-      </button>
-    );
-  };
-
   return (
     <main className="dashboard-layout creator-surface text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
       <AppHeader
-        left={<NotificationBell triggerClassName="text-label hover:bg-fill" role="creator" />}
+        className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-separator/70"
+        left={<div className="w-8 h-8 sm:w-9 sm:h-9" />}
+        center={
+          <span className="text-base sm:text-lg font-bold tracking-tight text-slate-950 dark:text-white">
+            Byblos
+          </span>
+        }
         right={
           <button
             type="button"
             onClick={openProfile}
             aria-label="Open profile"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
+            className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
           >
-            <UserRound className="h-5 w-5" />
+            <UserRound className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         }
       />
 
       <div className="relative flex-1 min-h-0 overflow-hidden">
         <div className="h-full overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-      <div className="px-4 pt-3 sm:px-6 lg:px-8">
-        <div role="tablist" aria-label="Dashboard section" className="flex gap-1 rounded-control bg-fill p-1">
-          {tabButton('performance', 'Performance')}
-          {tabButton('withdrawals', 'Withdrawals')}
-          {tabButton('shops', 'Shops', shopRequests.length)}
-        </div>
-      </div>
-
-      <div className="space-y-5 px-4 pt-3.5 pb-8 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(2.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}>
+          <div className="space-y-5 px-4 pt-3.5 pb-8 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(5.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}>
         {tab === 'performance' ? (
           <>
             <CreatorEarningsHero
@@ -293,7 +272,7 @@ export default function CreatorDashboard() {
             clearance={clearance}
             withdrawals={dashboard?.withdrawals || []}
           />
-        ) : (
+        ) : tab === 'shops' ? (
           <>
             {shopRequests.length > 0 && (
               <section className="space-y-2">
@@ -346,6 +325,15 @@ export default function CreatorDashboard() {
 
             <CreatorAvailableShops />
           </>
+        ) : (
+          <div className="mx-auto w-full max-w-[760px]">
+            <NotificationList
+              variant="default"
+              role="creator"
+              scrollClassName=""
+              className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+            />
+          </div>
         )}
       </div>
 
@@ -358,6 +346,14 @@ export default function CreatorDashboard() {
             onLogout={handleLogout}
           />
         </div>
+
+      <CreatorDashboardTabs
+        activeTab={tab}
+        shopRequestsCount={shopRequests.length}
+        unreadNotificationsCount={unreadNotificationsCount}
+        onSelectTab={setTab}
+        hidden={sheetOpen}
+      />
     </main>
   );
 }

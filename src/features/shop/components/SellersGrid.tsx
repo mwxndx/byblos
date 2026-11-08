@@ -17,28 +17,22 @@ const INITIAL_VISIBLE_SELLERS = 24;
 const VISIBLE_SELLERS_STEP = 24;
 
 const SellerGridSkeleton = () => (
-    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
         <span className="sr-only">Loading shops…</span>
-        {Array.from({ length: 12 }).map((_, index) => (
+        {Array.from({ length: 8 }).map((_, index) => (
             <div
                 key={index}
                 aria-hidden="true"
-                className="h-[184px] overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-[#0a0a0a] p-3 shadow-sm dark:shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-colors duration-200"
+                className="flex items-center justify-between h-[72px] sm:h-[80px] rounded-2xl border border-transparent bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm dark:shadow-[0_4px_16px_rgba(0,0,0,0.35)] transition-colors duration-200"
             >
-                <div className="mb-3 flex items-start gap-3">
-                    <Skeleton className="h-14 w-14 rounded-2xl" />
-                    <div className="flex-1 space-y-2">
-                        <Skeleton className="h-4 w-2/3 rounded" />
-                        <Skeleton className="h-3 w-full rounded" />
-                        <Skeleton className="h-3 w-4/5 rounded" />
-                    </div>
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 rounded-full" />
+                    <Skeleton className="h-4 w-32 rounded" />
                 </div>
-                <div className="grid grid-cols-3 gap-1.5">
-                    <Skeleton className="h-12 rounded-xl" />
-                    <Skeleton className="h-12 rounded-xl" />
-                    <Skeleton className="h-12 rounded-xl" />
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-7 w-7 rounded-full" />
+                    <Skeleton className="h-7 w-7 rounded-full" />
                 </div>
-                <Skeleton className="mt-3 h-9 rounded-xl" />
             </div>
         ))}
     </div>
@@ -106,7 +100,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     }
 
     return (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 [@media(min-width:640px)]:grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
+        <div className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
             {visibleSellers.map((seller) => (
                 <SellerBrandCard key={seller.id} seller={seller} isBuyer={isBuyer} />
             ))}
