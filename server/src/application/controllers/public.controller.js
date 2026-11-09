@@ -311,6 +311,7 @@ export const getSellers = async (req, res) => {
       totalWishlistCount: Number.parseInt(row.total_wishlist_count, 10) || 0,
       wishlistCount: Number.parseInt(row.total_wishlist_count, 10) || 0,
       knockCount: Number.parseInt(row.knock_count, 10) || 0,
+      previewProducts: Array.isArray(row.preview_products) ? row.preview_products : [],
       createdAt: row.created_at
     }));
 

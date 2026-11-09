@@ -56,10 +56,27 @@ export async function findActiveWithStats({ limit, offset }) {
       s.created_at,
       COALESCE(k.knock_count, 0) AS knock_count,
       COUNT(*) OVER() AS total_count,
-      COUNT(w.id) as total_wishlist_count
+      COUNT(w.id) as total_wishlist_count,
+      COALESCE(preview.products, '[]'::json) AS preview_products
     FROM sellers s
     LEFT JOIN products p ON s.id = p.seller_id
     LEFT JOIN wishlists w ON p.id = w.product_id
+    LEFT JOIN LATERAL (
+      SELECT json_agg(
+        json_build_object(
+          'id', lp.id,
+          'imageUrl', lp.image_url,
+          'name', lp.name
+        )
+      ) AS products
+      FROM (
+        SELECT sub_p.id, sub_p.image_url, sub_p.name
+        FROM products sub_p
+        WHERE sub_p.seller_id = s.id AND sub_p.status = 'available'
+        ORDER BY sub_p.created_at DESC
+        LIMIT 4
+      ) lp
+    ) preview ON true
     LEFT JOIN LATERAL (
       SELECT COUNT(*)::int AS knock_count
       FROM seller_knocks sk
@@ -69,7 +86,7 @@ export async function findActiveWithStats({ limit, offset }) {
     WHERE s.user_id IS NOT NULL
       AND (s.status IS NULL OR s.status NOT IN ('deleted', 'suspended'))
       AND (s.is_active = true OR s.is_active IS NULL)
-    GROUP BY s.id, k.knock_count
+    GROUP BY s.id, k.knock_count, preview.products
     ORDER BY
       (
         CASE 

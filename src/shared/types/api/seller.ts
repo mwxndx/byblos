@@ -35,6 +35,7 @@ export interface ApiPublicSeller {
   wishlistCount?: number;
   knockCount?: number;
   knock_count?: number;
+  previewProducts?: Array<{ id: number; imageUrl?: string | null; name: string }>;
 }
 
 // Seller schema returned by the seller portal API
@@ -75,6 +76,7 @@ export interface ApiSeller {
   creatorCommissionRate?: number;
   creator_commission_rate?: number;
   is_verified: boolean;
+  products?: Array<Record<string, unknown>>;
 }
 
 

@@ -121,42 +121,73 @@ export const findSellerByShopName = async (shopName) => {
 
   const queryText = `
     SELECT 
-      id, 
-      full_name AS "fullName", 
-      shop_name AS "shopName", 
-      slug,
-      email, 
-      whatsapp_number AS "whatsappNumber", 
-      city, 
-      location, 
-      physical_address AS "physicalAddress",
-      latitude,
-      longitude,
-      bio,
-      avatar_url AS "avatarUrl",
-      instagram_link AS "instagramLink",
-      tiktok_link AS "tiktokLink",
-      facebook_link AS "facebookLink",
-      creator_commission_rate AS "creatorCommissionRate",
-      is_creator_marketplace_enabled AS "isCreatorMarketplaceEnabled",
-      total_sales AS "totalSales",
-      net_revenue AS "netRevenue",
-      balance,
-      created_at AS "createdAt"
-    FROM sellers 
-    WHERE COALESCE(status, 'active') = 'active'
+      s.id, 
+      s.full_name AS "fullName", 
+      s.shop_name AS "shopName", 
+      s.slug,
+      s.email, 
+      s.whatsapp_number AS "whatsappNumber", 
+      s.city, 
+      s.location, 
+      s.physical_address AS "physicalAddress",
+      s.latitude,
+      s.longitude,
+      s.bio,
+      s.avatar_url AS "avatarUrl",
+      s.instagram_link AS "instagramLink",
+      s.tiktok_link AS "tiktokLink",
+      s.facebook_link AS "facebookLink",
+      s.creator_commission_rate AS "creatorCommissionRate",
+      s.is_creator_marketplace_enabled AS "isCreatorMarketplaceEnabled",
+      s.total_sales AS "totalSales",
+      s.net_revenue AS "netRevenue",
+      s.balance,
+      s.created_at AS "createdAt",
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id', p.id,
+            'name', p.name,
+            'description', p.description,
+            'price', p.price,
+            'imageUrl', p.image_url,
+            'images', p.images,
+            'aesthetic', p.aesthetic,
+            'sellerId', p.seller_id,
+            'status', p.status,
+            'isSold', (p.status = 'sold'),
+            'isDigital', p.is_digital,
+            'productType', p.product_type,
+            'is_custom_product', p.is_custom_product,
+            'production_days', p.production_days,
+            'customization_prompt', p.customization_prompt,
+            'is_imported_product', p.is_imported_product,
+            'import_days', p.import_days,
+            'import_note', p.import_note,
+            'serviceLocations', p.service_locations,
+            'serviceOptions', p.service_options,
+            'createdAt', p.created_at,
+            'updatedAt', p.updated_at
+          ) ORDER BY p.created_at DESC
+        ) FILTER (WHERE p.id IS NOT NULL),
+        '[]'::json
+      ) AS products
+    FROM sellers s
+    LEFT JOIN products p ON s.id = p.seller_id AND p.status = 'available'
+    WHERE COALESCE(s.status, 'active') = 'active'
       AND (
-        LOWER(TRIM(shop_name)) = LOWER(TRIM($1))
-        OR (slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($1)))
-        OR (slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($2)))
-        OR LOWER(TRIM(shop_name)) = LOWER(TRIM($3))
-        OR LOWER(TRIM(shop_name)) = LOWER(TRIM($4))
+        LOWER(TRIM(s.shop_name)) = LOWER(TRIM($1))
+        OR (s.slug IS NOT NULL AND LOWER(TRIM(s.slug)) = LOWER(TRIM($1)))
+        OR (s.slug IS NOT NULL AND LOWER(TRIM(s.slug)) = LOWER(TRIM($2)))
+        OR LOWER(TRIM(s.shop_name)) = LOWER(TRIM($3))
+        OR LOWER(TRIM(s.shop_name)) = LOWER(TRIM($4))
       )
+    GROUP BY s.id
     ORDER BY 
       CASE 
-        WHEN LOWER(TRIM(shop_name)) = LOWER(TRIM($1)) THEN 1
-        WHEN LOWER(TRIM(shop_name)) = LOWER(TRIM($4)) THEN 2
-        WHEN slug IS NOT NULL AND LOWER(TRIM(slug)) = LOWER(TRIM($1)) THEN 3
+        WHEN LOWER(TRIM(s.shop_name)) = LOWER(TRIM($1)) THEN 1
+        WHEN LOWER(TRIM(s.shop_name)) = LOWER(TRIM($4)) THEN 2
+        WHEN s.slug IS NOT NULL AND LOWER(TRIM(s.slug)) = LOWER(TRIM($1)) THEN 3
         ELSE 4
       END
     LIMIT 1

@@ -56,7 +56,9 @@ export function useShopPage() {
   }, [location.search, shopName, trackCreatorLink]);
 
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
-  const { data: sellerProducts, isLoading: isProductsLoading } = usePublicSellerProductsQuery(seller?.id || '', !!seller?.id);
+  const joinedProducts = (seller?.products && seller.products.length > 0) ? (seller.products as unknown as ApiSellerProduct[]) : undefined;
+  const { data: fetchedProducts, isLoading: isProductsLoading } = usePublicSellerProductsQuery(seller?.id || '', !joinedProducts && !!seller?.id);
+  const sellerProducts = joinedProducts || fetchedProducts;
 
   useEffect(() => {
     if (sellerError) {
@@ -66,7 +68,7 @@ export function useShopPage() {
       return;
     }
 
-    if (isSellerLoading || (seller && isProductsLoading)) {
+    if (isSellerLoading || (seller && !joinedProducts && isProductsLoading)) {
       setIsLoading(true);
       return;
     }
@@ -138,7 +140,7 @@ export function useShopPage() {
     }
 
     setIsLoading(false);
-  }, [seller, sellerProducts, isSellerLoading, isProductsLoading, sellerError, shopName, location.search]);
+  }, [seller, sellerProducts, joinedProducts, isSellerLoading, isProductsLoading, sellerError, shopName, location.search]);
 
   // Digital products are hidden inside the native app: Google Play requires
   // digital goods to be sold via Play Billing, so they stay web-only.

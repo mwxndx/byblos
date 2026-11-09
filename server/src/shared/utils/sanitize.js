@@ -179,7 +179,8 @@ export const sanitizePublicSeller = (seller) => {
         creatorCommissionRate: sellerObj.creatorCommissionRate !== undefined
             ? Number.parseFloat(sellerObj.creatorCommissionRate)
             : (sellerObj.creator_commission_rate !== undefined ? Number.parseFloat(sellerObj.creator_commission_rate) : null),
-        isCreatorMarketplaceEnabled: Boolean(sellerObj.isCreatorMarketplaceEnabled ?? sellerObj.is_creator_marketplace_enabled)
+        isCreatorMarketplaceEnabled: Boolean(sellerObj.isCreatorMarketplaceEnabled ?? sellerObj.is_creator_marketplace_enabled),
+        products: Array.isArray(sellerObj.products) ? sellerObj.products : undefined
         // STRICTLY REMOVED: email, phone, whatsappNumber, fullName, balance, revenue, internal IDs, coordinates
     };
 };
