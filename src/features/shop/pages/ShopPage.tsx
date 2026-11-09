@@ -2,6 +2,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Loader2, Store, Package, ExternalLink, Sparkles, AlertCircle } from '@/shared/ui/icons';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
+import { AppHeader } from '@/shared/ui/AppHeader';
 import { BagProvider } from '@/features/shop/bag/BagContext';
 import { BagSheet } from '@/features/shop/components/BagSheet';
 import { ShopBagProductCard } from '@/features/shop/components/ShopBagProductCard';
@@ -98,8 +99,20 @@ const ShopPage = () => {
         url={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
         canonical={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
       />
+      <div className="sticky top-0 z-50 bg-[var(--bg,#000000)]">
+        <AppHeader
+          className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-[var(--bg,#000000)]"
+          left={<div className="w-0" />}
+          center={
+            <span className="text-base sm:text-lg font-bold tracking-tight text-slate-950 dark:text-white">
+              Byblos
+            </span>
+          }
+          right={<div className="w-0" />}
+        />
+      </div>
       {creatorModeNotice && (
-        <div className="sticky top-0 z-50 border-b border-amber-500/40 bg-amber-500/10 text-amber-900 dark:text-amber-200 px-4 py-2.5 backdrop-blur-md shadow-sm">
+        <div className="relative z-40 border-b border-amber-500/40 bg-amber-500/10 text-amber-900 dark:text-amber-200 px-4 py-2.5 backdrop-blur-md shadow-sm">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs sm:text-sm font-medium">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
@@ -109,7 +122,7 @@ const ShopPage = () => {
         </div>
       )}
       {isCreatorPreview && (
-        <div className="sticky top-0 z-50 border-b border-yellow-400/30 bg-black/90 px-4 py-2.5 backdrop-blur-md shadow-lg">
+        <div className="relative z-40 border-b border-yellow-400/30 bg-black/90 px-4 py-2.5 backdrop-blur-md shadow-lg">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
             <div className="flex items-center gap-2 text-yellow-400 font-bold">
               <Sparkles className="h-4 w-4 shrink-0" />

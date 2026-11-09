@@ -1352,12 +1352,12 @@ nav,
     box-shadow: none !important;
 }
 
-:is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .auth-page) header {
+:is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .auth-page, .shop-page-root) header {
     border-bottom-color: var(--bg, var(--byblos-bg, #000000)) !important;
     box-shadow: none !important;
 }
 
-[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard, .auth-page) header,
+[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard, .auth-page, .shop-page-root) header,
 [data-theme="light"] header.border-b,
 [data-theme="light"] header[class*="border-b"] {
     border-bottom-color: #ffffff !important;

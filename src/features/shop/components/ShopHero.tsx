@@ -28,7 +28,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
   const mapHref = coordsMapUrl(sellerInfo?.latitude, sellerInfo?.longitude);
 
   return (
-    <header className="relative w-full max-w-4xl mx-auto px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 sm:pt-6 sm:pb-4">
+    <div className="relative w-full max-w-4xl mx-auto px-4 pt-2 pb-3 sm:pt-4 sm:pb-4">
       {/* Top Navigation Row */}
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <Button
@@ -95,6 +95,6 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
           <SocialButtons instagramHref={instagramHref} tiktokHref={tiktokHref} shopName={sellerInfo?.shopName || 'Shop'} />
         </div>
       </div>
-    </header>
+    </div>
   );
 }
