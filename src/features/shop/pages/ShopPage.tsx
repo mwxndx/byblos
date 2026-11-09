@@ -213,8 +213,10 @@ const ShopPage = () => {
           <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
             {filteredProducts.map((product) => {
               // Ensure the product has the seller info from the shop
+              const rawImg = product.image_url || (product as unknown as { imageUrl?: string }).imageUrl || '';
               const productWithSeller: Product & { seller?: Seller; isSold?: boolean; } = {
                 ...product,
+                image_url: rawImg,
                 aesthetic: isAesthetic(product.aesthetic) ? product.aesthetic : 'all',
                 seller: sellerInfo ? {
                   id: sellerInfo.id,

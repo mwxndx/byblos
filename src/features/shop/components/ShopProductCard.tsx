@@ -58,14 +58,15 @@ export function ShopProductCard({
   };
 
   const { isSold } = getProductFlags(product as unknown as ProductWithApiFields);
-  const image = product.image_url ? getImageUrl(product.image_url) : null;
+  const rawImage = product.image_url || (product as unknown as { imageUrl?: string }).imageUrl || '';
+  const image = rawImage ? getImageUrl(rawImage) : null;
   const theme = (product.seller?.theme as Theme) || 'default';
   const themeVars = getProductCardThemeVars(theme);
 
   // Extract all images array
   const productImages: string[] = [];
-  if (product.image_url) {
-    productImages.push(getImageUrl(product.image_url));
+  if (rawImage) {
+    productImages.push(getImageUrl(rawImage));
   }
   const images = (product as unknown as { images?: unknown }).images;
   if (Array.isArray(images)) {

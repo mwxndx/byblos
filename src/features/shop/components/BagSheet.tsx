@@ -109,7 +109,10 @@ export function BagSheet() {
                 {bag.items.map((line) => (
                   <li key={String(line.product.id)} className="flex items-center gap-3 rounded-2xl border p-2" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
                     <div className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-black/5 dark:bg-white/10">
-                      {line.product.image_url ? <img src={getImageUrl(line.product.image_url)} alt={line.product.name} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center opacity-40"><ShoppingBag className="h-4 w-4" /></div>}
+                      {(() => {
+                        const bagImg = line.product.image_url || (line.product as unknown as { imageUrl?: string }).imageUrl;
+                        return bagImg ? <img src={getImageUrl(bagImg)} alt={line.product.name} className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center opacity-40"><ShoppingBag className="h-4 w-4" /></div>;
+                      })()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-bold">{line.product.name}</p>

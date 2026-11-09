@@ -151,6 +151,7 @@ export const findSellerByShopName = async (shopName) => {
             'description', p.description,
             'price', p.price,
             'imageUrl', p.image_url,
+            'image_url', p.image_url,
             'images', p.images,
             'aesthetic', p.aesthetic,
             'sellerId', p.seller_id,

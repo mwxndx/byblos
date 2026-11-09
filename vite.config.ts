@@ -56,6 +56,11 @@ export default defineConfig(({ command, mode }) => {
             });
           }
         },
+        '^/uploads': {
+          target: proxyTarget,
+          changeOrigin: true,
+          secure: false,
+        },
       },
       // Enable serving static files from public directory
       fs: {

@@ -123,8 +123,11 @@ export function useShopPage() {
       const availableProducts: ShopProduct[] = (sellerProducts as ApiSellerProduct[])
         .map((p) => {
           const pObj = p as unknown as Record<string, unknown>;
+          const productImg = (pObj.image_url || pObj.imageUrl || pObj.image || '') as string;
           return {
             ...p,
+            image_url: productImg,
+            imageUrl: productImg,
             sellerId: p.sellerId || '',
             isSold: Boolean(p.isSold ?? p.status === 'sold'),
             status: p.status || (p.isSold ? 'sold' : 'available'),

@@ -163,12 +163,19 @@ export function formatDate(dateInput: string | Date, format: 'full' | 'date' | '
  * Handles base64, absolute URLs, relative paths, and Capacitor Native environment paths
  */
 export function getImageUrl(path: string | undefined | null): string {
-  // Return placeholder image if no path provided
-  if (!path) return 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23111111"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23666666"%3ENo Image%3C/text%3E%3C/svg%3E';
+  const placeholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23111111"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23666666"%3ENo Image%3C/text%3E%3C/svg%3E';
 
-  // 1. If it's already a full URL (http/https) or a data URL (base64), return it as is
-  if (path.startsWith('http') || path.startsWith('data:')) {
-    return path;
+  // Return placeholder image if no path provided or string is 'null'/'undefined'
+  if (!path) return placeholder;
+
+  const trimmed = String(path).trim();
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined') {
+    return placeholder;
+  }
+
+  // 1. If it's already a full URL (http/https), a data URL (base64), or a blob URL, return it as is
+  if (trimmed.startsWith('http') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
+    return trimmed;
   }
 
   // 2. Identify the backend base URL
@@ -185,7 +192,7 @@ export function getImageUrl(path: string | undefined | null): string {
   }
 
   // 3. Normalize the path (ensure it starts with /)
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
 
   // 4. Combine and return
   return `${baseUrl}${cleanPath}`;

@@ -250,6 +250,7 @@ export async function findSellerProducts(sellerId, { limit = 50, offset = 0 } = 
       p.description,
       p.price,
       p.image_url AS "imageUrl",
+      p.image_url AS "image_url",
       p.images,
       p.aesthetic,
       p.seller_id AS "sellerId",

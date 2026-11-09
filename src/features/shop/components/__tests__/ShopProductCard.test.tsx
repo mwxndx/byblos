@@ -93,4 +93,18 @@ describe('ShopProductCard', () => {
     expect(productImg).toHaveClass('object-contain');
     expect(productImg).not.toHaveClass('object-cover');
   });
+
+  it('renders product image when backend only returns imageUrl instead of image_url', () => {
+    const productWithOnlyImageUrl = {
+      ...mockProduct,
+      image_url: undefined as unknown as string,
+      imageUrl: 'https://images.unsplash.com/photo-camelcase-fallback',
+    } as unknown as Product;
+
+    render(<ShopProductCard product={productWithOnlyImageUrl} onTap={vi.fn()} />);
+
+    const productImg = screen.getByAltText('Byblos Silk Shirt');
+    expect(productImg).toBeInTheDocument();
+    expect(productImg).toHaveAttribute('src', 'https://images.unsplash.com/photo-camelcase-fallback');
+  });
 });

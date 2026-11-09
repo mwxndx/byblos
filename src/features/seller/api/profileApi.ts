@@ -1,6 +1,7 @@
 
 import type { ApiSeller } from '@/shared/types/api/seller';
 import apiClient, { getFreshCsrfToken } from '@/infrastructure/http/apiClient';
+import { transformProduct } from './productsApi';
 import type {
   RegisterSellerInput,
   SellerAnalytics,
@@ -47,7 +48,7 @@ export const transformSeller = (data: unknown): ApiSeller => {
     facebookLink: str(seller.facebookLink || seller.facebook_link),
     creatorCommissionRate: Number(seller.creatorCommissionRate ?? seller.creator_commission_rate ?? 0.01),
     is_verified: !!(seller.is_verified || seller.isVerified || user?.is_verified),
-    products: Array.isArray(seller.products) ? (seller.products as Array<Record<string, unknown>>) : undefined,
+    products: Array.isArray(seller.products) ? ((seller.products as Array<Record<string, unknown>>).map(transformProduct) as unknown as Array<Record<string, unknown>>) : undefined,
     totalSales: optNum(seller.totalSales || seller.total_sales) ?? 0,
     createdAt: str(seller.createdAt || seller.created_at, new Date().toISOString()),
     updatedAt: str(seller.updatedAt || seller.updated_at, new Date().toISOString())
