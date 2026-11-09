@@ -1,5 +1,6 @@
 import FulfillmentQueueService from '../../orders/fulfillment/fulfillmentQueue.service.js';
 import NotificationService from '../../communication/notifications/notification.service.js';
+import { getAppVersionPolicy, updateAppVersionPolicy } from '../../../shared/utils/appVersion.js';
 
 import dotenv from 'dotenv';
 import { AppError } from '../../../shared/utils/errorHandler.js';
@@ -656,9 +657,18 @@ const resolveFlaggedCreatorEarning = async (req, res, next) => {
 
 const broadcastAppUpdate = async (req, res, next) => {
   try {
-    const { minVersionCode, title, body, storeUrl } = req.body || {};
-    const defaultMinVersion = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '78', 10);
-    const parsedMinVersion = minVersionCode ? Number(minVersionCode) : defaultMinVersion;
+    const { minVersionCode, latestVersionCode, latestVersionName, title, body, storeUrl } = req.body || {};
+    const currentPolicy = getAppVersionPolicy();
+    const parsedMinVersion = minVersionCode ? Number(minVersionCode) : currentPolicy.minAndroidVersionCode;
+
+    // Dynamically update authoritative version policy so /public/app-version and all clients immediately reflect the update
+    const updatedPolicy = updateAppVersionPolicy({
+      minVersionCode: parsedMinVersion,
+      latestVersionCode: latestVersionCode ? Number(latestVersionCode) : parsedMinVersion,
+      latestVersionName: latestVersionName ? String(latestVersionName) : undefined,
+      storeUrl: storeUrl ? String(storeUrl) : undefined
+    });
+
     const result = await NotificationService.broadcastAppUpdate({
       minVersionCode: parsedMinVersion,
       title: title ? String(title) : undefined,
@@ -671,6 +681,8 @@ const broadcastAppUpdate = async (req, res, next) => {
       data: {
         success: true,
         minVersionCode: parsedMinVersion,
+        latestVersionCode: updatedPolicy.latestAndroidVersionCode,
+        latestVersionName: updatedPolicy.latestVersionName,
         targetedDevices: result?.targeted ?? result?.targetedDevices ?? 0,
         fcmSent: result?.sent ?? result?.fcmSent ?? 0,
         fcmFailed: result?.failed ?? result?.fcmFailed ?? 0,

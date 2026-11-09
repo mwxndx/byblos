@@ -22,6 +22,11 @@ interface AdminBroadcastModalProps {
 }
 
 export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcastModalProps>) {
+  const [currentPolicy, setCurrentPolicy] = useState<{ versionCode: number; versionName: string; storeUrl: string }>({
+    versionCode: 78,
+    versionName: '1.0.78',
+    storeUrl: ''
+  });
   const [minVersionCode, setMinVersionCode] = useState<number>(78);
   const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.78');
   const [body, setBody] = useState<string>(
@@ -39,14 +44,14 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
     adminApi.getAppVersionPolicy?.()
       .then((policy) => {
         if (!isMounted || !policy) return;
-        if (policy.latestAndroidVersionCode) {
-          setMinVersionCode(policy.latestAndroidVersionCode);
-        }
-        if (policy.latestVersionName) {
-          setTitle(`Update Available: Byblos ${policy.latestVersionName}`);
-        }
-        if (policy.storeUrl) {
-          setStoreUrl(policy.storeUrl);
+        const code = policy.latestAndroidVersionCode || 78;
+        const name = policy.latestVersionName || `1.0.${code}`;
+        const store = policy.storeUrl || '';
+        setCurrentPolicy({ versionCode: code, versionName: name, storeUrl: store });
+        setMinVersionCode(code);
+        setTitle(`Update Available: Byblos ${name}`);
+        if (store) {
+          setStoreUrl(store);
         }
       })
       .catch(() => {});
@@ -57,10 +62,10 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
 
   const handleReset = () => {
     setResult(null);
-    setMinVersionCode(78);
-    setTitle('Update Available: Byblos 1.0.78');
+    setMinVersionCode(currentPolicy.versionCode);
+    setTitle(`Update Available: Byblos ${currentPolicy.versionName}`);
     setBody('A new version of Byblos is available. Please update now to continue using all features.');
-    setStoreUrl('');
+    setStoreUrl(currentPolicy.storeUrl);
   };
 
   const handleClose = () => {
@@ -86,6 +91,13 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
       });
 
       setResult(data);
+      if (data.latestVersionCode) {
+        setCurrentPolicy((prev) => ({
+          ...prev,
+          versionCode: data.latestVersionCode ?? prev.versionCode,
+          versionName: data.latestVersionName || prev.versionName
+        }));
+      }
       toast.success('App update broadcast sent successfully!');
     } catch (error) {
       toast.error(classifyApiError(error, 'Failed to broadcast app update').message);

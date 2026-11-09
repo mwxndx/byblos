@@ -6115,6 +6115,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (116, '20261027200000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (117, '20261102160000_normalize_seller_shop_names', '2026-11-02 16:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (118, '20261108090000_remove_founder_card_and_membership', '2026-11-08 09:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (119, '20261108130000_remove_seller_shop_theme', '2026-11-08 13:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (120, '20261109153000_shop_products_joined_indexes', '2026-11-09 15:30:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the

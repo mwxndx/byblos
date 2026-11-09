@@ -10,6 +10,8 @@ export interface BroadcastUpdatePayload {
 export interface BroadcastUpdateResult {
   success: boolean;
   minVersionCode: number;
+  latestVersionCode?: number;
+  latestVersionName?: string;
   targetedDevices: number;
   fcmSent: number;
   fcmFailed: number;
@@ -31,7 +33,9 @@ export async function broadcastAppUpdate(payload?: BroadcastUpdatePayload): Prom
   const res = data?.data || {};
   return {
     success: res.success ?? true,
-    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 76,
+    minVersionCode: res.minVersionCode ?? payload?.minVersionCode ?? 78,
+    latestVersionCode: res.latestVersionCode,
+    latestVersionName: res.latestVersionName,
     targetedDevices: res.targetedDevices ?? res.targeted ?? 0,
     fcmSent: res.fcmSent ?? res.sent ?? 0,
     fcmFailed: res.fcmFailed ?? res.failed ?? 0,

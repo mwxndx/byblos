@@ -1,3 +1,4 @@
+import { getAppVersionPolicy } from '../../shared/utils/appVersion.js';
 import logger from '../../shared/utils/logger.js';
 import cacheService from '../../shared/utils/cache.service.js';
 import paymentService from '../../domains/payments/payments/payment.service.js';
@@ -630,28 +631,9 @@ export const cancelPendingPublicOrder = createCancelPendingPublicOrder();
 
 
 export const getAppVersion = async (req, res) => {
-  const minAndroidVersionCode = Number.parseInt(process.env.MIN_ANDROID_VERSION_CODE || '78', 10);
-  const latestAndroidVersionCode = Number.parseInt(process.env.LATEST_ANDROID_VERSION_CODE || '78', 10);
-  const latestVersionName = process.env.LATEST_ANDROID_VERSION_NAME || '1.0.78';
-  const forceUpdate = process.env.FORCE_ANDROID_UPDATE !== 'false';
-  const storeUrl = process.env.ANDROID_STORE_URL || 'market://details?id=space.bybloshq.app';
-  const webStoreUrl = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
-
+  const policy = getAppVersionPolicy();
   return res.status(200).json({
     status: 'success',
-    data: {
-      platform: 'android',
-      minAndroidVersionCode,
-      latestAndroidVersionCode,
-      latestVersionName,
-      forceUpdate,
-      storeUrl,
-      webStoreUrl,
-      releaseNotes: [
-        'Introduced modern floating navigation bars across Buyer, Seller, and Creator dashboards with integrated notification alerts.',
-        'Redesigned seller shop cards with a sleek rectangular layout, compact header, and quick-toggle search in the buyer dashboard.',
-        'Streamlined adaptive light and dark themes across all dashboards, enhanced toast alert delivery, and upgraded loading skeletons.'
-      ]
-    }
+    data: policy
   });
 };

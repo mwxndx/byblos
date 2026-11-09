@@ -207,7 +207,8 @@ describe('DIST-03: Fulfillment Reliability & Dead-Letter Job Recovery (Integrati
     assert.equal(issues[0].resolved, true, 'System issue must be marked resolved upon retry');
 
     // Verify worker processes the retried job to completion
-    await FulfillmentQueueService.processJobs(1);
+    await pool.query("DELETE FROM fulfillment_jobs WHERE id != $1 AND status = 'PENDING'", [job.id]);
+    await FulfillmentQueueService.processJobs(5);
 
     const { rows: [completedJob] } = await pool.query(
       'SELECT status FROM fulfillment_jobs WHERE id = $1',

@@ -8,13 +8,23 @@ class CacheService {
     }
 
     /**
+     * Check if Redis is ready for operations
+     * @returns {boolean}
+     */
+    isReady() {
+        if (!this.redis) return false;
+        if (this.redis.__inMemoryFallback) return true;
+        return this.redis.status === 'ready';
+    }
+
+    /**
      * Get value from cache
      * @param {string} key 
      * @returns {Promise<any>}
      */
     async get(key) {
         try {
-            if (!this.redis) return null;
+            if (!this.isReady()) return null;
 
             const data = await this.redis.get(key);
             if (data) {
@@ -22,7 +32,7 @@ class CacheService {
             }
             return null;
         } catch (error) {
-            logger.error(`Cache Get Error (${key}):`, error);
+            logger.warn(`Cache Get Warning (${key}): ${error.message}`);
             return null;
         }
     }
@@ -35,13 +45,13 @@ class CacheService {
      */
     async set(key, value, ttlSeconds = this.defaultTTL) {
         try {
-            if (!this.redis) return false;
+            if (!this.isReady()) return false;
 
             const stringValue = JSON.stringify(value);
             await this.redis.set(key, stringValue, 'EX', ttlSeconds);
             return true;
         } catch (error) {
-            logger.error(`Cache Set Error (${key}):`, error);
+            logger.warn(`Cache Set Warning (${key}): ${error.message}`);
             return false;
         }
     }
@@ -52,11 +62,11 @@ class CacheService {
      */
     async del(key) {
         try {
-            if (!this.redis) return false;
+            if (!this.isReady()) return false;
             await this.redis.del(key);
             return true;
         } catch (error) {
-            logger.error(`Cache Del Error (${key}):`, error);
+            logger.warn(`Cache Del Warning (${key}): ${error.message}`);
             return false;
         }
     }
@@ -75,7 +85,7 @@ class CacheService {
      */
     async clearPattern(pattern) {
         try {
-            if (!this.redis) return false;
+            if (!this.isReady()) return false;
             let cursor = '0';
             const allKeys = [];
             do {
@@ -94,7 +104,7 @@ class CacheService {
             }
             return true;
         } catch (error) {
-            logger.error(`Cache Clear Pattern Error (${pattern}):`, error);
+            logger.warn(`Cache Clear Pattern Warning (${pattern}): ${error.message}`);
             return false;
         }
     }

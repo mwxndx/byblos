@@ -56,11 +56,9 @@ export async function findActiveWithStats({ limit, offset }) {
       s.created_at,
       COALESCE(k.knock_count, 0) AS knock_count,
       COUNT(*) OVER() AS total_count,
-      COUNT(w.id) as total_wishlist_count,
+      COALESCE(w.total_wishlist_count, 0) AS total_wishlist_count,
       COALESCE(preview.products, '[]'::json) AS preview_products
     FROM sellers s
-    LEFT JOIN products p ON s.id = p.seller_id
-    LEFT JOIN wishlists w ON p.id = w.product_id
     LEFT JOIN LATERAL (
       SELECT json_agg(
         json_build_object(
@@ -78,6 +76,12 @@ export async function findActiveWithStats({ limit, offset }) {
       ) lp
     ) preview ON true
     LEFT JOIN LATERAL (
+      SELECT COUNT(wl.id)::int AS total_wishlist_count
+      FROM products wp
+      JOIN wishlists wl ON wp.id = wl.product_id
+      WHERE wp.seller_id = s.id
+    ) w ON true
+    LEFT JOIN LATERAL (
       SELECT COUNT(*)::int AS knock_count
       FROM seller_knocks sk
       WHERE sk.seller_id = s.id
@@ -86,7 +90,6 @@ export async function findActiveWithStats({ limit, offset }) {
     WHERE s.user_id IS NOT NULL
       AND (s.status IS NULL OR s.status NOT IN ('deleted', 'suspended'))
       AND (s.is_active = true OR s.is_active IS NULL)
-    GROUP BY s.id, k.knock_count, preview.products
     ORDER BY
       (
         CASE 
@@ -100,7 +103,7 @@ export async function findActiveWithStats({ limit, offset }) {
         CASE WHEN s.instagram_link IS NOT NULL AND TRIM(s.instagram_link) != '' THEN 50 ELSE 0 END +
         CASE WHEN s.tiktok_link IS NOT NULL AND TRIM(s.tiktok_link) != '' THEN 50 ELSE 0 END
       ) DESC,
-      total_wishlist_count DESC,
+      COALESCE(w.total_wishlist_count, 0) DESC,
       COALESCE(k.knock_count, 0) DESC,
       s.id ASC
     LIMIT $1 OFFSET $2
