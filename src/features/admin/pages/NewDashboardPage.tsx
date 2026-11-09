@@ -146,7 +146,7 @@ const NewAdminDashboard = () => {
   return (
     <div className="admin-surface min-h-full overflow-x-hidden bg-[var(--bg)] text-label font-sans">
       <AppHeader
-        className="!bg-white border-b border-gray-200"
+        className="!bg-white border-b border-white"
         left={
           <div className="flex items-center gap-2 sm:gap-3">
             <img

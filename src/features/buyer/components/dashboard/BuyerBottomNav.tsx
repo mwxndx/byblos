@@ -62,7 +62,7 @@ export function BuyerBottomNav({
               </span>
 
               {count > 0 ? (
-                <span className="absolute top-0 right-[50%] translate-x-[14px] text-[10px] font-bold leading-none text-black dark:text-white [data-theme=light]_&:text-black [data-theme=dark]_&:text-white">
+                <span className={`absolute top-0 right-[50%] translate-x-[14px] text-[10px] font-bold leading-none ${item.key === 'notifications' ? 'text-red-600 dark:text-red-500 [data-theme=light]_&:text-red-600 [data-theme=dark]_&:text-red-500' : 'text-black dark:text-white [data-theme=light]_&:text-black [data-theme=dark]_&:text-white'}`}>
                   {count > 99 ? '99+' : count}
                 </span>
               ) : showDot ? (

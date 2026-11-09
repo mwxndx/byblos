@@ -122,7 +122,7 @@ export function DashboardProfilePanel({
           className,
         )}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-separator bg-surface-1 px-4 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-white dark:border-separator bg-surface-1 px-4 py-3">
           <h2 id={titleId} className="text-base font-semibold">{title}</h2>
           <Button
             type="button"

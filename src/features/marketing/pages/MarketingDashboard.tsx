@@ -141,7 +141,7 @@ export default function MarketingDashboard() {
     return (
         <div className="marketing-surface min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
             <AppHeader
-                className="!bg-white border-b border-gray-200"
+                className="!bg-white border-b border-white"
                 left={
                     <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
                         <img

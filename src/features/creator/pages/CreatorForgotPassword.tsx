@@ -27,7 +27,7 @@ export default function CreatorForgotPassword() {
 
   return (
     <main className="auth-page min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200">
-      <header className="sticky top-0 z-30 border-b border-black/[0.08] dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-white dark:border-separator bg-[var(--byblos-bg,#000000)] pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <Button

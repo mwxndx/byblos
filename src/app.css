@@ -1357,4 +1357,22 @@ nav,
     box-shadow: none !important;
 }
 
+[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard, .auth-page) header,
+[data-theme="light"] header.border-b,
+[data-theme="light"] header[class*="border-b"] {
+    border-bottom-color: #ffffff !important;
+}
+
+/* Profile Panel headers and borders */
+[data-theme="light"] .dashboard-profile-backdrop aside header,
+[data-theme="light"] .dashboard-profile-backdrop aside > div.sticky,
+[data-theme="light"] aside[role="complementary"] > div.sticky {
+    border-bottom-color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+[data-theme="light"] .auth-page header {
+    border-bottom-color: #ffffff !important;
+}
+
 

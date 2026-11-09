@@ -147,7 +147,7 @@ export function ResetPasswordPage() {
   return (
     <div className="auth-page min-h-screen w-full bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex flex-col relative transition-colors duration-200" style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
-      <header className="bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md border-b border-black/[0.08] dark:border-white/15 sticky top-0 z-30 pt-safe-top transition-colors duration-200">
+      <header className="bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md border-b border-white dark:border-white/15 sticky top-0 z-30 pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <Button variant="ghost" size="sm" onClick={() => navigate('/seller/login')} className="text-slate-700 dark:text-white hover:text-black hover:bg-yellow-400 rounded-xl">
             <ArrowLeft className="h-4 w-4 mr-2" /> Back

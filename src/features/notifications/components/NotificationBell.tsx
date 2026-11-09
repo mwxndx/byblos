@@ -31,7 +31,7 @@ export function NotificationBell({ variant = 'default', triggerClassName, role, 
           <Bell className={cn('h-5 w-5', iconClassName)} style={iconStyle} />
           {unreadCount > 0 && (
             <span
-              className="absolute -top-1 -right-1 text-[10px] font-bold leading-none text-black dark:text-white [data-theme=light]_&:text-black [data-theme=dark]_&:text-white"
+              className="absolute -top-1 -right-1 text-[10px] font-bold leading-none text-red-600 dark:text-red-500 [data-theme=light]_&:text-red-600 [data-theme=dark]_&:text-red-500"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>

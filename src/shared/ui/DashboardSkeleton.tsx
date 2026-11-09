@@ -15,7 +15,7 @@ export function DashboardSkeleton() {
       <span className="sr-only">Loading dashboard…</span>
 
       {/* Modern Compact Header Skeleton */}
-      <header className="sticky top-0 z-40 w-full border-b border-separator/70 bg-white/95 dark:bg-black/95 backdrop-blur-md px-4 py-2 sm:px-6">
+      <header className="sticky top-0 z-40 w-full border-b border-white dark:border-separator/70 bg-white/95 dark:bg-black/95 backdrop-blur-md px-4 py-2 sm:px-6">
         <div className="mx-auto flex h-10 sm:h-11 max-w-[1480px] items-center justify-between">
           <div className="w-8 h-8 sm:w-9 sm:h-9" />
           <Skeleton className="h-5 w-32 sm:w-44 rounded-md" />
