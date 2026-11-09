@@ -4,8 +4,19 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ShopPage from '../ShopPage';
-import { GlobalAuthContext } from '@/features/auth/contexts/authContextObjects';
-import type { GlobalAuthContextType } from '@/features/auth/types/authTypes';
+
+// Mock useGlobalAuth to avoid dependency on internal auth context providers
+vi.mock('@/features/auth/hooks/useGlobalAuth', () => ({
+  useGlobalAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    updateProfile: vi.fn(),
+    refreshUser: vi.fn(),
+  }),
+}));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -13,16 +24,6 @@ const queryClient = new QueryClient({
     mutations: { retry: false },
   },
 });
-
-const mockAuthValue: GlobalAuthContextType = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: false,
-  login: vi.fn(),
-  logout: vi.fn(),
-  updateProfile: vi.fn(),
-  refreshUser: vi.fn(),
-};
 
 // Mock useShopPage hook to supply ready-state shop data
 vi.mock('../useShopPage', () => ({
@@ -61,13 +62,11 @@ describe('ShopPage Header UI', () => {
     render(
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
-          <GlobalAuthContext.Provider value={mockAuthValue}>
-            <MemoryRouter initialEntries={['/test-boutique']}>
-              <Routes>
-                <Route path="/:shopName" element={<ShopPage />} />
-              </Routes>
-            </MemoryRouter>
-          </GlobalAuthContext.Provider>
+          <MemoryRouter initialEntries={['/test-boutique']}>
+            <Routes>
+              <Route path="/:shopName" element={<ShopPage />} />
+            </Routes>
+          </MemoryRouter>
         </QueryClientProvider>
       </HelmetProvider>
     );
