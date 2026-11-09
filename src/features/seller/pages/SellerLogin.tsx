@@ -140,7 +140,7 @@ export function SellerLogin() {
 
   return (
     <main className="auth-page min-h-screen min-h-[100dvh] min-h-[-webkit-fill-available] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-      <header className="sticky top-0 z-30 border-b border-white dark:border-separator bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
+      <header className="sticky top-0 z-30 border-b border-white dark:border-[#000000] bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">

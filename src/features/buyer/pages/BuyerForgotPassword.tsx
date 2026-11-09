@@ -44,7 +44,7 @@ export function BuyerForgotPassword() {
             }}
         >
             {/* Header */}
-            <header className="bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md border-b border-white dark:border-separator sticky top-0 z-30 pt-safe-top transition-colors duration-200">
+            <header className="bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md border-b border-white dark:border-[#000000] sticky top-0 z-30 pt-safe-top transition-colors duration-200">
                 <div className="w-full px-4 sm:px-6 lg:px-8">
                     <div className="relative flex items-center justify-between h-20">
                         {/* Left: Back Button */}

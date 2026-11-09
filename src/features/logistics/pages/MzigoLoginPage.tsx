@@ -64,7 +64,7 @@ const MzigoLoginPage = () => {
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}
     >
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white dark:border-separator bg-white/80 dark:bg-black/80 backdrop-blur-md pt-safe-top">
+      <header className="sticky top-0 z-30 border-b border-white dark:border-[#000000] bg-white/80 dark:bg-black/80 backdrop-blur-md pt-safe-top">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">
             <div className="flex flex-1 items-center gap-2">
