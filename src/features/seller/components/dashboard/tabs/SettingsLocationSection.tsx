@@ -56,7 +56,7 @@ export function SettingsLocationSection({
           size="sm"
           onClick={onSave}
           disabled={isSaving}
-          className="btn-standard h-8 rounded-lg bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 text-xs font-semibold shadow-md"
+          className="btn-standard h-8 rounded-lg bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 text-xs font-semibold"
         >
           {isSaving ? (
             <>
@@ -91,128 +91,128 @@ export function SettingsLocationSection({
           action={headerAction}
         />
 
-            <div className="grid grid-cols-1 gap-3 sm:gap-4">
-              <div className="seller-card-soft p-4">
-                <p className="seller-label mb-2">City</p>
-                {isEditing ? (
-                  <select
-                    name="city"
-                    value={formData.city}
-                    onChange={handleCityChange}
-                    className="seller-field w-full p-2 sm:p-3 text-xs sm:text-sm lg:text-base rounded-lg sm:rounded-xl focus:ring-2"
-                  >
-                    <option value="">Select a city</option>
-                    {Object.keys(cities).map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
-                    {sellerProfile?.city || 'Not set'}
-                  </p>
-                )}
-              </div>
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
+          <div className="seller-card-soft p-4">
+            <p className="seller-label mb-2">City</p>
+            {isEditing ? (
+              <select
+                name="city"
+                value={formData.city}
+                onChange={handleCityChange}
+                className="seller-field w-full p-2 sm:p-3 text-xs sm:text-sm lg:text-base rounded-lg sm:rounded-xl focus:ring-2"
+              >
+                <option value="">Select a city</option>
+                {Object.keys(cities).map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
+                {sellerProfile?.city || 'Not set'}
+              </p>
+            )}
+          </div>
 
-              <div className="seller-card-soft p-4">
-                <p className="seller-label mb-2">Location/Area</p>
-                {isEditing ? (
-                  <select
-                    name="location"
-                    value={formData.location}
-                    onChange={handleLocationChange}
-                    className="seller-field w-full p-2 sm:p-3 text-xs sm:text-sm lg:text-base rounded-lg sm:rounded-xl focus:ring-2"
-                    disabled={!formData.city}
-                  >
-                    <option value="">Select a location</option>
-                    {getLocations().map(location => (
-                      <option key={location} value={location}>{location}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
-                    {sellerProfile?.location || 'Not set'}
-                  </p>
-                )}
-              </div>
-            </div>
+          <div className="seller-card-soft p-4">
+            <p className="seller-label mb-2">Location/Area</p>
+            {isEditing ? (
+              <select
+                name="location"
+                value={formData.location}
+                onChange={handleLocationChange}
+                className="seller-field w-full p-2 sm:p-3 text-xs sm:text-sm lg:text-base rounded-lg sm:rounded-xl focus:ring-2"
+                disabled={!formData.city}
+              >
+                <option value="">Select a location</option>
+                {getLocations().map(location => (
+                  <option key={location} value={location}>{location}</option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
+                {sellerProfile?.location || 'Not set'}
+              </p>
+            )}
+          </div>
+        </div>
 
-            <div className="seller-card-soft p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="seller-label">Physical Shop Address</p>
-                {isEditing && (formData.physicalAddress || formData.latitude || formData.longitude) ? (
-                  <button
-                    type="button"
-                    onClick={() => handleShopLocationChange('', null)}
-                    className="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
-                    title="Clear physical shop address"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Clear Address
-                  </button>
-                ) : null}
-              </div>
-              {isEditing ? (
-                <div className="mt-2 space-y-3">
-                  <ShopLocationPicker
-                    initialAddress={formData.physicalAddress}
-                    initialCoordinates={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : null}
-                    onLocationChange={handleShopLocationChange}
-                  />
-                  {(Boolean(formData.physicalAddress) || formData.latitude != null || formData.longitude != null || Boolean(sellerProfile?.physicalAddress)) && (
-                    <button
-                      type="button"
-                      onClick={handleDeleteLocation}
-                      disabled={isDeletingLocation || isSaving}
-                      className="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/15 text-red-300 text-xs font-semibold hover:bg-red-500/25 transition disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isDeletingLocation ? (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-3.5 w-3.5" />
-                      )}
-                      Delete Location
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {sellerProfile?.physicalAddress ? (
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <div>
-                        <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
-                          {sellerProfile.physicalAddress}
-                        </p>
-                        <p className="text-xs text-label-2">
-                          {sellerProfile.latitude && sellerProfile.longitude
-                            ? `Coordinates: ${Number(sellerProfile.latitude).toFixed(6)}, ${Number(sellerProfile.longitude).toFixed(6)}`
-                            : 'No map location pinned'}
-                        </p>
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleDeleteLocation}
-                        disabled={isDeletingLocation || isSaving}
-                        className="self-start sm:self-auto h-8 px-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs font-semibold gap-1.5 shrink-0"
-                        title="Remove physical shop address"
-                      >
-                        {isDeletingLocation ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
-                        Remove Address
-                      </Button>
-                    </div>
+        <div className="seller-card-soft p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="seller-label">Physical Shop Address</p>
+            {isEditing && (formData.physicalAddress || formData.latitude || formData.longitude) ? (
+              <button
+                type="button"
+                onClick={() => handleShopLocationChange('', null)}
+                className="inline-flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors"
+                title="Clear physical shop address"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Clear Address
+              </button>
+            ) : null}
+          </div>
+          {isEditing ? (
+            <div className="mt-2 space-y-3">
+              <ShopLocationPicker
+                initialAddress={formData.physicalAddress}
+                initialCoordinates={formData.latitude && formData.longitude ? { lat: formData.latitude, lng: formData.longitude } : null}
+                onLocationChange={handleShopLocationChange}
+              />
+              {(Boolean(formData.physicalAddress) || formData.latitude != null || formData.longitude != null || Boolean(sellerProfile?.physicalAddress)) && (
+                <button
+                  type="button"
+                  onClick={handleDeleteLocation}
+                  disabled={isDeletingLocation || isSaving}
+                  className="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/15 text-red-300 text-xs font-semibold hover:bg-red-500/25 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isDeletingLocation ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   ) : (
-                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-label-2 italic">
-                      No physical address set
-                    </p>
+                    <Trash2 className="h-3.5 w-3.5" />
                   )}
-                </div>
+                  Delete Location
+                </button>
               )}
             </div>
-          </div>
-      </section>
+          ) : (
+            <div className="space-y-2">
+              {sellerProfile?.physicalAddress ? (
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <p className="text-xs sm:text-sm lg:text-base font-semibold text-label">
+                      {sellerProfile.physicalAddress}
+                    </p>
+                    <p className="text-xs text-label-2">
+                      {sellerProfile.latitude && sellerProfile.longitude
+                        ? `Coordinates: ${Number(sellerProfile.latitude).toFixed(6)}, ${Number(sellerProfile.longitude).toFixed(6)}`
+                        : 'No map location pinned'}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDeleteLocation}
+                    disabled={isDeletingLocation || isSaving}
+                    className="self-start sm:self-auto h-8 px-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs font-semibold gap-1.5 shrink-0"
+                    title="Remove physical shop address"
+                  >
+                    {isDeletingLocation ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-3.5 w-3.5" />
+                    )}
+                    Remove Address
+                  </Button>
+                </div>
+              ) : (
+                <p className="text-xs sm:text-sm lg:text-base font-semibold text-label-2 italic">
+                  No physical address set
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }

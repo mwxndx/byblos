@@ -61,40 +61,150 @@ class OrderReadService {
     }
   }
 
+  /**
+   * Fetches an order with its seller, buyer, line items (via json_agg),
+   * and latest payment (via lateral join) in a single unified SQL query.
+   *
+   * @param {number|string} orderId
+   * @param {object} [client] - Optional database client or transaction pool.
+   * @returns {Promise<{ fullOrder: object, items: Array<object>, payment: object|null }|null>}
+   */
+  static async getOrderWithItems(orderId, client = null) {
+    const db = client || pool;
+    const query = `
+      SELECT 
+        o.id,
+        o.order_number,
+        o.buyer_id,
+        o.seller_id,
+        o.total_amount,
+        o.platform_fee_amount,
+        o.seller_payout_amount,
+        o.payment_method,
+        o.buyer_name,
+        o.buyer_email,
+        o.buyer_mobile_payment,
+        o.buyer_whatsapp_number,
+        o.shipping_address,
+        o.notes,
+        o.metadata,
+        o.status,
+        o.payment_status,
+        o.payment_reference,
+        o.service_requirements,
+        o.fulfillment_type,
+        o.delivery_location,
+        o.order_type,
+        o.total_quantity,
+        o.reservation_expires_at,
+        o.location_address,
+        o.location_lat,
+        o.location_lng,
+        o.service_title,
+        o.notification_sent,
+        o.created_at,
+        o.updated_at,
+        o.client_checkout_token,
+        o.custom_production_deadline_at,
+        o.custom_production_grace_deadline_at,
+        o.custom_production_reminder_sent_at,
+        o.auto_cancelled_reason,
+        o.seller_dropoff_deadline,
+        o.buyer_pickup_deadline,
+        o.ready_for_pickup_at,
+        o.handoff_confirmed_at,
+        o.cancelled_at,
+        o.pre_handoff_sla,
+        o.paid_at,
+        o.is_debt,
+        o.is_seller_initiated,
+        o.completed_at,
+        o.payment_completed_at,
+        b.full_name AS buyer_name_actual,
+        b.mobile_payment AS buyer_phone_actual,
+        b.whatsapp_number AS buyer_whatsapp_actual,
+        b.email AS buyer_email_actual,
+        b.latitude AS buyer_latitude,
+        b.longitude AS buyer_longitude,
+        b.user_id AS buyer_user_id,
+        s.user_id AS seller_user_id,
+        COALESCE(s.full_name, u.email, 'Unknown Seller') AS seller_name,
+        COALESCE(s.whatsapp_number, NULL) AS seller_phone,
+        s.whatsapp_number AS seller_whatsapp,
+        COALESCE(s.email, u.email) AS seller_email,
+        s.physical_address AS seller_address,
+        s.shop_name,
+        s.latitude AS seller_latitude,
+        s.longitude AS seller_longitude,
+        s.instagram_link,
+        s.tiktok_link,
+        s.facebook_link,
+        p_latest.payment AS payment,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', oi.id,
+              'order_id', oi.order_id,
+              'product_id', oi.product_id,
+              'name', oi.name,
+              'price', oi.price,
+              'quantity', oi.quantity,
+              'subtotal', oi.subtotal,
+              'product_name', COALESCE(p.name, oi.product_name, oi.name),
+              'product_price', COALESCE(oi.product_price, oi.price),
+              'product_type', COALESCE(p.product_type::text, oi.metadata->>'productType', 'physical'),
+              'is_digital', COALESCE(p.is_digital, (oi.metadata->>'isDigital')::boolean, false),
+              'digital_file_name', COALESCE(p.digital_file_name, oi.metadata->>'digitalFileName'),
+              'digital_file_path', p.digital_file_path,
+              'image_url', COALESCE(p.image_url, oi.metadata->>'imageUrl'),
+              'metadata', oi.metadata,
+              'created_at', oi.created_at,
+              'updated_at', oi.updated_at
+            ) ORDER BY oi.id ASC
+          ) FILTER (WHERE oi.id IS NOT NULL),
+          '[]'::json
+        ) AS items
+      FROM product_orders o
+      LEFT JOIN buyers b ON o.buyer_id = b.id
+      LEFT JOIN sellers s ON o.seller_id = s.id
+      LEFT JOIN users u ON s.user_id = u.id
+      LEFT JOIN LATERAL (
+        SELECT jsonb_build_object(
+          'id', pay.id,
+          'invoice_id', pay.invoice_id,
+          'amount', pay.amount,
+          'currency', pay.currency,
+          'status', pay.status,
+          'payment_method', pay.payment_method,
+          'provider_reference', pay.provider_reference,
+          'mpesa_receipt', pay.mpesa_receipt,
+          'created_at', pay.created_at,
+          'updated_at', pay.updated_at
+        ) AS payment
+        FROM payments pay
+        WHERE pay.order_id = o.id
+           OR pay.invoice_id = o.id::text
+           OR pay.metadata->>'order_id' = o.id::text
+        ORDER BY pay.created_at DESC, pay.id DESC
+        LIMIT 1
+      ) p_latest ON true
+      LEFT JOIN order_items oi ON o.id = oi.order_id
+      LEFT JOIN products p ON oi.product_id = p.id
+      WHERE o.id = $1
+      GROUP BY o.id, b.id, s.id, u.id, p_latest.payment
+    `;
+
+    const { rows } = await db.query(query, [orderId]);
+    if (rows.length === 0) return null;
+
+    const { items, payment, ...fullOrder } = rows[0];
+    return { fullOrder, items, payment };
+  }
+
   static async getStatusNotificationDetails(orderId) {
-    const fullOrderResult = await pool.query(
-      `SELECT o.*, 
-              b.full_name as buyer_name_actual, b.mobile_payment as buyer_phone_actual, 
-              b.whatsapp_number as buyer_whatsapp_actual, b.email as buyer_email_actual,
-              b.latitude AS buyer_latitude, b.longitude AS buyer_longitude,
-              b.user_id AS buyer_user_id, s.user_id AS seller_user_id,
-              COALESCE(s.full_name, u.email, 'Unknown Seller') as seller_name, 
-              COALESCE(s.whatsapp_number, NULL) as seller_phone, 
-              s.whatsapp_number as seller_whatsapp, 
-              COALESCE(s.email, u.email) as seller_email, 
-              s.physical_address as seller_address, s.shop_name,
-              s.latitude as seller_latitude, s.longitude as seller_longitude,
-              s.instagram_link, s.tiktok_link, s.facebook_link
-       FROM product_orders o
-       LEFT JOIN buyers b ON o.buyer_id = b.id
-       LEFT JOIN sellers s ON o.seller_id = s.id
-       LEFT JOIN users u ON s.user_id = u.id
-       WHERE o.id = $1`,
-      [orderId]
-    );
-
-    if (fullOrderResult.rows.length === 0) return null;
-
-    const itemsResult = await pool.query(
-      `SELECT oi.*, p.product_type::text as product_type, p.is_digital, p.name as product_name,
-              p.digital_file_path, p.digital_file_name
-       FROM order_items oi
-       LEFT JOIN products p ON oi.product_id = p.id
-       WHERE oi.order_id = $1`,
-      [orderId]
-    );
-
-    return { fullOrder: fullOrderResult.rows[0], items: itemsResult.rows };
+    const res = await this.getOrderWithItems(orderId);
+    if (!res) return null;
+    return { fullOrder: res.fullOrder, items: res.items };
   }
 
   static async getReceiptNotificationDetails(orderId) {

@@ -6,7 +6,7 @@ import { RefundConfirmDialog } from './RefundConfirmDialog';
 import { RefundHistory } from './RefundHistory';
 
 const cardClass =
-  'rounded-2xl border border-transparent bg-white p-4 shadow-sm dark:bg-surface-1 sm:p-6';
+  'rounded-2xl border border-transparent bg-white p-4 dark:bg-surface-1 sm:p-6';
 
 /**
  * Buyer refund withdrawals, laid out like the seller Withdrawals tab so the
@@ -88,7 +88,7 @@ export function BuyerRefundsTab({ refundAmount }: Readonly<{ refundAmount: numbe
 
       {/* ── Supporting balance tiles ─────────────────────────── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        <div className="flex min-w-0 flex-col justify-between rounded-xl border border-transparent bg-white p-2.5 shadow-sm dark:bg-surface-1 sm:p-4">
+        <div className="flex min-w-0 flex-col justify-between rounded-xl border border-transparent bg-white p-2.5 dark:bg-surface-1 sm:p-4">
           <div>
             <h4 className="truncate text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50 sm:text-xs">
               Refund balance
@@ -100,7 +100,7 @@ export function BuyerRefundsTab({ refundAmount }: Readonly<{ refundAmount: numbe
           <p className="mt-1 truncate text-[9px] font-semibold text-slate-400 dark:text-white/40 sm:text-[10px]">Total credited</p>
         </div>
 
-        <div className="flex min-w-0 flex-col justify-between rounded-xl border border-transparent bg-white p-2.5 shadow-sm dark:bg-surface-1 sm:p-4">
+        <div className="flex min-w-0 flex-col justify-between rounded-xl border border-transparent bg-white p-2.5 dark:bg-surface-1 sm:p-4">
           <div>
             <h4 className="truncate text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50 sm:text-xs">
               Clearing (T+2)
@@ -114,7 +114,7 @@ export function BuyerRefundsTab({ refundAmount }: Readonly<{ refundAmount: numbe
           </p>
         </div>
 
-        <div className="flex min-w-0 flex-col justify-between rounded-xl border border-transparent bg-white p-2.5 shadow-sm dark:bg-surface-1 sm:p-4">
+        <div className="flex min-w-0 flex-col justify-between rounded-xl border border-transparent bg-white p-2.5 dark:bg-surface-1 sm:p-4">
           <div>
             <h4 className="truncate text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-white/50 sm:text-xs">
               Available

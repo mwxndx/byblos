@@ -73,7 +73,7 @@ export function RequestCard({
     : 'border-amber-400/40 bg-amber-400/10 text-amber-100';
 
   return (
-    <article className={`rounded-2xl border p-4 text-label shadow-[0_18px_45px_rgba(0,0,0,0.45)] ${tone}`}>
+    <article className={`rounded-2xl border p-4 text-label ${tone}`}>
       {/* Top row — flow (deliver vs collect) on the left, timing on the right. */}
       <div className="flex items-center justify-between gap-2">
         {isDoorDelivery ? (

@@ -1046,9 +1046,7 @@ button.btn-primary svg {
 :is(.seller-surface, .buyer-surface) :is([class*="rounded-2xl"], [class*="rounded-3xl"]):is([class*="bg-white/["], [class*="bg-black"], [class*="bg-[#0a0a0a]"], [class*="bg-[#0A0A0A]"]) {
     background-color: #161616 !important;
     border-color: transparent !important;
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset,
-                0 14px 30px -16px rgba(0, 0, 0, 0.95),
-                0 4px 10px -6px rgba(0, 0, 0, 0.55) !important;
+    box-shadow: none !important;
 }
 
 
@@ -1057,7 +1055,7 @@ button.btn-primary svg {
      Light base + dark: override so these classes flip with the seller theme
      (System/Light/Dark) instead of being locked dark. The accent stays
      theme-agnostic (driven by --theme-accent regardless of light/dark). */
-  .seller-card       { @apply rounded-2xl border border-transparent bg-white shadow-sm dark:bg-[#0a0a0a]; }
+  .seller-card       { @apply rounded-2xl border border-transparent bg-white dark:bg-[#0a0a0a]; }
   .seller-card-soft  { @apply rounded-2xl border border-transparent bg-slate-50 dark:bg-white/[0.03]; }
   .seller-field      { @apply h-10 rounded-xl border border-slate-200 bg-white text-slate-950 placeholder:text-slate-400
                                focus:border-[var(--theme-accent,#f5c518)] focus:ring-[var(--theme-accent,#f5c518)]
@@ -1234,7 +1232,18 @@ html.light #root {
 }
 
 /* ── Dashboard surface cards — light mode physical elevation & background-matching borders ──────────────── */
-[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard, .admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard) :is(
+[data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard) :is(
+    [class*="rounded-xl"]:not(.theme-swatch),
+    [class*="rounded-2xl"]:not(.theme-swatch),
+    [class*="rounded-3xl"]:not(.theme-swatch),
+    section
+) {
+    background-color: #ffffff !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+[data-theme="light"] :is(.admin-surface, .admin-light-dashboard, .marketing-surface, .marketing-light-dashboard) :is(
     [class*="rounded-xl"]:not(.theme-swatch),
     [class*="rounded-2xl"]:not(.theme-swatch),
     [class*="rounded-3xl"]:not(.theme-swatch),
@@ -1257,9 +1266,7 @@ html.light #root {
 [data-theme="light"] :is(.seller-surface, .buyer-surface) div.lg\:rounded-2xl {
     background-color: #ffffff !important;
     border-color: transparent !important;
-    box-shadow:
-        0 1px 0 rgba(255, 255, 255, 0.95) inset,
-        0 12px 32px -8px rgba(15, 23, 42, 0.09) !important;
+    box-shadow: none !important;
 }
 
 
@@ -1323,6 +1330,31 @@ nav,
 .shop-page-root {
     transition: background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
                 color 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Dashboard Surface Uniformity & Borderless Header Rules ───────────────── */
+:is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard) :is(
+    [class*="rounded-card"],
+    [class*="rounded-xl"],
+    [class*="rounded-2xl"],
+    [class*="rounded-3xl"],
+    [class*="rounded-[2rem]"],
+    article,
+    section,
+    .stat-card,
+    .chart-card,
+    .seller-card,
+    div.sticky,
+    header,
+    nav,
+    [class*="shadow"]
+) {
+    box-shadow: none !important;
+}
+
+:is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard) header {
+    border-bottom-color: var(--bg, var(--byblos-bg, #000000)) !important;
+    box-shadow: none !important;
 }
 
 

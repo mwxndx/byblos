@@ -32,7 +32,7 @@ export function BuyerDashboardHeader({
   return (
     <div className="sticky top-0 z-50 bg-[var(--bg,#000000)]">
       <AppHeader
-        className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-separator/70"
+        className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-[var(--bg,#000000)]"
         left={
           <div className="flex items-center gap-1.5">
             {!isAuthenticated && (
@@ -47,7 +47,7 @@ export function BuyerDashboardHeader({
             )}
 
             {/* Nairobi pill on the left of the header */}
-            <div className="relative inline-flex items-center rounded-full border border-slate-200/80 dark:border-white/15 bg-slate-100/80 dark:bg-white/[0.06] text-label shadow-sm">
+            <div className="relative inline-flex items-center rounded-full border border-slate-200/80 dark:border-white/15 bg-slate-100/80 dark:bg-white/[0.06] text-label">
               <MapPin className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-label-2" aria-hidden="true" />
               <select
                 aria-label="City"
@@ -97,7 +97,7 @@ export function BuyerDashboardHeader({
 
       {/* Expandable search bar when search icon is clicked */}
       {isSearchOpen && (
-        <div className="w-full px-4 py-2 border-b border-separator/80 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md flex items-center justify-center animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="w-full px-4 py-2 border-b border-[var(--bg,#000000)] bg-white/95 dark:bg-[#000000]/95 backdrop-blur-md flex items-center justify-center animate-in fade-in slide-in-from-top-1 duration-150">
           <div className="flex items-center gap-2 rounded-xl border border-separator bg-slate-100/90 dark:bg-zinc-900/90 px-3 h-9 w-full max-w-[500px]">
             <Search className="h-4 w-4 text-label-2 shrink-0" />
             <input

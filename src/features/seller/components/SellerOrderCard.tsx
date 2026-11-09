@@ -68,7 +68,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                 && isPaid
                                 && ['PAID', 'AWAITING_SELLER_ACTION', 'DELIVERY_PENDING'].includes(order.status);
 
-                            let cardClasses = "transition-all duration-300 bg-black border shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40 ";
+                            let cardClasses = "transition-all duration-300 bg-black border hover:border-yellow-400/40 ";
                             let itemClasses = "text-xs sm:text-sm text-label rounded-lg px-3 py-2 border ";
 
                             if (isService) {
@@ -196,7 +196,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
 
                                                 {/* Service Booking Details */}
                                                 {(order.metadata?.booking_date || order.metadata?.service_location || order.metadata?.service_requirements) && (
-                                                    <div className="mt-4 p-3 bg-purple-500/10 rounded-lg border border-purple-400/25 shadow-sm">
+                                                    <div className="mt-4 p-3 bg-purple-500/10 rounded-lg border border-purple-400/25">
                                                         <h4 className="flex items-center text-sm font-semibold text-label mb-2">
                                                             <Calendar className="h-4 w-4 mr-2 text-purple-200" />
                                                             Service Booking Details

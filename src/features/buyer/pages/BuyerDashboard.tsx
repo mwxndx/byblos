@@ -150,7 +150,7 @@ function BuyerDashboard() {
                   variant="default"
                   role="buyer"
                   scrollClassName=""
-                  className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+                  className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1"
                 />
               ) : (
                 <div className="rounded-2xl border border-transparent bg-white dark:bg-surface-1 p-6 text-center space-y-3">

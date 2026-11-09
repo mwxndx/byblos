@@ -94,7 +94,7 @@ export function SettingsTab({
           setIsEditingContacts(false);
         }}
         disabled={isSaving}
-        className="btn-standard h-8 rounded-lg bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 text-xs font-semibold shadow-md"
+        className="btn-standard h-8 rounded-lg bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 text-xs font-semibold"
       >
         {isSaving ? (
           <>
@@ -208,14 +208,14 @@ export function SettingsTab({
         }}
       />
 
-      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 sm:p-5 lg:p-6">
         <SectionHeader title="Legal" description="Review the documents you agreed to when you registered." />
         <div className="mt-4">
           <LegalLinks />
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 shadow-sm sm:p-5 lg:p-6">
+      <section className="rounded-2xl border border-slate-200 dark:border-separator bg-white dark:bg-[#000000] p-4 sm:p-5 lg:p-6">
         <SectionHeader title="Account" description="Sign out of your seller account on this device." />
         <div className="mt-4">
           <Button

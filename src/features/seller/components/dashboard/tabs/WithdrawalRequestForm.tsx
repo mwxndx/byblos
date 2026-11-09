@@ -43,14 +43,14 @@ export function WithdrawalRequestForm({
         {!showWithdrawalForm ? (
           <Button
             onClick={() => setShowWithdrawalForm(true)}
-            className="btn-standard gap-1.5 sm:gap-2 shadow-lg px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-auto bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
+            className="btn-standard gap-1.5 sm:gap-2 px-4 sm:px-5 md:px-6 py-2.5 sm:py-2.5 md:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-auto bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
             disabled={balance < MIN_WITHDRAWAL_AMOUNT}
           >
             <Wallet className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             Request Withdrawal
           </Button>
         ) : (
-          <div className="border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+          <div className="border border-slate-200 bg-white dark:border-separator dark:bg-surface-1 rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8">
             <h4 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-4">Request Withdrawal</h4>
             <form onSubmit={handleWithdrawalRequest} className="space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -118,7 +118,7 @@ export function WithdrawalRequestForm({
                 <Button
                   type="submit"
                   disabled={isRequestingWithdrawal || totalDeducted > balance}
-                  className="btn-standard shadow-lg px-4 py-2 h-10 sm:h-8 text-xs rounded-lg font-semibold w-full sm:w-auto bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
+                  className="btn-standard px-4 py-2 h-10 sm:h-8 text-xs rounded-lg font-semibold w-full sm:w-auto bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
                   size="sm"
                 >
                   {isRequestingWithdrawal ? (

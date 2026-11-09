@@ -688,6 +688,19 @@ class Order {
     const { rows } = await client.query(query, params);
     return rows;
   }
+
+  /**
+   * Delegates to OrderReadService to retrieve an order joined with its line items,
+   * products, and payment record in a single atomic SQL query using JSON aggregation.
+   *
+   * @param {number|string} orderId
+   * @param {object} [client]
+   * @returns {Promise<{ fullOrder: object, items: Array<object>, payment: object|null }|null>}
+   */
+  static async getOrderWithItems(orderId, client = null) {
+    const { default: OrderReadService } = await import('./orderRead.service.js');
+    return OrderReadService.getOrderWithItems(orderId, client);
+  }
 }
 
 export default Order;

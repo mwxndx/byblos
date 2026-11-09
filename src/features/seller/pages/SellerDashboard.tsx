@@ -283,7 +283,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
                 variant="default"
                 role="seller"
                 scrollClassName=""
-                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1 shadow-sm"
+                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1"
               />
             </div>
           )}

@@ -9,7 +9,7 @@ interface SellerDashboardHeaderProps {
 export function SellerDashboardHeader({ shopName, onOpenProfile }: Readonly<SellerDashboardHeaderProps>) {
   return (
     <AppHeader
-      className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-separator/70"
+      className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-[var(--bg,#000000)]"
       left={<div className="w-8 h-8 sm:w-9 sm:h-9" />}
       center={
         <h1 className="text-sm sm:text-lg font-semibold text-slate-900 dark:text-white tracking-tight truncate">

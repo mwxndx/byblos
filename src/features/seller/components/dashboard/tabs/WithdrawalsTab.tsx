@@ -30,7 +30,7 @@ interface WithdrawalsTabProps {
 }
 
 // Card surface: light in light mode, the original near-black in dark mode.
-const cardClass = 'rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-6 border border-transparent bg-white dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]';
+const cardClass = 'rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-6 border border-transparent bg-white dark:bg-surface-1';
 
 export function WithdrawalsTab({
   balance,
@@ -66,7 +66,7 @@ export function WithdrawalsTab({
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* ── Primary Hero Balance ────────────────────────────────────────── */}
-      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-transparent bg-white dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+      <div className="rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-transparent bg-white dark:bg-surface-1">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -83,7 +83,7 @@ export function WithdrawalsTab({
             <div className="w-full sm:w-auto shrink-0">
               <Button
                 onClick={() => setShowWithdrawalForm(true)}
-                className="btn-standard gap-2 shadow-lg px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-12 bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
+                className="btn-standard gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold text-xs sm:text-sm w-full sm:w-auto h-11 sm:h-12 bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
                 disabled={balance < MIN_WITHDRAWAL_AMOUNT}
               >
                 <Wallet className="h-4 w-4" />
@@ -96,7 +96,7 @@ export function WithdrawalsTab({
 
       {/* ── Supporting Compact Balances ─────────────────────────────────── */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-transparent bg-white dark:bg-surface-1 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-transparent bg-white dark:bg-surface-1 flex flex-col justify-between min-w-0">
           <div>
             <h4 className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-white/50 uppercase tracking-wider truncate" title="Preparing for Withdrawal">
               Preparing
@@ -113,7 +113,7 @@ export function WithdrawalsTab({
           </div>
         </div>
 
-        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-transparent bg-white dark:bg-surface-1 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-transparent bg-white dark:bg-surface-1 flex flex-col justify-between min-w-0">
           <div>
             <h4 className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-white/50 uppercase tracking-wider truncate" title="Being Sent to You">
               In Transit
@@ -127,7 +127,7 @@ export function WithdrawalsTab({
           </p>
         </div>
 
-        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-transparent bg-white dark:bg-surface-1 shadow-sm flex flex-col justify-between min-w-0">
+        <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-transparent bg-white dark:bg-surface-1 flex flex-col justify-between min-w-0">
           <div>
             <h4 className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-white/50 uppercase tracking-wider truncate" title="Held for Refunds">
               Held for Refunds
@@ -177,7 +177,7 @@ export function WithdrawalsTab({
         />
       )}
 
-      <div className="rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-transparent bg-white dark:bg-surface-1 shadow-[0_12px_35px_rgba(0,0,0,0.45)]">
+      <div className="rounded-2xl sm:rounded-3xl p-3 sm:p-6 md:p-8 border border-transparent bg-white dark:bg-surface-1">
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4 sm:mb-6">
           <div>
             <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white">Withdrawal Requests</h3>

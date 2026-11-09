@@ -172,7 +172,7 @@ export function CreatorsTab() {
   if (isLoading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
-        <div className="flex items-center gap-3 rounded-full border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 px-5 py-3 shadow-xl">
+        <div className="flex items-center gap-3 rounded-full border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 px-5 py-3">
           <Loader2 className="h-5 w-5 animate-spin text-yellow-500" />
           <span className="text-sm font-semibold text-slate-500 dark:text-white/80">Loading creators...</span>
         </div>
@@ -187,7 +187,7 @@ export function CreatorsTab() {
   return (
     <div className="flex flex-col gap-6">
       {/* ── Section 1: Marketplace Listing & Commission ── */}
-      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
+      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3.5">
             <div className="rounded-2xl p-3 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 shrink-0">
@@ -238,7 +238,7 @@ export function CreatorsTab() {
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 transform rounded-full shadow-sm transition-transform ${
+                      className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
                         isMarketplaceEnabled ? 'translate-x-6 bg-black' : 'translate-x-1 bg-white'
                       }`}
                     />
@@ -257,7 +257,7 @@ export function CreatorsTab() {
                   className={`h-11 px-5 font-semibold transition-all ${
                     isMarketplaceEnabled
                       ? 'border border-slate-300 dark:border-separator bg-transparent text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10'
-                      : 'bg-yellow-400 text-black hover:bg-yellow-300 shadow-sm'
+                      : 'bg-yellow-400 text-black hover:bg-yellow-300'
                   }`}
                 >
                   {getListingButtonContent(updateListingMutation.isPending, isMarketplaceEnabled)}
@@ -321,7 +321,7 @@ export function CreatorsTab() {
       {/* ── Incoming Requests + Active Creators, side by side on desktop ── */}
       <div className="grid gap-6 lg:grid-cols-2 order-3">
       {/* ── Section 2: Incoming Creator Collaboration Requests ── */}
-      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
+      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="rounded-xl p-2 bg-blue-500/10 border border-blue-500/20 text-blue-400">
@@ -438,7 +438,7 @@ export function CreatorsTab() {
       </section>
 
       {/* ── Section 3: Active Collaborating Creators ── */}
-      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
+      <section className="rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <div className="rounded-xl p-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
@@ -550,7 +550,7 @@ export function CreatorsTab() {
       </div>
 
       {/* ── Section 4: Direct Creator Email Invite (below Marketplace) ── */}
-      <section className="order-2 rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6 shadow-sm">
+      <section className="order-2 rounded-3xl border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 p-5 sm:p-6">
         <div className="flex items-center gap-3">
           <div className="rounded-xl p-2 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400">
             <MailPlus className="h-5 w-5" />

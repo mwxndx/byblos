@@ -80,7 +80,7 @@ export function ProductsList({ products, onDelete, onStatusUpdate, onRefresh, se
       />
 
       {filteredProducts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1 p-8 text-center shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1 p-8 text-center">
           <p className="text-slate-700 dark:text-white/70">No products match &ldquo;{searchQuery}&rdquo;.</p>
           <Button variant="link" className="mt-2 text-yellow-700 dark:text-yellow-400" onClick={onClearSearch || (() => setSearchQuery(''))}>
             Clear search

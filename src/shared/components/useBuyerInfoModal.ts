@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/shared/hooks/use-toast';
-import { isValidEmail } from '@/features/auth/utils/authValidation';
+import { isValidEmail } from '@/shared/utils/validation';
 import type { BuyerInfo, BuyerInfoModalProps } from './BuyerInfoModal';
 
 export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false, theme = 'default', phoneNumber, initialData }: BuyerInfoModalProps) {

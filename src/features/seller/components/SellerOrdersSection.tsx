@@ -52,7 +52,7 @@ export default function SellerOrdersSection() {
         return (
             <div className="space-y-4 sm:space-y-6">
                 {[1, 2].map((i) => (
-                    <Card key={i} className="bg-black border border-white/15 shadow-sm hover:shadow-md transition-all duration-300">
+                    <Card key={i} className="bg-black border border-white/15 transition-all duration-300">
                         <CardContent className="p-4 sm:p-6">
                             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-4 lg:space-y-0">
                                 <div className="space-y-3 sm:space-y-4 flex-1">
@@ -91,7 +91,7 @@ export default function SellerOrdersSection() {
 
     if (ordersQuery.error) {
         return (
-            <div className="text-center py-12 px-4 bg-white rounded-2xl border border-red-200 shadow-sm">
+            <div className="text-center py-12 px-4 bg-white rounded-2xl border border-red-200">
                 <div className="mx-auto w-16 h-16 bg-red-50 border border-red-200 rounded-full flex items-center justify-center mb-4">
                     <RefreshCw className="h-8 w-8 text-red-600" />
                 </div>
@@ -148,7 +148,7 @@ export default function SellerOrdersSection() {
 
                 <div className="space-y-4">
                     {filteredOrders.length === 0 ? (
-                        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-transparent shadow-sm">
+                        <div className="text-center py-12 px-4 bg-white rounded-2xl border border-transparent">
                             <p className="text-slate-600">No orders found matching "{searchQuery}"</p>
                         </div>
                     ) : (

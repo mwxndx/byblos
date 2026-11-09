@@ -199,6 +199,10 @@ const CorePaymentService = {
         return requireValidWebhookSignature(signature, rawBody);
     },
 
+    async findPaymentByProviderReference(providerReference, client = pool, source = 'unknown') {
+        return findPaymentByProviderReference(client, providerReference, source);
+    },
+
     async completeVerifiedPayment({ dbClient = null, reference, paymentId = null, providerPayload = {}, source = 'unknown' }) {
         const providerReference = extractPaymentReference(providerPayload, reference);
         const providerStatus = normalizeProviderPaymentStatus(providerPayload);

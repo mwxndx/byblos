@@ -14,8 +14,8 @@ export default function WishlistSection() {
   if (wishlist.length === 0) {
     return (
       <div className="text-center py-16 sm:py-20 lg:py-24">
-        <div className="max-w-2xl mx-auto rounded-3xl p-10 sm:p-12 bg-white dark:bg-black border border-transparent shadow-xl dark:shadow-2xl transition-colors duration-200">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-yellow-400/15 dark:bg-yellow-400/10 border border-yellow-400/20 rounded-3xl flex items-center justify-center shadow-sm">
+        <div className="max-w-2xl mx-auto rounded-3xl p-10 sm:p-12 bg-white dark:bg-black border border-transparent transition-colors duration-200">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-yellow-400/15 dark:bg-yellow-400/10 border border-yellow-400/20 rounded-3xl flex items-center justify-center">
             <Heart className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 text-yellow-500 dark:text-yellow-400 fill-current" />
           </div>
           <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">
@@ -46,7 +46,7 @@ export default function WishlistSection() {
           placeholder="Search wishlist..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="bg-white dark:bg-fill border border-slate-200 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 rounded-xl pl-10 h-10 shadow-sm transition-colors"
+          className="bg-white dark:bg-fill border border-slate-200 dark:border-separator text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder-gray-500 rounded-xl pl-10 h-10 transition-colors"
         />
       </div>
 

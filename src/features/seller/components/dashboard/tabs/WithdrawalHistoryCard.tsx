@@ -7,7 +7,7 @@ import { getWithdrawalStatusTone } from '@/shared/utils/withdrawalStatus';
 
 export function WithdrawalHistoryCard({ request }: Readonly<{ request: ApiWithdrawalRequest }>) {
   return (
-    <Card key={request.id} className="group transition-all duration-300 bg-white border border-transparent text-slate-900 dark:bg-surface-1 dark:text-white shadow-sm">
+    <Card key={request.id} className="group transition-all duration-300 bg-white border border-transparent text-slate-900 dark:bg-surface-1 dark:text-white">
                 <CardContent className="p-3 sm:p-5 lg:p-6">
                   <div className="flex min-w-0 justify-between items-start">
                     <div className="space-y-2 min-w-0 w-full">

@@ -21,7 +21,7 @@ export function BuyerDashboardSearch({
   return (
     <div className="w-full px-4 sm:px-6 pb-3 pt-3 sm:pt-3.5 flex flex-col items-center shrink-0 gap-2.5">
       {/* City selector — centered in the middle above search products search bar */}
-      <div className="relative inline-flex items-center rounded-full border border-separator bg-white dark:bg-black text-label shadow-sm">
+      <div className="relative inline-flex items-center rounded-full border border-separator bg-white dark:bg-black text-label">
         <MapPin className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-label-2" aria-hidden="true" />
         <select
           aria-label="City"
@@ -39,7 +39,7 @@ export function BuyerDashboardSearch({
       </div>
 
       {/* Search products search bar */}
-      <div className="flex items-center gap-2.5 rounded-xl border border-separator bg-white dark:bg-black px-3.5 h-10 w-full max-w-[760px] shadow-[var(--shadow-card)] transition-colors duration-200">
+      <div className="flex items-center gap-2.5 rounded-xl border border-separator bg-white dark:bg-black px-3.5 h-10 w-full max-w-[760px] transition-colors duration-200">
         <Search className="h-4 w-4 text-label-2 shrink-0" />
         <input
           value={productSearchQuery}

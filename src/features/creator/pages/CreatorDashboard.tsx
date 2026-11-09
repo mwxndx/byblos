@@ -176,7 +176,7 @@ export default function CreatorDashboard() {
   return (
     <main className="dashboard-layout creator-surface text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
       <AppHeader
-        className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-separator/70"
+        className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-[var(--bg,#000000)]"
         left={<div className="w-8 h-8 sm:w-9 sm:h-9" />}
         center={
           <span className="text-base sm:text-lg font-bold tracking-tight text-slate-950 dark:text-white">
@@ -331,7 +331,7 @@ export default function CreatorDashboard() {
               variant="default"
               role="creator"
               scrollClassName=""
-              className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1 shadow-sm dark:shadow-[0_8px_25px_rgba(0,0,0,0.45)]"
+              className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1"
             />
           </div>
         )}

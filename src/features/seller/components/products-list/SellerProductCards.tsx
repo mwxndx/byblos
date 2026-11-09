@@ -46,7 +46,7 @@ export const SellerProductCards = memo(function SellerProductCards({
           <div
             key={product.id}
             data-testid={`product-card-${product.id}`}
-            className="relative flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3.5 sm:p-4 md:px-5 md:py-4 md:pr-16 shadow-sm hover:border-[var(--theme-accent,#f5c518)]/40 transition-colors gap-3.5 md:gap-6 lg:gap-8"
+            className="relative flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3.5 sm:p-4 md:px-5 md:py-4 md:pr-16 hover:border-[var(--theme-accent,#f5c518)]/40 transition-colors gap-3.5 md:gap-6 lg:gap-8"
           >
             {/* Top right corner: Pencil icon */}
             <button

@@ -32,7 +32,7 @@ export function BuyerBottomNav({
 
   return (
     <nav
-      className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-2xl sm:rounded-full border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl dark:shadow-2xl px-2 py-1.5 transition-colors duration-200"
+      className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-2xl sm:rounded-full border border-slate-200/90 dark:border-white/10 bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md px-2 py-1.5 transition-colors duration-200"
       aria-label="Buyer navigation"
     >
       <div className="flex h-12 sm:h-13 items-center justify-between w-full">
@@ -48,11 +48,10 @@ export function BuyerBottomNav({
               onClick={() => onSelect(item.key)}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-xl py-2 transition-all duration-150 active:scale-95 ${
-                isActive
+              className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-xl py-2 transition-all duration-150 active:scale-95 ${isActive
                   ? 'text-black dark:text-white font-bold'
                   : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
-              }`}
+                }`}
             >
               <item.Icon
                 size={22}
