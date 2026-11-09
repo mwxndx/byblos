@@ -27,8 +27,8 @@ interface AdminOverviewTabProps {
 
 export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Readonly<AdminOverviewTabProps>) {
   const [appPolicy, setAppPolicy] = useState<{ versionName: string; versionCode: number }>({
-    versionName: '1.0.78',
-    versionCode: 78,
+    versionName: '1.0.79',
+    versionCode: 79,
   });
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
           }
         })
         .catch(() => {
-          // Fallback default is 78 (1.0.78)
+          // Fallback default is 79 (1.0.79)
         });
     }
     return () => {

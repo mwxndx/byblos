@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 78;
-  const defaultName = '1.0.78';
+  const defaultCode = 79;
+  const defaultName = '1.0.79';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Introduced modern floating navigation bars across Buyer, Seller, and Creator dashboards with integrated notification alerts.',
-      'Redesigned seller shop cards with a sleek rectangular layout, compact header, and quick-toggle search in the buyer dashboard.',
-      'Streamlined adaptive light and dark themes across all dashboards, enhanced toast alert delivery, and upgraded loading skeletons.'
+      'Refined public seller shop page layout with a sleek, centered header and theme-consistent typography.',
+      'Enhanced product and avatar image loading reliability with resilient multi-format URL resolution.',
+      'Streamlined shopping bag preview and checkout responsiveness across all screen sizes and connection profiles.'
     ]
   };
 }
