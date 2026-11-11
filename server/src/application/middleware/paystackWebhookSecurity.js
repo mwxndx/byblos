@@ -15,11 +15,14 @@ function getClientIp(req) {
         .replace(/^::ffff:/, '');
 }
 
+const OFFICIAL_PAYSTACK_IPS = ['52.31.139.6', '52.214.14.220', '52.49.173.169'];
+
 function configuredWebhookIps() {
-    return String(process.env.PAYSTACK_WEBHOOK_IPS || '')
+    const configured = String(process.env.PAYSTACK_WEBHOOK_IPS || '')
         .split(',')
         .map(ip => ip.trim())
         .filter(Boolean);
+    return configured.length > 0 ? configured : OFFICIAL_PAYSTACK_IPS;
 }
 
 export function verifyPaystackHmacSignature(signature, rawBody, secret = process.env.PAYSTACK_SECRET_KEY) {

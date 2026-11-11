@@ -26,7 +26,7 @@ export async function reconcileStuckWithdrawalsHelper(withdrawalServiceInstance,
          LEFT JOIN buyers b ON wr.buyer_id = b.id
          WHERE wr.status = 'processing'
            AND wr.created_at < NOW() - ($1 * INTERVAL '1 hour')
-           AND wr.created_at > NOW() - INTERVAL '48 hours'
+           AND wr.created_at > NOW() - INTERVAL '30 days'
          ORDER BY wr.created_at ASC
          LIMIT 50`,
         [hoursAgo]
@@ -51,10 +51,23 @@ export async function reconcileStuckWithdrawalsHelper(withdrawalServiceInstance,
             try {
                 const statusCheck = await payoutService.checkPayoutStatus(request.provider_reference);
                 const statusPayload = statusCheck?.raw_response || statusCheck || {};
-                const providerAmount = Number.parseFloat(statusPayload.amount ?? statusCheck?.amount);
+                const innerData = statusPayload?.data && typeof statusPayload.data === 'object' ? statusPayload.data : statusPayload;
+                const providerAmount = Number.parseFloat(
+                    statusCheck?.amount
+                    ?? innerData.amount_major
+                    ?? (Number.isFinite(Number(innerData.amount)) ? Number(innerData.amount) / 100 : statusPayload.amount)
+                );
                 const expectedAmount = Number.parseFloat(request.amount || 0);
 
-                if (statusCheck?.success && providerPayloadIndicatesSuccess(statusPayload)) {
+                const isSuccess = (statusCheck?.success === true || statusCheck?.status === 'success' || statusCheck?.status === 'completed')
+                    || providerPayloadIndicatesSuccess(statusCheck)
+                    || providerPayloadIndicatesSuccess(statusPayload);
+
+                const isFailure = (statusCheck?.success === false || statusCheck?.status === 'failed' || statusCheck?.status === 'reversed')
+                    || providerPayloadIndicatesFailure(statusCheck)
+                    || providerPayloadIndicatesFailure(statusPayload);
+
+                if (isSuccess) {
                     if (!Number.isNaN(providerAmount) && Math.abs(providerAmount - expectedAmount) > 0.01) {
                         await pool.query(
                             `UPDATE withdrawal_requests
@@ -73,16 +86,16 @@ export async function reconcileStuckWithdrawalsHelper(withdrawalServiceInstance,
 
                     await withdrawalServiceInstance.updateStatusWithSideEffects(request.id, 'completed', {
                         provider_reference: request.provider_reference,
-                        mpesa_receipt: statusPayload.third_party_trans_id || statusPayload.mpesa_receipt || null,
+                        mpesa_receipt: statusCheck?.mpesa_receipt || innerData.third_party_trans_id || innerData.mpesa_receipt || innerData.transfer_code || null,
                         remarks: 'Payout confirmed by provider status reconciliation'
                     });
                     continue;
                 }
 
-                if (statusCheck?.success && providerPayloadIndicatesFailure(statusPayload)) {
+                if (isFailure) {
                     await withdrawalServiceInstance.updateStatusWithSideEffects(request.id, 'failed', {
                         provider_reference: request.provider_reference,
-                        remarks: statusPayload.message || 'Payout failed by provider status reconciliation'
+                        remarks: statusPayload.message || innerData.message || 'Payout failed by provider status reconciliation'
                     });
                     continue;
                 }

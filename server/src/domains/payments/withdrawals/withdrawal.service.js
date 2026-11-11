@@ -345,9 +345,10 @@ class WithdrawalService {
                  SET status = $1, 
                      processed_at = NOW(),
                      provider_reference = COALESCE($2, provider_reference),
+                     mpesa_receipt = COALESCE($5, mpesa_receipt),
                      metadata = COALESCE(metadata, '{}'::jsonb) || $3::jsonb
                  WHERE id = $4`,
-                [newStatus, provider_reference, JSON.stringify(metadataUpdate), requestId]
+                [newStatus, provider_reference, JSON.stringify(metadataUpdate), requestId, mpesa_receipt]
             );
 
             let newBalance = null;
@@ -697,6 +698,19 @@ class WithdrawalService {
                 );
                 await this.markPayoutProviderAttemptAccepted(request.id, null, providerResponse);
                 logger.warn(`[WithdrawalService] Request ${request.id}: payout provider returned no transaction_reference`, providerResponse);
+            }
+
+            // If the payout provider completed the transfer synchronously on initiation,
+            // immediately finalize the withdrawal to 'completed' and clear the reserved balance.
+            // Do not leave it stuck in 'processing' waiting for a webhook or reconciliation cron.
+            if (providerResponse.success === true || providerResponse.status === 'success' || providerResponse.status === 'completed') {
+                logger.info(`[WithdrawalService] Request ${request.id} succeeded synchronously on initiation. Finalizing.`);
+                await this.updateStatusWithSideEffects(request.id, 'completed', {
+                    provider_reference: reference || request.provider_reference,
+                    mpesa_receipt: providerResponse.transfer_code || providerResponse.mpesa_receipt || null,
+                    remarks: 'Payout confirmed synchronously on provider initiation'
+                });
+                return;
             }
 
             try {

@@ -13,20 +13,26 @@ function normalizePayoutStatus(value) {
 }
 
 export function providerPayloadIndicatesSuccess(data = {}) {
-    const normalizedStatus = normalizePayoutStatus(data.status || data.state || data.result || data.transaction_status);
-    const resultCode = data.result_code ?? data.resultCode ?? data.code;
+    const inner = data?.data && typeof data.data === 'object' ? data.data : data;
+    const normalizedStatus = normalizePayoutStatus(inner.status || inner.state || inner.result || inner.transaction_status || (typeof data.status === 'string' ? data.status : ''));
+    const resultCode = inner.result_code ?? inner.resultCode ?? inner.code ?? data.result_code ?? data.resultCode ?? data.code;
     return Number.parseInt(resultCode, 10) === 0
         || PAYOUT_SUCCESS_STATUSES.has(normalizedStatus)
+        || inner.success === true
+        || String(inner.success).toLowerCase() === 'true'
         || data.success === true
         || String(data.success).toLowerCase() === 'true';
 }
 
 export function providerPayloadIndicatesFailure(data = {}) {
-    const normalizedStatus = normalizePayoutStatus(data.status || data.state || data.result || data.transaction_status);
-    const resultCode = data.result_code ?? data.resultCode ?? data.code;
+    const inner = data?.data && typeof data.data === 'object' ? data.data : data;
+    const normalizedStatus = normalizePayoutStatus(inner.status || inner.state || inner.result || inner.transaction_status || (typeof data.status === 'string' ? data.status : ''));
+    const resultCode = inner.result_code ?? inner.resultCode ?? inner.code ?? data.result_code ?? data.resultCode ?? data.code;
     const parsedResultCode = Number.parseInt(resultCode, 10);
     return (Number.isFinite(parsedResultCode) && parsedResultCode !== 0)
         || PAYOUT_FAILURE_STATUSES.has(normalizedStatus)
+        || inner.success === false
+        || String(inner.success).toLowerCase() === 'false'
         || data.success === false
         || String(data.success).toLowerCase() === 'false';
 }

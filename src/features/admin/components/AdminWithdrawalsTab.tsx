@@ -168,7 +168,7 @@ export const AdminWithdrawalsTab = ({
                   </td>
                   <td className="px-5 md:px-8 py-4 md:py-6 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {request.status === 'pending' ? (
+                      {['pending', 'manual_review', 'processing'].includes(request.status) ? (
                         <>
                           <Button
                             variant="outline"
