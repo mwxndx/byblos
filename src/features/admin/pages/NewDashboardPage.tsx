@@ -221,7 +221,7 @@ const NewAdminDashboard = () => {
           </div>
         </section>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6 w-full min-w-0 max-w-full">
           <AdminDashboardTabs
             counts={{
               withdrawals: pendingPayoutCount,

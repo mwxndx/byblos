@@ -157,7 +157,7 @@ export default function MarketingDashboard() {
                         <select
                             value={period}
                             onChange={(e) => setPeriod(Number(e.target.value))}
-                            className="cursor-pointer rounded-xl border border-gray-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-semibold text-gray-800 shadow-sm transition-colors focus:border-yellow-500 focus:outline-none"
+                            className="cursor-pointer rounded-xl border border-gray-200 bg-white px-2 py-1.5 sm:px-3 sm:py-2 text-[11px] sm:text-xs font-semibold text-gray-800 shadow-sm transition-colors focus:border-yellow-500 focus:outline-none max-w-[125px] sm:max-w-none"
                         >
                             <option value={3}>Last 3 Months</option>
                             <option value={6}>Last 6 Months</option>
@@ -175,7 +175,7 @@ export default function MarketingDashboard() {
                     </div>
                 }
             />
-            <div className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-6 md:space-y-12">
+            <div className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-6 md:space-y-12 max-w-7xl mx-auto w-full min-w-0">
 
             {/* Overview Stat Cards */}
             {overview && (
@@ -268,14 +268,16 @@ export default function MarketingDashboard() {
                                     nameKey="category"
                                     cx="50%"
                                     cy="50%"
-                                    outerRadius={80}
-                                    label={({ category }) => category}
+                                    outerRadius={75}
+                                    innerRadius={30}
+                                    paddingAngle={2}
                                 >
                                     {productMix.map((entry: MarketingRecord, index: number) => (
                                         <Cell key={`cell-${entry.category || entry.name || index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip content={<CustomTooltip />} />
+                                <Legend wrapperStyle={{ fontSize: '10px', paddingTop: '8px' }} />
                             </PieChart>
                         </ResponsiveContainer>
                     </ChartCard>
@@ -321,7 +323,7 @@ export default function MarketingDashboard() {
             {/* Section 3: Top Performers & Referrals */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                 {Array.isArray(topPerfs?.sellers) && (topPerfs.sellers as MarketingRecord[]).length > 0 && (
-                    <div className="bg-surface-1 border border-transparent rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-transparent rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl min-w-0 overflow-hidden">
                         <SectionTitle title="Top Performing Shops" subtitle="Highest GMV sellers this month" />
                         <div className="divide-y divide-separator">
                             {(topPerfs.sellers as MarketingRecord[]).map((s: MarketingRecord, idx: number) => (
@@ -341,7 +343,7 @@ export default function MarketingDashboard() {
                 )}
 
                 {Array.isArray(referrals?.creators) && (referrals.creators as MarketingRecord[]).length > 0 && (
-                    <div className="bg-surface-1 border border-transparent rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl">
+                    <div className="bg-surface-1 border border-transparent rounded-2xl md:rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-xl min-w-0 overflow-hidden">
                         <SectionTitle title="Creator Referrals" subtitle="Top performing creators" />
                         <div className="divide-y divide-separator">
                             {(referrals.creators as MarketingRecord[]).map((c: MarketingRecord, idx: number) => (

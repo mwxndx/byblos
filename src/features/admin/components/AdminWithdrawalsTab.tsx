@@ -87,56 +87,65 @@ export const AdminWithdrawalsTab = ({
           <p className="mt-3 text-2xl font-semibold text-label tabular-nums">{pendingPayoutCount.toLocaleString()}</p>
           <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-emerald-100/50">Awaiting settlement</p>
         </div>
-        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-4">
+        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-3 sm:p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[10px] font-semibold uppercase tracking-widest text-yellow-200/70">Pending payout value</p>
             <TrendingUp className="h-4 w-4 text-yellow-300" />
           </div>
-          <p className="mt-3 text-2xl font-semibold text-label tabular-nums">KSh {pendingPayoutAmount.toLocaleString()}</p>
+          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">KSh {pendingPayoutAmount.toLocaleString()}</p>
           <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-yellow-100/50">Capital waiting to leave</p>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-3 border-b border-separator bg-white/[0.015] p-5 md:grid-cols-3 md:p-8">
-        <div className="rounded-2xl border border-separator bg-white/[0.03] p-4">
+      <div className="grid grid-cols-1 gap-2.5 sm:gap-3 border-b border-separator bg-white/[0.015] p-4 sm:p-6 md:p-8 sm:grid-cols-3">
+        <div className="rounded-2xl border border-separator bg-white/[0.03] p-3.5 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-label-3">Provider health</p>
-          <div className="mt-3 flex items-center gap-3">
-            <span className={`h-2.5 w-2.5 rounded-full ${providerHealthOk ? 'bg-green-400' : 'bg-yellow-400'}`} />
-            <p className="text-sm font-semibold text-label">{providerHealthOk ? 'Connected' : providerHealthAvailable ? 'Check needed' : 'Loading'}</p>
+          <div className="mt-2 sm:mt-3 flex items-center gap-2.5 sm:gap-3">
+            <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${providerHealthOk ? 'bg-green-400' : 'bg-yellow-400'}`} />
+            <p className="text-xs sm:text-sm font-semibold text-label truncate">{providerHealthOk ? 'Connected' : providerHealthAvailable ? 'Check needed' : 'Loading'}</p>
           </div>
         </div>
-        <div className="rounded-2xl border border-separator bg-white/[0.03] p-4">
+        <div className="rounded-2xl border border-separator bg-white/[0.03] p-3.5 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-label-3">Payment provider balance/status</p>
-          <p className="mt-3 text-sm font-semibold text-label">{formatProviderBalance(providerHealth?.payin)}</p>
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-label truncate">{formatProviderBalance(providerHealth?.payin)}</p>
           <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-label-3">Pay-in account</p>
         </div>
-        <div className="rounded-2xl border border-separator bg-white/[0.03] p-4">
+        <div className="rounded-2xl border border-separator bg-white/[0.03] p-3.5 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-label-3">Payment provider balance/status</p>
-          <p className="mt-3 text-sm font-semibold text-label">{formatProviderBalance(providerHealth?.payout)}</p>
+          <p className="mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-label truncate">{formatProviderBalance(providerHealth?.payout)}</p>
           <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-label-3">Payout account</p>
         </div>
       </div>
       <CardContent className="p-0">
-        <div className="overflow-x-auto no-scrollbar touch-pan-x">
-          <table className="w-full text-left border-collapse">
+        <div className="w-full overflow-x-auto no-scrollbar touch-pan-x overscroll-x-contain">
+          <table className="w-full min-w-[560px] text-left border-collapse">
             <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
               <tr>
-                <th className="px-5 md:px-8 py-4 md:py-6">Seller</th>
-                <th className="px-5 md:px-8 py-4 md:py-6 text-right sm:text-left">Amount</th>
-                <th className="px-5 md:px-8 py-4 md:py-6 hidden xl:table-cell">Provider reference</th>
-                <th className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">Status</th>
-                <th className="px-5 md:px-8 py-4 md:py-6 text-right">Action</th>
+                <th className="px-3.5 sm:px-5 md:px-8 py-3 sm:py-4 md:py-6">Seller</th>
+                <th className="px-3.5 sm:px-5 md:px-8 py-3 sm:py-4 md:py-6 text-right sm:text-left">Amount</th>
+                <th className="px-3.5 sm:px-5 md:px-8 py-3 sm:py-4 md:py-6 hidden xl:table-cell">Provider reference</th>
+                <th className="px-3.5 sm:px-5 md:px-8 py-3 sm:py-4 md:py-6 text-center hidden md:table-cell">Status</th>
+                <th className="px-3.5 sm:px-5 md:px-8 py-3 sm:py-4 md:py-6 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-separator">
               {withdrawalRequests?.map((request) => (
                 <tr key={request.id} className="hover:bg-white/[0.02] transition-all group">
-                  <td className="px-5 md:px-8 py-4 md:py-6">
+                  <td className="px-3.5 sm:px-5 md:px-8 py-3.5 sm:py-4 md:py-6">
                     <div className="space-y-1">
                       <p className="text-sm md:text-base font-semibold text-label tracking-tight">{request.sellerName}</p>
                       <p className="text-[10px] text-label-3 font-medium italic opacity-60 truncate max-w-[150px]">{request.sellerEmail}</p>
+                      <div className="md:hidden pt-0.5">
+                        <Badge className={`px-2 py-0.5 rounded-full text-[9px] font-semibold uppercase tracking-wider border-none inline-flex items-center
+                        ${getWithdrawalStatusTone(request.status) === 'success' ? 'bg-green-500/10 text-green-400' :
+                            getWithdrawalStatusTone(request.status) === 'danger' ? 'bg-red-500/10 text-red-500' :
+                              getWithdrawalStatusTone(request.status) === 'review' ? 'bg-amber-500/10 text-amber-400' :
+                                'bg-yellow-500/10 text-yellow-500'}`}>
+                          {getWithdrawalStatusLabel(request.status)}
+                        </Badge>
+                      </div>
                     </div>
                   </td>
-                  <td className="px-5 md:px-8 py-4 md:py-6 text-right sm:text-left">
+                  <td className="px-3.5 sm:px-5 md:px-8 py-3.5 sm:py-4 md:py-6 text-right sm:text-left">
                     <p className="text-sm md:text-lg font-semibold text-label tracking-tight tabular-nums">KSh {request.amount.toLocaleString()}</p>
                     <p className="text-[9px] md:text-[10px] font-semibold text-label-3 uppercase tracking-widest opacity-50">{formatDate(request.createdAt)}</p>
                   </td>
@@ -151,7 +160,7 @@ export const AdminWithdrawalsTab = ({
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 md:px-8 py-4 md:py-6 text-center hidden md:table-cell">
+                  <td className="px-3.5 sm:px-5 md:px-8 py-3.5 sm:py-4 md:py-6 text-center hidden md:table-cell">
                     {/* Colour + label come from the shared withdrawal-status helpers
                         (src/shared/utils/withdrawalStatus), so real terminal states
                         — completed/failed/rejected/manual_review/compensation_required
@@ -166,15 +175,15 @@ export const AdminWithdrawalsTab = ({
                       {getWithdrawalStatusLabel(request.status)}
                     </Badge>
                   </td>
-                  <td className="px-5 md:px-8 py-4 md:py-6 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="px-3.5 sm:px-5 md:px-8 py-3.5 sm:py-4 md:py-6 text-right">
+                    <div className="flex items-center justify-end gap-1.5 sm:gap-2">
                       {['pending', 'manual_review', 'processing'].includes(request.status) ? (
                         <>
                           <Button
                             variant="outline"
                             size="sm"
                             disabled={processingRequestId === request.id}
-                            className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-green-500 hover:bg-green-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            className="h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 rounded-xl border-separator bg-fill text-green-500 hover:bg-green-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
                             onClick={() => onAction(request.id, 'approved')}
                           >
                             {processingRequestId === request.id ? (
@@ -188,7 +197,7 @@ export const AdminWithdrawalsTab = ({
                             variant="outline"
                             size="sm"
                             disabled={processingRequestId === request.id}
-                            className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            className="h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
                             onClick={() => onAction(request.id, 'rejected')}
                           >
                             {processingRequestId === request.id ? (
@@ -200,7 +209,7 @@ export const AdminWithdrawalsTab = ({
                           </Button>
                         </>
                       ) : (
-                        <span className="text-[9px] md:text-[10px] font-semibold text-gray-600 uppercase tracking-widest italic">
+                        <span className="text-[9px] md:text-[10px] font-semibold text-gray-500 uppercase tracking-widest italic">
                           {request.status}
                         </span>
                       )}
