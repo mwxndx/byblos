@@ -26,7 +26,7 @@ const SellerGridSkeleton = () => (
                 className="flex items-center justify-between h-[72px] sm:h-[80px] rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200"
             >
                 <div className="flex items-center gap-3 min-w-0 pr-2">
-                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-full" />
+                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl" />
                     <Skeleton className="h-4 w-28 sm:w-36 rounded-md" />
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-row-reverse">

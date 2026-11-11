@@ -33,19 +33,20 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(heading.className).toMatch(/text-\[15px\]/);
   });
 
-  it('renders a rectangular card with circular frame for business profile photo on the left', () => {
+  it('renders a rectangular card with square frame with rounded corners for business profile photo on the left', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
       </MemoryRouter>
     );
 
-    // Business profile photo is housed in a circular frame
+    // Business profile photo is housed in a square frame with rounded corners
     const businessImg = screen.getByAltText('Amani Styles business photo');
-    const circularFrame = businessImg.parentElement;
-    expect(circularFrame).toBeInTheDocument();
-    expect(circularFrame).toHaveClass('rounded-full');
-    expect(circularFrame).toHaveClass('aspect-square');
+    const avatarFrame = businessImg.parentElement;
+    expect(avatarFrame).toBeInTheDocument();
+    expect(avatarFrame).toHaveClass('rounded-xl');
+    expect(avatarFrame).not.toHaveClass('rounded-full');
+    expect(avatarFrame).toHaveClass('aspect-square');
 
     // Root card is full-width rectangular
     const card = container.firstElementChild;
@@ -53,16 +54,17 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(card).not.toHaveClass('aspect-[4/5]');
   });
 
-  it('renders store fallback icon in circular frame when avatar is empty', () => {
+  it('renders store fallback icon in square frame with rounded corners when avatar is empty', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
       </MemoryRouter>
     );
 
-    const circularFrame = container.querySelector('.rounded-full');
-    expect(circularFrame).toBeInTheDocument();
-    expect(circularFrame).toHaveClass('aspect-square');
-    expect(circularFrame?.querySelector('svg')).toBeInTheDocument();
+    const avatarFrame = container.querySelector('.rounded-xl');
+    expect(avatarFrame).toBeInTheDocument();
+    expect(avatarFrame).toHaveClass('aspect-square');
+    expect(avatarFrame).not.toHaveClass('rounded-full');
+    expect(avatarFrame?.querySelector('svg')).toBeInTheDocument();
   });
 });

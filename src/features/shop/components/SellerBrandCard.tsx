@@ -92,9 +92,9 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             onKeyDown={handleCardKeyDown}
             aria-label={`Open ${shopName}`}
         >
-            {/* Left side: Business profile photo in circular frame from left towards right, followed by shop name */}
+            {/* Left side: Business profile photo in square frame with rounded corners, followed by shop name */}
             <div className="flex items-center gap-3 min-w-0 pr-2">
-                <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-full aspect-square border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
+                <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl aspect-square border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
                     {hasAvatar ? (
                         <img
                             src={getImageUrl(avatarUrl)}
