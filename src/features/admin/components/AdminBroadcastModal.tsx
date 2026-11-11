@@ -23,12 +23,12 @@ interface AdminBroadcastModalProps {
 
 export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcastModalProps>) {
   const [currentPolicy, setCurrentPolicy] = useState<{ versionCode: number; versionName: string; storeUrl: string }>({
-    versionCode: 79,
-    versionName: '1.0.79',
+    versionCode: 80,
+    versionName: '1.0.80',
     storeUrl: ''
   });
-  const [minVersionCode, setMinVersionCode] = useState<number>(79);
-  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.79');
+  const [minVersionCode, setMinVersionCode] = useState<number>(80);
+  const [title, setTitle] = useState<string>('Update Available: Byblos 1.0.80');
   const [body, setBody] = useState<string>(
     'A new version of Byblos is available. Please update now to continue using all features.'
   );
@@ -44,7 +44,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
     adminApi.getAppVersionPolicy?.()
       .then((policy) => {
         if (!isMounted || !policy) return;
-        const code = policy.latestAndroidVersionCode || 79;
+        const code = policy.latestAndroidVersionCode || 80;
         const name = policy.latestVersionName || `1.0.${code}`;
         const store = policy.storeUrl || '';
         setCurrentPolicy({ versionCode: code, versionName: name, storeUrl: store });

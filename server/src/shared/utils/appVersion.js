@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 79;
-  const defaultName = '1.0.79';
+  const defaultCode = 80;
+  const defaultName = '1.0.80';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Refined public seller shop page layout with a sleek, centered header and theme-consistent typography.',
-      'Enhanced product and avatar image loading reliability with resilient multi-format URL resolution.',
-      'Streamlined shopping bag preview and checkout responsiveness across all screen sizes and connection profiles.'
+      'Optimized mobile responsiveness for admin and marketing dashboards with smooth horizontal tab scrolling and fluid charts.',
+      'Refined buyer and creator profile drawers to full-height viewports, eliminating bottom navigation gaps.',
+      'Updated seller brand identity cards to clean rounded-square avatar frames across buyer marketplace views.'
     ]
   };
 }
