@@ -59,7 +59,13 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
   };
 
   return (
-    <DashboardProfilePanel open={open} onOpenChange={onOpenChange} title="Profile">
+    <DashboardProfilePanel
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Profile"
+      bottomInset="0px"
+      className="creator-surface"
+    >
       <div className="space-y-4 px-4 py-4 pb-8">
           {/* Theme + account switcher — one equal row */}
           <section className="rounded-card border border-transparent bg-surface-1 p-4">

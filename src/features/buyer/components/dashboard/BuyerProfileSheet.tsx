@@ -281,8 +281,8 @@ interface BuyerProfileSheetProps extends BuyerProfileContentProps {
 }
 
 /**
- * Buyer profile contained by the dashboard body. It intentionally leaves the
- * shared header and fixed bottom navigation visible above the profile panel.
+ * Buyer profile contained by the dashboard body. Matches seller profile UX
+ * by hiding bottom navigation and filling full height (bottomInset="0px").
  */
 export function BuyerProfileSheet({ open, onOpenChange, ...content }: Readonly<BuyerProfileSheetProps>) {
   return (
@@ -290,7 +290,8 @@ export function BuyerProfileSheet({ open, onOpenChange, ...content }: Readonly<B
       open={open}
       onOpenChange={onOpenChange}
       title="Profile"
-      bottomInset="calc(3.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))"
+      bottomInset="0px"
+      className="buyer-surface"
     >
       <div className="px-4 py-4 pb-8">
         <BuyerProfileContent {...content} />
