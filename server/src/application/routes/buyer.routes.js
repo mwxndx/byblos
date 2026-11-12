@@ -3,6 +3,7 @@ import * as V from '../../shared/validations/buyer.validation.js';
 import express from 'express';
 import * as buyerController from '../../domains/commerce/buyers/buyer.controller.js';
 import { protect, hasPermission } from '../middleware/auth.js';
+import wishlistRoutes from './wishlist.routes.js';
 
 import { validateRegistration, validateLogin } from '../middleware/authValidation.js';
 import { authLimiter } from '../middleware/authRateLimiter.js';
