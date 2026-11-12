@@ -10,9 +10,15 @@ interface UseSellerDashboardDataArgs {
   navigate: (path: string, options?: import('react-router-dom').NavigateOptions) => void;
   locationPathname: string;
   toast: (options: Record<string, unknown>) => void;
+  enabled?: boolean;
 }
 
-export function useSellerDashboardData({ navigate, locationPathname, toast }: UseSellerDashboardDataArgs) {
+export function useSellerDashboardData({
+  navigate,
+  locationPathname,
+  toast,
+  enabled = true,
+}: UseSellerDashboardDataArgs) {
   const queryClient = useQueryClient();
 
   const productsQuery = useQuery({
@@ -20,8 +26,9 @@ export function useSellerDashboardData({ navigate, locationPathname, toast }: Us
     queryFn: () => sellerApi.getProducts(),
     staleTime: 60_000,
     gcTime: 5 * 60_000,
-    retry: 1,
-    refetchOnWindowFocus: false
+    retry: 2,
+    refetchOnWindowFocus: false,
+    enabled: Boolean(enabled),
   });
 
   const analyticsQuery = useQuery({
@@ -29,8 +36,9 @@ export function useSellerDashboardData({ navigate, locationPathname, toast }: Us
     queryFn: () => sellerApi.getAnalytics(),
     staleTime: 15_000,
     gcTime: 5 * 60_000,
-    retry: 1,
-    refetchOnWindowFocus: true
+    retry: 2,
+    refetchOnWindowFocus: true,
+    enabled: Boolean(enabled),
   });
 
   const handleDashboardFetchError = useCallback((err: unknown) => {
@@ -65,9 +73,24 @@ export function useSellerDashboardData({ navigate, locationPathname, toast }: Us
     [analyticsQuery.data, products]
   );
 
-  const isLoading = productsQuery.isLoading || analyticsQuery.isLoading;
-  const error = productsQuery.error || analyticsQuery.error
-    ? 'Failed to load data. Please try again later.'
+  const isProductsInitialLoading = Boolean(enabled) && (productsQuery.isLoading || (productsQuery.isPending && !productsQuery.data));
+  const isAnalyticsInitialLoading = Boolean(enabled) && (analyticsQuery.isLoading || (analyticsQuery.isPending && !analyticsQuery.data));
+  const isInitialLoading = isProductsInitialLoading || isAnalyticsInitialLoading;
+  const isFetching = productsQuery.isFetching || analyticsQuery.isFetching;
+
+  const isLoading = isInitialLoading || isFetching;
+
+  // Only surface a fatal dashboard error if both queries failed, have zero cached data, and are not actively fetching/retrying
+  const hasFatalError = Boolean(
+    productsQuery.isError &&
+    analyticsQuery.isError &&
+    !productsQuery.data &&
+    !analyticsQuery.data &&
+    !isFetching
+  );
+
+  const error = hasFatalError
+    ? 'Failed to load dashboard data. Please try again later.'
     : null;
 
   const fetchData = useCallback(async (): Promise<AnalyticsData> => {
@@ -127,6 +150,8 @@ export function useSellerDashboardData({ navigate, locationPathname, toast }: Us
     error,
     fetchData,
     fetchProducts,
+    hasFatalError,
+    isInitialLoading,
     isLoading,
     products
   };

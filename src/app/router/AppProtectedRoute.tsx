@@ -6,6 +6,7 @@ import { requiresEmailVerification, getDashboardPath } from '@/features/auth/uti
 import { useMyAccounts } from '@/features/auth/hooks/useMyAccounts';
 import { Button } from '@/shared/ui/button';
 import { Loader2 } from '@/shared/ui/icons';
+import { authStateManager } from '@/infrastructure/auth/authState';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface AppProtectedRouteProps {
@@ -28,8 +29,8 @@ export function AppProtectedRoute({
     const { data: myAccounts, isLoading: isAccountsLoading } = useMyAccounts(Boolean(isAuthenticated && user));
     const [isSwitching, setIsSwitching] = useState(false);
 
-    // Show branded fallback while auth state is resolving only if user is not yet hydrated
-    if (isLoading && !user) {
+    // Show branded fallback while auth state is resolving or rehydrating if user is not yet hydrated
+    if ((isLoading || authStateManager.isCurrentlyRehydrating()) && !user) {
         return <>{fallback ?? <RouteFallback />}</>;
     }
 

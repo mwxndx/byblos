@@ -46,9 +46,8 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { user: _globalUser, logout, updateProfile } = useGlobalAuth();
+  const { user: _globalUser, logout, updateProfile, isLoading: isAuthLoading } = useGlobalAuth();
   const sellerProfile = _globalUser?.role === 'seller' ? _globalUser.profile as SellerProfile : null;
-  const isAuthLoading = false; // globalAuth loading is handled by AppProtectedRoute
   const updateSellerProfile = (updates: Partial<SellerProfile>) => updateProfile(updates, 'seller');
 
   const { data: liveSellerProfile } = useSellerProfileQuery(!!sellerProfile);
@@ -107,12 +106,15 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
     error,
     fetchData,
     fetchProducts,
+    hasFatalError,
+    isInitialLoading,
     isLoading,
     products
   } = useSellerDashboardData({
     navigate,
     locationPathname: location.pathname,
-    toast
+    toast,
+    enabled: Boolean(sellerProfile)
   });
 
   const settingsForm = useSellerSettingsForm({
@@ -233,11 +235,11 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
     );
   }
 
-  if (isAuthLoading || isLoading) {
+  if (isAuthLoading || isInitialLoading) {
     return <DashboardSkeleton />;
   }
 
-  if (!analytics || error) {
+  if (hasFatalError && !products.length) {
     return <SellerDashboardErrorState error={error} onRetry={fetchData} />;
   }
 
