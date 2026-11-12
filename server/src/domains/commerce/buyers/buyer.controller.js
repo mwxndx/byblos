@@ -247,12 +247,7 @@ export const checkBuyerByPhone = async (req, res, next) => {
     const existingBuyer = await Buyer.findByPhone(phone);
 
     if (existingBuyer) {
-      // Buyer exists - return buyer info BUT NO TOKEN
-      // logger.info('Buyer found with phone');
-
-      // SECURITY FIX: Do not generate token here
-      // const token = signToken(existingBuyer.id, 'buyer');
-
+      // Buyer exists - return buyer info without token (pre-auth check)
       res.status(200).json({
         status: 'success',
         data: {

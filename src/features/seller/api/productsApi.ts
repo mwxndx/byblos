@@ -1,16 +1,3 @@
-function unwrapProducts(bodyData: unknown): unknown[] {
-  if (Array.isArray(bodyData)) return bodyData;
-  if (!bodyData || typeof bodyData !== 'object') return [];
-  const body = bodyData as { data?: unknown; products?: unknown };
-  const nested = body.data as { products?: unknown } | unknown[] | undefined;
-  if (Array.isArray((nested as { products?: unknown } | undefined)?.products)) {
-    return (nested as { products: unknown[] }).products;
-  }
-  if (Array.isArray(body.products)) return body.products;
-  if (Array.isArray(nested)) return nested;
-  return [];
-}
-
 import apiClient from '@/infrastructure/http/apiClient';
 import type { ApiSellerProduct } from '@/shared/types/api/product';
 

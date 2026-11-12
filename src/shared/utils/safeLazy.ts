@@ -74,9 +74,6 @@ export const safeLazy = <T extends ComponentType<unknown>>(
             return { default: component as T };
 
         } catch (error: unknown) {
-            const err = error as { name?: string; message?: string } | undefined;
-            console.error('safeLazy caught a chunk loading error:', err?.message || error);
-
             const isChunkError = isDynamicImportError(error);
 
             if (isChunkError && !isNativeApp()) {
@@ -87,7 +84,6 @@ export const safeLazy = <T extends ComponentType<unknown>>(
                 // Only auto-reload if we haven't reloaded in the last 10 seconds
                 if (!lastReload || now - Number.parseInt(lastReload, 10) > 10000) {
                     setSafeSessionItem('last_chunk_reload', now.toString());
-                    console.warn('[safeLazy] Chunk loading failed. Refreshing web page...');
                     if (typeof window !== 'undefined' && window.location) {
                         window.location.reload();
                     }
@@ -95,8 +91,6 @@ export const safeLazy = <T extends ComponentType<unknown>>(
                     // Return a placeholder promise that never resolves/rejects 
                     // while the page is reloading to avoid further errors
                     return new Promise(() => { }) as Promise<{ default: T }>;
-                } else {
-                    console.error('[safeLazy] Chunk loading failed repeatedly. Not reloading again to avoid loop.');
                 }
             }
 

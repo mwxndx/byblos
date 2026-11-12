@@ -31,8 +31,8 @@ export default function LocationMapView({ center, markerPosition, watchKey, onMa
                     setTileUrlIndex(0);
                 }
             })
-            .catch((err) => {
-                console.warn('[LocationMapView] Failed to get map config:', err);
+            .catch(() => {
+                // Keep default fallback tile URLs
             });
         return () => {
             isMounted = false;

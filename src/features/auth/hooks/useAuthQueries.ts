@@ -1,4 +1,4 @@
-import { useQuery, queryOptions } from '@tanstack/react-query';
+import { queryOptions } from '@tanstack/react-query';
 import buyerApi from '@/features/buyer/api';
 import { sellerApi } from '@/features/seller/api';
 import adminApi from '@/features/admin/api';
@@ -59,33 +59,5 @@ export const marketingProfileQueryOptions = queryOptions({
   staleTime: 5 * 60 * 1000,
   gcTime: 30 * 60 * 1000,
 });
-
-export function useBuyerProfileQuery(enabled = true) {
-  return useQuery({
-    ...buyerProfileQueryOptions,
-    enabled,
-  });
-}
-
-export function useSellerProfileQuery(enabled = true) {
-  return useQuery({
-    ...sellerProfileQueryOptions,
-    enabled,
-  });
-}
-
-export function useAdminProfileQuery(enabled = true) {
-  return useQuery({
-    ...adminProfileQueryOptions,
-    enabled,
-  });
-}
-
-export function useCreatorProfileQuery(enabled = true) {
-  return useQuery({
-    ...creatorProfileQueryOptions,
-    enabled,
-  });
-}
 
 

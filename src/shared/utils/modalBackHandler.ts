@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { App } from '@capacitor/app';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-export interface NavigationDelegate {
+interface NavigationDelegate {
   getPathname: () => string;
   navigate: (to: string) => void;
 }
@@ -54,7 +54,7 @@ export function registerSubNavigation(handler: BackHandlerCallback): () => void 
  * Attempts to dismiss the topmost open modal, sheet, or overlay (Priority 1).
  * Returns true if an overlay was dismissed, false otherwise.
  */
-export function dismissTopmostOverlay(): boolean {
+function dismissTopmostOverlay(): boolean {
   // 1. Try explicit registered dismiss handlers (LIFO)
   if (modalDismissStack.length > 0) {
     const handler = modalDismissStack.pop();
@@ -89,7 +89,7 @@ export function dismissTopmostOverlay(): boolean {
  * Attempts to handle dashboard in-memory sub-navigation (Priority 2).
  * Returns true if a sub-navigation state was popped, false otherwise.
  */
-export function handleSubNavigation(): boolean {
+function handleSubNavigation(): boolean {
   if (subNavigationStack.length > 0) {
     const handler = subNavigationStack.pop();
     if (handler) {
@@ -129,7 +129,7 @@ function trimTrailingSlashes(path: string): string {
   return path.slice(0, end) || '/';
 }
 
-export function isAuthenticatedDashboardRoot(pathname: string): boolean {
+function isAuthenticatedDashboardRoot(pathname: string): boolean {
   const cleanPath = trimTrailingSlashes(pathname);
   return AUTHENTICATED_DASHBOARD_ROOTS.includes(cleanPath);
 }

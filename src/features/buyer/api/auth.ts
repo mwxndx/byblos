@@ -2,16 +2,6 @@ import apiClient, { getFreshCsrfToken } from '@/infrastructure/http/apiClient';
 import { buyerApiInstance, ApiError } from './instance';
 import { Buyer, transformBuyer } from './profile';
 
-interface LoginApiResponse {
-  status: string;
-  message?: string;
-  data: {
-    buyer: Buyer;
-    token?: string;
-    refreshToken?: string;
-  };
-}
-
 export interface LoginResponse {
   buyer?: Buyer;
   token?: string;

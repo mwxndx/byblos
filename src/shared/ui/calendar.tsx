@@ -5,7 +5,7 @@ import { DayPicker } from "react-day-picker";
 import { cn } from "@/shared/utils/cn";
 import { buttonVariants } from "@/shared/ui/buttonVariants";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
 const CalendarIconLeft = () => <ChevronLeft className="h-4 w-4" />;
 const CalendarIconRight = () => <ChevronRight className="h-4 w-4" />;

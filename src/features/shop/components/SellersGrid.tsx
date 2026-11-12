@@ -14,7 +14,6 @@ interface SellersGridProps {
 }
 
 const INITIAL_VISIBLE_SELLERS = 24;
-const VISIBLE_SELLERS_STEP = 24;
 
 const SellerGridSkeleton = () => (
     <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">

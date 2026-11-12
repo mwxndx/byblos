@@ -9,7 +9,7 @@ export const BYBLOS_AUTH_KEYS = {
   CSRF_TOKEN: 'byblos.auth.csrf_token',
 } as const;
 
-export const LEGACY_AUTH_KEYS = [
+const LEGACY_AUTH_KEYS = [
   'buyer_token_legacy',
   'buyer_session_legacy',
   'seller_token_legacy',
@@ -24,6 +24,11 @@ export const LEGACY_AUTH_KEYS = [
   'mzigoLogisticsToken',
 ] as const;
 
+async function getSecureStorage() {
+  const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
+  return SecureStorage;
+}
+
 export const storage = {
   async get(key: string): Promise<string | null> {
     if (!isNativeApp()) {
@@ -36,23 +41,21 @@ export const storage = {
 
     // 1. Try native Keystore-backed SecureStorage first
     try {
-      const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
+      const SecureStorage = await getSecureStorage();
       const val = await SecureStorage.getItem(key);
       if (val !== null && val !== undefined) {
         return String(val);
       }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : (typeof e === 'string' ? e : JSON.stringify(e));
-      console.warn(`[Storage] Failed to read ${key} from SecureStorage`, msg);
+    } catch {
+      // Fall through to Preferences migration check
     }
 
     // 2. Migration fallback: Check Preferences for previously stored tokens
     try {
       const { value } = await Preferences.get({ key });
       if (value !== null && value !== undefined) {
-        // Automatically migrate to SecureStorage and clean up unencrypted Preferences
         try {
-          const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
+          const SecureStorage = await getSecureStorage();
           await SecureStorage.setItem(key, value);
           await Preferences.remove({ key });
         } catch {
@@ -60,9 +63,8 @@ export const storage = {
         }
         return value;
       }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[Storage] Failed to get ${key} from Preferences fallback`, msg);
+    } catch {
+      // Fall through to localStorage fallback
     }
 
     try {
@@ -84,19 +86,11 @@ export const storage = {
 
     // On native Android/iOS, write exclusively to Keystore-backed SecureStorage
     try {
-      const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
+      const SecureStorage = await getSecureStorage();
       await SecureStorage.setItem(key, value);
-      // Clean up any stale unencrypted copy in Preferences
       await Preferences.remove({ key }).catch(() => {});
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[Storage] Failed to set ${key} in SecureStorage, using fallback`, msg);
-      try {
-        await Preferences.set({ key, value });
-      } catch (prefErr: unknown) {
-        const prefMsg = prefErr instanceof Error ? prefErr.message : (typeof prefErr === 'string' ? prefErr : JSON.stringify(prefErr));
-        console.warn(`[Storage] Failed to set ${key} in Preferences fallback`, prefMsg);
-      }
+    } catch {
+      await Preferences.set({ key, value }).catch(() => {});
     }
   },
 
@@ -110,20 +104,10 @@ export const storage = {
 
     if (!isNativeApp()) return;
 
-    try {
-      const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
-      await SecureStorage.removeItem(key);
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[Storage] Failed to remove ${key} from SecureStorage`, msg);
-    }
-
-    try {
-      await Preferences.remove({ key });
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[Storage] Failed to remove ${key} from Preferences`, msg);
-    }
+    await Promise.all([
+      getSecureStorage().then((s) => s.removeItem(key)).catch(() => {}),
+      Preferences.remove({ key }).catch(() => {}),
+    ]);
   },
 
   async clear(): Promise<void> {
@@ -136,20 +120,10 @@ export const storage = {
 
     if (!isNativeApp()) return;
 
-    try {
-      const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
-      await SecureStorage.clear();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[Storage] Failed to clear SecureStorage`, msg);
-    }
-
-    try {
-      await Preferences.clear();
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[Storage] Failed to clear Preferences`, msg);
-    }
+    await Promise.all([
+      getSecureStorage().then((s) => s.clear()).catch(() => {}),
+      Preferences.clear().catch(() => {}),
+    ]);
   }
 };
 
@@ -197,11 +171,13 @@ export const authStorage = {
   },
 
   async clearAuth(): Promise<void> {
-    await storage.remove(BYBLOS_AUTH_KEYS.ACTIVE_ROLE);
-    await storage.remove(BYBLOS_AUTH_KEYS.SESSION);
-    await storage.remove(BYBLOS_AUTH_KEYS.TOKEN);
-    await storage.remove(BYBLOS_AUTH_KEYS.REFRESH_TOKEN);
-    await storage.remove(BYBLOS_AUTH_KEYS.CSRF_TOKEN);
-    await this.purgeLegacyAndInactiveKeys();
+    await Promise.all([
+      storage.remove(BYBLOS_AUTH_KEYS.ACTIVE_ROLE),
+      storage.remove(BYBLOS_AUTH_KEYS.SESSION),
+      storage.remove(BYBLOS_AUTH_KEYS.TOKEN),
+      storage.remove(BYBLOS_AUTH_KEYS.REFRESH_TOKEN),
+      storage.remove(BYBLOS_AUTH_KEYS.CSRF_TOKEN),
+      this.purgeLegacyAndInactiveKeys(),
+    ]);
   }
 };

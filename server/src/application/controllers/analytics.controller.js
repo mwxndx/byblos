@@ -1,5 +1,6 @@
 import * as sellerAnalyticsRepository from '../../domains/commerce/sellers/sellerAnalytics.repository.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
+import logger from '../../shared/utils/logger.js';
 
 const SELLER_ANALYTICS_EXCLUDED_STATUSES = [
   'CANCELLED',
@@ -72,7 +73,7 @@ const mapAnalyticsDto = ({
 };
 
 const handleAnalyticsError = (error, next) => {
-  console.error('Error in getSellerAnalytics:', error.message);
+  logger.error('Error in getSellerAnalytics:', { error: error.message });
 
   if (error.code === '42P01') {
     const missingTable = resolveMissingDatabaseTable(error.message);

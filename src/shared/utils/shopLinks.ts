@@ -8,7 +8,7 @@ export const getShopUsername = (shopName?: string | null) => {
 // window.location.origin is the in-app WebView host (capacitor://localhost or
 // https://localhost) which is useless in a shared link, so shareable shop URLs
 // must fall back to the canonical public site.
-export const PUBLIC_WEB_ORIGIN =
+const PUBLIC_WEB_ORIGIN =
   ((import.meta.env.VITE_PUBLIC_WEB_URL as string | undefined) || '').replace(/\/$/, '') ||
   'https://www.byblosafrica.site';
 

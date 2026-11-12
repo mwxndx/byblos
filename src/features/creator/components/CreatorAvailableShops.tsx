@@ -9,59 +9,6 @@ import { useRequestCollaborationMutation } from '../hooks/mutations/useRequestCo
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { AvailableShop } from '../api/marketplace';
 
-
-function ShopActionButton({
-  shop,
-  isRequesting,
-  onRequest,
-}: Readonly<{
-  shop: AvailableShop;
-  isRequesting: boolean;
-  onRequest: (shop: AvailableShop) => void;
-}>) {
-  if (shop.collaborationStatus === 'active') {
-    return (
-      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-green)_14%,transparent)] px-3 text-xs font-medium text-sys-green">
-        <Check className="h-3.5 w-3.5" />
-        Promoting
-      </span>
-    );
-  }
-  if (shop.collaborationStatus === 'pending') {
-    return (
-      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_14%,transparent)] px-3 text-xs font-medium text-sys-orange">
-        <Clock className="h-3.5 w-3.5" />
-        Pending
-      </span>
-    );
-  }
-  if (shop.collaborationStatus === 'denied') {
-    return (
-      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-slate-100 dark:bg-white/10 px-3 text-xs font-medium text-slate-500 dark:text-white/50 cursor-not-allowed">
-        <X className="h-3.5 w-3.5" />
-        Declined
-      </span>
-    );
-  }
-  return (
-    <Button
-      type="button"
-      onClick={() => onRequest(shop)}
-      disabled={isRequesting}
-      className="h-9 px-3.5 text-xs"
-    >
-      {isRequesting ? (
-        <>
-          <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-          Requesting…
-        </>
-      ) : (
-        'Request Link'
-      )}
-    </Button>
-  );
-}
-
 export function CreatorAvailableShops() {
   const { data: shops = [], isLoading, refetch } = useAvailableShopsQuery();
   const requestMutation = useRequestCollaborationMutation();

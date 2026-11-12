@@ -8,7 +8,7 @@ import { AndroidAuthStrategy } from '../auth/AndroidAuthStrategy';
 import { createDefaultStorageAdapter } from '../auth/adapters';
 import { emitSessionExpired } from '../navigation/navigationService';
 
-export interface UniversalHttpClientOptions {
+interface UniversalHttpClientOptions {
   storageAdapter?: StorageAdapter;
   authStrategy?: AuthStrategy;
   defaultRole?: AppRole;

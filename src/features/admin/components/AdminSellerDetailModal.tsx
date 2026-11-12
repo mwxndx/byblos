@@ -47,7 +47,7 @@ interface AdminSellerDetailModalProps {
   inspectionSessionId: string;
 }
 
-export function AdminSellerDetailModal({ seller, isLoading, onClose, safeFormatDate, inspectionSessionId }: Readonly<AdminSellerDetailModalProps>) {
+export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionSessionId }: Readonly<AdminSellerDetailModalProps>) {
   useModalBackDismiss(Boolean(seller), onClose);
 
   if (!seller) return null;

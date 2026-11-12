@@ -8,7 +8,7 @@ import { Button } from '@/shared/ui/button';
 import { Loader2 } from '@/shared/ui/icons';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-export interface AppProtectedRouteProps {
+interface AppProtectedRouteProps {
     children: React.ReactNode;
     allowedRoles: UserRole[];
     redirectTo?: string;
@@ -138,26 +138,12 @@ export function AppProtectedRoute({
 }
 
 // ─── Convenience Wrappers ──────────────────────────────────────────────────────
-export function BuyerProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
-    return <AppProtectedRoute allowedRoles={['buyer']}>{children}</AppProtectedRoute>;
-}
-
 export function SellerProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
     return <AppProtectedRoute allowedRoles={['seller']}>{children}</AppProtectedRoute>;
 }
 
 export function AdminProtectedRoute({ children }: Readonly<{ children: React.ReactNode }>) {
     return <AppProtectedRoute allowedRoles={['admin']}>{children}</AppProtectedRoute>;
-}
-
-export function MultiRoleProtectedRoute({
-    children,
-    roles,
-}: {
-    children: React.ReactNode;
-    roles: UserRole[];
-}) {
-    return <AppProtectedRoute allowedRoles={roles}>{children}</AppProtectedRoute>;
 }
 
 

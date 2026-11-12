@@ -4,14 +4,11 @@ import express from 'express';
 import * as buyerController from '../../domains/commerce/buyers/buyer.controller.js';
 import { protect, hasPermission } from '../middleware/auth.js';
 
-import wishlistRoutes from './wishlist.routes.js';
 import { validateRegistration, validateLogin } from '../middleware/authValidation.js';
 import { authLimiter } from '../middleware/authRateLimiter.js';
 import { withdrawalRateLimiter, publicApiRateLimiter } from '../middleware/rateLimiting.js';
 
 const router = express.Router();
-
-
 
 // Public routes
 router.post('/register', authLimiter, validateRegistration, buyerController.register);

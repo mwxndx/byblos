@@ -84,9 +84,7 @@ class OrderDeadlineService {
             // the try/catch pattern in checkExpiredReservations et al.
             let processedCount = 0;
             // Sequential processing intentional: cancels order and refunds buyer under transaction isolation
-            // Sequential processing intentional: auto-cancels order on buyer pickup deadline
-            // Sequential processing intentional: releases expired reservation under row lock
-            for (const order of expiredOrders) { // NOSONAR: javascript:S9382 // NOSONAR: javascript:S9382 // NOSONAR: javascript:S9382
+            for (const order of expiredOrders) { // NOSONAR: javascript:S9382
                 try {
                     await this.cancelOrderAndRefund(
                         order,
@@ -342,7 +340,7 @@ class OrderDeadlineService {
             const remindedOrders = [];
             // Sequential processing intentional: sends production reminder under FOR UPDATE SKIP LOCKED
             // Sequential processing intentional: cancels expired custom order under transactional boundary
-            for (const order of candidates) { // NOSONAR: javascript:S9382 // NOSONAR: javascript:S9382
+            for (const order of candidates) { // NOSONAR: javascript:S9382
                 const client = await pool.connect();
                 let reminderEventId = null;
                 try {

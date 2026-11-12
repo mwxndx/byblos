@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { registerPlugin } from '@capacitor/core';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 
-export interface ScreenSecurityPluginInterface {
+interface ScreenSecurityPluginInterface {
   enable(): Promise<{ secured: boolean }>;
   disable(): Promise<{ secured: boolean }>;
   setSecure(options: { secure: boolean }): Promise<{ secured: boolean }>;
@@ -66,11 +66,8 @@ async function syncNativeScreenSecurity(secure: boolean): Promise<void> {
     } else if (!secure && typeof bridge.disable === 'function') {
       await bridge.disable();
     }
-  } catch (error) {
+  } catch {
     // Fail safe; don't break UI on older webviews or platforms
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[ScreenSecurity] Failed to sync native security state:', error);
-    }
   }
 }
 

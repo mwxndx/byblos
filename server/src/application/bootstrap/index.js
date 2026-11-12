@@ -2,6 +2,7 @@ import expressLoader from './express.js';
 import cronLoader from './cron.js';
 import servicesLoader from './services.js';
 import { testConnection } from '../../infrastructure/database/database.js';
+import { verifyRequiredIndexes } from './schemaCheck.js';
 import logger from '../../shared/utils/logger.js';
 
 /**
@@ -24,7 +25,6 @@ export default async (app) => {
         await testConnection();
         logger.info('Database connected');
 
-        const { verifyRequiredIndexes } = await import('./schemaCheck.js');
         await verifyRequiredIndexes();
     } catch (err) {
         logger.error('Database connection/verification failed:', err.message);

@@ -109,7 +109,7 @@ async function syncPendingPaymentFromProvider(row) {
       }
     });
   } catch (error) {
-    console.warn('[PublicOrderStatus] Provider status sync failed:', error.message);
+    logger.warn('[PublicOrderStatus] Provider status sync failed:', { error: error.message });
   }
 
   return await publicOrderStatusRepository.findStatusByIdentifier(row.order_number) || row;
@@ -181,7 +181,7 @@ export const getProducts = async (req, res) => {
 
     res.status(200).json(responseData);
   } catch (error) {
-    console.error('Error fetching products:', error);
+    logger.error('Error fetching products:', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch products',
@@ -217,7 +217,7 @@ export const getProduct = async (req, res) => {
       data: { product }
     });
   } catch (error) {
-    console.error(`Error fetching product ${req.params.id}:`, error);
+    logger.error(`Error fetching product ${req.params.id}:`, { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch product',
@@ -246,7 +246,7 @@ export const getAesthetics = async (req, res) => {
 
     res.status(200).json(responseData);
   } catch (error) {
-    console.error('Error fetching aesthetics:', error);
+    logger.error('Error fetching aesthetics:', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch aesthetics',
@@ -275,7 +275,7 @@ export const getSellerPublicInfo = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error(`Error fetching seller ${req.params.id}:`, error);
+    logger.error(`Error fetching seller ${req.params.id}:`, { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch seller information',
@@ -340,7 +340,7 @@ export const getSellers = async (req, res) => {
 
     res.status(200).json(responseData);
   } catch (error) {
-    console.error('Error fetching sellers:', error);
+    logger.error('Error fetching sellers:', { error: error.message });
     res.status(500).json({
       status: 'error',
       message: 'Failed to fetch sellers',
@@ -376,7 +376,7 @@ export const knockSeller = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error recording seller knock:', error);
+    logger.error('Error recording seller knock:', { error: error.message });
     return res.status(500).json({
       status: 'error',
       message: 'Failed to record knock',
@@ -406,7 +406,7 @@ export const getServiceAvailability = async (req, res) => {
       data: { unavailableSlots, date }
     });
   } catch (error) {
-    console.error('Error fetching availability:', error);
+    logger.error('Error fetching availability:', { error: error.message });
     res.status(500).json({ status: 'error', message: 'Failed to fetch availability' });
   }
 };
@@ -588,7 +588,7 @@ export function createCancelPendingPublicOrder({
           });
         }
       } catch (err) {
-        console.warn('[cancelPendingPublicOrder] Provider status check failed; cancellation deferred:', err.message);
+        logger.warn('[cancelPendingPublicOrder] Provider status check failed; cancellation deferred:', { error: err.message });
         return res.status(503).json({
           status: 'pending_verification',
           code: 'PAYMENT_STATUS_UNVERIFIED',
@@ -618,7 +618,7 @@ export function createCancelPendingPublicOrder({
       message: 'Order has been safely cancelled and stock released.'
     });
     } catch (error) {
-      console.error(`Error cancelling public order ${req.params.id}:`, error);
+      logger.error(`Error cancelling public order ${req.params.id}:`, { error: error.message });
       return res.status(500).json({
         status: 'error',
         message: 'Failed to cancel order'

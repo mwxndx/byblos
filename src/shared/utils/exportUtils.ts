@@ -1,10 +1,6 @@
 import type { ApiOrder, ApiWithdrawalRequest } from '@/shared/types';
 import { format } from 'date-fns';
 
-type WithdrawalRequest = ApiWithdrawalRequest;
-
-
-
 /**
  * Sanitize a cell value to prevent CSV Formula Injection
  */
@@ -67,7 +63,7 @@ const downloadCSV = (csvContent: string, filename: string): void => {
 /**
  * Format orders data for CSV export
  */
-export const formatOrdersForExport = (orders: ApiOrder[]) => {
+const formatOrdersForExport = (orders: ApiOrder[]) => {
     return orders.map(order => {
         const productNames = order.items?.map(item => item.name).join(', ') || 'N/A';
         const totalQuantity = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
@@ -91,7 +87,7 @@ export const formatOrdersForExport = (orders: ApiOrder[]) => {
 /**
  * Format withdrawals data for CSV export
  */
-export const formatWithdrawalsForExport = (withdrawals: WithdrawalRequest[]) => {
+const formatWithdrawalsForExport = (withdrawals: ApiWithdrawalRequest[]) => {
     return withdrawals.map(withdrawal => ({
         'Request ID': withdrawal.id,
         'Date': format(new Date(withdrawal.createdAt), 'yyyy-MM-dd HH:mm:ss'),
@@ -120,7 +116,7 @@ export const exportOrdersToCSV = (orders: ApiOrder[], filename?: string): void =
  * Export withdrawals to CSV file
  */
 export const exportWithdrawalsToCSV = (
-    withdrawals: WithdrawalRequest[],
+    withdrawals: ApiWithdrawalRequest[],
     filename?: string
 ): void => {
     const formattedData = formatWithdrawalsForExport(withdrawals);

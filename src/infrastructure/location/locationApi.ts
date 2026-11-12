@@ -8,7 +8,7 @@ export interface LocationSearchResult {
   lng: number;
 }
 
-export interface LocationMapConfig {
+interface LocationMapConfig {
   cartoApiKey?: string;
 }
 
@@ -25,8 +25,7 @@ export async function getLocationConfig(): Promise<LocationMapConfig> {
     try {
       const response = await apiClient.get('/locations/config');
       return (response.data?.data as LocationMapConfig) || {};
-    } catch (error) {
-      console.warn('[locationApi] Failed to load location config:', error);
+    } catch {
       return {};
     }
   })();
@@ -52,8 +51,7 @@ export async function searchLocations(query: string): Promise<LocationSearchResu
     });
 
     return Array.isArray(response.data?.data) ? response.data.data : [];
-  } catch (error) {
-    console.error('[locationApi] Location search failed:', error);
+  } catch {
     return [];
   }
 }

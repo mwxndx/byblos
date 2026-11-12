@@ -1,15 +1,7 @@
-import { useLocation, Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from '@/shared/ui/icons';
 
 const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    // Using console.error for 404s — these are meaningful errors worth tracking
-    console.error('404: User navigated to non-existent route:', location.pathname);
-  }, [location.pathname]);
-
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
       {/* Byblos ambient glow */}

@@ -29,8 +29,7 @@ export const getFreshCsrfToken = async (): Promise<string | null> => {
         }
       }
       return csrfTokenCache;
-    } catch (error) {
-      console.error('Failed to fetch CSRF token:', error);
+    } catch {
       return null;
     } finally {
       hasActiveCsrfFetch = false;

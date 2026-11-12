@@ -6,10 +6,6 @@ import { checkShopNameAvailability } from '@/features/seller/api';
 import { useSellerResendVerificationMutation } from '@/features/seller/hooks/mutations/useSellerAuthMutations';
 import { checkPasswordStrength, normalizeShopName, type SellerRegistrationFormData } from '../utils/sellerRegistrationUtils';
 
-interface SellerRegistrationProps {
-  onSuccess?: () => void;
-}
-
 import { useGlobalAuth } from '@/features/auth/contexts';
 
 export function useSellerRegistration(onSuccess?: () => void) {

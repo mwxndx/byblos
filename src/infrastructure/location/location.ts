@@ -3,7 +3,7 @@ export interface LocationCoordinates {
   lng: number;
 }
 
-export interface LocationSelection {
+interface LocationSelection {
   address: string;
   coordinates: LocationCoordinates | null;
 }

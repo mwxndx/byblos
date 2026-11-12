@@ -1,9 +1,9 @@
 import * as React from "react";
 import { cn } from "@/shared/utils/cn";
 
-export type StatCardColor = 'yellow' | 'green' | 'blue' | 'purple' | 'red' | 'gray';
+type StatCardColor = 'yellow' | 'green' | 'blue' | 'purple' | 'red' | 'gray';
 
-export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
+interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string | number;
   icon?: React.ReactNode;

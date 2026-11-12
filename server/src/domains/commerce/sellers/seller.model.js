@@ -4,7 +4,6 @@ import { toCamelCase } from '../../../shared/utils/caseUtils.js';
 import logger from '../../../shared/utils/logger.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 
-const SALT_ROUNDS = 10;
 
 const query = (text, params) => pool.query(text, params);
 

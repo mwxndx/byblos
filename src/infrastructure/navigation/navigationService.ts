@@ -42,11 +42,6 @@ export function clearAppNavigator(navigate: AppNavigate): void {
   }
 }
 
-/** True once the app router is mounted and can handle client-side navigation. */
-export function isAppNavigatorReady(): boolean {
-  return appNavigator !== null;
-}
-
 /**
  * Navigate via the app's React Router instance (client-side, no page reload).
  * Returns `false` when the router is not mounted yet, so the caller can fall
@@ -65,7 +60,7 @@ export function appNavigate(path: string, options?: NavigateOptions): boolean {
  * router is not mounted yet so the caller can hard-navigate as a last resort.
  */
 export function emitSessionExpired(redirectPath: string = '/buyer/login'): boolean {
-  if (!isAppNavigatorReady()) return false;
+  if (!appNavigator) return false;
   const targetPath = redirectPath?.startsWith('/') ? redirectPath : '/buyer/login';
   globalThis.dispatchEvent(
     new CustomEvent<SessionExpiredDetail>(SESSION_EXPIRED_EVENT, {

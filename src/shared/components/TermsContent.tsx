@@ -1,5 +1,3 @@
-import React from 'react';
-
 export function TermsContent() {
   return (
     <>
@@ -20,7 +18,7 @@ export function TermsContent() {
               <Sub title="1.2 Information We Collect">
                 <BulletList items={[
                   "Identity data: Full name, email, phone number, location.",
-                  "Contact data: Phone number, email address,",
+                  "Contact data: Phone number, email address.",
                   "Transactional data: Payment records, M-Pesa references, order history, order confirmations, receipts.",
                   "Technical data: IP address, device type, browser, cookies, session logs.",
                   "Communications: Customer service interactions, WhatsApp messages, dispute records.",

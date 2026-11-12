@@ -223,13 +223,6 @@ export const getSellerById = async (req, res) => {
       });
     }
 
-    /* console.log('Found seller:', {
-      id: seller.id,
-      shopName: seller.shop_name,
-      // email: seller.email ? '[REDACTED]' : 'missing',
-      // phone: seller.phone ? '[REDACTED]' : 'missing',
-      isActive: seller.is_active
-    }); */
 
     // Check if the requesting user is the owner of this profile
     const isOwner = await req.user.can('manage-shop', seller, 'product', 'manage');

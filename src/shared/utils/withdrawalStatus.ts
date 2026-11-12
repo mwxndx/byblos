@@ -32,7 +32,7 @@ export const getWithdrawalStatusLabel = (status?: string | null): string => {
 };
 
 /** Semantic tone for badge colouring — each render site maps this to its own classes. */
-export type WithdrawalStatusTone = 'success' | 'danger' | 'review' | 'progress';
+type WithdrawalStatusTone = 'success' | 'danger' | 'review' | 'progress';
 
 const WITHDRAWAL_STATUS_TONES: Record<string, WithdrawalStatusTone> = {
   completed: 'success',

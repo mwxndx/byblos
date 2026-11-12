@@ -16,6 +16,36 @@ interface State {
   errorInfo: ErrorInfo | null;
 }
 
+function ChunkUpdateFallback({ devError }: Readonly<{ devError?: Error | null }>) {
+  return (
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center animate-in fade-in duration-500">
+      <div className="bg-zinc-900/50 border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl backdrop-blur-xl">
+        <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertTriangle className="w-8 h-8 text-yellow-500" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-3">New Update Available</h2>
+        <p className="text-gray-400 mb-8 leading-relaxed">
+          We pushed a new version of the app. Refresh to receive the latest updates.
+        </p>
+        <Button
+          onClick={() => window.location.reload()}
+          className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+        >
+          <RefreshCw className="w-4 h-4" />
+          Refresh Now
+        </Button>
+        {import.meta.env.DEV && devError && (
+          <div className="mt-6 p-4 bg-red-950/30 rounded-lg text-left overflow-auto max-h-40 border border-red-900/50">
+            <p className="text-red-400 font-mono text-xs break-all">
+              {devError.toString()}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main ErrorBoundary class ─────────────────────────────────────────────────
 /**
  * Unified ErrorBoundary — handles both general React errors and chunk-load
@@ -36,7 +66,6 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ error, errorInfo });
-    // TODO: forward to monitoring service (Sentry, LogRocket, etc.)
   }
 
   handleReset = () => {
@@ -59,33 +88,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Chunk-load failure UI (new deployment)
       if (chunkError) {
-        return (
-          <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center animate-in fade-in duration-500">
-            <div className="bg-zinc-900/50 border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl backdrop-blur-xl">
-              <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-8 h-8 text-yellow-500" />
-              </div>
-              <h2 className="text-2xl font-bold text-white mb-3">New Update Available</h2>
-              <p className="text-gray-400 mb-8 leading-relaxed">
-                We pushed a new version of the app. Refresh to receive the latest updates.
-              </p>
-              <Button
-                onClick={this.handleReload}
-                className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
-              >
-                <RefreshCw className="w-4 h-4" />
-                Refresh Now
-              </Button>
-              {import.meta.env.DEV && (
-                <div className="mt-6 p-4 bg-red-950/30 rounded-lg text-left overflow-auto max-h-40 border border-red-900/50">
-                  <p className="text-red-400 font-mono text-xs break-all">
-                    {this.state.error?.toString()}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        );
+        return <ChunkUpdateFallback devError={this.state.error} />;
       }
 
       // General application error UI
@@ -166,33 +169,13 @@ export class ErrorBoundary extends Component<Props, State> {
  */
 export function RootErrorElement() {
   const error = useRouteError();
-  console.error('[RootErrorElement] Uncaught route error:', error);
 
   const isChunk =
     isDynamicImportError(error) ||
     (isRouteErrorResponse(error) && error.status === 404);
 
   if (isChunk) {
-    return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center animate-in fade-in duration-500">
-        <div className="bg-zinc-900/50 border border-white/10 p-8 rounded-2xl max-w-md w-full shadow-2xl backdrop-blur-xl">
-          <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <AlertTriangle className="w-8 h-8 text-yellow-500" />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-3">New Update Available</h2>
-          <p className="text-gray-400 mb-8 leading-relaxed">
-            We pushed a new version of the app. Refresh to get the latest.
-          </p>
-          <Button
-            onClick={() => window.location.reload()}
-            className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh Now
-          </Button>
-        </div>
-      </div>
-    );
+    return <ChunkUpdateFallback />;
   }
 
   return (

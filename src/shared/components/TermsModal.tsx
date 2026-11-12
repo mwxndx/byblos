@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { TermsContent } from './TermsContent';
 import { useTermsScrollSpy } from './terms/useTermsScrollSpy';
 
-export interface TermsModalProps {
+interface TermsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccept?: () => void;

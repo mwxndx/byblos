@@ -2,6 +2,7 @@ import express from 'express';
 import { pool } from '../../infrastructure/database/database.js';
 import getRedisClient from '../../shared/config/redis.js';
 import paymentService from '../../domains/payments/payments/payment.service.js';
+import logger from '../../shared/utils/logger.js';
 
 const router = express.Router();
 
@@ -86,7 +87,7 @@ router.get('/', async (req, res) => {
       database: 'connected'
     });
   } catch (error) {
-    console.error('Health check failed:', error);
+    logger.error('Health check failed:', { error: error.message });
     res.status(503).json({
       status: 'error',
       message: 'Service Unavailable',

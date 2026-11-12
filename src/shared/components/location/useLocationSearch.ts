@@ -50,8 +50,7 @@ export function useLocationSearch({
       if (results.length > 0) {
         onApplyResult(results[0], false);
       }
-    } catch (error) {
-      console.error('Error searching address:', error);
+    } catch {
       setSearchError('Location search is temporarily unavailable. Try again in a few seconds.');
       setSearchResults([]);
       setShowResults(true);

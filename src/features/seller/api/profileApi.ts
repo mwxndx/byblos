@@ -61,16 +61,6 @@ interface ShopNameAvailabilityResponse {
   };
 }
 
-interface LoginResponse {
-  status?: string;
-  message?: string;
-  data: {
-    seller: ApiSeller;
-    token?: string;
-    refreshToken?: string;
-  };
-}
-
 interface RegisterResponse {
   status: string;
   message?: string;
@@ -84,10 +74,6 @@ interface RegisterResponse {
 
 interface SellerResponse {
   data: unknown;
-}
-
-interface AnalyticsResponse {
-  data: SellerAnalytics;
 }
 
 interface ForgotPasswordResponse {
@@ -351,13 +337,8 @@ export const sellerProfileApi = {
   },
 
   updateProfile: async (data: UpdateSellerProfileInput): Promise<ApiSeller> => {
-    try {
-      const response = await sellerApiInstance.patch<{ data: ApiSeller }>('/sellers/profile', data);
-      return transformSeller(response.data.data);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      throw error;
-    }
+    const response = await sellerApiInstance.patch<{ data: ApiSeller }>('/sellers/profile', data);
+    return transformSeller(response.data.data);
   },
 
   async updateTheme(theme: Theme): Promise<{ theme: Theme }> {

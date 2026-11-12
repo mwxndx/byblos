@@ -2,6 +2,8 @@ import express from 'express';
 import { refreshToken } from '../controllers/refreshToken.controller.js';
 import { authLimiter } from '../middleware/authRateLimiter.js';
 import { verifyToken } from '../../shared/utils/jwt.js';
+import tokenBlacklist from '../../domains/identity/tokens/tokenBlacklist.service.js';
+import { verifyRefreshToken } from '../../shared/utils/refreshToken.js';
 
 const router = express.Router();
 
@@ -24,8 +26,6 @@ router.post('/revoke-token', authLimiter, async (req, res) => {
   }
 
   try {
-    const tokenBlacklist = (await import('../../domains/identity/tokens/tokenBlacklist.service.js')).default;
-    const { verifyRefreshToken } = await import('../../shared/utils/refreshToken.js');
     await Promise.all(tokens.map(async (t) => {
       try {
         let decoded = null;

@@ -4,8 +4,6 @@ import type { PaymentStatus, ApiOrder, ApiOrderItem } from '@/shared/types';
 
 type DateLike = string | Date | { createdAt?: string | Date; created_at?: string | Date };
 
-const badgeGlow = 'shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_10px_20px_rgba(0,0,0,0.35)]';
-
 export const detailPillClass = 'rounded-xl border border-white/15 bg-white/8 px-3 py-2';
 
 /**

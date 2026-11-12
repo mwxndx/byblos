@@ -42,23 +42,17 @@ export function SettingsTab({
   cities,
   formData,
   getLocations,
-  handleBusinessPhotoUploaded,
   handleCityChange,
   handleDeleteLocation,
   handleLocationChange,
   handleRemoveSocialLink,
   handleSaveProfile,
   handleShopLocationChange,
-  isCheckingShopName,
   isDeletingLocation,
-  isEditing,
   isSaving,
   sellerProfile,
   setFormData,
-  shopNameAvailable,
   onLogout,
-  onThemeChange,
-  toggleEdit
 }: SettingsTabProps) {
   const [isEditingContacts, setIsEditingContacts] = useState(false);
   const [isEditingLocation, setIsEditingLocation] = useState(false);

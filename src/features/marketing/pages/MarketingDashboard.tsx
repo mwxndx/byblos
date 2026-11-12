@@ -56,7 +56,7 @@ export default function MarketingDashboard() {
             ? { bg: '#ffffff', border: 'rgba(0,0,0,0.1)', text: '#0f172a' }
             : { bg: '#0A0A0A', border: 'rgba(255,255,255,0.1)', text: '#F5F5F5' }
     };
-    const { user: globalUser, logout } = useGlobalAuth();
+    const { logout } = useGlobalAuth();
     const [period, setPeriod] = useState<number>(12);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');

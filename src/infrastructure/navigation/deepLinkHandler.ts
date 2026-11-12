@@ -108,8 +108,8 @@ export function useNativeDeepLinkHandler(navigate?: (path: string) => void): voi
           handleUrl(launchUrl.url);
         }
       })
-      .catch((err) => {
-        console.warn('[DeepLink] Failed to read launch URL:', err);
+      .catch(() => {
+        // Launch URL is optional on startup
       });
 
     // 2. Listen for URL open events while app is running in background or foreground

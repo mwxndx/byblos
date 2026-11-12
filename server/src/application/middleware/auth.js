@@ -97,9 +97,6 @@ export const restrictTo = (...roles) => {
 
 export const protect = async (req, res, next) => {
   try {
-    // console.log('\n=== Auth Middleware ===');
-    // console.log('Request URL:', req.originalUrl);
-
     // 1) Get token and check if it exists
     const token = getTokenFromRequest(req);
 

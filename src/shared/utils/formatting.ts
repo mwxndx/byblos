@@ -11,8 +11,12 @@ const currencyFormatter = new Intl.NumberFormat('en-KE', {
   maximumFractionDigits: 2,
 });
 
+function resolveCurrencyPrefix(currency?: string): string {
+  return !currency || currency.toUpperCase() === 'KES' || currency.toUpperCase() === 'KSH' ? 'KSh' : currency;
+}
+
 export function formatCurrency(amount: number | string | null | undefined, currency?: string): string {
-  const prefix = (!currency || currency.toUpperCase() === 'KES' || currency.toUpperCase() === 'KSH') ? 'KSh' : currency;
+  const prefix = resolveCurrencyPrefix(currency);
 
   // Handle null, undefined, or empty string
   if (amount === null || amount === undefined || amount === '') {
@@ -45,6 +49,8 @@ export function formatCurrency(amount: number | string | null | undefined, curre
     return `${prefix} 0`;
   }
 
+  const fallbackFormatted = () => `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+
   try {
     if (prefix === 'KSh') {
       // Format as Kenyan Shillings using cached formatter
@@ -53,10 +59,9 @@ export function formatCurrency(amount: number | string | null | undefined, curre
       // Standardize currency symbol to capital KSh
       return formatted.replace(/Ksh/i, 'KSh');
     }
-    return `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    return fallbackFormatted();
   } catch {
-    // Fallback to manual locale string formatting if Intl.NumberFormat fails
-    return `${prefix} ${numericAmount.toLocaleString('en-KE', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    return fallbackFormatted();
   }
 }
 
@@ -66,7 +71,7 @@ export function formatCurrency(amount: number | string | null | undefined, curre
  * Values >= 1000 display at most one decimal place, omitting .0 for clean whole numbers.
  */
 export function formatCompactCurrency(amount: number | string | null | undefined, currency?: string): string {
-  const prefix = (!currency || currency.toUpperCase() === 'KES' || currency.toUpperCase() === 'KSH') ? 'KSh' : currency;
+  const prefix = resolveCurrencyPrefix(currency);
 
   if (amount === null || amount === undefined || amount === '') {
     return `${prefix} 0`;
@@ -152,8 +157,7 @@ export function formatDate(dateInput: string | Date, format: 'full' | 'date' | '
           minute: '2-digit',
         });
     }
-  } catch (error) {
-    console.error('Error formatting date:', error, 'Input:', dateInput);
+  } catch {
     return 'Date not available';
   }
 }

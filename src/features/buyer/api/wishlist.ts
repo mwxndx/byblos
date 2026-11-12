@@ -120,8 +120,7 @@ export async function syncWishlist(items: WishlistItem[]): Promise<boolean> {
       { items }
     );
     return true;
-  } catch (error) {
-    const err = error as ApiError;
+  } catch {
     return false;
   }
 }

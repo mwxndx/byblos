@@ -62,7 +62,7 @@ export function useLocationMapState({
     }
   }, [initialAddress, initialCoordinates]);
 
-  const applyLocationResult = useCallback((result: LocationSearchResult, shouldCloseResults: boolean) => {
+  const applyLocationResult = useCallback((result: LocationSearchResult, _shouldCloseResults: boolean) => {
     const lat = Number(result.lat);
     const lng = Number(result.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;

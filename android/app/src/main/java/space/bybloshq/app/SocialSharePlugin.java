@@ -62,10 +62,10 @@ public class SocialSharePlugin extends Plugin {
 
     private String getBase64Arg(PluginCall call) {
         String base64 = call.getString("pngBase64");
-        if (base64 == null || base64.trim().isEmpty()) {
+        if (base64 == null) {
             base64 = call.getString("imageBase64");
         }
-        return base64;
+        return (base64 != null && !base64.trim().isEmpty()) ? base64.trim() : null;
     }
 
     private String getCaptionArg(PluginCall call) {
@@ -88,7 +88,7 @@ public class SocialSharePlugin extends Plugin {
 
     private void handleInstagramShare(PluginCall call) {
         String base64 = getBase64Arg(call);
-        if (base64 == null || base64.trim().isEmpty()) {
+        if (base64 == null) {
             call.reject("Missing or empty base64 image data");
             return;
         }
@@ -133,7 +133,7 @@ public class SocialSharePlugin extends Plugin {
         String base64 = getBase64Arg(call);
         String caption = getCaptionArg(call);
 
-        if (base64 == null || base64.trim().isEmpty()) {
+        if (base64 == null) {
             call.reject("Missing or empty base64 image data");
             return;
         }

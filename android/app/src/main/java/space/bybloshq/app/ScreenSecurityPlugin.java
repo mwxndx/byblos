@@ -21,72 +21,44 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class ScreenSecurityPlugin extends Plugin {
     private static final String TAG = "ScreenSecurityPlugin";
 
+    private void applySecure(boolean secure, PluginCall call) {
+        Activity activity = getActivity();
+        if (activity == null) {
+            call.reject("Activity is null");
+            return;
+        }
+
+        activity.runOnUiThread(() -> {
+            try {
+                if (secure) {
+                    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                } else {
+                    activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                }
+                Log.d(TAG, "FLAG_SECURE set to " + secure);
+                JSObject ret = new JSObject();
+                ret.put("secured", secure);
+                call.resolve(ret);
+            } catch (Exception e) {
+                Log.e(TAG, "Error toggling FLAG_SECURE", e);
+                call.reject("Failed to set screen security: " + e.getMessage());
+            }
+        });
+    }
+
     @PluginMethod
     public void enable(PluginCall call) {
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(() -> {
-                try {
-                    activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                    Log.d(TAG, "FLAG_SECURE enabled");
-                    JSObject ret = new JSObject();
-                    ret.put("secured", true);
-                    call.resolve(ret);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error enabling FLAG_SECURE", e);
-                    call.reject("Failed to enable screen security: " + e.getMessage());
-                }
-            });
-        } else {
-            call.reject("Activity is null");
-        }
+        applySecure(true, call);
     }
 
     @PluginMethod
     public void disable(PluginCall call) {
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(() -> {
-                try {
-                    activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                    Log.d(TAG, "FLAG_SECURE disabled");
-                    JSObject ret = new JSObject();
-                    ret.put("secured", false);
-                    call.resolve(ret);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error disabling FLAG_SECURE", e);
-                    call.reject("Failed to disable screen security: " + e.getMessage());
-                }
-            });
-        } else {
-            call.reject("Activity is null");
-        }
+        applySecure(false, call);
     }
 
     @PluginMethod
     public void setSecure(PluginCall call) {
         Boolean secure = call.getBoolean("secure", true);
-        Activity activity = getActivity();
-        if (activity != null) {
-            activity.runOnUiThread(() -> {
-                try {
-                    if (Boolean.TRUE.equals(secure)) {
-                        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                        Log.d(TAG, "FLAG_SECURE set to true");
-                    } else {
-                        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                        Log.d(TAG, "FLAG_SECURE set to false");
-                    }
-                    JSObject ret = new JSObject();
-                    ret.put("secured", secure);
-                    call.resolve(ret);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error setting FLAG_SECURE", e);
-                    call.reject("Failed to set screen security: " + e.getMessage());
-                }
-            });
-        } else {
-            call.reject("Activity is null");
-        }
+        applySecure(Boolean.TRUE.equals(secure), call);
     }
 }

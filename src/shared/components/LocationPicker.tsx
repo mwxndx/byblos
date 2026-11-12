@@ -10,7 +10,7 @@ import { LocationSearchCombobox } from './location/LocationSearchCombobox';
 
 const LocationMapView = lazy(() => import('./LocationMapView'));
 
-export interface LocationPickerProps {
+interface LocationPickerProps {
   initialAddress?: string;
   initialCoordinates?: LocationCoordinates | null;
   onLocationChange: (address: string, coordinates: LocationCoordinates | null) => void;

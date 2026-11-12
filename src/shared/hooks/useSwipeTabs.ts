@@ -1,6 +1,6 @@
 import { useRef, type TouchEvent } from 'react';
 
-export interface UseSwipeTabsOptions<T extends string> {
+interface UseSwipeTabsOptions<T extends string> {
   /** Ordered tab ids, left-to-right, matching the visible tab bar. */
   tabs: readonly T[];
   /** Currently active tab id. */
@@ -16,7 +16,7 @@ export interface UseSwipeTabsOptions<T extends string> {
   maxVerticalDrift?: number;
 }
 
-export interface SwipeTabsHandlers {
+interface SwipeTabsHandlers {
   onTouchStart: (event: TouchEvent<HTMLElement>) => void;
   onTouchEnd: (event: TouchEvent<HTMLElement>) => void;
   onTouchCancel: () => void;

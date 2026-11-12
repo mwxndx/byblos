@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export type ErrorCategory = 'http' | 'network' | 'timeout' | 'client' | 'unknown';
+type ErrorCategory = 'http' | 'network' | 'timeout' | 'client' | 'unknown';
 
-export interface ClassifiedError {
+interface ClassifiedError {
   category: ErrorCategory;
   statusCode?: number;
   message: string;

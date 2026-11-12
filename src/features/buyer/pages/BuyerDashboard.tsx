@@ -37,7 +37,7 @@ const SWIPE_SECTIONS = ['shop', 'wishlist', 'orders', 'notifications'] as const;
 function BuyerDashboard() {
   useThemeScope('buyer');
   const navigate = useNavigate();
-  const { user: globalUser, logout, updateProfile } = useGlobalAuth();
+  const { user: globalUser, logout } = useGlobalAuth();
   const user = globalUser?.role === 'buyer' ? globalUser.profile as BuyerProfile : null;
 
   const { wishlist } = useWishlist();

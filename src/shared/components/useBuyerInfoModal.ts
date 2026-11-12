@@ -3,7 +3,7 @@ import { useToast } from '@/shared/hooks/use-toast';
 import { isValidEmail } from '@/shared/utils/validation';
 import type { BuyerInfo, BuyerInfoModalProps } from './BuyerInfoModal';
 
-export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false, theme = 'default', phoneNumber, initialData }: BuyerInfoModalProps) {
+export function useBuyerInfoModal({ isOpen, onClose, onSubmit, isLoading = false, phoneNumber, initialData }: BuyerInfoModalProps) {
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);

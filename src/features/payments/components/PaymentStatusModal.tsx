@@ -50,49 +50,6 @@ const DESCRIPTION_BY_STATE: Record<ModalState, string> = {
   TIMEOUT: 'Payment status timed out',
 };
 
-function DeviceTrackingSection({ orderNumber }: Readonly<{ orderNumber?: string }>) {
-  const platform = getDevicePlatform();
-  if (platform === 'android') {
-    return (
-      <>
-        <p className="mt-2 text-[11px] leading-relaxed text-slate-700 dark:text-white/70">
-          Track live courier updates and get push notifications in the Byblos Android App.
-        </p>
-        <a
-          href={getAndroidDeepLink(orderNumber)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2.5 flex h-10 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-xs font-bold text-white dark:text-slate-950 transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
-        >
-          Open App / Get on Google Play
-        </a>
-      </>
-    );
-  }
-  if (platform === 'ios') {
-    return (
-      <p className="mt-2 text-[11px] leading-relaxed text-slate-700 dark:text-white/70">
-        Order updates will be sent via SMS & Email. Save your tracking link to check status anytime.
-      </p>
-    );
-  }
-  return (
-    <>
-      <p className="mt-2 text-[11px] leading-relaxed text-slate-700 dark:text-white/70">
-        Get the Byblos Android app on your phone for live GPS courier tracking.
-      </p>
-      <a
-        href={APP_DOWNLOAD_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-2.5 flex h-10 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-xs font-bold text-white dark:text-slate-950 transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
-      >
-        Get it on Google Play
-      </a>
-    </>
-  );
-}
-
 export const PaymentStatusModal = ({
   isOpen,
   orderNumber,

@@ -2,7 +2,7 @@ import { StorageAdapter } from './types';
 import { storage as capacitorStorage } from '../storage/storage';
 import { isNativeApp } from '../navigation/mobileApp';
 
-export class NativeStorageAdapter implements StorageAdapter {
+class NativeStorageAdapter implements StorageAdapter {
   async getItem(key: string): Promise<string | null> {
     return await capacitorStorage.get(key);
   }
@@ -17,7 +17,7 @@ export class NativeStorageAdapter implements StorageAdapter {
   }
 }
 
-export class WebLocalStorageAdapter implements StorageAdapter {
+class WebLocalStorageAdapter implements StorageAdapter {
   getItem(key: string): Promise<string | null> {
     try {
       return Promise.resolve(localStorage.getItem(key));
@@ -28,58 +28,24 @@ export class WebLocalStorageAdapter implements StorageAdapter {
   setItem(key: string, value: string): Promise<void> {
     try {
       localStorage.setItem(key, value);
-    } catch (e) {
-      console.warn('[WebLocalStorageAdapter] Failed to set item:', e);
+    } catch {
+      /* ignore localStorage quota/availability errors */
     }
     return Promise.resolve();
   }
   removeItem(key: string): Promise<void> {
     try {
       localStorage.removeItem(key);
-    } catch (e) {
-      console.warn('[WebLocalStorageAdapter] Failed to remove item:', e);
+    } catch {
+      /* ignore */
     }
     return Promise.resolve();
   }
   clear(): Promise<void> {
     try {
       localStorage.clear();
-    } catch (e) {
-      console.warn('[WebLocalStorageAdapter] Failed to clear:', e);
-    }
-    return Promise.resolve();
-  }
-}
-
-export class WebSessionStorageAdapter implements StorageAdapter {
-  getItem(key: string): Promise<string | null> {
-    try {
-      return Promise.resolve(sessionStorage.getItem(key));
     } catch {
-      return Promise.resolve(null);
-    }
-  }
-  setItem(key: string, value: string): Promise<void> {
-    try {
-      sessionStorage.setItem(key, value);
-    } catch (e) {
-      console.warn('[WebSessionStorageAdapter] Failed to set item:', e);
-    }
-    return Promise.resolve();
-  }
-  removeItem(key: string): Promise<void> {
-    try {
-      sessionStorage.removeItem(key);
-    } catch (e) {
-      console.warn('[WebSessionStorageAdapter] Failed to remove item:', e);
-    }
-    return Promise.resolve();
-  }
-  clear(): Promise<void> {
-    try {
-      sessionStorage.clear();
-    } catch (e) {
-      console.warn('[WebSessionStorageAdapter] Failed to clear:', e);
+      /* ignore */
     }
     return Promise.resolve();
   }

@@ -25,8 +25,7 @@ export async function searchSellers(filters: { city: string; location?: string }
     }
 
     return sellersData.map(transformSeller).filter((seller): seller is ApiPublicSeller => seller !== null);
-  } catch (error) {
-    const err = error as { message?: string; response?: { status?: number; statusText?: string; data?: unknown }; stack?: string };
+  } catch {
     return [];
   }
 }

@@ -5,18 +5,8 @@ export async function requestRefund(data: {
   mpesaNumber?: string;
   mpesaName?: string;
 }): Promise<{ success: boolean; message?: string }> {
-  try {
-    const response = await buyerApiInstance.post('/buyers/refund-request', data);
-    return { success: true, message: response.data?.message || 'Refund request submitted successfully' };
-  } catch (error) {
-    console.error('Error requesting refund:', error);
-    // Rethrow the ORIGINAL axios error, not a flattened `new Error(message)`.
-    // The caller (useRefundRequestMutation) runs it through classifyApiError,
-    // which needs the intact AxiosError to read the real response body and to
-    // distinguish network/timeout failures — wrapping it in a plain Error here
-    // defeated that and always produced the generic fallback message.
-    throw error;
-  }
+  const response = await buyerApiInstance.post('/buyers/refund-request', data);
+  return { success: true, message: response.data?.message || 'Refund request submitted successfully' };
 }
 
 export async function getPendingRefundRequests(): Promise<{

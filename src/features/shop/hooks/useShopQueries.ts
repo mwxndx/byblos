@@ -37,7 +37,7 @@ export function useKnockSellerMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (sellerId: string | number) => publicApiService.knockSeller(sellerId),
-    onSuccess: (_data, sellerId) => {
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['public-sellers'] });
     },
   });

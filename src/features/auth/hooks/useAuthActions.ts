@@ -137,7 +137,7 @@ export function useAuthActions({
     }
   }, [markAuthChecked, navigate, setIsLoading, setUser, mutations, queryClient]);
 
-  const loginWithToken = useCallback(async (token: string, role: UserRole) => {
+  const loginWithToken = useCallback(async (_token: string, role: UserRole) => {
     setIsLoading(true);
     try {
       const queryOpts = getProfileQueryOptionsForRole(role);

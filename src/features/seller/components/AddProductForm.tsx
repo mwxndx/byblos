@@ -16,7 +16,7 @@ import {
 } from '../utils/addProductFormUtils';
 import { Sparkles } from '@/shared/ui/icons';
 
-export const AddProductForm = ({ onSuccess, onClose }: { onSuccess: () => void; onClose?: () => void }) => {
+export const AddProductForm = ({ onSuccess }: { onSuccess: () => void; onClose?: () => void }) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState('');

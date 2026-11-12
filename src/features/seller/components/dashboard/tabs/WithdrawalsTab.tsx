@@ -29,9 +29,6 @@ interface WithdrawalsTabProps {
   withdrawalRequests: ApiWithdrawalRequest[];
 }
 
-// Card surface: light in light mode, the original near-black in dark mode.
-const cardClass = 'rounded-2xl sm:rounded-3xl p-3 sm:p-5 md:p-6 border border-transparent bg-white dark:bg-surface-1';
-
 export function WithdrawalsTab({
   balance,
   pendingSettlementBalance = 0,

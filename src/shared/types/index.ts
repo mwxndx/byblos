@@ -148,25 +148,6 @@ export interface Order {
   notes?: string;
 }
 
-export interface CartItem extends Omit<OrderItem, 'id'> {
-  id?: string;
-  inStock: boolean;
-}
-
-export interface Cart {
-  items: CartItem[];
-  itemCount: number;
-  subtotal: number;
-  shipping: number;
-  tax: number;
-  total: number;
-  discount?: {
-    code: string;
-    amount: number;
-    type: 'percentage' | 'fixed';
-  };
-}
-
 export interface User {
   id: string;
   email: string;
@@ -210,9 +191,7 @@ export interface Address {
   notes?: string;
 }
 
-export type PaymentProvider = 'paystack' | 'mpesa';
-
-export interface PaymentMethod {
+interface PaymentMethod {
   id: string;
   type: 'card' | 'paypal' | 'mobile_money' | 'bank_transfer';
   isDefault: boolean;
@@ -267,16 +246,6 @@ export interface ApiResponse<T> {
   error?: string;
   code?: number;
   timestamp?: string;
-}
-
-export interface PaginatedResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrevious: boolean;
 }
 
 // OrderStatus, PaymentStatus, ProductType, and Theme live in ./primitives (re-exported at the top of this file).

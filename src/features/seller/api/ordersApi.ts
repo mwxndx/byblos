@@ -1,14 +1,3 @@
-function unwrapSellerOrders(responseBody: unknown): unknown[] {
-  if (Array.isArray(responseBody)) return responseBody;
-  if (!responseBody || typeof responseBody !== 'object') return [];
-  const body = responseBody as { data?: unknown; orders?: unknown };
-  if (Array.isArray(body.orders)) return body.orders;
-  if (Array.isArray(body.data)) return body.data;
-  const nested = body.data as { orders?: unknown } | undefined;
-  if (Array.isArray(nested?.orders)) return nested.orders;
-  return [];
-}
-
 import apiClient from '@/infrastructure/http/apiClient';
 import type { ApiOrder, OrderStatus } from '@/shared/types';
 import type { OrdersAnalytics, OrderQueryParams } from '../types';
