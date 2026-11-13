@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ShopProductCard } from '../ShopProductCard';
-import type { Product } from '@/shared/types';
+
+type Product = Parameters<typeof ShopProductCard>[0]['product'];
 
 vi.mock('@/features/shop/wishlist/useWishlist', () => ({
   useWishlist: () => ({
