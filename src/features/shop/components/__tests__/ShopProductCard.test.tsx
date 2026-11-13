@@ -74,7 +74,7 @@ describe('ShopProductCard', () => {
     expect(screen.getByText('100% pure silk shirt with minimalist finish.')).toBeInTheDocument();
   });
 
-  it('opens image viewer when image button is clicked without triggering card onTap', () => {
+  it('opens image viewer portaled to document.body with async decoding without triggering card onTap', () => {
     const handleTap = vi.fn();
     render(<ShopProductCard product={mockProduct} onTap={handleTap} />);
 
@@ -82,7 +82,12 @@ describe('ShopProductCard', () => {
     fireEvent.click(imageBtn);
 
     expect(handleTap).not.toHaveBeenCalled();
-    expect(screen.getByRole('dialog', { name: /Byblos Silk Shirt images/i })).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: /Byblos Silk Shirt images/i });
+    expect(dialog).toBeInTheDocument();
+    expect(dialog.parentElement).toBe(document.body);
+
+    const viewerImg = screen.getByAltText(/Byblos Silk Shirt - image 1/i);
+    expect(viewerImg).toHaveAttribute('decoding', 'async');
   });
 
   it('renders product photo with object-contain to avoid image clipping from being rendered too big', () => {

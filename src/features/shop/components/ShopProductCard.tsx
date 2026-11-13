@@ -1,4 +1,5 @@
-import { useState, type MouseEvent } from 'react';
+import { useState, useMemo, type MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Info, Package, X } from '@/shared/ui/icons';
 import { Card } from '@/shared/ui/card';
 import type { Product } from '@/shared/types';
@@ -6,7 +7,6 @@ import { cn, formatCurrency, getImageUrl } from '@/shared/utils/formatting';
 import { getProductCardThemeVars, getProductFlags, type ProductWithApiFields, type Theme } from '@/features/shop/utils/productCardUtils';
 import { useWishlist } from '@/features/shop/wishlist/useWishlist';
 import { useIsProductWishlisted } from '@/features/shop/wishlist/wishlistStore';
-import { useScreenSecurity } from '@/shared/utils/screenSecurity';
 
 interface ShopProductCardProps {
   product: Product;
@@ -40,8 +40,6 @@ export function ShopProductCard({
   const [showImages, setShowImages] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  useScreenSecurity(showImages, 'product-image:' + product.id);
-
   const { addToWishlist, removeFromWishlist } = useWishlist();
   const isAutoWishlisted = useIsProductWishlisted(product.id);
   const wishlisted = isWishlisted !== undefined ? isWishlisted : isAutoWishlisted;
@@ -63,34 +61,37 @@ export function ShopProductCard({
   const theme = (product.seller?.theme as Theme) || 'default';
   const themeVars = getProductCardThemeVars(theme);
 
-  // Extract all images array
-  const productImages: string[] = [];
-  if (rawImage) {
-    productImages.push(getImageUrl(rawImage));
-  }
-  const images = (product as unknown as { images?: unknown }).images;
-  if (Array.isArray(images)) {
-    images.forEach((img) => {
-      if (typeof img === 'string' && img.trim()) {
-        const fullUrl = getImageUrl(img);
-        if (!productImages.includes(fullUrl)) productImages.push(fullUrl);
-      }
-    });
-  } else if (typeof images === 'string' && images.trim()) {
-    try {
-      const parsed = JSON.parse(images);
-      if (Array.isArray(parsed)) {
-        parsed.forEach((img) => {
-          if (typeof img === 'string' && img.trim()) {
-            const fullUrl = getImageUrl(img);
-            if (!productImages.includes(fullUrl)) productImages.push(fullUrl);
-          }
-        });
-      }
-    } catch {
-      // ignore
+  // Extract all images array memoized to avoid recalculating on each render tick
+  const productImages = useMemo(() => {
+    const list: string[] = [];
+    if (rawImage) {
+      list.push(getImageUrl(rawImage));
     }
-  }
+    const rawImages = (product as unknown as { images?: unknown }).images;
+    if (Array.isArray(rawImages)) {
+      rawImages.forEach((img) => {
+        if (typeof img === 'string' && img.trim()) {
+          const fullUrl = getImageUrl(img);
+          if (!list.includes(fullUrl)) list.push(fullUrl);
+        }
+      });
+    } else if (typeof rawImages === 'string' && rawImages.trim()) {
+      try {
+        const parsed = JSON.parse(rawImages);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((img) => {
+            if (typeof img === 'string' && img.trim()) {
+              const fullUrl = getImageUrl(img);
+              if (!list.includes(fullUrl)) list.push(fullUrl);
+            }
+          });
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return list;
+  }, [rawImage, product]);
 
   const stop = (e: MouseEvent) => e.stopPropagation();
 
@@ -224,7 +225,7 @@ export function ShopProductCard({
       </Card>
 
       {/* Description popup (§18) */}
-      {showDescription && (
+      {showDescription && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={`${product.name} description`}>
           <button type="button" aria-label="Close description" onClick={() => setShowDescription(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
           <div
@@ -246,13 +247,14 @@ export function ShopProductCard({
               {product.description?.trim() || 'No description provided for this product.'}
             </p>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Full Image viewer — borderless, clean overlay with only image and close icon */}
-      {showImages && (
+      {showImages && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 select-none animate-in fade-in-0 duration-200"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 select-none"
           role="dialog"
           aria-modal="true"
           aria-label={`${product.name} images`}
@@ -262,7 +264,7 @@ export function ShopProductCard({
             type="button"
             aria-label="Close image viewer"
             onClick={() => setShowImages(false)}
-            className="absolute inset-0 bg-black/90 backdrop-blur-sm cursor-default"
+            className="absolute inset-0 bg-black/90 backdrop-blur-sm cursor-default transition-opacity duration-200"
           />
 
           {/* Close button (top right, safe-area aware) */}
@@ -282,7 +284,8 @@ export function ShopProductCard({
               <img
                 src={productImages[activeImageIndex]}
                 alt={`${product.name} - image ${activeImageIndex + 1}`}
-                className="max-h-[85vh] max-w-[95vw] w-auto h-auto object-contain select-none pointer-events-auto rounded-lg shadow-2xl"
+                className="max-h-[85vh] max-w-[95vw] w-auto h-auto object-contain select-none pointer-events-auto rounded-lg shadow-2xl transition-opacity duration-200"
+                decoding="async"
                 onContextMenu={(e) => e.preventDefault()}
               />
             ) : (
@@ -343,7 +346,8 @@ export function ShopProductCard({
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
