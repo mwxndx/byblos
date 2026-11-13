@@ -11,9 +11,11 @@ import { SellerForgotPasswordDialog } from '../components/SellerForgotPasswordDi
 import { toast } from 'sonner';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import { getLoginPath } from '@/features/auth/utils/authRouting';
+import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import type { UserRole } from '@/features/auth/types/authTypes';
 
 export function SellerLogin() {
+  useThemeScope('seller');
   const navigate = useNavigate();
   const { login, forgotPassword } = useGlobalAuth();
 
@@ -139,7 +141,7 @@ export function SellerLogin() {
   };
 
   return (
-    <main className="auth-page min-h-screen min-h-[100dvh] min-h-[-webkit-fill-available] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+    <main className="auth-page min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
       <header className="sticky top-0 z-30 border-b border-white dark:border-[#000000] bg-[var(--byblos-bg,#000000)]/90 backdrop-blur-md pt-safe-top transition-colors duration-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="relative flex h-16 items-center justify-between sm:h-20">

@@ -146,7 +146,7 @@ export function useThemeScope(scope: ThemeScope): { theme: AppTheme; setTheme: (
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('byblos-theme-change', handleThemeChange);
 
-    if (theme !== 'system') {
+    if (theme !== 'system' || typeof window.matchMedia !== 'function') {
       return () => {
         window.removeEventListener('storage', handleStorageChange);
         window.removeEventListener('byblos-theme-change', handleThemeChange);

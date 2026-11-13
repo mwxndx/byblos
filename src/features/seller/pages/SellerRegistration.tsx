@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/shared/ui/button';
 import { Mail, Loader2, ArrowLeft, RefreshCw, Store } from '@/shared/ui/icons';
 import { useToast } from '@/shared/hooks/use-toast';
+import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import TermsModal from '@/shared/components/TermsModal';
 import { SellerRegistrationSteps } from '../components/SellerRegistrationSteps';
 import { useSellerRegistration } from '../hooks/useSellerRegistration';
@@ -15,6 +16,7 @@ interface SellerRegistrationProps {
 
 
 const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
+  useThemeScope('seller');
   const navigate = useNavigate();
   const { toast } = useToast();
   const {
@@ -74,7 +76,7 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
 
   return (
     <main
-      className="auth-page min-h-screen min-h-[100dvh] min-h-[-webkit-fill-available] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200"
+      className="auth-page min-h-screen min-h-[100dvh] min-h-[100svh] bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] pb-safe-bottom transition-colors duration-200"
       style={{
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
@@ -112,8 +114,8 @@ const SellerRegistration = ({ onSuccess }: SellerRegistrationProps) => {
       </header>
 
       {/* Main Content */}
-      <div className="mx-auto flex flex-1 w-full max-w-md flex-col px-4 py-5 min-h-[calc(100dvh-4rem)] sm:min-h-[calc(100dvh-5rem)]">
-        <div className="my-auto w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
+      <div className="mx-auto flex w-full max-w-md flex-col px-4 py-6 sm:py-8">
+        <div className="w-full space-y-4 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Create Account</h2>
 
