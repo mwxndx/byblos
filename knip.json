@@ -1,19 +1,12 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": [
-    "src/main.tsx",
     "index.html",
-    "scripts/generate-sitemap.mjs"
+    "src/main.tsx"
   ],
   "project": ["src/**/*.{ts,tsx}"],
   "ignore": [
-    "server/**",
-    "android/**",
-    "dist/**",
-    "graphify-out/**",
-    "e2e/**",
-    ".agents/**",
-    ".claude/**"
+    "server/**"
   ],
-  "ignoreBinaries": ["cap"]
+  "ignoreDependencies": ["pg"]
 }
