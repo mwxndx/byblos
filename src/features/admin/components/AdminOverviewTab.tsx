@@ -27,8 +27,8 @@ interface AdminOverviewTabProps {
 
 export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Readonly<AdminOverviewTabProps>) {
   const [appPolicy, setAppPolicy] = useState<{ versionName: string; versionCode: number }>({
-    versionName: '1.0.80',
-    versionCode: 80,
+    versionName: '1.0.81',
+    versionCode: 81,
   });
 
   useEffect(() => {

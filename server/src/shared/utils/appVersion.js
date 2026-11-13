@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 80;
-  const defaultName = '1.0.80';
+  const defaultCode = 81;
+  const defaultName = '1.0.81';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Optimized mobile responsiveness for admin and marketing dashboards with smooth horizontal tab scrolling and fluid charts.',
-      'Refined buyer and creator profile drawers to full-height viewports, eliminating bottom navigation gaps.',
-      'Updated seller brand identity cards to clean rounded-square avatar frames across buyer marketplace views.'
+      'Eliminated product catalog image viewer pop-up flicker and hardware surface buffer tearing across Android devices.',
+      'Fixed seller registration layout viewport alignment and removed extraneous whitespace above registration forms.',
+      'Hardened modal portaling and enhanced overall store browsing stability and theme rendering responsiveness.'
     ]
   };
 }
