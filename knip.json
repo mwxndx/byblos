@@ -4,9 +4,13 @@
     "index.html",
     "src/main.tsx"
   ],
-  "project": ["src/**/*.{ts,tsx}"],
+  "project": [
+    "src/**/*.{ts,tsx}"
+  ],
   "ignore": [
     "server/**"
   ],
-  "ignoreDependencies": ["pg"]
+  "ignoreDependencies": [
+    "pg"
+  ]
 }
