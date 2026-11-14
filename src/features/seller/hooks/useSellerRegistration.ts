@@ -71,20 +71,6 @@ export function useSellerRegistration(onSuccess?: () => void) {
   const { toast } = useToast();
   const resendVerificationMutation = useSellerResendVerificationMutation();
 
-  // Keep the standalone auth route aligned with the light app shell.
-  useEffect(() => {
-    const originalBodyStyle = document.body.style.cssText;
-    const originalHtmlStyle = document.documentElement.style.cssText;
-
-    document.body.style.cssText = 'margin: 0; padding: 0; background-color: #f8f7f2; overflow-x: hidden;';
-    document.documentElement.style.cssText = 'margin: 0; padding: 0; background-color: #f8f7f2; overflow-x: hidden;';
-
-    return () => {
-      document.body.style.cssText = originalBodyStyle;
-      document.documentElement.style.cssText = originalHtmlStyle;
-    };
-  }, []);
-
   const validatePasswords = (password: string, confirmPassword: string, showToast = true): boolean => {
     if (password !== confirmPassword) {
       if (showToast) {

@@ -108,8 +108,8 @@ function BuyerDashboard() {
   return (
     <div className="page-enter dashboard-layout buyer-surface min-w-0 overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{
       display: 'flex', flexDirection: 'column',
-      minHeight: '100%',
-      height: '100%',
+      minHeight: '100dvh',
+      height: '100dvh',
       overflowY: 'hidden',
     }}>
       <BuyerDashboardHeader
@@ -130,7 +130,7 @@ function BuyerDashboard() {
           overflowY: 'auto',
           overflowX: 'hidden',
           padding: 'clamp(10px, 4vw, 18px)',
-          paddingBottom: 'calc(5.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+          paddingBottom: 'calc(4.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
           WebkitOverflowScrolling: 'touch',
           scrollBehavior: 'smooth',
           overscrollBehavior: 'none',
