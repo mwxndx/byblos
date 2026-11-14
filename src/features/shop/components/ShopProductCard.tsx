@@ -2,6 +2,7 @@ import { useState, useMemo, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Info, Package, X } from '@/shared/ui/icons';
 import { Card } from '@/shared/ui/card';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import type { Product } from '@/shared/types';
 import { cn, formatCurrency, getImageUrl } from '@/shared/utils/formatting';
 import { getProductCardThemeVars, getProductFlags, type ProductWithApiFields, type Theme } from '@/features/shop/utils/productCardUtils';
@@ -36,7 +37,6 @@ export function ShopProductCard({
   onToggleWishlist,
   isReadOnly = false,
 }: Readonly<ShopProductCardProps>) {
-  const [showDescription, setShowDescription] = useState(false);
   const [showImages, setShowImages] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -206,50 +206,50 @@ export function ShopProductCard({
             </button>
           </div>
 
-          {/* Price on left, description icon on right */}
+          {/* Price on left, description icon with service charge Popover on right */}
           <div className="mt-auto flex items-center justify-between gap-2 pt-1">
             <p className="text-sm font-normal tabular-nums text-label sm:text-base">
               {formatCurrency(product.price)}
             </p>
 
-            <button
-              type="button"
-              onClick={(e) => { stop(e); setShowDescription(true); }}
-              aria-label={`View ${product.name} description`}
-              className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0"
-            >
-              <Info className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
-            </button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  onClick={stop}
+                  aria-label={`View ${product.name} description`}
+                  title="View description & service charge"
+                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+                >
+                  <Info className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                role="dialog"
+                aria-label={`${product.name} description`}
+                align="end"
+                className="w-72 sm:w-80 p-3.5 text-xs leading-relaxed text-slate-700 dark:text-white/90 shadow-xl rounded-xl z-50 bg-white dark:bg-surface-1 border border-slate-200 dark:border-white/10"
+                onClick={stop}
+              >
+                {product.description?.trim() ? (
+                  <div className="space-y-2">
+                    <p className="whitespace-pre-line text-slate-900 dark:text-white font-medium border-b border-slate-200/80 dark:border-white/10 pb-2">
+                      {product.description.trim()}
+                    </p>
+                    <p className="text-[11px] sm:text-xs text-slate-600 dark:text-white/70">
+                      Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-700 dark:text-white/90">
+                    Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
+                  </p>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </Card>
-
-      {/* Description popup (§18) */}
-      {showDescription && typeof document !== 'undefined' && createPortal(
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={`${product.name} description`}>
-          <button type="button" aria-label="Close description" onClick={() => setShowDescription(false)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-          <div
-            className="relative z-10 w-full max-w-sm rounded-2xl border p-5 shadow-2xl"
-            style={{
-              ...themeVars,
-              backgroundColor: 'var(--product-card-bg, var(--byblos-surface, #ffffff))',
-              color: 'var(--product-card-text, var(--byblos-text, #0f0f0e))',
-              borderColor: 'var(--product-card-border, var(--byblos-border, rgba(0, 0, 0, 0.12)))',
-            }}
-          >
-            <div className="mb-2 flex items-start justify-between gap-3">
-              <h3 className="text-base font-normal text-label">{product.name}</h3>
-              <button type="button" onClick={() => setShowDescription(false)} aria-label="Close" className="-mr-1 -mt-1 rounded-full p-1.5 opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="max-h-[50vh] overflow-y-auto whitespace-pre-line text-sm leading-relaxed opacity-80">
-              {product.description?.trim() || 'No description provided for this product.'}
-            </p>
-          </div>
-        </div>,
-        document.body
-      )}
 
       {/* Full Image viewer — borderless, clean overlay with only image and close icon */}
       {showImages && typeof document !== 'undefined' && createPortal(
