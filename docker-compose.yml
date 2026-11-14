@@ -1,13 +1,18 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
     container_name: byblos-postgres
     restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+      - path: ./server/.env
+        required: false
     environment:
-      POSTGRES_DB: ${DB_NAME:-bybloshqdb}
-      POSTGRES_USER: ${DB_USER:-byblos_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-byblos_prod}
+      POSTGRES_USER: ${DB_USER:-byblos_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ByblosSecureDbPass2026!}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -15,7 +20,7 @@ services:
     networks:
       - byblos-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-byblos_user} -d ${DB_NAME:-bybloshqdb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-byblos_admin} -d ${DB_NAME:-byblos_prod}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -36,9 +41,9 @@ services:
       NODE_ENV: production
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-bybloshqdb}
-      DB_USER: ${DB_USER:-byblos_user}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME:-byblos_prod}
+      DB_USER: ${DB_USER:-byblos_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-ByblosSecureDbPass2026!}
       DB_SSL: "false"
     command: ["npm", "run", "migrate"]
     depends_on:
@@ -64,12 +69,17 @@ services:
     image: edoburu/pgbouncer:latest
     container_name: byblos-pgbouncer
     restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+      - path: ./server/.env
+        required: false
     environment:
-      DB_USER: ${DB_USER:-byblos_user}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: ${DB_USER:-byblos_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-ByblosSecureDbPass2026!}
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-bybloshqdb}
+      DB_NAME: ${DB_NAME:-byblos_prod}
       POOL_MODE: transaction
       MAX_CLIENT_CONN: 1000
       DEFAULT_POOL_SIZE: 20
@@ -102,9 +112,9 @@ services:
       APP_NAME: ${APP_NAME:-Byblos}
       DB_HOST: pgbouncer
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-bybloshqdb}
-      DB_USER: ${DB_USER:-byblos_user}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME:-byblos_prod}
+      DB_USER: ${DB_USER:-byblos_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-ByblosSecureDbPass2026!}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
 
@@ -185,9 +195,9 @@ services:
       APP_NAME: ${APP_NAME:-Byblos}
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: ${DB_NAME:-bybloshqdb}
-      DB_USER: ${DB_USER:-byblos_user}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME:-byblos_prod}
+      DB_USER: ${DB_USER:-byblos_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-ByblosSecureDbPass2026!}
       DB_SSL: "false"
       REDIS_URL: redis://redis:6379
 
@@ -285,7 +295,11 @@ services:
 
 volumes:
   postgres_data:
+    name: byblos-infra_pgdata
+    external: true
   redis_data:
+    name: byblos-infra_redisdata
+    external: true
 
 
 networks:
