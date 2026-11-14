@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SellerBrandCard from '../SellerBrandCard';
-import type { ApiPublicSeller } from '@/shared/types/api/seller';
+import type { ApiPublicSeller } from '../../../../shared/types/api/seller';
 
 vi.mock('@/features/shop/hooks/useShopQueries', () => ({
   useKnockSellerMutation: () => ({ mutate: vi.fn() }),

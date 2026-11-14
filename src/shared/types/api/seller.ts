@@ -21,6 +21,9 @@ export interface ApiPublicSeller {
   shopName?: string;
   shop_name?: string;
   slug?: string | null;
+  status?: string;
+  is_active?: boolean;
+  isActive?: boolean;
   createdAt: string;
   created_at?: string;
   updatedAt?: string;

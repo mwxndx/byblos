@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SellersGrid from '../SellersGrid';
-import type { ApiPublicSeller } from '@/shared/types/api/seller';
+import type { ApiPublicSeller } from '../../../../shared/types/api/seller';
 import type { ApiProduct } from '@/features/shop/utils/productTransforms';
 
 vi.mock('@/features/shop/hooks/useShopQueries', () => ({
