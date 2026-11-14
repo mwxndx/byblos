@@ -22,9 +22,10 @@ describe('BuyerBottomNav — Floating Navigation Bar', () => {
     // Fixed width with fluid boundary
     expect(nav.className).toContain('w-[360px]');
 
-    // Rounded pill styling with backdrop blur
+    // Rounded pill styling with backdrop blur and distinct border
     expect(nav.className).toContain('rounded-2xl');
     expect(nav.className).toContain('backdrop-blur-md');
+    expect(nav).toHaveClass('border', 'border-slate-300', 'dark:border-white/20', 'dashboard-floating-nav');
 
     // Labels are sr-only (no visible text under icons)
     const labelSpans = nav.querySelectorAll('span.sr-only');

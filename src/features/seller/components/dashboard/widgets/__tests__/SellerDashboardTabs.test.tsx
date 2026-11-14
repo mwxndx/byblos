@@ -22,8 +22,9 @@ describe('SellerDashboardTabs', () => {
     // Rounded corners
     expect(nav.className).toMatch(/rounded-(2xl|full)/);
 
-    // Identical width on desktop and mobile
+    // Identical width on desktop and mobile with distinct light/dark border
     expect(nav).toHaveClass('w-[360px]');
+    expect(nav).toHaveClass('border', 'border-slate-300', 'dark:border-white/20', 'dashboard-floating-nav');
   });
 
   it('renders notifications tab next to creators tab with unread count badge', () => {

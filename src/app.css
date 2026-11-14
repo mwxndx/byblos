@@ -115,6 +115,31 @@ nav.fixed.bottom-0 {
     margin-bottom: 0;
     background-color: var(--byblos-bg);
 }
+
+/* ── Floating dashboard bottom navigation bar border & elevation ──
+   Ensures a crisp, distinct outline and depth separation across both
+   light and dark modes in Buyer, Seller, and Creator dashboards. */
+.dashboard-floating-nav,
+nav.dashboard-floating-nav,
+nav[aria-label="Buyer navigation"],
+nav[aria-label="Dashboard sections"],
+nav[aria-label="Creator navigation"] {
+    border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.8), 0 4px 12px -2px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="light"] .dashboard-floating-nav,
+[data-theme="light"] nav.dashboard-floating-nav,
+[data-theme="light"] nav[aria-label="Buyer navigation"],
+[data-theme="light"] nav[aria-label="Dashboard sections"],
+[data-theme="light"] nav[aria-label="Creator navigation"],
+html.light .dashboard-floating-nav,
+html.light nav.dashboard-floating-nav,
+.light .dashboard-floating-nav,
+.light nav.dashboard-floating-nav {
+    border: 1.5px solid rgba(0, 0, 0, 0.16) !important;
+    box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.10), 0 4px 10px -2px rgba(0, 0, 0, 0.05) !important;
+}
 .mt-safe-top {
     margin-top: var(--sat) !important;
 }
@@ -1232,9 +1257,9 @@ html.light #root {
 
 /* ── Dashboard surface cards — light mode physical elevation & background-matching borders ──────────────── */
 [data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard) :is(
-    [class*="rounded-xl"]:not(.theme-swatch),
-    [class*="rounded-2xl"]:not(.theme-swatch),
-    [class*="rounded-3xl"]:not(.theme-swatch),
+    [class*="rounded-xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav),
+    [class*="rounded-2xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav),
+    [class*="rounded-3xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav),
     section
 ) {
     background-color: #ffffff !important;
@@ -1335,7 +1360,7 @@ nav,
 :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard) :is(
     [class*="rounded-card"],
     [class*="rounded-xl"],
-    [class*="rounded-2xl"],
+    [class*="rounded-2xl"]:not(.dashboard-floating-nav):not(nav),
     [class*="rounded-3xl"],
     [class*="rounded-[2rem]"],
     article,
@@ -1345,8 +1370,8 @@ nav,
     .seller-card,
     div.sticky,
     header,
-    nav,
-    [class*="shadow"]
+    nav:not(.dashboard-floating-nav),
+    [class*="shadow"]:not(.dashboard-floating-nav)
 ) {
     box-shadow: none !important;
 }
