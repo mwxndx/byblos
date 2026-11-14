@@ -41,13 +41,14 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
       </MemoryRouter>
     );
 
-    // Business profile photo frame is circular and displays full uncropped image
+    // Business profile photo frame is centered and circular with zoomed object-cover
     const businessImg = screen.getByAltText('Amani Styles business photo');
-    expect(businessImg).toHaveClass('object-contain');
-    expect(businessImg).not.toHaveClass('object-cover');
+    expect(businessImg).toHaveClass('object-cover');
+    expect(businessImg).not.toHaveClass('object-contain');
     const avatarFrame = businessImg.parentElement;
     expect(avatarFrame).toBeInTheDocument();
     expect(avatarFrame).toHaveClass('rounded-full', 'aspect-square');
+    expect(avatarFrame?.parentElement).toHaveClass('justify-center');
 
     // Right-pointing arrow is removed since tapping card opens the shop
     expect(container.querySelector('.group-hover\\:translate-x-0\\.5')).not.toBeInTheDocument();

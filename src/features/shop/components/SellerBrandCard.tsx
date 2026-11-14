@@ -92,14 +92,14 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             onKeyDown={handleCardKeyDown}
             aria-label={`Open ${shopName}`}
         >
-            {/* Top section: Circular business profile photo frame */}
-            <div className="relative flex items-center justify-between w-full shrink-0 h-1/2">
-                <div className="relative h-full aspect-square shrink-0 overflow-hidden rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-zinc-900/60 flex items-center justify-center p-1 sm:p-1.5">
+            {/* Top section: Centered circular business profile photo frame */}
+            <div className="relative flex items-center justify-center w-full shrink-0 h-1/2">
+                <div className="relative h-full aspect-square shrink-0 overflow-hidden rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-zinc-900/60 flex items-center justify-center">
                     {hasAvatar ? (
                         <img
                             src={getImageUrl(avatarUrl)}
                             alt={`${shopName} business photo`}
-                            className="h-full w-full rounded-full object-contain transition-transform duration-200 group-hover:scale-105"
+                            className="h-full w-full rounded-full object-cover transition-transform duration-200 group-hover:scale-105"
                             loading="lazy"
                             onError={() => setAvatarFailed(true)}
                         />
@@ -118,7 +118,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                             event.stopPropagation();
                             handleUnfollow();
                         }}
-                        className="self-start flex h-6 sm:h-7 items-center justify-center gap-1 rounded-lg sm:rounded-xl border border-red-400/35 bg-red-500/15 px-2 text-[10px] sm:text-[11px] font-semibold text-red-600 dark:text-white backdrop-blur-md transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
+                        className="absolute top-0 right-0 z-10 flex h-6 sm:h-7 items-center justify-center gap-1 rounded-lg sm:rounded-xl border border-red-400/35 bg-red-500/15 px-2 text-[10px] sm:text-[11px] font-semibold text-red-600 dark:text-white backdrop-blur-md transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
                         aria-label={`Unfollow ${shopName}`}
                     >
                         <UserMinus className="h-3 w-3" />
