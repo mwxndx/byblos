@@ -22,13 +22,10 @@ const SellerGridSkeleton = () => (
             <div
                 key={index}
                 aria-hidden="true"
-                className="flex flex-col justify-between aspect-square w-full rounded-[48px] border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0a0a0a] p-3.5 sm:p-4 shadow-sm transition-colors duration-200"
+                className="flex flex-col justify-between aspect-square w-full rounded-[24px] border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200"
             >
-                <div className="flex items-start justify-between w-full">
-                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl aspect-square" />
-                    <Skeleton className="h-4 w-4 rounded" />
-                </div>
-                <div className="flex flex-col items-start gap-2 w-full">
+                <Skeleton className="h-1/2 w-full shrink-0 rounded-xl" />
+                <div className="flex flex-col items-start gap-1.5 w-full pt-1">
                     <Skeleton className="h-4 w-24 sm:w-28 rounded-md" />
                     <div className="flex items-center gap-1.5">
                         <Skeleton className="h-6 w-6 rounded-full" />

@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, MapPin, Store, UserMinus } from '@/shared/ui/icons';
+import { MapPin, Store, UserMinus } from '@/shared/ui/icons';
 import { cn, getImageUrl } from '@/shared/utils/formatting';
 import { useKnockSellerMutation } from '@/features/shop/hooks/useShopQueries';
 import type { ApiPublicSeller } from '@/shared/types/api/seller';
@@ -83,7 +83,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[48px] border border-slate-300 dark:border-white/20 bg-white dark:bg-surface-1 p-3.5 sm:p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-slate-400 dark:hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
+                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[24px] border border-slate-300 dark:border-white/20 bg-white dark:bg-surface-1 p-3 sm:p-3.5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-slate-400 dark:hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -92,48 +92,42 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             onKeyDown={handleCardKeyDown}
             aria-label={`Open ${shopName}`}
         >
-            {/* Top row: Business profile photo in square frame with rounded corners on left, unfollow / chevron on right */}
-            <div className="flex items-start justify-between w-full">
-                <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl aspect-square border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
-                    {hasAvatar ? (
-                        <img
-                            src={getImageUrl(avatarUrl)}
-                            alt={`${shopName} business photo`}
-                            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
-                            loading="lazy"
-                            onError={() => setAvatarFailed(true)}
-                        />
-                    ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-zinc-900">
-                            <Store className="h-6 w-6 text-slate-400 dark:text-white/50" strokeWidth={1.5} />
-                        </div>
-                    )}
-                </div>
+            {/* Top section: Business profile photo frame occupying half the seller shop card */}
+            <div className="relative h-1/2 w-full shrink-0 overflow-hidden rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
+                {hasAvatar ? (
+                    <img
+                        src={getImageUrl(avatarUrl)}
+                        alt={`${shopName} business photo`}
+                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                        loading="lazy"
+                        onError={() => setAvatarFailed(true)}
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-slate-100 dark:bg-zinc-900">
+                        <Store className="h-7 w-7 text-slate-400 dark:text-white/50" strokeWidth={1.5} />
+                    </div>
+                )}
 
-                <div className="flex items-center shrink-0">
-                    {showUnfollow && onUnfollow ? (
-                        <button
-                            type="button"
-                            disabled={isUnfollowing}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                handleUnfollow();
-                            }}
-                            className="flex h-7 items-center justify-center gap-1 rounded-xl border border-red-400/35 bg-red-500/15 px-2 text-[11px] font-semibold text-red-600 dark:text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
-                            aria-label={`Unfollow ${shopName}`}
-                        >
-                            <UserMinus className="h-3 w-3" />
-                            <span>{isUnfollowing ? '...' : 'Unfollow'}</span>
-                        </button>
-                    ) : (
-                        <ChevronRight className="h-4 w-4 text-slate-400 dark:text-white/40 group-hover:translate-x-0.5 transition-transform" />
-                    )}
-                </div>
+                {showUnfollow && onUnfollow && (
+                    <button
+                        type="button"
+                        disabled={isUnfollowing}
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            handleUnfollow();
+                        }}
+                        className="absolute top-2 right-2 z-10 flex h-6 sm:h-7 items-center justify-center gap-1 rounded-lg sm:rounded-xl border border-red-400/35 bg-red-500/15 px-2 text-[10px] sm:text-[11px] font-semibold text-red-600 dark:text-white backdrop-blur-md transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
+                        aria-label={`Unfollow ${shopName}`}
+                    >
+                        <UserMinus className="h-3 w-3" />
+                        <span>{isUnfollowing ? '...' : 'Unfollow'}</span>
+                    </button>
+                )}
             </div>
 
             {/* Bottom section: Shop name and icons aligned to the left */}
-            <div className="flex flex-col items-start text-left w-full gap-2 min-w-0">
-                <h3 className="truncate w-full text-left text-[15px] sm:text-[16px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
+            <div className="flex flex-col items-start text-left w-full gap-1.5 sm:gap-2 min-w-0 pt-1">
+                <h3 className="truncate w-full text-left text-[14px] sm:text-[15px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
                     {shopName}
                 </h3>
 

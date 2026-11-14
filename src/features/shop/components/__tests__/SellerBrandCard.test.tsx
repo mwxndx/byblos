@@ -34,28 +34,30 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(heading.className).toMatch(/text-\[15px\]/);
   });
 
-  it('renders a square card with rounded corners matching navigation (48px) and light/dark borders', () => {
+  it('renders a square card with rounded corners reduced by factor of 2 (24px), half-card photo frame, and light/dark borders', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
       </MemoryRouter>
     );
 
-    // Business profile photo is housed in a square frame with rounded corners
+    // Business profile photo frame occupies half the seller shop card
     const businessImg = screen.getByAltText('Amani Styles business photo');
     const avatarFrame = businessImg.parentElement;
     expect(avatarFrame).toBeInTheDocument();
-    expect(avatarFrame).toHaveClass('rounded-xl');
+    expect(avatarFrame).toHaveClass('rounded-xl', 'h-1/2', 'w-full');
     expect(avatarFrame).not.toHaveClass('rounded-full');
-    expect(avatarFrame).toHaveClass('aspect-square');
 
-    // Root card is full-width square with navigation corner integer (48px) and distinct borders
+    // Right-pointing arrow is removed since tapping card opens the shop
+    expect(container.querySelector('.group-hover\\:translate-x-0\\.5')).not.toBeInTheDocument();
+
+    // Root card is full-width square with 24px roundness (reduced by factor of 2 from 48px) and distinct borders
     const card = container.firstElementChild;
-    expect(card).toHaveClass('w-full', 'aspect-square', 'rounded-[48px]');
+    expect(card).toHaveClass('w-full', 'aspect-square', 'rounded-[24px]');
     expect(card).toHaveClass('border', 'border-slate-300', 'dark:border-white/20');
   });
 
-  it('renders store fallback icon in square frame with rounded corners when avatar is empty', () => {
+  it('renders store fallback icon in half-card frame with rounded corners when avatar is empty', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
@@ -64,7 +66,7 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
 
     const avatarFrame = container.querySelector('.rounded-xl');
     expect(avatarFrame).toBeInTheDocument();
-    expect(avatarFrame).toHaveClass('aspect-square');
+    expect(avatarFrame).toHaveClass('rounded-xl', 'h-1/2', 'w-full');
     expect(avatarFrame).not.toHaveClass('rounded-full');
     expect(avatarFrame?.querySelector('svg')).toBeInTheDocument();
   });
