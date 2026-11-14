@@ -59,7 +59,7 @@ export function CreatorDashboardTabs({
               onClick={() => onSelectTab(id)}
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
-              className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-xl py-2 transition-all duration-150 active:scale-95 ${
+              className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-full py-2 transition-all duration-150 active:scale-95 ${
                 isActive
                   ? 'text-black dark:text-white font-bold'
                   : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
