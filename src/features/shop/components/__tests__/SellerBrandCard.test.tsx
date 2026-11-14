@@ -47,7 +47,7 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(businessImg).not.toHaveClass('object-cover');
     const avatarFrame = businessImg.parentElement;
     expect(avatarFrame).toBeInTheDocument();
-    expect(avatarFrame).toHaveClass('rounded-xl', 'h-1/2', 'w-full');
+    expect(avatarFrame).toHaveClass('rounded-[24px]', 'h-1/2', 'w-full');
     expect(avatarFrame).not.toHaveClass('rounded-full');
 
     // Right-pointing arrow is removed since tapping card opens the shop
@@ -66,9 +66,9 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
       </MemoryRouter>
     );
 
-    const avatarFrame = container.querySelector('.rounded-xl');
+    const avatarFrame = container.querySelector('.h-1\\/2');
     expect(avatarFrame).toBeInTheDocument();
-    expect(avatarFrame).toHaveClass('rounded-xl', 'h-1/2', 'w-full');
+    expect(avatarFrame).toHaveClass('rounded-[24px]', 'h-1/2', 'w-full');
     expect(avatarFrame).not.toHaveClass('rounded-full');
     expect(avatarFrame?.querySelector('svg')).toBeInTheDocument();
   });
