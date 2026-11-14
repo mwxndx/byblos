@@ -101,7 +101,7 @@ services:
       PORT: 3000
       APP_NAME: ${APP_NAME:-Byblos}
       DB_HOST: pgbouncer
-      DB_PORT: 6432
+      DB_PORT: 5432
       DB_NAME: ${DB_NAME:-bybloshqdb}
       DB_USER: ${DB_USER:-byblos_user}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -139,6 +139,7 @@ services:
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
       CARTO_API_KEY: ${CARTO_API_KEY}
+    command: ["node", "src/index.js"]
     depends_on:
       postgres:
         condition: service_healthy
