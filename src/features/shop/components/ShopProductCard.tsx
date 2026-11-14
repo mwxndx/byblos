@@ -206,7 +206,7 @@ export function ShopProductCard({
             </button>
           </div>
 
-          {/* Price on left, description icon with service charge Popover on right */}
+          {/* Price on left, description icon with popover on right */}
           <div className="mt-auto flex items-center justify-between gap-2 pt-1">
             <p className="text-sm font-normal tabular-nums text-label sm:text-base">
               {formatCurrency(product.price)}
@@ -217,8 +217,10 @@ export function ShopProductCard({
                 <button
                   type="button"
                   onClick={stop}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
                   aria-label={`View ${product.name} description`}
-                  title="View description & service charge"
+                  title="View description"
                   className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
                 >
                   <Info className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
@@ -228,23 +230,14 @@ export function ShopProductCard({
                 role="dialog"
                 aria-label={`${product.name} description`}
                 align="end"
+                disableAnimation
                 className="w-72 sm:w-80 p-3.5 text-xs leading-relaxed text-slate-700 dark:text-white/90 shadow-xl rounded-xl z-50 bg-white dark:bg-surface-1 border border-slate-200 dark:border-white/10"
                 onClick={stop}
+                onPointerDown={(e) => e.stopPropagation()}
               >
-                {product.description?.trim() ? (
-                  <div className="space-y-2">
-                    <p className="whitespace-pre-line text-slate-900 dark:text-white font-medium border-b border-slate-200/80 dark:border-white/10 pb-2">
-                      {product.description.trim()}
-                    </p>
-                    <p className="text-[11px] sm:text-xs text-slate-600 dark:text-white/70">
-                      Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-xs text-slate-700 dark:text-white/90">
-                    Byblos adds a 2% service charge to each product price to keep products safe in transit, secure the transaction, and support our operations and maintenance.
-                  </p>
-                )}
+                <p className="whitespace-pre-line text-slate-900 dark:text-white font-normal">
+                  {product.description?.trim() || 'No description provided for this product.'}
+                </p>
               </PopoverContent>
             </Popover>
           </div>

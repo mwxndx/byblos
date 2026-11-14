@@ -69,7 +69,7 @@ describe('ShopProductCard', () => {
     expect(descBtn).toHaveClass('rounded-full');
   });
 
-  it('opens description popover when description button is clicked without triggering card onTap and shows 2% charge', () => {
+  it('opens description popover when description button is clicked without triggering card onTap and shows only description', () => {
     const handleTap = vi.fn();
     render(<ShopProductCard product={mockProduct} onTap={handleTap} />);
 
@@ -79,10 +79,10 @@ describe('ShopProductCard', () => {
     expect(handleTap).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog', { name: /Byblos Silk Shirt description/i })).toBeInTheDocument();
     expect(screen.getByText('100% pure silk shirt with minimalist finish.')).toBeInTheDocument();
-    expect(screen.getByText(/Byblos adds a 2% service charge/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Byblos adds a 2% service charge/i)).not.toBeInTheDocument();
   });
 
-  it('renders 2% charge in popover even when product has no description', () => {
+  it('renders fallback in popover when product has no description and no 2% charge info', () => {
     const handleTap = vi.fn();
     render(<ShopProductCard product={{ ...mockProduct, description: '' }} onTap={handleTap} />);
 
@@ -90,7 +90,8 @@ describe('ShopProductCard', () => {
     fireEvent.click(descBtn);
 
     expect(handleTap).not.toHaveBeenCalled();
-    expect(screen.getByText(/Byblos adds a 2% service charge/i)).toBeInTheDocument();
+    expect(screen.getByText('No description provided for this product.')).toBeInTheDocument();
+    expect(screen.queryByText(/Byblos adds a 2% service charge/i)).not.toBeInTheDocument();
   });
 
   it('opens image viewer portaled to document.body with async decoding without triggering card onTap', () => {
