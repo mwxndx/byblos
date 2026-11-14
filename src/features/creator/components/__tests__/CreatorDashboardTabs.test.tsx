@@ -18,7 +18,7 @@ describe('CreatorDashboardTabs — Floating Navigation Bar', () => {
     expect(nav).toBeInTheDocument();
     expect(nav).toHaveClass('fixed', 'bottom-4', 'sm:bottom-5', 'left-1/2', '-translate-x-1/2', 'z-50');
     expect(nav.className).toContain('w-[360px]');
-    expect(nav.className).toContain('rounded-2xl');
+    expect(nav.className).toContain('rounded-[48px]');
     expect(nav).toHaveClass('border', 'border-slate-300', 'dark:border-white/20', 'dashboard-floating-nav');
 
     // All 4 tabs present

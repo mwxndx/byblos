@@ -19,8 +19,8 @@ describe('SellerDashboardTabs', () => {
     // Floats above bottom with fixed positioning and centered translation
     expect(nav).toHaveClass('fixed', 'left-1/2', '-translate-x-1/2', 'z-50');
 
-    // Rounded corners
-    expect(nav.className).toMatch(/rounded-(2xl|full)/);
+    // Rounded corners (increased roundness factor of 3)
+    expect(nav.className).toMatch(/rounded-(\[48px\]|2xl|full)/);
 
     // Identical width on desktop and mobile with distinct light/dark border
     expect(nav).toHaveClass('w-[360px]');

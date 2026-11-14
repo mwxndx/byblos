@@ -125,6 +125,7 @@ nav[aria-label="Buyer navigation"],
 nav[aria-label="Dashboard sections"],
 nav[aria-label="Creator navigation"] {
     border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+    border-radius: 48px !important;
     box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.8), 0 4px 12px -2px rgba(0, 0, 0, 0.6) !important;
 }
 
@@ -138,6 +139,7 @@ html.light nav.dashboard-floating-nav,
 .light .dashboard-floating-nav,
 .light nav.dashboard-floating-nav {
     border: 1.5px solid rgba(0, 0, 0, 0.16) !important;
+    border-radius: 48px !important;
     box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.10), 0 4px 10px -2px rgba(0, 0, 0, 0.05) !important;
 }
 .mt-safe-top {
