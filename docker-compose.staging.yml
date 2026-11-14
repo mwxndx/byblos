@@ -42,8 +42,11 @@ services:
     volumes:
       - redis_data_staging:/data
 
+  pgbouncer:
+    container_name: byblos-pgbouncer-staging
+
   backend:
-    container_name: byblos-backend-staging
+    # container_name omitted to allow scaling with --scale backend=N
 
   # Enabled on staging so we verify the worker boots alongside the API. In the
   # base file this service is gated behind the `split-workers` profile; naming

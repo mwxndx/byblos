@@ -59,12 +59,36 @@ services:
     networks:
       - byblos-network
 
-  # Backend API
+  # PgBouncer Connection Pooler (Multiplexes connections for >250 concurrent users)
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: byblos-pgbouncer
+    restart: unless-stopped
+    environment:
+      DB_USER: ${DB_USER:-byblos_user}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-bybloshqdb}
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 1000
+      DEFAULT_POOL_SIZE: 20
+      MIN_POOL_SIZE: 5
+      RESERVE_POOL_SIZE: 5
+      MAX_DB_CONNECTIONS: 50
+      AUTH_TYPE: plain
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - byblos-network
+
+  # Backend API (Scalable horizontally across multiple replicas)
   backend:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: byblos-backend
+    # container_name omitted to allow scaling with --scale backend=N
     restart: unless-stopped
     env_file:
       - path: .env
@@ -76,8 +100,8 @@ services:
       BYBLOS_PROCESS_ROLE: ${BYBLOS_API_PROCESS_ROLE:-all}
       PORT: 3000
       APP_NAME: ${APP_NAME:-Byblos}
-      DB_HOST: postgres
-      DB_PORT: 5432
+      DB_HOST: pgbouncer
+      DB_PORT: 6432
       DB_NAME: ${DB_NAME:-bybloshqdb}
       DB_USER: ${DB_USER:-byblos_user}
       DB_PASSWORD: ${DB_PASSWORD}
@@ -118,6 +142,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      pgbouncer:
+        condition: service_started
       redis:
         condition: service_started
       migrate:
@@ -199,6 +225,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      pgbouncer:
+        condition: service_started
       redis:
         condition: service_started
       migrate:
