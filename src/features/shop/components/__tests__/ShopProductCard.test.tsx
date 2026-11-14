@@ -31,8 +31,13 @@ describe('ShopProductCard', () => {
       fullName: 'Alice Seller',
       shopName: 'Alice Atelier',
       theme: 'default',
+      bannerUrl: '',
+      email: 'alice@example.com',
+      phone: '+254700000000',
+      whatsappNumber: '+254700000000',
+      createdAt: new Date().toISOString(),
     },
-  };
+  } as unknown as Product;
 
   it('renders card with lift effect classes and increased content height', () => {
     const handleTap = vi.fn();
