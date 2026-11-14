@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 81;
-  const defaultName = '1.0.81';
+  const defaultCode = 82;
+  const defaultName = '1.0.82';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Eliminated product catalog image viewer pop-up flicker and hardware surface buffer tearing across Android devices.',
-      'Fixed seller registration layout viewport alignment and removed extraneous whitespace above registration forms.',
-      'Hardened modal portaling and enhanced overall store browsing stability and theme rendering responsiveness.'
+      'Refined seller brand card profile photo framing with seamless circular centering and auto-zoom presentation.',
+      'Enhanced mobile safe-area viewport rendering and dynamic device status bar theming across light and dark modes.',
+      'Hardened backend high-concurrency connection pooling and multi-replica load balancing for smoother marketplace browsing.'
     ]
   };
 }
