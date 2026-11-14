@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Store, ExternalLink, Send, Check, Clock, Loader2, MapPin, Package, X } from '@/shared/ui/icons';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -9,10 +9,26 @@ import { useRequestCollaborationMutation } from '../hooks/mutations/useRequestCo
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { AvailableShop } from '../api/marketplace';
 
-export function CreatorAvailableShops() {
+interface CreatorAvailableShopsProps {
+  searchQuery?: string;
+}
+
+export function CreatorAvailableShops({ searchQuery = '' }: Readonly<CreatorAvailableShopsProps> = {}) {
   const { data: shops = [], isLoading, refetch } = useAvailableShopsQuery();
   const requestMutation = useRequestCollaborationMutation();
   const [requestingShopId, setRequestingShopId] = useState<number | null>(null);
+
+  const filteredShops = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return shops;
+    return shops.filter((shop) => {
+      const name = (shop.shopName || '').toLowerCase();
+      const slug = (shop.slug || '').toLowerCase();
+      const loc = (shop.location || '').toLowerCase();
+      const addr = (shop.physicalAddress || '').toLowerCase();
+      return name.includes(q) || slug.includes(q) || loc.includes(q) || addr.includes(q);
+    });
+  }, [shops, searchQuery]);
 
   const handleSendRequest = async (shop: AvailableShop) => {
     setRequestingShopId(shop.id);
@@ -44,7 +60,8 @@ export function CreatorAvailableShops() {
 
         {shops.length > 0 && (
           <span className="text-xs font-medium text-label-3">
-            {shops.length} {shops.length === 1 ? 'shop' : 'shops'} available
+            {searchQuery.trim() ? `${filteredShops.length} of ${shops.length}` : shops.length}{' '}
+            {shops.length === 1 ? 'shop' : 'shops'} available
           </span>
         )}
       </div>
@@ -63,9 +80,18 @@ export function CreatorAvailableShops() {
           </p>
         </div>
       )}
-      {!isLoading && shops.length > 0 && (
+      {!isLoading && shops.length > 0 && filteredShops.length === 0 && (
+        <div className="rounded-card border border-transparent bg-surface-1 p-8 text-center">
+          <Store className="mx-auto mb-2 h-10 w-10 text-label-3" />
+          <p className="text-sm font-medium text-label">No available shops matching &ldquo;{searchQuery}&rdquo;</p>
+          <p className="mx-auto mt-1 max-w-sm text-xs text-label-3">
+            Try searching for a different shop name or location to explore available shops.
+          </p>
+        </div>
+      )}
+      {!isLoading && filteredShops.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {shops.map((shop) => {
+          {filteredShops.map((shop) => {
             const commissionPercent = (shop.creatorCommissionRate * 100).toFixed(1).replace(/\.0$/, '');
             const previewUrl = `/${shop.slug || shop.shopName}?view=creator-preview&rate=${shop.creatorCommissionRate}`;
             const isRequesting = requestingShopId === shop.id;

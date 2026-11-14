@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, LogOut, UserRound } from '@/shared/ui/icons';
+import { Loader2, LogOut, Search, UserRound, X } from '@/shared/ui/icons';
 import { NotificationList } from '@/features/notifications/components/NotificationList';
 import { useNotifications } from '@/features/notifications/hooks/useNotifications';
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ import { useLeavePromotedShopMutation } from '@/features/creator/hooks/mutations
 import { useLeaveInvitedBusinessMutation } from '@/features/creator/hooks/mutations/useLeaveInvitedBusinessMutation';
 import { clearRoleSession } from '@/features/auth/services/authSession';
 import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
 import { AppHeader } from '@/shared/ui/AppHeader';
 import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
 import { copyLinkedTextToClipboard, resolveShareOrigin } from '@/shared/utils/shopLinks';
@@ -46,6 +47,7 @@ export default function CreatorDashboard() {
   const [leavingShopSellerId, setLeavingShopSellerId] = useState<number | null>(null);
   const [leavingBusinessSellerId, setLeavingBusinessSellerId] = useState<number | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [shopSearchQuery, setShopSearchQuery] = useState('');
 
   const dashboardQuery = useCreatorDashboardQuery(analysisPeriod);
   const referralQuery = useCreatorReferralDashboardQuery();
@@ -143,6 +145,17 @@ export default function CreatorDashboard() {
 
   const analysis = useMemo(() => dashboard?.analysis || dashboard?.monthly || [], [dashboard?.analysis, dashboard?.monthly]);
   const businessEarnings = useMemo(() => dashboard?.businessEarnings || [], [dashboard?.businessEarnings]);
+  const shopRequests = useMemo(() => dashboard?.shopRequests || [], [dashboard?.shopRequests]);
+
+  const filteredShopRequests = useMemo(() => {
+    if (!shopSearchQuery.trim()) return shopRequests;
+    const q = shopSearchQuery.trim().toLowerCase();
+    return shopRequests.filter((request) => {
+      const shopName = (request.shop_name || '').toLowerCase();
+      const sellerName = (request.seller_name || '').toLowerCase();
+      return shopName.includes(q) || sellerName.includes(q);
+    });
+  }, [shopRequests, shopSearchQuery]);
 
   if (loading) {
     return <DashboardSkeleton />;
@@ -159,7 +172,6 @@ export default function CreatorDashboard() {
   const referralLink = `${resolveShareOrigin()}/seller/register?ref=${referral?.referralCode || ''}`;
   const invitedBusinesses = referral?.referredSellers || [];
   const linkedShops = dashboard?.shops || [];
-  const shopRequests = dashboard?.shopRequests || [];
 
   const latestPeriod = analysis.length ? analysis[analysis.length - 1] : undefined;
   const monthEarnings = Number(latestPeriod?.earnings || 0);
@@ -273,15 +285,38 @@ export default function CreatorDashboard() {
             withdrawals={dashboard?.withdrawals || []}
           />
         ) : tab === 'shops' ? (
-          <>
-            {shopRequests.length > 0 && (
+          <div className="space-y-6">
+            {/* Search bar for shops */}
+            <div className="relative w-full max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-white/40 pointer-events-none" />
+              <Input
+                type="search"
+                aria-label="Search shops"
+                value={shopSearchQuery}
+                onChange={(e) => setShopSearchQuery(e.target.value)}
+                placeholder="Search shops by name, slug, or location..."
+                className="bg-white dark:bg-surface-1 border-slate-200 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 rounded-xl pl-10 pr-9 h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-400 dark:focus-visible:ring-white/20"
+              />
+              {shopSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setShopSearchQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white p-1"
+                  aria-label="Clear shop search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {filteredShopRequests.length > 0 && (
               <section className="space-y-2">
                 <div className="px-1">
                   <h2 className="text-base font-semibold text-label">Shop requests</h2>
                   <p className="mt-0.5 text-xs text-label-3">Accept a seller request to start earning on that shop.</p>
                 </div>
                 <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
-                  {shopRequests.map((request, i) => (
+                  {filteredShopRequests.map((request, i) => (
                     <div key={request.id}>
                       {i > 0 && <div className="ml-4 h-px bg-separator" />}
                       <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
@@ -321,10 +356,11 @@ export default function CreatorDashboard() {
               onLeave={handleLeaveShop}
               leavingSellerId={leavingShopSellerId}
               maxPromotions={MAX_PROMOTED_SHOPS}
+              searchQuery={shopSearchQuery}
             />
 
-            <CreatorAvailableShops />
-          </>
+            <CreatorAvailableShops searchQuery={shopSearchQuery} />
+          </div>
         ) : (
           <div className="mx-auto w-full max-w-[760px]">
             <NotificationList

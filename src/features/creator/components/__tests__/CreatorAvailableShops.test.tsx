@@ -71,4 +71,29 @@ describe('CreatorAvailableShops', () => {
     expect(screen.getByText('Declined')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /request/i })).toBeInTheDocument();
   });
+
+  it('filters available shops by search query', () => {
+    render(
+      <MemoryRouter>
+        <CreatorAvailableShops searchQuery="Boutique" />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Active Boutique')).toBeInTheDocument();
+    expect(screen.queryByText('Pending Store')).not.toBeInTheDocument();
+    expect(screen.queryByText('Declined Shop')).not.toBeInTheDocument();
+    expect(screen.queryByText('Open Brand')).not.toBeInTheDocument();
+    expect(screen.getByText('1 of 4 shops available')).toBeInTheDocument();
+  });
+
+  it('renders empty search state when no available shops match query', () => {
+    render(
+      <MemoryRouter>
+        <CreatorAvailableShops searchQuery="nonexistent" />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/No available shops matching/i)).toBeInTheDocument();
+    expect(screen.queryByText('Active Boutique')).not.toBeInTheDocument();
+  });
 });

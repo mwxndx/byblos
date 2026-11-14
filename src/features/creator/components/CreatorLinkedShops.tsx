@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Copy, LogOut, Loader2, Store, ExternalLink, AlertCircle } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { getCreatorShopUrl, getShopUsername, resolveShareOrigin } from '@/shared/utils/shopLinks';
@@ -10,15 +11,33 @@ interface CreatorLinkedShopsProps {
   onLeave: (sellerId: number) => void;
   leavingSellerId: number | null;
   maxPromotions: number;
+  searchQuery?: string;
 }
 
-export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, maxPromotions }: Readonly<CreatorLinkedShopsProps>) {
+export function CreatorLinkedShops({
+  shops,
+  onCopy,
+  onLeave,
+  leavingSellerId,
+  maxPromotions,
+  searchQuery = '',
+}: Readonly<CreatorLinkedShopsProps>) {
+  const filteredShops = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return shops;
+    return shops.filter((shop) => {
+      const name = (shop.shop_name || '').toLowerCase();
+      const slug = (shop.slug || '').toLowerCase();
+      return name.includes(q) || slug.includes(q);
+    });
+  }, [shops, searchQuery]);
+
   return (
     <section className="space-y-2">
       <div className="flex items-center justify-between px-1">
         <h2 className="text-base font-semibold text-label">Your links</h2>
         <span className="rounded-full bg-fill px-2.5 py-1 text-xs font-medium text-label-2">
-          {shops.length} of {maxPromotions} promoting
+          {searchQuery.trim() ? `${filteredShops.length} of ${shops.length}` : `${shops.length} of ${maxPromotions}`} promoting
         </span>
       </div>
 
@@ -26,9 +45,13 @@ export function CreatorLinkedShops({ shops, onCopy, onLeave, leavingSellerId, ma
         <div className="rounded-card border border-transparent bg-surface-1 p-4 text-sm text-label-2">
           Accept a shop request to get your first shareable link.
         </div>
+      ) : filteredShops.length === 0 ? (
+        <div className="rounded-card border border-transparent bg-surface-1 p-4 text-sm text-label-2">
+          No linked shops matching &ldquo;{searchQuery}&rdquo;.
+        </div>
       ) : (
         <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
-          {shops.map((shop, i) => {
+          {filteredShops.map((shop, i) => {
             const isPaused = Boolean(shop.sellerCreatorModeOff || shop.status === 'paused');
             const link = isPaused ? '' : getCreatorShopUrl(shop.slug || shop.shop_name, shop.code);
             const shopUsername = getShopUsername(shop.shop_name);

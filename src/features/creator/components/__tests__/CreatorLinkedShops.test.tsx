@@ -105,4 +105,38 @@ describe('CreatorLinkedShops', () => {
     fireEvent.click(leaveBtn);
     expect(mockOnLeave).toHaveBeenCalledWith(102);
   });
+
+  it('filters linked shops by search query', () => {
+    render(
+      <CreatorLinkedShops
+        shops={[activeShop, pausedShop]}
+        onCopy={mockOnCopy}
+        onLeave={mockOnLeave}
+        leavingSellerId={null}
+        maxPromotions={3}
+        searchQuery="Glam"
+      />
+    );
+
+    expect(screen.getByText('Glam Boutique')).toBeInTheDocument();
+    expect(screen.queryByText('Urban Sneakers')).not.toBeInTheDocument();
+    expect(screen.getByText('1 of 2 promoting')).toBeInTheDocument();
+  });
+
+  it('renders empty message when no linked shops match search query', () => {
+    render(
+      <CreatorLinkedShops
+        shops={[activeShop, pausedShop]}
+        onCopy={mockOnCopy}
+        onLeave={mockOnLeave}
+        leavingSellerId={null}
+        maxPromotions={3}
+        searchQuery="nonexistent"
+      />
+    );
+
+    expect(screen.getByText(/No linked shops matching/i)).toBeInTheDocument();
+    expect(screen.queryByText('Glam Boutique')).not.toBeInTheDocument();
+    expect(screen.queryByText('Urban Sneakers')).not.toBeInTheDocument();
+  });
 });
