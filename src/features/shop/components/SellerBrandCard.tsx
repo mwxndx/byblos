@@ -93,12 +93,12 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             aria-label={`Open ${shopName}`}
         >
             {/* Top section: Business profile photo frame occupying half the seller shop card */}
-            <div className="relative h-1/2 w-full shrink-0 overflow-hidden rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
+            <div className="relative h-1/2 w-full shrink-0 overflow-hidden rounded-xl border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-zinc-900/60 flex items-center justify-center p-1.5 sm:p-2">
                 {hasAvatar ? (
                     <img
                         src={getImageUrl(avatarUrl)}
                         alt={`${shopName} business photo`}
-                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                        className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
                         loading="lazy"
                         onError={() => setAvatarFailed(true)}
                     />

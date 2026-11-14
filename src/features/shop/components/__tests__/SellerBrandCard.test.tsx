@@ -41,8 +41,10 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
       </MemoryRouter>
     );
 
-    // Business profile photo frame occupies half the seller shop card
+    // Business profile photo frame occupies half the seller shop card and displays full uncropped image
     const businessImg = screen.getByAltText('Amani Styles business photo');
+    expect(businessImg).toHaveClass('object-contain');
+    expect(businessImg).not.toHaveClass('object-cover');
     const avatarFrame = businessImg.parentElement;
     expect(avatarFrame).toBeInTheDocument();
     expect(avatarFrame).toHaveClass('rounded-xl', 'h-1/2', 'w-full');
