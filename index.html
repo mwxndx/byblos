@@ -90,7 +90,7 @@
         var metaLight = document.getElementById('theme-color-light');
         if (metaLight) metaLight.setAttribute('content', isDark ? '#000000' : '#ffffff');
         var statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-        if (statusMeta) statusMeta.setAttribute('content', isDark ? 'black-translucent' : 'default');
+        if (statusMeta) statusMeta.setAttribute('content', 'black-translucent');
       } catch (e) {
         // Ignored: LocalStorage or theme-color metadata not accessible in restricted context
       }

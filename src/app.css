@@ -67,8 +67,12 @@ html.pwa-standalone {
 }
 
 /* ── iOS Standalone PWA Status Bar Scrim for Light Mode ──
-   In light mode, the top safe area is filled with the app's light background color (--byblos-bg, #ffffff)
-   so the status bar seamlessly matches the app theme, while iOS renders black battery and network icons. */
+   iOS standalone PWAs with apple-mobile-web-app-status-bar-style="black-translucent"
+   force the status bar icons (clock, battery, Wi-Fi) to white. When light theme is active,
+   the white header background leaks underneath the status bar, rendering the white icons
+   invisible.
+   A fixed dark status bar scrim over the top safe area ensures the white system icons
+   remain 100% crisp and readable while the light-themed UI sits cleanly below it. */
 html[data-theme="light"].pwa-standalone:not(.native-app):not(.capacitor-native)::before,
 html.light.pwa-standalone:not(.native-app):not(.capacitor-native)::before {
     content: '';
@@ -77,7 +81,7 @@ html.light.pwa-standalone:not(.native-app):not(.capacitor-native)::before {
     left: 0;
     right: 0;
     height: var(--sat, env(safe-area-inset-top, 0px));
-    background-color: var(--byblos-bg, #ffffff);
+    background-color: #000000;
     z-index: 9999;
     pointer-events: none;
 }
