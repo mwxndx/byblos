@@ -1,5 +1,6 @@
-import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { CreatorDashboardTabs } from '../CreatorDashboardTabs';
 
 describe('CreatorDashboardTabs — Floating Navigation Bar', () => {
