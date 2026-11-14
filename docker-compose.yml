@@ -4,11 +4,6 @@ services:
     image: postgres:16-alpine
     container_name: byblos-postgres
     restart: unless-stopped
-    env_file:
-      - path: .env
-        required: false
-      - path: ./server/.env
-        required: false
     environment:
       POSTGRES_DB: ${DB_NAME:-byblos_prod}
       POSTGRES_USER: ${DB_USER:-byblos_admin}
@@ -69,11 +64,6 @@ services:
     image: edoburu/pgbouncer:latest
     container_name: byblos-pgbouncer
     restart: unless-stopped
-    env_file:
-      - path: .env
-        required: false
-      - path: ./server/.env
-        required: false
     environment:
       DB_USER: ${DB_USER:-byblos_admin}
       DB_PASSWORD: ${DB_PASSWORD:-ByblosSecureDbPass2026!}
