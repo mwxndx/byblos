@@ -39,12 +39,11 @@ export function applyResolvedTheme(resolved: 'light' | 'dark'): void {
     meta.setAttribute('content', themeColor);
   });
 
-  // iOS standalone PWA status bar style: strictly locked to 'black-translucent'
-  // to preserve edge-to-edge layout and avoid startup canvas mismatch. In light theme,
-  // the top safe area is preserved via a dedicated status bar scrim so white system icons never wash out.
+  // iOS status bar text style: 'default' = dark text (black time/battery for light backgrounds),
+  // 'black-translucent' = light text (white time/battery for dark backgrounds)
   const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
   if (statusMeta) {
-    statusMeta.setAttribute('content', 'black-translucent');
+    statusMeta.setAttribute('content', resolved === 'light' ? 'default' : 'black-translucent');
   }
 
   // Keep the native (Android/iOS) status bar icons & background and keyboard

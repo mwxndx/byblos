@@ -128,12 +128,12 @@ describe('Cold Launch & Splash Screen Verification (Android & iOS PWA)', () => {
       expect(indexHtmlContent).toMatch(/background-color:\s*#f5f4f0 !important;/);
     });
 
-    it('provides a dark status bar scrim in app.css for light theme in standalone PWA to prevent white status bar leak', () => {
+    it('provides a themed status bar scrim in app.css for light theme in standalone PWA matching app background', () => {
       const appCssPath = path.join(rootDir, 'src/app.css');
       const appCssContent = fs.readFileSync(appCssPath, 'utf8');
       expect(appCssContent).toContain('html[data-theme="light"].pwa-standalone:not(.native-app):not(.capacitor-native)::before');
       expect(appCssContent).toMatch(/height:\s*var\(--sat,\s*env\(safe-area-inset-top,\s*0px\)\);/);
-      expect(appCssContent).toMatch(/background-color:\s*#000000;/);
+      expect(appCssContent).toMatch(/background-color:\s*var\(--byblos-bg,\s*#ffffff\);/);
     });
   });
 });

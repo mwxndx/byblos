@@ -32,7 +32,7 @@ describe('useAppTheme & Theme Synchronization', () => {
     expect(meta?.getAttribute('content')).toBe('#ffffff');
 
     const statusMeta = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-    expect(statusMeta?.getAttribute('content')).toBe('black-translucent');
+    expect(statusMeta?.getAttribute('content')).toBe('default');
   });
 
   it('applies dark theme with pure black #000000 status bar and html attributes', () => {
