@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SellerBrandCard from '../SellerBrandCard';
@@ -19,7 +20,7 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     theme: 'default',
   };
 
-  it('renders shop name as bold with increased font size (+3px: 15px/17px)', () => {
+  it('renders shop name as bold with increased font size and left-aligned', () => {
     render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
@@ -28,12 +29,12 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
 
     const heading = screen.getByRole('heading', { level: 3, name: 'Amani Styles' });
     expect(heading).toBeInTheDocument();
-    expect(heading).toHaveClass('font-bold');
+    expect(heading).toHaveClass('font-bold', 'text-left');
     expect(heading).not.toHaveClass('font-normal');
     expect(heading.className).toMatch(/text-\[15px\]/);
   });
 
-  it('renders a rectangular card with square frame with rounded corners for business profile photo on the left', () => {
+  it('renders a square card with rounded corners matching navigation (48px) and light/dark borders', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
@@ -48,10 +49,10 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(avatarFrame).not.toHaveClass('rounded-full');
     expect(avatarFrame).toHaveClass('aspect-square');
 
-    // Root card is full-width rectangular
+    // Root card is full-width square with navigation corner integer (48px) and distinct borders
     const card = container.firstElementChild;
-    expect(card).toHaveClass('w-full');
-    expect(card).not.toHaveClass('aspect-[4/5]');
+    expect(card).toHaveClass('w-full', 'aspect-square', 'rounded-[48px]');
+    expect(card).toHaveClass('border', 'border-slate-300', 'dark:border-white/20');
   });
 
   it('renders store fallback icon in square frame with rounded corners when avatar is empty', () => {

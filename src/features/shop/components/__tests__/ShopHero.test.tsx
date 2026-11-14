@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -78,5 +79,39 @@ describe('ShopHero Component (TDD)', () => {
     const avatarImg = screen.getByAltText('Jane Boutique avatar');
     expect(avatarImg).toBeInTheDocument();
     expect(avatarImg).toHaveAttribute('src', 'https://images.unsplash.com/photo-avatar.jpg');
+  });
+
+  it('renders location and social links on the same row in shop hero', () => {
+    const mockSeller: ShopSeller = {
+      id: '123',
+      fullName: 'Jane Doe',
+      shopName: 'Jane Boutique',
+      phone: '0712345678',
+      whatsappNumber: '0712345678',
+      email: 'jane@example.com',
+      bio: 'Quality goods',
+      avatarUrl: '',
+      latitude: -1.286389,
+      longitude: 36.817223,
+      createdAt: new Date().toISOString(),
+      isCreatorMarketplaceEnabled: true,
+      hasPhysicalShop: false,
+    };
+
+    render(
+      <MemoryRouter>
+        <ShopHero
+          sellerInfo={mockSeller}
+          showSellerAvatar={false}
+          setAvatarLoadFailed={vi.fn()}
+          sellerInitials="JB"
+        />
+      </MemoryRouter>
+    );
+
+    const locationLink = screen.getByRole('link', { name: /Open shop location on the map/i });
+    expect(locationLink).toBeInTheDocument();
+    const rowContainer = locationLink.parentElement;
+    expect(rowContainer?.className).toContain('flex-row');
   });
 });

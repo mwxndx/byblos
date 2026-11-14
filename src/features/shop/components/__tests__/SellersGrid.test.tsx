@@ -1,4 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SellersGrid from '../SellersGrid';
@@ -147,7 +148,7 @@ describe('SellersGrid defense-in-depth', () => {
     expect(screen.queryByText('Shoe Palace')).not.toBeInTheDocument();
   });
 
-  it('renders shop cards in a single column layout', () => {
+  it('renders shop cards in a two column layout', () => {
     const mockSellers: Partial<ApiPublicSeller>[] = [
       { id: '1', shopName: 'Shop A', fullName: 'Seller A', status: 'active', is_active: true },
     ];
@@ -166,8 +167,7 @@ describe('SellersGrid defense-in-depth', () => {
       </MemoryRouter>
     );
 
-    const grid = container.querySelector('.grid-cols-1');
+    const grid = container.querySelector('.grid-cols-2');
     expect(grid).toBeInTheDocument();
-    expect(grid?.className).not.toContain('lg:grid-cols-2');
   });
 });

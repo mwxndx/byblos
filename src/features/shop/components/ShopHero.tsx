@@ -75,9 +75,8 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
           </p>
         )}
 
-        {/* Vertical stack under the photo: Location on its own row (when available),
-            then Instagram + TikTok together on the next row (disabled when absent). */}
-        <div className="mt-3 flex flex-col items-start gap-2 text-xs font-semibold">
+        {/* Action icons row under the photo: Location and social buttons on the same row */}
+        <div className="mt-3 flex flex-row flex-wrap items-center gap-2 text-xs font-semibold">
           {mapHref && (
             <a
               href={mapHref}

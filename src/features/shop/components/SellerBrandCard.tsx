@@ -83,7 +83,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3 sm:p-3.5 shadow-sm transition-all duration-200 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70 min-h-[72px] sm:min-h-[80px]',
+                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[48px] border border-slate-300 dark:border-white/20 bg-white dark:bg-surface-1 p-3.5 sm:p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:border-slate-400 dark:hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -92,8 +92,8 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
             onKeyDown={handleCardKeyDown}
             aria-label={`Open ${shopName}`}
         >
-            {/* Left side: Business profile photo in square frame with rounded corners, followed by shop name */}
-            <div className="flex items-center gap-3 min-w-0 pr-2">
+            {/* Top row: Business profile photo in square frame with rounded corners on left, unfollow / chevron on right */}
+            <div className="flex items-start justify-between w-full">
                 <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-xl aspect-square border border-slate-200/80 dark:border-white/10 bg-slate-100 dark:bg-zinc-900 flex items-center justify-center">
                     {hasAvatar ? (
                         <img
@@ -110,55 +110,57 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                     )}
                 </div>
 
-                <div className="flex flex-col min-w-0 justify-center">
-                    <h3 className="truncate text-[15px] sm:text-[16px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
-                        {shopName}
-                    </h3>
+                <div className="flex items-center shrink-0">
+                    {showUnfollow && onUnfollow ? (
+                        <button
+                            type="button"
+                            disabled={isUnfollowing}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                handleUnfollow();
+                            }}
+                            className="flex h-7 items-center justify-center gap-1 rounded-xl border border-red-400/35 bg-red-500/15 px-2 text-[11px] font-semibold text-red-600 dark:text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
+                            aria-label={`Unfollow ${shopName}`}
+                        >
+                            <UserMinus className="h-3 w-3" />
+                            <span>{isUnfollowing ? '...' : 'Unfollow'}</span>
+                        </button>
+                    ) : (
+                        <ChevronRight className="h-4 w-4 text-slate-400 dark:text-white/40 group-hover:translate-x-0.5 transition-transform" />
+                    )}
                 </div>
             </div>
 
-            {/* Right side: arranged horizontally from right towards left */}
-            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-row-reverse">
-                {showUnfollow && onUnfollow ? (
-                    <button
-                        type="button"
-                        disabled={isUnfollowing}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            handleUnfollow();
-                        }}
-                        className="flex h-8 items-center justify-center gap-1.5 rounded-xl border border-red-400/35 bg-red-500/15 px-3 text-[11px] font-semibold text-red-600 dark:text-white transition duration-200 hover:bg-red-500/25 active:bg-red-500/30 disabled:cursor-wait disabled:opacity-60"
-                        aria-label={`Unfollow ${shopName}`}
-                    >
-                        <UserMinus className="h-3.5 w-3.5" />
-                        <span>{isUnfollowing ? '...' : 'Unfollow'}</span>
-                    </button>
-                ) : (
-                    <ChevronRight className="h-4 w-4 text-slate-400 dark:text-white/40 group-hover:translate-x-0.5 transition-transform" />
-                )}
+            {/* Bottom section: Shop name and icons aligned to the left */}
+            <div className="flex flex-col items-start text-left w-full gap-2 min-w-0">
+                <h3 className="truncate w-full text-left text-[15px] sm:text-[16px] font-bold tracking-tight text-slate-900 dark:text-white" title={shopName}>
+                    {shopName}
+                </h3>
 
-                {mapHref ? (
-                    <a
-                        href={mapHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={stop}
-                        aria-label={`${shopName} location on the map`}
-                        className="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.06] p-1.5 shadow-sm transition-all hover:opacity-80"
-                    >
-                        <MapPin className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
-                    </a>
-                ) : (
-                    <span
-                        aria-label="Location not available"
-                        aria-disabled="true"
-                        className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-1.5 opacity-35"
-                    >
-                        <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-white/60" />
-                    </span>
-                )}
+                <div className="flex items-center justify-start gap-1.5 sm:gap-2">
+                    {mapHref ? (
+                        <a
+                            href={mapHref}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={stop}
+                            aria-label={`${shopName} location on the map`}
+                            className="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.06] p-1.5 shadow-sm transition-all hover:opacity-80"
+                        >
+                            <MapPin className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
+                        </a>
+                    ) : (
+                        <span
+                            aria-label="Location not available"
+                            aria-disabled="true"
+                            className="inline-flex cursor-not-allowed items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.03] p-1.5 opacity-35"
+                        >
+                            <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-white/60" />
+                        </span>
+                    )}
 
-                <SocialButtons instagramHref={instagramHref} tiktokHref={tiktokHref} shopName={shopName} size="sm" />
+                    <SocialButtons instagramHref={instagramHref} tiktokHref={tiktokHref} shopName={shopName} size="sm" />
+                </div>
             </div>
         </div>
     );

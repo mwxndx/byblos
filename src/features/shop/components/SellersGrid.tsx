@@ -16,22 +16,25 @@ interface SellersGridProps {
 const INITIAL_VISIBLE_SELLERS = 24;
 
 const SellerGridSkeleton = () => (
-    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
+    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-[760px] mx-auto">
         <span className="sr-only">Loading shops…</span>
-        {Array.from({ length: 8 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
             <div
                 key={index}
                 aria-hidden="true"
-                className="flex items-center justify-between h-[72px] sm:h-[80px] rounded-2xl border border-slate-200/60 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200"
+                className="flex flex-col justify-between aspect-square w-full rounded-[48px] border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0a0a0a] p-3.5 sm:p-4 shadow-sm transition-colors duration-200"
             >
-                <div className="flex items-center gap-3 min-w-0 pr-2">
-                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl" />
-                    <Skeleton className="h-4 w-28 sm:w-36 rounded-md" />
-                </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-row-reverse">
+                <div className="flex items-start justify-between w-full">
+                    <Skeleton className="h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl aspect-square" />
                     <Skeleton className="h-4 w-4 rounded" />
-                    <Skeleton className="h-7 w-7 rounded-full" />
-                    <Skeleton className="h-7 w-7 rounded-full" />
+                </div>
+                <div className="flex flex-col items-start gap-2 w-full">
+                    <Skeleton className="h-4 w-24 sm:w-28 rounded-md" />
+                    <div className="flex items-center gap-1.5">
+                        <Skeleton className="h-6 w-6 rounded-full" />
+                        <Skeleton className="h-6 w-6 rounded-full" />
+                        <Skeleton className="h-6 w-6 rounded-full" />
+                    </div>
                 </div>
             </div>
         ))}
@@ -100,7 +103,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     }
 
     return (
-        <div className="grid grid-cols-1 gap-2.5 sm:gap-3 w-full max-w-[760px] mx-auto">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-[760px] mx-auto">
             {visibleSellers.map((seller) => (
                 <SellerBrandCard key={seller.id} seller={seller} isBuyer={isBuyer} />
             ))}
