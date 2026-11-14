@@ -34,21 +34,20 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(heading.className).toMatch(/text-\[15px\]/);
   });
 
-  it('renders a square card with rounded corners reduced by factor of 2 (24px), half-card photo frame, and light/dark borders', () => {
+  it('renders a square card with 24px roundness, circular business profile photo frame, and light/dark borders', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={mockSeller} />
       </MemoryRouter>
     );
 
-    // Business profile photo frame occupies half the seller shop card and displays full uncropped image
+    // Business profile photo frame is circular and displays full uncropped image
     const businessImg = screen.getByAltText('Amani Styles business photo');
     expect(businessImg).toHaveClass('object-contain');
     expect(businessImg).not.toHaveClass('object-cover');
     const avatarFrame = businessImg.parentElement;
     expect(avatarFrame).toBeInTheDocument();
-    expect(avatarFrame).toHaveClass('rounded-[24px]', 'h-1/2', 'w-full');
-    expect(avatarFrame).not.toHaveClass('rounded-full');
+    expect(avatarFrame).toHaveClass('rounded-full', 'aspect-square');
 
     // Right-pointing arrow is removed since tapping card opens the shop
     expect(container.querySelector('.group-hover\\:translate-x-0\\.5')).not.toBeInTheDocument();
@@ -59,17 +58,16 @@ describe('SellerBrandCard — Clean Unified Card & Bold Shop Name', () => {
     expect(card).toHaveClass('border', 'border-slate-300', 'dark:border-white/20');
   });
 
-  it('renders store fallback icon in half-card frame with rounded corners when avatar is empty', () => {
+  it('renders store fallback icon in circular frame when avatar is empty', () => {
     const { container } = render(
       <MemoryRouter>
         <SellerBrandCard seller={{ ...mockSeller, avatarUrl: '' }} />
       </MemoryRouter>
     );
 
-    const avatarFrame = container.querySelector('.h-1\\/2');
+    const avatarFrame = container.querySelector('.rounded-full');
     expect(avatarFrame).toBeInTheDocument();
-    expect(avatarFrame).toHaveClass('rounded-[24px]', 'h-1/2', 'w-full');
-    expect(avatarFrame).not.toHaveClass('rounded-full');
+    expect(avatarFrame).toHaveClass('rounded-full', 'aspect-square');
     expect(avatarFrame?.querySelector('svg')).toBeInTheDocument();
   });
 });
