@@ -83,4 +83,15 @@ export default async () => {
             logger.error('Failed to start referral rewards cron:', err.message);
         }
     }
+
+    // 8. Cryptographic Financial Ledger Audit & S3 WORM Anchoring (hourly)
+    if (process.env.ENABLE_LEDGER_AUDIT_CRON !== 'false') {
+        try {
+            const { scheduleLedgerAudit } = await import('../cron/ledgerAuditCron.js');
+            scheduleLedgerAudit();
+            logger.info('✅ Cryptographic ledger audit & anchoring cron started');
+        } catch (err) {
+            logger.error('❌ Failed to start ledger audit cron:', err.message);
+        }
+    }
 };

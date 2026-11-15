@@ -167,3 +167,5 @@ staging-smoke-summary.json
 .fallow/
 .ua/
 BYBLOS_KNOWLEDGE_GRAPH.pdf
+
+data/
