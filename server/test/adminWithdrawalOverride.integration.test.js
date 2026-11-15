@@ -51,7 +51,7 @@ before(async () => {
       } else if (req.url.includes('/transfer')) {
         let ref = 'byblos-mock-ref';
         try { ref = JSON.parse(body).reference || ref; } catch { /* keep default */ }
-        res.end(JSON.stringify({ status: true, message: 'ok', data: { transfer_code: 'TRF_mock_123', reference: ref, status: 'success' } }));
+        res.end(JSON.stringify({ status: true, message: 'ok', data: { transfer_code: 'TRF_mock_123', reference: ref, status: 'pending' } }));
       } else {
         res.end(JSON.stringify({ status: true, data: {} }));
       }
