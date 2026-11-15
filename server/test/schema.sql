@@ -331,6 +331,19 @@ $$;
 
 
 --
+-- Name: enforce_ledger_immutability(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.enforce_ledger_immutability() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    RAISE EXCEPTION 'CRITICAL SECURITY VIOLATION: financial_ledger is strictly append-only. UPDATE, DELETE, and TRUNCATE are prohibited.';
+END;
+$$;
+
+
+--
 -- Name: update_modified_column(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -3328,6 +3341,30 @@ ALTER TABLE ONLY public.event_dedupe
 
 
 --
+-- Name: financial_ledger financial_ledger_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.financial_ledger
+    ADD CONSTRAINT financial_ledger_pkey PRIMARY KEY (sequence_number);
+
+
+--
+-- Name: financial_ledger financial_ledger_row_hash_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.financial_ledger
+    ADD CONSTRAINT financial_ledger_row_hash_key UNIQUE (row_hash);
+
+
+--
+-- Name: ledger_epochs ledger_epochs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ledger_epochs
+    ADD CONSTRAINT ledger_epochs_pkey PRIMARY KEY (epoch_id);
+
+
+--
 -- Name: event_outbox event_outbox_event_id_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5101,6 +5138,13 @@ CREATE TRIGGER generate_ticket_number_trigger BEFORE INSERT ON public.tickets FO
 --
 
 CREATE TRIGGER logistics_tracking_events_immutable BEFORE DELETE OR UPDATE ON public.logistics_tracking_events FOR EACH ROW EXECUTE FUNCTION public.prevent_logistics_tracking_event_mutation();
+
+
+--
+-- Name: financial_ledger trg_financial_ledger_immutable; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER trg_financial_ledger_immutable BEFORE DELETE OR UPDATE ON public.financial_ledger FOR EACH ROW EXECUTE FUNCTION public.enforce_ledger_immutability();
 
 
 --
