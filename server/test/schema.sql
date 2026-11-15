@@ -2736,6 +2736,69 @@ ALTER SEQUENCE public.withdrawal_requests_id_seq OWNED BY public.withdrawal_requ
 
 
 --
+-- Name: financial_ledger; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.financial_ledger (
+    sequence_number bigint NOT NULL,
+    entry_id uuid DEFAULT gen_random_uuid() NOT NULL,
+    event_type character varying(64) NOT NULL,
+    entity_type character varying(32) NOT NULL,
+    entity_id integer NOT NULL,
+    order_id integer,
+    payout_id integer,
+    withdrawal_id integer,
+    payment_reference character varying(128),
+    amount numeric(14,2) NOT NULL,
+    currency character varying(10) DEFAULT 'KES'::character varying NOT NULL,
+    balance_after numeric(14,2) NOT NULL,
+    prev_hash character varying(64) NOT NULL,
+    row_hash character varying(64) NOT NULL,
+    payload jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp with time zone DEFAULT clock_timestamp() NOT NULL
+);
+
+CREATE SEQUENCE public.financial_ledger_sequence_number_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.financial_ledger_sequence_number_seq OWNED BY public.financial_ledger.sequence_number;
+
+ALTER TABLE ONLY public.financial_ledger ALTER COLUMN sequence_number SET DEFAULT nextval('public.financial_ledger_sequence_number_seq'::regclass);
+
+--
+-- Name: ledger_epochs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ledger_epochs (
+    epoch_id bigint NOT NULL,
+    epoch_uuid uuid DEFAULT gen_random_uuid() NOT NULL,
+    start_sequence bigint NOT NULL,
+    end_sequence bigint NOT NULL,
+    entry_count integer NOT NULL,
+    merkle_root character varying(64) NOT NULL,
+    anchor_type character varying(32) DEFAULT 's3_worm'::character varying NOT NULL,
+    anchor_reference character varying(255),
+    status character varying(32) DEFAULT 'anchored'::character varying NOT NULL,
+    created_at timestamp with time zone DEFAULT clock_timestamp() NOT NULL
+);
+
+CREATE SEQUENCE public.ledger_epochs_epoch_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.ledger_epochs_epoch_id_seq OWNED BY public.ledger_epochs.epoch_id;
+
+ALTER TABLE ONLY public.ledger_epochs ALTER COLUMN epoch_id SET DEFAULT nextval('public.ledger_epochs_epoch_id_seq'::regclass);
+
+
+--
 -- Name: app_notifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -6116,6 +6179,8 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (117, '20261102160000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (118, '20261108090000_remove_founder_card_and_membership', '2026-11-08 09:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (119, '20261108130000_remove_seller_shop_theme', '2026-11-08 13:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (120, '20261109153000_shop_products_joined_indexes', '2026-11-09 15:30:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (121, '20261115180000_create_cryptographic_financial_ledger', '2026-11-15 18:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (122, '20261115181000_seed_genesis_financial_ledger_balances', '2026-11-15 18:10:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
