@@ -39,3 +39,4 @@ describe('Cryptographic Financial Ledger Phase 1 - Migration & Hash Consistency'
         assert.match(computedHash, /^[0-9a-f]{64}$/, 'Hash must contain only lowercase hex characters');
     });
 });
+

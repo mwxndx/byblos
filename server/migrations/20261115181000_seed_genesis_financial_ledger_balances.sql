@@ -128,3 +128,4 @@ BEGIN
         RETURNING sequence_number, row_hash INTO v_seq, v_last_hash;
     END LOOP;
 END $$;
+

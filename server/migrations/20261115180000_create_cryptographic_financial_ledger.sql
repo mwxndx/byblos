@@ -60,3 +60,4 @@ DROP TRIGGER IF EXISTS trg_financial_ledger_immutable ON financial_ledger;
 CREATE TRIGGER trg_financial_ledger_immutable
 BEFORE UPDATE OR DELETE ON financial_ledger
 FOR EACH ROW EXECUTE FUNCTION enforce_ledger_immutability();
+
