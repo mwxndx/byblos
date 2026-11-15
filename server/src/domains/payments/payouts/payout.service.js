@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import logger from '../../../shared/utils/logger.js';
 import Fees from '../../../shared/config/fees.js';
 import PaystackTransferClient from '../../../infrastructure/providers/PaystackTransferClient.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 
 const SUPPORTED_PAYOUT_PROVIDERS = new Set(['paystack']);
 
@@ -175,6 +176,19 @@ class PayoutService {
                 [amount, request.seller_id]
             );
             newBalance = Number.parseFloat(rows[0]?.balance ?? 0);
+            await LedgerService.appendEntry(client, {
+                eventType: 'WITHDRAWAL_REVERSED_REFUND',
+                entityType: 'seller',
+                entityId: request.seller_id,
+                withdrawalId: request.id,
+                amount,
+                balanceAfter: newBalance,
+                payload: {
+                    withdrawalFee,
+                    requestedAmount: request.amount,
+                    reason: 'withdrawal_refund'
+                }
+            });
             logger.info(`[PayoutService] Refunded KES ${amount} to seller ${request.seller_id}. New balance: ${newBalance}`);
         } else if (request.creator_id) {
             const { rows } = await client.query(
@@ -187,6 +201,19 @@ class PayoutService {
                 [amount, request.creator_id]
             );
             newBalance = Number.parseFloat(rows[0]?.balance ?? 0);
+            await LedgerService.appendEntry(client, {
+                eventType: 'WITHDRAWAL_REVERSED_REFUND',
+                entityType: 'creator',
+                entityId: request.creator_id,
+                withdrawalId: request.id,
+                amount,
+                balanceAfter: newBalance,
+                payload: {
+                    withdrawalFee,
+                    requestedAmount: request.amount,
+                    reason: 'withdrawal_refund'
+                }
+            });
             logger.info(`[PayoutService] Refunded KES ${amount} to creator ${request.creator_id}. New balance: ${newBalance}`);
         } else if (request.buyer_id) {
             const { rows } = await client.query(
@@ -199,6 +226,19 @@ class PayoutService {
                 [amount, request.buyer_id]
             );
             newBalance = Number.parseFloat(rows[0]?.refunds ?? 0);
+            await LedgerService.appendEntry(client, {
+                eventType: 'WITHDRAWAL_REVERSED_REFUND',
+                entityType: 'buyer',
+                entityId: request.buyer_id,
+                withdrawalId: request.id,
+                amount,
+                balanceAfter: newBalance,
+                payload: {
+                    withdrawalFee,
+                    requestedAmount: request.amount,
+                    reason: 'withdrawal_refund'
+                }
+            });
             logger.info(`[PayoutService] Refunded KES ${amount} to buyer refund balance ${request.buyer_id}. New refund balance: ${newBalance}`);
         } else {
             logger.error('[PayoutService] Cannot refund: withdrawal has no seller_id, creator_id, or buyer_id', {

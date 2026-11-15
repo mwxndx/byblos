@@ -5,6 +5,7 @@ import refundAccountingService from './refundAccounting.service.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import logger from '../../../shared/utils/logger.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 
 class RefundExecutionService {
   /**
@@ -91,30 +92,57 @@ class RefundExecutionService {
 
     // 2. Credit buyer's refund balance (registered buyer or lookup via order email)
     let buyerRefunded = false;
+    let creditedBuyerId = null;
+    let buyerNewRefunds = 0;
     if (lockedRequest.buyer_id) {
-      await client.query(
+      const { rows } = await client.query(
         `UPDATE buyers
          SET refunds = COALESCE(refunds, 0) + $1,
              updated_at = NOW()
-         WHERE id = $2`,
+         WHERE id = $2
+         RETURNING id, refunds`,
         [effectiveRefundAmount, lockedRequest.buyer_id]
       );
-      buyerRefunded = true;
+      if (rows.length > 0) {
+        buyerRefunded = true;
+        creditedBuyerId = rows[0].id;
+        buyerNewRefunds = Number.parseFloat(rows[0].refunds || 0);
+      }
     } else if (accounting?.order?.buyer_email) {
-      const { rowCount } = await client.query(
+      const { rows } = await client.query(
         `UPDATE buyers
          SET refunds = COALESCE(refunds, 0) + $1,
              updated_at = NOW()
-         WHERE LOWER(email) = LOWER($2)`,
+         WHERE LOWER(email) = LOWER($2)
+         RETURNING id, refunds`,
         [effectiveRefundAmount, accounting.order.buyer_email]
       );
-      if (rowCount > 0) {
+      if (rows.length > 0) {
         buyerRefunded = true;
+        creditedBuyerId = rows[0].id;
+        buyerNewRefunds = Number.parseFloat(rows[0].refunds || 0);
       } else {
         logger.info(
           `[REFUND] Guest order #${lockedRequest.order_id} refund of ${effectiveRefundAmount} recorded for unregistered email ${accounting.order.buyer_email}`
         );
       }
+    }
+
+    if (buyerRefunded && creditedBuyerId) {
+      await LedgerService.appendEntry(client, {
+        eventType: 'BUYER_REFUND_CREDITED',
+        entityType: 'buyer',
+        entityId: creditedBuyerId,
+        orderId: lockedRequest.order_id || null,
+        amount: effectiveRefundAmount,
+        balanceAfter: buyerNewRefunds,
+        payload: {
+          refundRequestId: lockedRequest.id,
+          reason: lockedRequest.reason,
+          autoApproved,
+          executionSource
+        }
+      });
     }
 
     // 3. Mark refund request as completed and record credit details

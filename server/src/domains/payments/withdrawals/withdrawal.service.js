@@ -1,10 +1,12 @@
 import { pool } from '../../../infrastructure/database/database.js';
 import logger from '../../../shared/utils/logger.js';
+import { reportAlert } from '../../../shared/utils/alerting.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import payoutService from '../payouts/payout.service.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import Fees from '../../../shared/config/fees.js';
 import PayoutCallbackStateMachineService from '../payouts/payoutCallbackStateMachine.service.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 
 
 
@@ -150,20 +152,23 @@ function _getReserveSql(entityType) {
                SET refunds = refunds - $1,
                    refund_withdrawal_reserved_balance = COALESCE(refund_withdrawal_reserved_balance, 0) + $1,
                    updated_at = NOW()
-               WHERE id = $2`;
+               WHERE id = $2
+               RETURNING refunds AS balance, refund_withdrawal_reserved_balance AS withdrawal_reserved_balance`;
     }
     if (entityType === 'creator') {
         return `UPDATE creators
                SET balance = balance - $1,
                    withdrawal_reserved_balance = COALESCE(withdrawal_reserved_balance, 0) + $1,
                    updated_at = NOW()
-               WHERE id = $2`;
+               WHERE id = $2
+               RETURNING balance, withdrawal_reserved_balance`;
     }
     return `UPDATE sellers
              SET balance = balance - $1,
                  withdrawal_reserved_balance = COALESCE(withdrawal_reserved_balance, 0) + $1,
                  updated_at = NOW()
-             WHERE id = $2`;
+             WHERE id = $2
+             RETURNING balance, withdrawal_reserved_balance`;
 }
 
 class WithdrawalService {
@@ -360,31 +365,56 @@ class WithdrawalService {
                 logger.warn(`[WithdrawalService] Request ${requestId} marked failed without refund: ${remarks || 'skipRefund=true'}`);
             } else if (newStatus === 'completed') {
                 const reservedAmount = getWithdrawalReservedAmount(request);
+                const rawEntityType = getEntityType(request);
+                const ledgerEntityType = rawEntityType === 'buyer_refund' ? 'buyer' : rawEntityType;
+                const entityId = request.seller_id || request.creator_id || request.buyer_id;
+                let finalBalance = 0;
+
                 if (request.seller_id) {
-                    await client.query(
+                    const { rows } = await client.query(
                         `UPDATE sellers
                          SET withdrawal_reserved_balance = GREATEST(COALESCE(withdrawal_reserved_balance, 0) - $1, 0),
                              updated_at = NOW()
-                         WHERE id = $2`,
+                         WHERE id = $2
+                         RETURNING balance`,
                         [reservedAmount, request.seller_id]
                     );
+                    finalBalance = Number.parseFloat(rows[0]?.balance ?? 0);
                 } else if (request.creator_id) {
-                    await client.query(
+                    const { rows } = await client.query(
                         `UPDATE creators
                          SET withdrawal_reserved_balance = GREATEST(COALESCE(withdrawal_reserved_balance, 0) - $1, 0),
                              updated_at = NOW()
-                         WHERE id = $2`,
+                         WHERE id = $2
+                         RETURNING balance`,
                         [reservedAmount, request.creator_id]
                     );
+                    finalBalance = Number.parseFloat(rows[0]?.balance ?? 0);
                 } else if (request.buyer_id) {
-                    await client.query(
+                    const { rows } = await client.query(
                         `UPDATE buyers
                          SET refund_withdrawal_reserved_balance = GREATEST(COALESCE(refund_withdrawal_reserved_balance, 0) - $1, 0),
                              updated_at = NOW()
-                         WHERE id = $2`,
+                         WHERE id = $2
+                         RETURNING refunds`,
                         [reservedAmount, request.buyer_id]
                     );
+                    finalBalance = Number.parseFloat(rows[0]?.refunds ?? 0);
                 }
+
+                await LedgerService.appendEntry(client, {
+                    eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+                    entityType: ledgerEntityType,
+                    entityId,
+                    withdrawalId: request.id,
+                    amount: 0,
+                    balanceAfter: finalBalance,
+                    payload: {
+                        providerReference: provider_reference,
+                        mpesaReceipt: mpesa_receipt,
+                        status: newStatus
+                    }
+                });
             }
 
             const updatedEvent = await eventBus.enqueueInTransaction(client, AppEvents.WITHDRAWAL.UPDATED, {
@@ -530,6 +560,32 @@ class WithdrawalService {
 
             const currentBalance = Number.parseFloat(entity.balance || 0);
 
+            // Cryptographic ledger balance verification
+            const ledgerEntityType = entityType === 'buyer_refund' ? 'buyer' : entityType;
+            const ledgerAudit = await LedgerService.verifyEntityBalance(client, {
+                entityType: ledgerEntityType,
+                entityId,
+                expectedBalance: currentBalance
+            });
+
+            if (!ledgerAudit.isValid) {
+                logger.error('[WithdrawalService] Cryptographic ledger verification failed for entity', {
+                    entityType: ledgerEntityType,
+                    entityId,
+                    expectedBalance: currentBalance,
+                    ledgerBalance: ledgerAudit.ledgerBalance,
+                    error: ledgerAudit.error
+                });
+                await reportAlert('SECURITY: Cryptographic Ledger Balance Mismatch on Withdrawal Attempt', {
+                    entityType: ledgerEntityType,
+                    entityId,
+                    expectedBalance: currentBalance,
+                    ledgerBalance: ledgerAudit.ledgerBalance,
+                    error: ledgerAudit.error
+                });
+                throw new AppError('Cryptographic balance verification failed. Withdrawal blocked for security review.', 403);
+            }
+
             // Clearing-aware availability check, computed INSIDE this FOR UPDATE
             // transaction so it is atomic with the deduction below. For sellers,
             // `balance` already excludes uncleared money (it lives in
@@ -556,7 +612,9 @@ class WithdrawalService {
 
             // Reserve available funds while Paystack processes the transfer.
             const reserveSql = _getReserveSql(entityType);
-            await client.query(reserveSql, [deductionAmount, entityId]);
+            const { rows: reserveRows } = await client.query(reserveSql, [deductionAmount, entityId]);
+            const reservedBalanceAfter = Number.parseFloat(reserveRows[0]?.balance ?? 0);
+            const reservedBalanceHeld = Number.parseFloat(reserveRows[0]?.withdrawal_reserved_balance ?? 0);
 
             const insertResult = await client.query(
                 `INSERT INTO withdrawal_requests 
@@ -585,6 +643,22 @@ class WithdrawalService {
             );
 
             request = insertResult.rows[0];
+
+            // Record immutable ledger entry for withdrawal reserve lock
+            await LedgerService.appendEntry(client, {
+                eventType: 'WITHDRAWAL_RESERVE_LOCKED',
+                entityType: ledgerEntityType,
+                entityId,
+                withdrawalId: request.id,
+                amount: -deductionAmount,
+                balanceAfter: reservedBalanceAfter,
+                payload: {
+                    requestedAmount: validatedAmount,
+                    withdrawalFee,
+                    deductionAmount,
+                    reservedBalanceAfter: reservedBalanceHeld
+                }
+            });
 
             const createdEvent = await eventBus.enqueueInTransaction(client, AppEvents.WITHDRAWAL.CREATED, {
                 eventId: `withdrawal.created:${request.id}`,

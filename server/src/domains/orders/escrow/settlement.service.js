@@ -1,4 +1,5 @@
 import logger from '../../../shared/utils/logger.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 
 import {
     reverseOrderSettlementForRefundHelper,
@@ -89,16 +90,17 @@ class SettlementService {
                 continue;
             }
 
-            const { rowCount } = await client.query(
+            const { rows: updatedSellers } = await client.query(
                 `UPDATE sellers
                  SET pending_settlement_balance = GREATEST(COALESCE(pending_settlement_balance, 0) - $1, 0),
                      balance = COALESCE(balance, 0) + $1,
                      updated_at = NOW()
-                 WHERE id = $2`,
+                 WHERE id = $2
+                 RETURNING balance, pending_settlement_balance`,
                 [amount, payout.seller_id]
             );
 
-            if (rowCount === 0) {
+            if (updatedSellers.length === 0) {
                 await client.query(
                     `UPDATE payouts
                      SET settlement_status = 'settlement_review',
@@ -110,6 +112,20 @@ class SettlementService {
                 );
                 continue;
             }
+
+            // Append immutable ledger record for promoted settlement
+            await LedgerService.appendEntry(client, {
+                eventType: 'SETTLEMENT_PROMOTED_TO_WITHDRAWABLE',
+                entityType: 'seller',
+                entityId: payout.seller_id,
+                payoutId: payout.id,
+                amount,
+                balanceAfter: Number(updatedSellers[0].balance || 0),
+                payload: {
+                    pendingSettlementBalance: updatedSellers[0].pending_settlement_balance,
+                    promotedBy: 'settlement_service'
+                }
+            });
 
             await client.query(
                 `UPDATE payouts

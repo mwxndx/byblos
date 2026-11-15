@@ -15,6 +15,7 @@ import Fees from '../../../shared/config/fees.js';
 import logger from '../../../shared/utils/logger.js';
 import notificationService from '../../communication/notifications/notification.service.js';
 import WithdrawalService from '../../payments/withdrawals/withdrawal.service.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import { computeCreatorReferralReward, isSelfReferral, computeClearance } from './creatorMoney.utils.js';
 import { addBusinessDays } from '../../orders/escrow/settlement.service.js';
@@ -1046,15 +1047,30 @@ class CreatorService {
     // invisible to the buyer and creator by design (see the remediation
     // report). Only getCreatorClearance's withdrawal-eligibility check and
     // the admin review queue know about the flag.
-    await client.query(
+    const { rows: updatedCreators } = await client.query(
       `UPDATE creators
        SET balance = balance + $1,
            total_earnings = total_earnings + $1,
            total_sales = total_sales + 1,
            updated_at = NOW()
-       WHERE id = $2`,
+       WHERE id = $2
+       RETURNING balance`,
       [amount, attribution.creator_id]
     );
+
+    await LedgerService.appendEntry(client, {
+      eventType: 'CREATOR_COMMISSION_CREDITED',
+      entityType: 'creator',
+      entityId: attribution.creator_id,
+      orderId: order.id,
+      amount,
+      balanceAfter: Number(updatedCreators[0]?.balance || 0),
+      payload: {
+        earningId: inserted[0].id,
+        sellerId: order.seller_id,
+        flagged
+      }
+    });
 
     if (flagged) {
       logger.warn('[CreatorAttribution] Post-hoc self-dealing match at credit time; earning held for review', {
@@ -1173,14 +1189,28 @@ class CreatorService {
 
     if (!inserted.length) return null;
 
-    await client.query(
+    const { rows: updatedCreators } = await client.query(
       `UPDATE creators
        SET balance = balance + $1,
            total_referral_earnings = total_referral_earnings + $1,
            updated_at = NOW()
-       WHERE id = $2`,
+       WHERE id = $2
+       RETURNING balance`,
       [amount, referrerId]
     );
+
+    await LedgerService.appendEntry(client, {
+      eventType: 'CREATOR_REFERRAL_REWARD_CREDITED',
+      entityType: 'creator',
+      entityId: referrerId,
+      orderId: order.id,
+      amount,
+      balanceAfter: Number(updatedCreators[0]?.balance || 0),
+      payload: {
+        sellerId,
+        rewardFlatAmount: Fees.CREATOR_REFERRAL_REWARD || 3
+      }
+    });
 
     logger.info(
       `[CreatorService] Credited creator ${referrerId} KES ${amount} (deducted from platform flat fee KES ${Fees.PLATFORM_COMMISSION_AMOUNT || 10}) for seller ${sellerId} referral on Order ${order.id}`

@@ -4,6 +4,7 @@ import payoutService from './payout.service.js';
 import eventBus, { AppEvents } from '../../../application/events/eventBus.js';
 import { getWithdrawalReservedAmount } from '../../../shared/utils/withdrawalUtils.js';
 import { toCents } from '../../orders/escrow/escrowMoney.utils.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 
 const PAYOUT_SUCCESS_STATUSES = new Set(['0', 'success', 'successful', 'completed', 'complete', 'paid', 'sent', 'delivered']);
 const PAYOUT_FAILURE_STATUSES = new Set(['failed', 'failure', 'cancelled', 'canceled', 'rejected', 'reversed', 'error']);
@@ -325,29 +326,71 @@ class PayoutCallbackStateMachineService {
             if (!isSuccess) {
                 newBalance = await payoutService.refundToWallet(client, request);
             } else if (request.seller_id) {
-                await client.query(
+                const { rows } = await client.query(
                     `UPDATE sellers
                      SET withdrawal_reserved_balance = GREATEST(COALESCE(withdrawal_reserved_balance, 0) - $1, 0),
                          updated_at = NOW()
-                     WHERE id = $2`,
+                     WHERE id = $2
+                     RETURNING balance`,
                     [getWithdrawalReservedAmount(request), request.seller_id]
                 );
+                await LedgerService.appendEntry(client, {
+                    eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+                    entityType: 'seller',
+                    entityId: request.seller_id,
+                    withdrawalId: request.id,
+                    amount: 0,
+                    balanceAfter: Number.parseFloat(rows[0]?.balance ?? 0),
+                    payload: {
+                        providerReference: transactionReference,
+                        clientReference,
+                        finalStatus
+                    }
+                });
             } else if (request.creator_id) {
-                await client.query(
+                const { rows } = await client.query(
                     `UPDATE creators
                      SET withdrawal_reserved_balance = GREATEST(COALESCE(withdrawal_reserved_balance, 0) - $1, 0),
                          updated_at = NOW()
-                     WHERE id = $2`,
+                     WHERE id = $2
+                     RETURNING balance`,
                     [getWithdrawalReservedAmount(request), request.creator_id]
                 );
+                await LedgerService.appendEntry(client, {
+                    eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+                    entityType: 'creator',
+                    entityId: request.creator_id,
+                    withdrawalId: request.id,
+                    amount: 0,
+                    balanceAfter: Number.parseFloat(rows[0]?.balance ?? 0),
+                    payload: {
+                        providerReference: transactionReference,
+                        clientReference,
+                        finalStatus
+                    }
+                });
             } else if (request.buyer_id) {
-                await client.query(
+                const { rows } = await client.query(
                     `UPDATE buyers
                      SET refund_withdrawal_reserved_balance = GREATEST(COALESCE(refund_withdrawal_reserved_balance, 0) - $1, 0),
                          updated_at = NOW()
-                     WHERE id = $2`,
+                     WHERE id = $2
+                     RETURNING refunds`,
                     [getWithdrawalReservedAmount(request), request.buyer_id]
                 );
+                await LedgerService.appendEntry(client, {
+                    eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+                    entityType: 'buyer',
+                    entityId: request.buyer_id,
+                    withdrawalId: request.id,
+                    amount: 0,
+                    balanceAfter: Number.parseFloat(rows[0]?.refunds ?? 0),
+                    payload: {
+                        providerReference: transactionReference,
+                        clientReference,
+                        finalStatus
+                    }
+                });
             }
 
             await this.updatePayoutProviderAttempt(client, request.id, transactionReference, finalStatus, data);

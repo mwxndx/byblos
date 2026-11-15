@@ -2,6 +2,7 @@ import logger from '../../../shared/utils/logger.js';
 import { reportAlert } from '../../../shared/utils/alerting.js';
 import CreatorService from '../../growth/creators/creator.service.js';
 import settlementService from './settlement.service.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 import {
     toCents as pureToCents,
     roundMoney as pureRoundMoney,
@@ -178,6 +179,24 @@ class EscrowManager {
             logger.error(`[EscrowManager] Seller ${sellerId} not found while releasing escrow for Order ${orderId}. Rolling back payout.`);
             throw new Error(`Seller ${sellerId} not found for escrow release`);
         }
+
+        // Record immutable ledger entry for escrow release
+        await LedgerService.appendEntry(client, {
+            eventType: 'ESCROW_RELEASED_TO_PENDING',
+            entityType: 'seller',
+            entityId: sellerId,
+            orderId,
+            payoutId: insertedPayouts[0].id,
+            amount: 0,
+            balanceAfter: Number(updatedSellers[0].balance || 0),
+            payload: {
+                sellerPayoutAmount,
+                totalAmount,
+                platformFeeAmount,
+                pendingSettlementBalance: updatedSellers[0].pending_settlement_balance,
+                source
+            }
+        });
 
         await CreatorService.creditCreatorForOrder(client, { order, paymentId });
         await CreatorService.creditCreatorReferralForSeller(client, { order });

@@ -30,6 +30,7 @@ import { normalizePaystackChargePayload } from '../../../shared/utils/paystackPa
 
 import { PaymentStatus } from '../../../shared/constants/enums.js';
 import withdrawalService from '../withdrawals/withdrawal.service.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
 import {
     recordFraudEvent,
     handleAmountMismatch,
@@ -409,6 +410,25 @@ const CorePaymentService = {
                         });
                     }
                 }
+            }
+
+            if (isSuccess) {
+                const capturedAmount = Number(paymentRow?.amount || 0);
+                await LedgerService.appendEntry(client, {
+                    eventType: 'PAYMENT_CAPTURED_TO_ESCROW',
+                    entityType: 'platform',
+                    entityId: 0,
+                    orderId: orderRow?.id || orderId || paymentRow.order_id || null,
+                    paymentReference: providerReference || receipt || paymentRow.paystack_reference || null,
+                    amount: capturedAmount,
+                    balanceAfter: 0,
+                    payload: {
+                        paymentId: paymentRow.id,
+                        orderId: orderRow?.id || orderId,
+                        currency: 'KES',
+                        source
+                    }
+                });
             }
 
             const durableEvent = await eventBus.enqueueInTransaction(
