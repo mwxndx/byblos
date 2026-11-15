@@ -26,3 +26,5 @@ if (existsSync(testEnvPath)) {
   const dotenv = await import('dotenv');
   dotenv.config({ path: testEnvPath });
 }
+
+process.env.PAYSTACK_WEBHOOK_IPS = process.env.PAYSTACK_WEBHOOK_IPS || '127.0.0.1,::1,::ffff:127.0.0.1';

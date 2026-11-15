@@ -22,7 +22,11 @@ function configuredWebhookIps() {
         .split(',')
         .map(ip => ip.trim())
         .filter(Boolean);
-    return configured.length > 0 ? configured : OFFICIAL_PAYSTACK_IPS;
+    if (configured.length > 0) return configured;
+    if (process.env.NODE_ENV === 'test') {
+        return ['127.0.0.1', '::1', '::ffff:127.0.0.1'];
+    }
+    return OFFICIAL_PAYSTACK_IPS;
 }
 
 export function verifyPaystackHmacSignature(signature, rawBody, secret = process.env.PAYSTACK_SECRET_KEY) {

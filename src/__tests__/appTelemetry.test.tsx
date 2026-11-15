@@ -8,6 +8,14 @@ const mockAnalytics = vi.fn();
 const mockSpeedInsights = vi.fn();
 
 // Mock child components and hooks to isolate App telemetry integration
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router-dom')>();
+  return {
+    ...actual,
+    RouterProvider: () => <div data-testid="mock-router-provider" />
+  };
+});
+
 vi.mock('@vercel/analytics/react', () => ({
   Analytics: (props: unknown) => {
     mockAnalytics(props);

@@ -166,6 +166,7 @@ jobs:
           PAYSTACK_SECRET_KEY=sk_test_mock_secret_key_for_testing
           PAYSTACK_PUBLIC_KEY=pk_test_mock_public_key_for_testing
           PAYSTACK_BASE_URL=http://localhost:3003/mock-paystack
+          PAYSTACK_WEBHOOK_IPS=127.0.0.1,::1,::ffff:127.0.0.1
           EMAIL_FROM_EMAIL=no-reply@byblos.test
           EMAIL_FROM_NAME=Byblos Test
           EOF

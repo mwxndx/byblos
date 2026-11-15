@@ -6225,3 +6225,30 @@ INSERT INTO public.roles (name, slug) VALUES
     ('Creator', 'creator'),
     ('Logistics', 'logistics')
 ON CONFLICT (slug) DO NOTHING;
+
+-- Cryptographic financial ledger genesis root row (mirrors 20261115181000_seed_genesis_financial_ledger_balances.sql)
+INSERT INTO public.financial_ledger (
+    sequence_number,
+    event_type,
+    entity_type,
+    entity_id,
+    amount,
+    currency,
+    balance_after,
+    prev_hash,
+    row_hash,
+    payload
+) VALUES (
+    1,
+    'GENESIS_ROOT',
+    'platform',
+    0,
+    0.00,
+    'KES',
+    0.00,
+    '0000000000000000000000000000000000000000000000000000000000000000',
+    'b4842716e4075247d98b210162322e70feb173f9df4072cf952862bdf57bc4c5',
+    '{"description": "Byblos Platform Cryptographic Financial Ledger Genesis Block"}'::jsonb
+) ON CONFLICT (sequence_number) DO NOTHING;
+
+SELECT pg_catalog.setval('public.financial_ledger_sequence_number_seq', 1, true);
