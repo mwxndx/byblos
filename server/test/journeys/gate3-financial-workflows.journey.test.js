@@ -24,6 +24,7 @@ import CreatorService from '../../src/domains/growth/creators/creator.service.js
 import withdrawalService from '../../src/domains/payments/withdrawals/withdrawal.service.js';
 import payoutCallbackStateMachineService from '../../src/domains/payments/payouts/payoutCallbackStateMachine.service.js';
 import escrowManager from '../../src/domains/orders/escrow/EscrowManager.js';
+import LedgerService from '../../src/domains/finance/ledger/LedgerService.js';
 import Fees from '../../src/shared/config/fees.js';
 import {
   createUser,
@@ -331,8 +332,16 @@ describe('GATE 3: Financial Workflows Business Journey', () => {
   // ---------------------------------------------------------------------------
   describe('3. Balance Deductions, Holds & Idempotency', () => {
     test('Withdrawal atomically deducts balance, reserves funds, and records request', async () => {
-      // Seed seller with available balance of KES 5,000
+      // Seed seller with available balance of KES 5,000 and matching ledger credit
       await pool.query('UPDATE sellers SET balance = 5000, withdrawal_reserved_balance = 0 WHERE id = $1', [seller.id]);
+      await LedgerService.appendEntry(pool, {
+        eventType: 'SETTLEMENT_PAYOUT_CREDIT',
+        entityType: 'seller',
+        entityId: seller.id,
+        amount: 5000,
+        balanceAfter: 5000,
+        payload: { note: 'Seed journey test balance' }
+      });
 
       const idempotencyKey = `journey-withdraw-seller-${Date.now()}`;
       const amount = 1000;
