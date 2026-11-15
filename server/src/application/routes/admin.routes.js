@@ -96,5 +96,10 @@ router.post('/fulfillment/orders/:id/cancel-refund', validate(V.cancelAndRefundD
 router.post('/broadcast-app-update', adminController.broadcastAppUpdate);
 router.post('/broadcast-update', adminController.broadcastAppUpdate);
 
+// Cryptographic Financial Ledger & Merkle Epochs Management
+router.get('/ledger/status', adminController.getLedgerStatus);
+router.get('/ledger/epochs', adminController.getLedgerEpochs);
+router.post('/ledger/audit-now', adminController.triggerLedgerAudit);
+
 export default router;
 

@@ -9,6 +9,8 @@ import CacheService from '../../../shared/utils/cache.service.js';
 import { buildSearchClause } from '../../../shared/utils/pagination.utils.js';
 import { invalidateUserSessions } from '../../../shared/utils/sessionRevocation.js';
 import { normalizeNairobiLocationSql } from '../../../shared/utils/location.utils.js';
+import LedgerService from '../../finance/ledger/LedgerService.js';
+import LedgerAuditService from '../../finance/ledger/LedgerAuditService.js';
 
 class AdminService {
   async getDashboardStats() {
@@ -919,29 +921,68 @@ class AdminService {
         newBalance = await payoutService.refundToWallet(client, request);
       } else if (status === 'completed') {
         if (request.seller_id) {
-          await client.query(
+          const { rows } = await client.query(
             `UPDATE sellers
              SET withdrawal_reserved_balance = GREATEST(COALESCE(withdrawal_reserved_balance, 0) - $1, 0),
                  updated_at = NOW()
-             WHERE id = $2`,
+             WHERE id = $2
+             RETURNING balance`,
             [getWithdrawalReservedAmount(request), request.seller_id]
           );
+          await LedgerService.appendEntry(client, {
+            eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+            entityType: 'seller',
+            entityId: request.seller_id,
+            withdrawalId: request.id,
+            amount: 0,
+            balanceAfter: Number.parseFloat(rows[0]?.balance ?? 0),
+            payload: {
+              adminId,
+              reason: 'admin_override_completed'
+            }
+          });
         } else if (request.creator_id) {
-          await client.query(
+          const { rows } = await client.query(
             `UPDATE creators
              SET withdrawal_reserved_balance = GREATEST(COALESCE(withdrawal_reserved_balance, 0) - $1, 0),
                  updated_at = NOW()
-             WHERE id = $2`,
+             WHERE id = $2
+             RETURNING balance`,
             [getWithdrawalReservedAmount(request), request.creator_id]
           );
+          await LedgerService.appendEntry(client, {
+            eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+            entityType: 'creator',
+            entityId: request.creator_id,
+            withdrawalId: request.id,
+            amount: 0,
+            balanceAfter: Number.parseFloat(rows[0]?.balance ?? 0),
+            payload: {
+              adminId,
+              reason: 'admin_override_completed'
+            }
+          });
         } else if (request.buyer_id) {
-          await client.query(
+          const { rows } = await client.query(
             `UPDATE buyers
              SET refund_withdrawal_reserved_balance = GREATEST(COALESCE(refund_withdrawal_reserved_balance, 0) - $1, 0),
                  updated_at = NOW()
-             WHERE id = $2`,
+             WHERE id = $2
+             RETURNING refunds`,
             [getWithdrawalReservedAmount(request), request.buyer_id]
           );
+          await LedgerService.appendEntry(client, {
+            eventType: 'WITHDRAWAL_PAYOUT_SETTLED',
+            entityType: 'buyer',
+            entityId: request.buyer_id,
+            withdrawalId: request.id,
+            amount: 0,
+            balanceAfter: Number.parseFloat(rows[0]?.refunds ?? 0),
+            payload: {
+              adminId,
+              reason: 'admin_override_completed'
+            }
+          });
         }
       }
 
@@ -955,6 +996,74 @@ class AdminService {
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLedgerStatus() {
+    const client = await pool.connect();
+    try {
+      const { rows: stats } = await client.query(`
+        SELECT 
+          COUNT(*)::int AS total_entries,
+          COALESCE(MAX(sequence_number), 0)::bigint AS latest_sequence,
+          COALESCE(MIN(sequence_number), 0)::bigint AS earliest_sequence
+        FROM financial_ledger
+      `);
+
+      const { rows: lastEpochs } = await client.query(`
+        SELECT epoch_id, start_sequence, end_sequence, entry_count, merkle_root, anchor_type, anchor_reference, status, created_at
+        FROM ledger_epochs
+        ORDER BY end_sequence DESC
+        LIMIT 1
+      `);
+
+      const audit = await LedgerService.auditChainIntegrity(client, {
+        fromSequence: Math.max(1, (Number(lastEpochs[0]?.end_sequence) || 1) - 50)
+      });
+
+      return {
+        totalEntries: stats[0].total_entries,
+        latestSequence: stats[0].latest_sequence,
+        earliestSequence: stats[0].earliest_sequence,
+        lastEpoch: lastEpochs[0] || null,
+        chainIntegrity: {
+          isValid: audit.isValid,
+          checkedFromSequence: Math.max(1, (Number(lastEpochs[0]?.end_sequence) || 1) - 50),
+          error: audit.reason || null
+        }
+      };
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLedgerEpochs({ limit = 50, offset = 0 } = {}) {
+    const client = await pool.connect();
+    try {
+      const { rows } = await client.query(`
+        SELECT epoch_id, epoch_uuid, start_sequence, end_sequence, entry_count, merkle_root, anchor_type, anchor_reference, status, created_at
+        FROM ledger_epochs
+        ORDER BY epoch_id DESC
+        LIMIT $1 OFFSET $2
+      `, [Math.min(Math.max(limit, 1), 100), Math.max(offset, 0)]);
+
+      const { rows: countRows } = await client.query(`SELECT COUNT(*)::int AS total FROM ledger_epochs`);
+
+      return {
+        epochs: rows,
+        total: countRows[0].total
+      };
+    } finally {
+      client.release();
+    }
+  }
+
+  async triggerLedgerAudit() {
+    const client = await pool.connect();
+    try {
+      return await LedgerAuditService.auditAndAnchorEpoch(client);
     } finally {
       client.release();
     }

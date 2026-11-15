@@ -744,6 +744,35 @@ const cancelAndRefundDeadLetter = async (req, res, next) => {
   }
 };
 
+const getLedgerStatus = async (req, res, next) => {
+  try {
+    const status = await AdminService.getLedgerStatus();
+    res.status(200).json({ status: 'success', data: status });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getLedgerEpochs = async (req, res, next) => {
+  try {
+    const limit = Number.parseInt(req.query.limit, 10) || 50;
+    const offset = Number.parseInt(req.query.offset, 10) || 0;
+    const result = await AdminService.getLedgerEpochs({ limit, offset });
+    res.status(200).json({ status: 'success', data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const triggerLedgerAudit = async (req, res, next) => {
+  try {
+    const result = await AdminService.triggerLedgerAudit();
+    res.status(200).json({ status: 'success', data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   adminLogin,
   getPaymentProviderBalances,
@@ -775,5 +804,8 @@ export {
   broadcastAppUpdate,
   getDeadLetterJobs,
   retryFulfillmentJob,
-  cancelAndRefundDeadLetter
+  cancelAndRefundDeadLetter,
+  getLedgerStatus,
+  getLedgerEpochs,
+  triggerLedgerAudit
 };
