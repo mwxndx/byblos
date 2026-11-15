@@ -1,7 +1,7 @@
 import { createResilientRateLimiter } from './createResilientRateLimiter.js';
 import logger from '../../shared/utils/logger.js';
 
-const email = (req) => (req.body?.email || '').trim().toLowerCase();
+const email = (req) => (typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '');
 const skipInDev = () => process.env.NODE_ENV === 'test' || (process.env.NODE_ENV === 'development' && process.env.SKIP_AUTH_RATE_LIMIT === 'true');
 
 const getDualKey = (req) => {
