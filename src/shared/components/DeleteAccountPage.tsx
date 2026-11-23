@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail, ShieldCheck, Trash2 } from '@/shared/ui/icons';
-import { SEOHead } from '@/shared/components/SEOHead';
+import { SEOHead } from '@/shared/seo';
 
 const SUPPORT_EMAIL = 'bybloshqke@zohomail.com';
 

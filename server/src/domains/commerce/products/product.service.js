@@ -131,7 +131,8 @@ class ProductService {
     static async invalidateProductCache(productId, sellerId, categoryId = null) {
         const keysToDelete = [
             `products:item:${productId}`,
-            `products:seller:${sellerId}`
+            `products:seller:${sellerId}`,
+            `product:public:${productId}`
         ];
         if (categoryId) {
             keysToDelete.push(`products:category:${categoryId}`);

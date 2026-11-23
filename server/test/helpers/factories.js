@@ -15,7 +15,7 @@
 import { pool } from '../../src/infrastructure/database/database.js';
 
 let counter = 0;
-function unique(prefix) {
+export function unique(prefix) {
   counter += 1;
   return `${prefix}${Date.now()}${counter}`;
 }

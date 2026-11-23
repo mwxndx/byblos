@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@/shared/ui/icons';
 import { TermsContent } from '@/shared/components/TermsContent';
-import { SEOHead } from '@/shared/components/SEOHead';
+import { SEOHead } from '@/shared/seo';
 
 const SITE = 'https://www.byblosafrica.site';
 

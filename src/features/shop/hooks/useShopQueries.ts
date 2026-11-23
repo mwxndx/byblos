@@ -37,7 +37,25 @@ export function useKnockSellerMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (sellerId: string | number) => publicApiService.knockSeller(sellerId),
-    onSuccess: () => {
+    onMutate: async (sellerId: string | number) => {
+      await queryClient.cancelQueries({ queryKey: ['public-sellers'] });
+      const queries = queryClient.getQueriesData<{ sellers?: Array<{ id: string | number; knockCount?: number; knock_count?: number }> }>({ queryKey: ['public-sellers'] });
+      for (const [key, data] of queries) {
+        if (data && Array.isArray(data.sellers)) {
+          queryClient.setQueryData(key, {
+            ...data,
+            sellers: data.sellers.map((s) => {
+              if (String(s.id) === String(sellerId)) {
+                const current = Number(s.knockCount ?? s.knock_count ?? 0);
+                return { ...s, knockCount: current + 1, knock_count: current + 1 };
+              }
+              return s;
+            }),
+          });
+        }
+      }
+    },
+    onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ['public-sellers'] });
     },
   });

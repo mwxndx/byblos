@@ -444,13 +444,19 @@ class NotificationService {
         }
 
         if (distinctRecipients.size > 0) {
-            const inAppPromises = Array.from(distinctRecipients.values()).map(r =>
-                pool.query(
-                    'INSERT INTO app_notifications (recipient_user_id, recipient_role, type, title, body, data, channels) VALUES ($1, $2, $3, $4, $5, $6, ARRAY[\'in_app\', \'push\'])',
-                    [r.userId, r.role, 'app_update', title, body, JSON.stringify(data)]
-                ).catch(err => logger.warn('[NotificationService] In-app update alert insert failed', { err: err.message }))
-            );
-            await Promise.allSettled(inAppPromises);
+            const recipients = Array.from(distinctRecipients.values());
+            const userIds = recipients.map(r => r.userId);
+            const roles = recipients.map(r => r.role);
+            try {
+                await pool.query(
+                    `INSERT INTO app_notifications (recipient_user_id, recipient_role, type, title, body, data, channels)
+                     SELECT u, r, 'app_update', $3, $4, $5::jsonb, ARRAY['in_app', 'push']
+                     FROM unnest($1::text[], $2::text[]) AS t(u, r)`,
+                    [userIds, roles, title, body, JSON.stringify(data)]
+                );
+            } catch (err) {
+                logger.warn('[NotificationService] In-app update alert batch insert failed', { err: err.message });
+            }
         }
 
         if (!isFcmConfigured()) {

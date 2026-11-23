@@ -7,16 +7,31 @@ export function useCancelOrderMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (orderId: string) => buyerApi.cancelOrder(orderId),
-    onSuccess: (_, orderId) => {
-      queryClient.invalidateQueries({ queryKey: buyerQueryKeys.orders() });
-      queryClient.invalidateQueries({ queryKey: buyerQueryKeys.order(orderId) });
-      toast.success('Order cancelled successfully');
+    onMutate: async (orderId: string) => {
+      await queryClient.cancelQueries({ queryKey: buyerQueryKeys.order(orderId) });
+      const previousOrder = queryClient.getQueryData(buyerQueryKeys.order(orderId));
+      if (previousOrder && typeof previousOrder === 'object') {
+        queryClient.setQueryData(buyerQueryKeys.order(orderId), {
+          ...previousOrder,
+          status: 'CANCELLED',
+          statusFormatted: 'Cancelled',
+        });
+      }
+      return { previousOrder };
     },
-    onError: (error) => {
+    onError: (error, orderId, context) => {
+      if (context?.previousOrder) {
+        queryClient.setQueryData(buyerQueryKeys.order(orderId), context.previousOrder);
+      }
       const err = error as Error;
       toast.error(err.message || 'Failed to cancel order');
     },
+    onSuccess: () => {
+      toast.success('Order cancelled successfully');
+    },
+    onSettled: (_data, _error, orderId) => {
+      void queryClient.invalidateQueries({ queryKey: buyerQueryKeys.orders() });
+      void queryClient.invalidateQueries({ queryKey: buyerQueryKeys.order(orderId) });
+    },
   });
 }
-
-

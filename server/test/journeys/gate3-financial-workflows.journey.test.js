@@ -27,6 +27,7 @@ import escrowManager from '../../src/domains/orders/escrow/EscrowManager.js';
 import LedgerService from '../../src/domains/finance/ledger/LedgerService.js';
 import Fees from '../../src/shared/config/fees.js';
 import {
+  unique,
   createUser,
   createBuyer,
   createSeller,
@@ -49,6 +50,7 @@ const createdOrderIds = [];
 const createdWithdrawalIds = [];
 
 before(async () => {
+  await pool.query("DELETE FROM sellers WHERE shop_name = 'Gate3 Shop'").catch(() => {});
   mockHttpServer = http.createServer((req, res) => {
     let body = '';
     req.on('data', (chunk) => { body += chunk; });
@@ -86,8 +88,9 @@ after(async () => {
 
   // Cleanup created withdrawal records
   if (createdWithdrawalIds.length > 0) {
-    await pool.query('DELETE FROM payout_provider_attempts WHERE withdrawal_request_id = ANY($1)', [createdWithdrawalIds]);
-    await pool.query('DELETE FROM withdrawal_requests WHERE id = ANY($1)', [createdWithdrawalIds]);
+    await pool.query('DELETE FROM financial_ledger WHERE withdrawal_id = ANY($1)', [createdWithdrawalIds]).catch(() => {});
+    await pool.query('DELETE FROM payout_provider_attempts WHERE withdrawal_request_id = ANY($1)', [createdWithdrawalIds]).catch(() => {});
+    await pool.query('DELETE FROM withdrawal_requests WHERE id = ANY($1)', [createdWithdrawalIds]).catch(() => {});
   }
 
   // Cleanup created orders
@@ -130,7 +133,7 @@ describe('GATE 3: Financial Workflows Business Journey', () => {
     // 1. Create seller
     const sUser = await createUser({ email: `gate3_seller_${Date.now()}@test.byblos.local` });
     createdUserIds.push(sUser.id);
-    seller = await createSeller({ userId: sUser.id, shopName: 'Gate3 Shop' });
+    seller = await createSeller({ userId: sUser.id, shopName: unique('Gate3 Shop ') });
     createdSellerIds.push(seller.id);
 
     // 2. Create creator with authenticated user
@@ -410,7 +413,7 @@ describe('GATE 3: Financial Workflows Business Journey', () => {
   describe('4. Concurrent Withdrawal Race Condition Prevention', () => {
     test('Simultaneous withdrawal requests cannot double-drain balance (row locking guard)', async () => {
       // Seed seller with EXACTLY KES 1,000 balance
-      const freshSeller = await createSeller({ shopName: 'Race Seller' });
+      const freshSeller = await createSeller({ shopName: unique('Race Seller ') });
       createdSellerIds.push(freshSeller.id);
       await pool.query('UPDATE sellers SET balance = 1000, withdrawal_reserved_balance = 0 WHERE id = $1', [freshSeller.id]);
 
@@ -464,7 +467,7 @@ describe('GATE 3: Financial Workflows Business Journey', () => {
   describe('5. Provider Callback Reconciliation & Refund Recovery', () => {
     test('Successful provider callback marks request completed and clears reserved balance', async () => {
       // 1. Create a withdrawal request in processing status
-      const testSeller = await createSeller({ shopName: 'Callback Success Seller' });
+      const testSeller = await createSeller({ shopName: unique('CB Success ') });
       createdSellerIds.push(testSeller.id);
       await pool.query('UPDATE sellers SET balance = 2000, withdrawal_reserved_balance = 0 WHERE id = $1', [testSeller.id]);
 
@@ -509,7 +512,7 @@ describe('GATE 3: Financial Workflows Business Journey', () => {
 
     test('Failed provider callback marks request failed and restores reserved funds to balance', async () => {
       // 1. Create a withdrawal request
-      const testSeller = await createSeller({ shopName: 'Callback Failure Seller' });
+      const testSeller = await createSeller({ shopName: unique('CB Fail ') });
       createdSellerIds.push(testSeller.id);
       await pool.query('UPDATE sellers SET balance = 2000, withdrawal_reserved_balance = 0 WHERE id = $1', [testSeller.id]);
 

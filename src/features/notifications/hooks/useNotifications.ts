@@ -65,10 +65,23 @@ export function useNotifications(variant: NotificationVariant = 'default', enabl
     mutationFn: async (id: AppNotification['id']) => {
       await apiClient.patch(`${base}/${id}/read`);
     },
-    onSuccess: (_data, id) => {
-      queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>
-        current.map((n) => (n.id === id ? { ...n, read_at: n.read_at ?? new Date().toISOString() } : n))
-      );
+    onMutate: async (id: AppNotification['id']) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousNotifications = queryClient.getQueryData<AppNotification[]>(queryKey);
+      if (previousNotifications) {
+        queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>
+          current.map((n) => (n.id === id ? { ...n, read_at: n.read_at ?? new Date().toISOString() } : n))
+        );
+      }
+      return { previousNotifications };
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(queryKey, context.previousNotifications);
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey });
     },
   });
 
@@ -77,10 +90,23 @@ export function useNotifications(variant: NotificationVariant = 'default', enabl
       const url = activeRole ? `${base}/read-all?role=${encodeURIComponent(activeRole)}` : `${base}/read-all`;
       await apiClient.patch(url);
     },
-    onSuccess: () => {
-      queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>
-        current.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() }))
-      );
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey });
+      const previousNotifications = queryClient.getQueryData<AppNotification[]>(queryKey);
+      if (previousNotifications) {
+        queryClient.setQueryData<AppNotification[]>(queryKey, (current = []) =>
+          current.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() }))
+        );
+      }
+      return { previousNotifications };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(queryKey, context.previousNotifications);
+      }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey });
     },
   });
 

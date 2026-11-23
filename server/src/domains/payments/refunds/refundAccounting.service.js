@@ -17,6 +17,98 @@ export function roundMoney(val) {
 }
 
 /**
+ * Returns verified captured payment amounts for a batch of orders from the payments table.
+ * If no payments rows exist for an order but the order is marked 'completed', falls back to order.total_amount.
+ *
+ * @param {import('pg').PoolClient} client
+ * @param {Array<object|number|string>} orders Array of order rows or order IDs
+ * @returns {Promise<Map<string, number>>}
+ */
+export async function getCapturedPaymentAmountsBatch(client, orders) {
+  const result = new Map();
+  if (!orders || orders.length === 0) return result;
+
+  const orderMap = new Map();
+  const orderIds = [];
+  const orderIdStrings = [];
+
+  for (const ord of orders) {
+    if (!ord) continue;
+    const id = ord.id !== undefined ? ord.id : ord;
+    const key = String(id);
+    orderMap.set(key, ord);
+    orderIds.push(Number(id) || id);
+    orderIdStrings.push(key);
+  }
+
+  if (orderIds.length === 0) return result;
+
+  const { rows: payRows } = await client.query(
+    `SELECT 
+       id,
+       order_id,
+       invoice_id,
+       amount,
+       status,
+       metadata
+     FROM payments
+     WHERE order_id = ANY($1) OR (invoice_id IS NOT NULL AND invoice_id = ANY($2))`,
+    [orderIds, orderIdStrings]
+  );
+
+  const paymentsByOrder = new Map();
+  for (const pay of payRows) {
+    const key = pay.order_id != null ? String(pay.order_id) : String(pay.invoice_id);
+    if (!paymentsByOrder.has(key)) {
+      paymentsByOrder.set(key, []);
+    }
+    paymentsByOrder.get(key).push(pay);
+  }
+
+  for (const [key, ord] of orderMap.entries()) {
+    const pays = paymentsByOrder.get(key) || [];
+    if (pays.length > 0) {
+      let capturedRefundableSum = 0;
+      let refundableCapturesCount = 0;
+      let recognizedRefundablePaymentExists = false;
+
+      for (const pay of pays) {
+        const isCaptured = ['completed', 'success', 'paid'].includes(String(pay.status).toLowerCase());
+        const purpose = extractPaymentPurpose(pay.metadata);
+        const isRefundable = isPaymentPurposeRefundable(purpose, { orderId: key, paymentId: pay.id });
+
+        if (isRefundable) {
+          recognizedRefundablePaymentExists = true;
+          if (isCaptured) {
+            capturedRefundableSum += Number(pay.amount || 0);
+            refundableCapturesCount++;
+          }
+        }
+      }
+
+      if (recognizedRefundablePaymentExists) {
+        result.set(key, refundableCapturesCount === 0 ? 0 : roundMoney(capturedRefundableSum));
+        continue;
+      }
+
+      result.set(key, 0);
+      continue;
+    }
+
+    // Fallback: If no detached payments rows exist at all for this order
+    const paymentStatus = typeof ord === 'object' && ord !== null ? ord.payment_status : null;
+    const totalAmount = typeof ord === 'object' && ord !== null ? ord.total_amount : 0;
+    if (paymentStatus && ['completed', 'paid', 'success'].includes(String(paymentStatus).toLowerCase())) {
+      result.set(key, roundMoney(totalAmount));
+    } else {
+      result.set(key, 0);
+    }
+  }
+
+  return result;
+}
+
+/**
  * Returns verified captured payment amount for an order from the payments table.
  * If no payments rows exist but the order is marked 'completed', falls back to order.total_amount
  * (for legacy fixtures and environments without detached payment rows).
@@ -34,56 +126,8 @@ export async function getCapturedPaymentAmount(client, orderId, orderRow = null)
 
   if (!order) return 0;
 
-  const { rows: payRows } = await client.query(
-    `SELECT 
-       id,
-       amount,
-       status,
-       metadata
-     FROM payments
-     WHERE (order_id = $1 OR (order_id IS NULL AND invoice_id = $1::text))`,
-    [orderId]
-  );
-
-  if (payRows.length > 0) {
-    let capturedRefundableSum = 0;
-    let refundableCapturesCount = 0;
-    let recognizedRefundablePaymentExists = false;
-
-    for (const pay of payRows) {
-      const isCaptured = ['completed', 'success', 'paid'].includes(String(pay.status).toLowerCase());
-      const purpose = extractPaymentPurpose(pay.metadata);
-      const isRefundable = isPaymentPurposeRefundable(purpose, { orderId, paymentId: pay.id });
-
-      if (isRefundable) {
-        recognizedRefundablePaymentExists = true;
-        if (isCaptured) {
-          capturedRefundableSum += Number(pay.amount || 0);
-          refundableCapturesCount++;
-        }
-      }
-    }
-
-    // If recognized buyer-order payments exist for this order, their captured total governs.
-    // If none were captured (e.g. all attempts failed/pending), refundable captured amount is 0.
-    if (recognizedRefundablePaymentExists) {
-      if (refundableCapturesCount === 0) {
-        return 0;
-      }
-      return roundMoney(capturedRefundableSum);
-    }
-
-    // If only non-refundable auxiliary payments exist for this order (e.g. only seller pickup fee),
-    // they must not contribute to the buyer's refundable captured amount.
-    return 0;
-  }
-
-  // Fallback: If no detached payments rows exist at all for this order
-  if (['completed', 'paid', 'success'].includes(String(order.payment_status).toLowerCase())) {
-    return roundMoney(order.total_amount);
-  }
-
-  return 0;
+  const batchMap = await getCapturedPaymentAmountsBatch(client, [order]);
+  return batchMap.get(String(order.id)) || 0;
 }
 
 /**
@@ -219,6 +263,7 @@ export async function validateRefundEligibility(client, orderId, requestedAmount
 export default {
   roundMoney,
   getCapturedPaymentAmount,
+  getCapturedPaymentAmountsBatch,
   getOrderRefundAccounting,
   validateRefundEligibility
 };

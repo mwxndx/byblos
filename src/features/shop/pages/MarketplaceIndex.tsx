@@ -3,6 +3,7 @@ import { Button } from '@/shared/ui/button';
 import { Link } from 'react-router-dom';
 import { isNativeApp, getDevicePlatform } from '@/infrastructure/navigation/mobileApp';
 import { SEOHead } from '@/shared/components/SEOHead';
+import { buildOrganizationSchema, buildWebSiteSchema } from '@/shared/seo';
 import { GlobalAuthContext } from '@/features/auth/contexts/authContextObjects';
 
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=space.bybloshq.app';
@@ -155,6 +156,7 @@ const IndexPage = () => {
         description="The safer way to buy from businesses on social media. Byblos gives Nairobi sellers a trusted shop link, secure checkout, order management, delivery, receipts, refunds, and withdrawals."
         url="https://www.byblosafrica.site/"
         canonical="https://www.byblosafrica.site/"
+        schema={[buildOrganizationSchema(), buildWebSiteSchema()]}
       />
       <LandingHome />
     </>

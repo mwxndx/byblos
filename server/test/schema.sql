@@ -6296,3 +6296,19 @@ INSERT INTO public.financial_ledger (
 ) ON CONFLICT (sequence_number) DO NOTHING;
 
 SELECT pg_catalog.setval('public.financial_ledger_sequence_number_seq', 1, true);
+
+-- Performance Indexes on searched and sorted columns
+CREATE INDEX IF NOT EXISTS idx_product_orders_seller_status_created ON public.product_orders (seller_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_product_orders_buyer_created ON public.product_orders (buyer_id, created_at DESC) WHERE buyer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_product_orders_active_settlement ON public.product_orders (payment_status, status) WHERE payment_status = 'completed';
+CREATE INDEX IF NOT EXISTS idx_payments_order_status ON public.payments (order_id, status) WHERE order_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_payments_invoice_status ON public.payments (invoice_id, status) WHERE invoice_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_seller_status ON public.withdrawal_requests (seller_id, status, created_at DESC) WHERE seller_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_creator_status ON public.withdrawal_requests (creator_id, status, created_at DESC) WHERE creator_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_buyer_status ON public.withdrawal_requests (buyer_id, status, created_at DESC) WHERE buyer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_pending_status ON public.withdrawal_requests (status) WHERE status NOT IN ('completed', 'failed', 'rejected');
+CREATE INDEX IF NOT EXISTS idx_creator_earnings_creator_created ON public.creator_earnings (creator_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_creator_referral_earnings_creator_created ON public.creator_referral_earnings (creator_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_seller_creator_links_seller_status ON public.seller_creator_links (seller_id, status);
+CREATE INDEX IF NOT EXISTS idx_seller_creator_links_creator_status ON public.seller_creator_links (creator_id, status);
+

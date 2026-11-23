@@ -194,6 +194,10 @@ export const getProducts = async (req, res) => {
 export const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    const cacheKey = `product:public:${id}`;
+    const cachedData = await cacheService.get(cacheKey);
+    if (cachedData) return res.status(200).json(cachedData);
+
     const row = await publicCatalogRepository.findProductByIdWithSeller(id);
 
     if (!row) {
@@ -212,10 +216,14 @@ export const getProduct = async (req, res) => {
       physicalAddress: row.physical_address
     });
 
-    res.status(200).json({
+    const responseData = {
       status: 'success',
       data: { product }
-    });
+    };
+
+    await cacheService.set(cacheKey, responseData, 120); // 2 mins cache
+
+    res.status(200).json(responseData);
   } catch (error) {
     logger.error(`Error fetching product ${req.params.id}:`, { error: error.message });
     res.status(500).json({
@@ -259,6 +267,10 @@ export const getAesthetics = async (req, res) => {
 export const getSellerPublicInfo = async (req, res) => {
   try {
     const { id } = req.params;
+    const cacheKey = `seller:public:${id}`;
+    const cachedData = await cacheService.get(cacheKey);
+    if (cachedData) return res.status(200).json(cachedData);
+
     const seller = await sellerRepository.findPublicById(id);
 
     if (!seller) {
@@ -268,12 +280,16 @@ export const getSellerPublicInfo = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    const responseData = {
       status: 'success',
       data: {
         seller: sanitizePublicSeller(seller)
       }
-    });
+    };
+
+    await cacheService.set(cacheKey, responseData, 300); // 5 mins cache
+
+    res.status(200).json(responseData);
   } catch (error) {
     logger.error(`Error fetching seller ${req.params.id}:`, { error: error.message });
     res.status(500).json({

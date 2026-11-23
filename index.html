@@ -199,11 +199,9 @@
 
   <!-- Primary SEO -->
   <title>BYBLOS | Start and Run Your Business in Nairobi</title>
-  <meta name="title" content="ByblosHQ | Start and Run Your Business in Nairobi">
+  <meta name="title" content="Byblos | Start and Run Your Business in Nairobi">
   <meta name="description"
     content="Create a trusted shop link, sell from Instagram, TikTok, or WhatsApp, collect secure payments, manage orders, delivery, receipts, refunds, and withdrawals in one place.">
-  <meta name="keywords"
-    content="start business Nairobi, run business Nairobi, online shop Kenya, social commerce Kenya, sell on Instagram Kenya, WhatsApp business Kenya, TikTok seller Kenya, secure checkout Kenya, small business Kenya, byblos Kenya" />
   <meta name="author" content="Byblos" />
   <meta name="robots" content="index, follow" />
   <meta name="googlebot" content="index, follow" />
@@ -246,29 +244,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 
-  <!-- Canonical URL is set per-route by <SEOHead> (react-helmet-async), not
-       hardcoded here: this single static index.html is served for every route
-       (see vercel.json), so a fixed canonical would make every deep page
-       (/about, /shop/men, seller shops, …) declare the homepage as its
-       canonical and get dropped from the index as a duplicate. Pages without
-       SEOHead self-canonicalise to their own URL, and the apex→www redirect
-       keeps that on the www host. -->
-
-
   <!-- Open Graph -->
+  <meta property="og:site_name" content="Byblos">
   <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_KE">
   <meta property="og:url" content="https://www.byblosafrica.site/">
-  <meta property="og:title" content="Start and Run Your Business in Nairobi">
+  <meta property="og:title" content="Byblos | Start and Run Your Business in Nairobi">
   <meta property="og:description"
     content="Byblos gives Nairobi sellers a trusted shop link, secure checkout, order management, delivery support, receipts, refunds, and withdrawals.">
-  <meta property="og:image" content="https://www.byblosafrica.site/your-preview-image.png">
+  <meta property="og:image" content="https://www.byblosafrica.site/android-chrome-512x512.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:image:alt" content="Byblos — Social Commerce & Storefronts for Nairobi Sellers">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:site" content="@byblosafrica">
   <meta property="twitter:url" content="https://www.byblosafrica.site/">
-  <meta property="twitter:title" content="ByblosHQ | Start and Run Your Business in Nairobi">
+  <meta property="twitter:title" content="Byblos | Start and Run Your Business in Nairobi">
   <meta property="twitter:description"
     content="Create a trusted shop link, sell from social media, manage orders, delivery, receipts, refunds, and withdrawals in one place.">
+  <meta property="twitter:image" content="https://www.byblosafrica.site/android-chrome-512x512.png">
+  <meta property="twitter:image:alt" content="Byblos — Social Commerce & Storefronts for Nairobi Sellers">
 
   <!-- Structured Data -->
   <script type="application/ld+json">
@@ -279,43 +276,33 @@
       "url": "https://www.byblosafrica.site/",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://www.byblosafrica.site/shop?q={search_term_string}",
+        "target": "https://www.byblosafrica.site/?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     }
-    </script>
+  </script>
 
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Store",
-      "name": "Byblos - Business Operating App for Nairobi Sellers",
+      "@type": "Organization",
+      "name": "Byblos",
+      "alternateName": "ByblosHQ",
       "url": "https://www.byblosafrica.site/",
-      "description": "Byblos helps Nairobi sellers start and run a business with a trusted shop link, secure checkout, order management, delivery support, receipts, refunds, and withdrawals.",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Nairobi",
-        "addressRegion": "Nairobi",
-        "addressCountry": "KE"
-      },
-      "openingHoursSpecification": [
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-          "opens": "09:00",
-          "closes": "18:00"
-        },
-        {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": ["Saturday"],
-          "opens": "10:00",
-          "closes": "16:00"
-        }
+      "logo": "https://www.byblosafrica.site/android-chrome-512x512.png",
+      "description": "Social commerce and shop infrastructure for sellers and creators in Nairobi, Kenya.",
+      "sameAs": [
+        "https://twitter.com/byblosafrica",
+        "https://instagram.com/byblosafrica"
       ],
-      "priceRange": "KSh 500 - KSh 50,000",
-      "image": "https://www.byblosafrica.site/images/og-image.jpg"
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Support",
+        "areaServed": "KE",
+        "availableLanguage": ["en", "sw"]
+      }
     }
-    </script>
+  </script>
 </head>
 
 <body>

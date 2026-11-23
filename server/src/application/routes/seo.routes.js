@@ -8,19 +8,12 @@ router.get('/sitemap.xml', async (req, res) => {
     try {
         const baseUrl = (process.env.FRONTEND_URL || 'https://www.byblosafrica.site').replace(/\/$/, '');
 
-        // Static routes
+        // Static routes that genuinely exist in the application
         const staticRoutes = [
             { url: '/', changefreq: 'daily', priority: '1.0' },
-            { url: '/shop', changefreq: 'daily', priority: '0.9' },
-            { url: '/shop/women', changefreq: 'daily', priority: '0.8' },
-            { url: '/shop/men', changefreq: 'daily', priority: '0.8' },
-            { url: '/shop/shoes', changefreq: 'daily', priority: '0.8' },
-            { url: '/shop/vintage', changefreq: 'daily', priority: '0.8' },
-            { url: '/sell', changefreq: 'weekly', priority: '0.7' },
-            { url: '/about', changefreq: 'monthly', priority: '0.5' },
-            { url: '/contact', changefreq: 'monthly', priority: '0.5' },
-            { url: '/privacy', changefreq: 'yearly', priority: '0.3' },
-            { url: '/terms', changefreq: 'yearly', priority: '0.3' },
+            { url: '/privacy', changefreq: 'monthly', priority: '0.4' },
+            { url: '/terms', changefreq: 'monthly', priority: '0.4' },
+            { url: '/delete-account', changefreq: 'monthly', priority: '0.3' },
         ];
 
         // Fetch active approved sellers from sellers table
@@ -50,7 +43,7 @@ router.get('/sitemap.xml', async (req, res) => {
             if (!seller.shop_name) continue;
             const lastMod = seller.updated_at ? new Date(seller.updated_at).toISOString() : new Date().toISOString();
             xml += `  <url>\n`;
-            xml += `    <loc>${baseUrl}/shop/${encodeURIComponent(seller.shop_name)}</loc>\n`;
+            xml += `    <loc>${baseUrl}/${encodeURIComponent(seller.shop_name)}</loc>\n`;
             xml += `    <lastmod>${lastMod}</lastmod>\n`;
             xml += `    <changefreq>daily</changefreq>\n`;
             xml += `    <priority>0.8</priority>\n`;
@@ -67,18 +60,15 @@ router.get('/sitemap.xml', async (req, res) => {
     }
 });
 
-// Serve /robots.txt dynamically
+// Serve /robots.txt dynamically matching production public/robots.txt
 router.get('/robots.txt', (req, res) => {
     const baseUrl = (process.env.FRONTEND_URL || 'https://www.byblosafrica.site').replace(/\/$/, '');
     const robotsContent = `User-agent: *
 Allow: /
-Allow: /shop
-Allow: /shop/*
-Allow: /sell
-Allow: /about
-Allow: /contact
 Allow: /privacy
 Allow: /terms
+Allow: /delete-account
+Allow: /shop/*
 
 Disallow: /buyer/
 Disallow: /seller/

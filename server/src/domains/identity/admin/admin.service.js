@@ -20,97 +20,50 @@ class AdminService {
       return cachedStats;
     }
 
-    // Parallel queries
-    const queries = {
-      sellers: 'SELECT COUNT(*) FROM sellers WHERE user_id IS NOT NULL',
-      products: `
-        SELECT COUNT(*)
-        FROM products p
-        LEFT JOIN sellers s ON s.id = p.seller_id
-        WHERE s.user_id IS NOT NULL
-      `,
-      buyers: 'SELECT COUNT(*) FROM buyers WHERE user_id IS NOT NULL', // Active registered buyers
-      creators: 'SELECT COUNT(*) FROM creators WHERE user_id IS NOT NULL',
-      creatorPendingRequests: `
-        SELECT COUNT(*)
-        FROM seller_creator_invites
-        WHERE status = 'pending'
-          AND accepted_creator_id IS NOT NULL
-      `,
-      creatorEarnings: 'SELECT COALESCE(SUM(total_earnings + total_referral_earnings), 0) AS count FROM creators',
-      // Site-wide creator sales/click totals -- the admin creators tab used to
-      // sum these off its own (previously unpaginated) list response. Now that
-      // that endpoint returns one page at a time, these two site-wide sums
-      // live here instead, alongside the other dashboard-stats aggregates.
-      creatorTotalSales: 'SELECT COALESCE(SUM(total_sales), 0) AS count FROM creators',
-      creatorLinkClicks: "SELECT COALESCE(SUM(click_count), 0) AS count FROM seller_creator_links WHERE status = 'active'",
-      clients: 'SELECT COUNT(DISTINCT buyer_id) FROM product_orders WHERE payment_status = \'completed\' AND buyer_id IS NOT NULL',
-      orders: 'SELECT COUNT(*) FROM product_orders',
-      wishlists: 'SELECT COUNT(*) FROM wishlists',
-      activeOrders: `
-        SELECT COUNT(*)
-        FROM product_orders
-        WHERE payment_status = 'completed'
-          AND status::text NOT IN ('COMPLETED', 'CANCELLED', 'FAILED', 'EXPIRED', 'REFUNDED')
-      `,
-      lowStockProducts: `
-        SELECT COUNT(*)
-        FROM products p
-        LEFT JOIN sellers s ON s.id = p.seller_id
-        WHERE s.user_id IS NOT NULL
-          AND COALESCE(p.track_inventory, false) = true
-          AND COALESCE(p.quantity, 0) <= COALESCE(NULLIF(p.low_stock_threshold, 0), 10)
-      `,
-      pendingWithdrawals: `
-        SELECT COUNT(*)
-        FROM withdrawal_requests
-        WHERE status NOT IN ('completed', 'failed', 'rejected')
-      `,
-      // Site-wide pending payout value -- the admin withdrawals tab used to
-      // sum this off its own (previously ~500-row-capped, near-complete)
-      // list response. Now that endpoint returns one page at a time, this
-      // sum lives here instead, alongside the pendingWithdrawals count above.
-      pendingWithdrawalAmount: `
-        SELECT COALESCE(SUM(amount), 0) AS count
-        FROM withdrawal_requests
-        WHERE status NOT IN ('completed', 'failed', 'rejected')
-      `,
-      // Admin action queues surfaced on the dashboard's "needs attention" row
-      // and as tab badges. Refund requests awaiting a decision:
-      pendingRefundRequests: `
-        SELECT COUNT(*)
-        FROM refund_requests
-        WHERE status = 'pending'
-      `,
-      // Creator earnings held for self-dealing review (the Detections queue) --
-      // flagged rows across both earning tables (see creator.service
-      // listFlaggedEarnings, which reads the same flag).
-      pendingDetections: `
-        SELECT (
-          (SELECT COUNT(*) FROM creator_earnings WHERE metadata->>'flagged_for_review' = 'true')
-          + (SELECT COUNT(*) FROM creator_referral_earnings WHERE metadata->>'flagged_for_review' = 'true')
-        ) AS count
-      `
+    // Consolidated single query for all dashboard stats
+    const consolidatedQuery = `
+      SELECT
+        (SELECT COUNT(*) FROM sellers WHERE user_id IS NOT NULL) AS total_sellers,
+        (SELECT COUNT(*) FROM products p LEFT JOIN sellers s ON s.id = p.seller_id WHERE s.user_id IS NOT NULL) AS total_products,
+        (SELECT COUNT(*) FROM buyers WHERE user_id IS NOT NULL) AS total_buyers,
+        (SELECT COUNT(*) FROM creators WHERE user_id IS NOT NULL) AS total_creators,
+        (SELECT COUNT(*) FROM seller_creator_invites WHERE status = 'pending' AND accepted_creator_id IS NOT NULL) AS total_creatorpendingrequests,
+        (SELECT COALESCE(SUM(total_earnings + total_referral_earnings), 0) FROM creators) AS total_creatorearnings,
+        (SELECT COALESCE(SUM(total_sales), 0) FROM creators) AS total_creatortotalsales,
+        (SELECT COALESCE(SUM(click_count), 0) FROM seller_creator_links WHERE status = 'active') AS total_creatorlinkclicks,
+        (SELECT COUNT(DISTINCT buyer_id) FROM product_orders WHERE payment_status = 'completed' AND buyer_id IS NOT NULL) AS total_clients,
+        (SELECT COUNT(*) FROM product_orders) AS total_orders,
+        (SELECT COUNT(*) FROM wishlists) AS total_wishlists,
+        (SELECT COUNT(*) FROM product_orders WHERE payment_status = 'completed' AND status::text NOT IN ('COMPLETED', 'CANCELLED', 'FAILED', 'EXPIRED', 'REFUNDED')) AS total_activeorders,
+        (SELECT COUNT(*) FROM products p LEFT JOIN sellers s ON s.id = p.seller_id WHERE s.user_id IS NOT NULL AND COALESCE(p.track_inventory, false) = true AND COALESCE(p.quantity, 0) <= COALESCE(NULLIF(p.low_stock_threshold, 0), 10)) AS total_lowstockproducts,
+        (SELECT COUNT(*) FROM withdrawal_requests WHERE status NOT IN ('completed', 'failed', 'rejected')) AS total_pendingwithdrawals,
+        (SELECT COALESCE(SUM(amount), 0) FROM withdrawal_requests WHERE status NOT IN ('completed', 'failed', 'rejected')) AS total_pendingwithdrawalamount,
+        (SELECT COUNT(*) FROM refund_requests WHERE status = 'pending') AS total_pendingrefundrequests,
+        (SELECT (SELECT COUNT(*) FROM creator_earnings WHERE metadata->>'flagged_for_review' = 'true') + (SELECT COUNT(*) FROM creator_referral_earnings WHERE metadata->>'flagged_for_review' = 'true')) AS total_pendingdetections
+    `;
+
+    const statsRes = await pool.query(consolidatedQuery);
+    const r = statsRes.rows[0] || {};
+
+    const stats = {
+      total_sellers: Number.parseInt(r.total_sellers || 0, 10),
+      total_products: Number.parseInt(r.total_products || 0, 10),
+      total_buyers: Number.parseInt(r.total_buyers || 0, 10),
+      total_creators: Number.parseInt(r.total_creators || 0, 10),
+      total_creatorPendingRequests: Number.parseInt(r.total_creatorpendingrequests || 0, 10),
+      total_creatorEarnings: Number.parseFloat(r.total_creatorearnings || 0),
+      total_creatorTotalSales: Number.parseFloat(r.total_creatortotalsales || 0),
+      total_creatorLinkClicks: Number.parseInt(r.total_creatorlinkclicks || 0, 10),
+      total_clients: Number.parseInt(r.total_clients || 0, 10),
+      total_orders: Number.parseInt(r.total_orders || 0, 10),
+      total_wishlists: Number.parseInt(r.total_wishlists || 0, 10),
+      total_activeOrders: Number.parseInt(r.total_activeorders || 0, 10),
+      total_lowStockProducts: Number.parseInt(r.total_lowstockproducts || 0, 10),
+      total_pendingWithdrawals: Number.parseInt(r.total_pendingwithdrawals || 0, 10),
+      total_pendingWithdrawalAmount: Number.parseFloat(r.total_pendingwithdrawalamount || 0),
+      total_pendingRefundRequests: Number.parseInt(r.total_pendingrefundrequests || 0, 10),
+      total_pendingDetections: Number.parseInt(r.total_pendingdetections || 0, 10)
     };
-
-    const stats = {};
-
-    await Promise.all(
-      Object.entries(queries).map(async ([key, query]) => {
-        try {
-          const res = await pool.query(query);
-          const lowerKey = key.toLowerCase();
-          // Money sums (earnings/amount) can be fractional -- parseInt would
-          // silently truncate cents.
-          stats[`total_${key}`] = (lowerKey.includes('earnings') || lowerKey.includes('amount'))
-            ? Number.parseFloat(res.rows[0].count || 0)
-            : Number.parseInt(res.rows[0].count, 10);
-        } catch (e) {
-          logger.error(`Failed to count ${key}:`, e);
-          stats[`total_${key}`] = 0;
-        }
-      })
-    );
 
     // Fetch top 3 shops by total sales
     let topShops = [];

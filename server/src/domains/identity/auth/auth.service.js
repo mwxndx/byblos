@@ -565,9 +565,11 @@ class AuthService {
 
             let uncreditedRefund = 0;
             const ordersToMarkCredited = [];
+            const capturedAmountsMap = await refundAccountingService.getCapturedPaymentAmountsBatch(client, linkResult.rows);
+
             for (const ord of linkResult.rows) {
                 // Authoritative captured payment check: An unpaid order can NEVER produce refund credits
-                const capturedAmount = await refundAccountingService.getCapturedPaymentAmount(client, ord.id, ord);
+                const capturedAmount = capturedAmountsMap.get(String(ord.id)) || 0;
                 if (capturedAmount <= 0) {
                     continue;
                 }

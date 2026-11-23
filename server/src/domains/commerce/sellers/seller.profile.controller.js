@@ -139,6 +139,9 @@ export const updateProfile = async (req, res) => {
     if (seller?.shop_name) {
       await cacheService.delete(`seller:shop:${String(seller.shop_name).toLowerCase().trim()}`);
     }
+    if (sellerId) {
+      await cacheService.delete(`seller:public:${sellerId}`);
+    }
 
     res.status(200).json({ status: 'success', data: { seller: sanitizeSeller(seller) } });
   } catch (error) {

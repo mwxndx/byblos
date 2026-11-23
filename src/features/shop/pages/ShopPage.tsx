@@ -8,7 +8,7 @@ import { BagSheet } from '@/features/shop/components/BagSheet';
 import { ShopBagProductCard } from '@/features/shop/components/ShopBagProductCard';
 import type { Product, Seller } from '@/shared/types';
 import { isAesthetic } from '../utils/shopPage.shared';
-import { SEOHead } from '@/shared/components/SEOHead';
+import { SEOHead, buildStoreSchema, buildBreadcrumbSchema } from '@/shared/seo';
 import { ShopHero } from '../components/ShopHero';
 import { useShopPage } from './useShopPage';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
@@ -84,20 +84,36 @@ const ShopPage = () => {
     );
   }
 
+  const shopUrl = getShopUrl(routeShopName, 'https://www.byblosafrica.site');
+  const shopName = sellerInfo?.shopName || sellerInfo?.fullName || 'Shop';
+  const shopBio = sellerInfo?.bio || `Shop ${shopName} on Byblos. Browse quality items and order securely.`;
+  const shopImage = sellerInfo?.avatarUrl ? getImageUrl(sellerInfo.avatarUrl) : undefined;
+  const storeSchema = buildStoreSchema({
+    name: shopName,
+    description: shopBio,
+    image: shopImage,
+    url: shopUrl,
+    addressLocality: sellerInfo?.city || 'Nairobi',
+    addressRegion: 'Nairobi',
+    telephone: sellerInfo?.phone || undefined,
+  });
+  const breadcrumbSchema = buildBreadcrumbSchema([
+    { name: 'Home', url: '/' },
+    { name: shopName, url: shopUrl },
+  ]);
+
   return (
     <BagProvider seedProduct={bagAdd} shopSlug={routeShopName || sellerInfo?.slug || sellerInfo?.shopName}>
     <div
       className="shop-page-root min-h-screen transition-colors duration-200 bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)]"
     >
       <SEOHead
-        title={sellerInfo?.shopName || sellerInfo?.fullName || 'Shop'}
-        description={sellerInfo?.bio || `Shop ${sellerInfo?.shopName || 'products'} on Byblos. Browse quality items and order securely.`}
-        image={sellerInfo?.avatarUrl ? getImageUrl(sellerInfo.avatarUrl) : undefined}
-        // A shop is reachable at both /shop/:slug and the short link /:slug — pin
-        // the canonical to one www short link so the two paths don't compete as
-        // duplicates, and drop any ?creator= tracking param from the canonical.
-        url={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
-        canonical={getShopUrl(routeShopName, 'https://www.byblosafrica.site')}
+        title={shopName}
+        description={shopBio}
+        image={shopImage}
+        url={shopUrl}
+        canonical={shopUrl}
+        schema={[storeSchema, breadcrumbSchema]}
       />
       <div className="sticky top-0 z-50 bg-[var(--bg,#000000)]">
         <AppHeader
