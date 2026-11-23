@@ -148,7 +148,7 @@ describe('SellersGrid defense-in-depth', () => {
     expect(screen.queryByText('Shoe Palace')).not.toBeInTheDocument();
   });
 
-  it('renders shop cards in a two column layout', () => {
+  it('renders shop cards in a two column layout on mobile and expands to multi-column on desktop', () => {
     const mockSellers: Partial<ApiPublicSeller>[] = [
       { id: '1', shopName: 'Shop A', fullName: 'Seller A', status: 'active', is_active: true },
     ];
@@ -169,5 +169,7 @@ describe('SellersGrid defense-in-depth', () => {
 
     const grid = container.querySelector('.grid-cols-2');
     expect(grid).toBeInTheDocument();
+    expect(grid?.className).toContain('md:grid-cols-3');
+    expect(grid?.className).toContain('lg:grid-cols-4');
   });
 });

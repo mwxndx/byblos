@@ -16,7 +16,7 @@ interface SellersGridProps {
 const INITIAL_VISIBLE_SELLERS = 24;
 
 const SellerGridSkeleton = () => (
-    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-[760px] mx-auto">
+    <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4.5 w-full max-w-[760px] md:max-w-none mx-auto">
         <span className="sr-only">Loading shops…</span>
         {Array.from({ length: 6 }).map((_, index) => (
             <div
@@ -100,7 +100,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     }
 
     return (
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-[760px] mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4.5 w-full max-w-[760px] md:max-w-none mx-auto">
             {visibleSellers.map((seller) => (
                 <SellerBrandCard key={seller.id} seller={seller} isBuyer={isBuyer} />
             ))}
