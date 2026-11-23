@@ -6308,7 +6308,7 @@ CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_creator_status ON public.with
 CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_buyer_status ON public.withdrawal_requests (buyer_id, status, created_at DESC) WHERE buyer_id IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_pending_status ON public.withdrawal_requests (status) WHERE status NOT IN ('completed', 'failed', 'rejected');
 CREATE INDEX IF NOT EXISTS idx_creator_earnings_creator_created ON public.creator_earnings (creator_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_creator_referral_earnings_creator_created ON public.creator_referral_earnings (creator_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_creator_referral_earnings_referrer_created ON public.creator_referral_earnings (referrer_creator_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_seller_creator_links_seller_status ON public.seller_creator_links (seller_id, status);
 CREATE INDEX IF NOT EXISTS idx_seller_creator_links_creator_status ON public.seller_creator_links (creator_id, status);
 

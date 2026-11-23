@@ -43,8 +43,8 @@ CREATE INDEX IF NOT EXISTS idx_withdrawal_requests_pending_status
 CREATE INDEX IF NOT EXISTS idx_creator_earnings_creator_created 
   ON creator_earnings (creator_id, created_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_creator_referral_earnings_creator_created 
-  ON creator_referral_earnings (creator_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_creator_referral_earnings_referrer_created 
+  ON creator_referral_earnings (referrer_creator_id, created_at DESC);
 
 -- 5. Seller Creator Links: search & filter by status
 CREATE INDEX IF NOT EXISTS idx_seller_creator_links_seller_status 
