@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 82;
-  const defaultName = '1.0.82';
+  const defaultCode = 83;
+  const defaultName = '1.0.83';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Refined seller brand card profile photo framing with seamless circular centering and auto-zoom presentation.',
-      'Enhanced mobile safe-area viewport rendering and dynamic device status bar theming across light and dark modes.',
-      'Hardened backend high-concurrency connection pooling and multi-replica load balancing for smoother marketplace browsing.'
+      'Accelerated marketplace discovery with database indexing and eliminated N+1 queries for faster shop and product browsing.',
+      'Modernized SEO infrastructure with full Schema.org structured data, dynamic OpenGraph previews, and automated canonicalization.',
+      'Introduced responsive optimistic UI for instant order cancellations, wishlist updates, and notification actions.'
     ]
   };
 }
