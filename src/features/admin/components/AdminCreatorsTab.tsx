@@ -58,27 +58,27 @@ export const AdminCreatorsTab = ({
         </div>
       </CardHeader>
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 border-b border-separator bg-white/[0.012] p-4 sm:p-6 md:grid-cols-4 md:p-8">
-        <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/[0.06] p-3 sm:p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-yellow-200/70">Creators</p>
+        <div className="rounded-2xl border border-separator bg-fill p-3 sm:p-4">
+          <p className="text-xs font-medium text-label-3">Creators</p>
           <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{pagination.total.toLocaleString()}</p>
         </div>
-        <div className="rounded-2xl border border-lime-500/20 bg-lime-500/[0.06] p-3 sm:p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-lime-200/70">Creator sales</p>
+        <div className="rounded-2xl border border-separator bg-fill p-3 sm:p-4">
+          <p className="text-xs font-medium text-label-3">Creator sales</p>
           <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{totalCreatorSales.toLocaleString()}</p>
         </div>
-        <div className="rounded-2xl border border-cyan-500/20 bg-cyan-500/[0.06] p-3 sm:p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-cyan-200/70">Link clicks</p>
+        <div className="rounded-2xl border border-separator bg-fill p-3 sm:p-4">
+          <p className="text-xs font-medium text-label-3">Link clicks</p>
           <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">{totalCreatorLinkClicks.toLocaleString()}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.06] p-3 sm:p-4">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-200/70">Creator earnings</p>
+        <div className="rounded-2xl border border-separator bg-fill p-3 sm:p-4">
+          <p className="text-xs font-medium text-label-3">Creator earnings</p>
           <p className="mt-2 sm:mt-3 text-xl sm:text-2xl font-semibold text-label tabular-nums">KSh {totalCreatorEarnings.toLocaleString()}</p>
         </div>
       </div>
       <CardContent className="p-0">
         <div className="overflow-x-auto no-scrollbar touch-pan-x">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
+            <thead className="bg-fill text-xs font-medium text-label-3 uppercase tracking-wider">
               <tr>
                 <th className="px-5 md:px-8 py-4 md:py-6">Creator</th>
                 <th className="px-5 md:px-8 py-4 md:py-6 hidden lg:table-cell">Contact</th>
@@ -93,7 +93,7 @@ export const AdminCreatorsTab = ({
                 <tr key={creator.id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-5 md:px-8 py-4 md:py-6">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 md:h-10 md:w-10 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center font-semibold text-yellow-500 text-xs md:text-sm uppercase group-hover:scale-105 transition-transform">
+                      <div className="h-9 w-9 md:h-10 md:w-10 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center font-semibold text-yellow-500 text-xs md:text-sm uppercase">
                         {creator.name?.[0] || 'C'}
                       </div>
                       <div className="min-w-0">

@@ -4,22 +4,11 @@ import { Home, ArrowLeft } from '@/shared/ui/icons';
 const NotFound = () => {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
-      {/* Byblos ambient glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -left-40 top-1/3 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl" />
-        <div className="absolute -right-40 bottom-1/3 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl" />
-      </div>
-
       <div className="relative text-center max-w-lg mx-auto">
         {/* 404 Glyph */}
         <div className="mb-8">
           <span
-            className="text-[10rem] font-semibold leading-none"
-            style={{
-              background: 'linear-gradient(135deg, #facc15 0%, #d97706 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
+            className="text-[10rem] font-semibold leading-none text-yellow-400"
           >
             404
           </span>

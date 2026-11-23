@@ -135,19 +135,19 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
 
             <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
               <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">Target Devices</p>
+                <p className="text-xs text-label-3 font-medium">Target Devices</p>
                 <p className="text-lg sm:text-xl font-bold text-label mt-1">{result.targetedDevices}</p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">In-App Alerts</p>
+                <p className="text-xs text-label-3 font-medium">In-App Alerts</p>
                 <p className="text-lg sm:text-xl font-bold text-label mt-1">{result.inAppNotificationsCreated}</p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">FCM Sent</p>
+                <p className="text-xs text-label-3 font-medium">FCM Sent</p>
                 <p className="text-lg sm:text-xl font-bold text-green-400 mt-1">{result.fcmSent}</p>
               </div>
               <div className="p-2.5 sm:p-3 rounded-xl bg-fill border border-separator text-center">
-                <p className="text-[10px] sm:text-[11px] text-label-3 uppercase tracking-wider font-semibold">FCM Failed</p>
+                <p className="text-xs text-label-3 font-medium">FCM Failed</p>
                 <p className="text-lg sm:text-xl font-bold text-label-3 mt-1">{result.fcmFailed}</p>
               </div>
             </div>

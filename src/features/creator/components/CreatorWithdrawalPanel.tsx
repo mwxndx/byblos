@@ -149,13 +149,13 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Read
         <div className="mt-4 space-y-2 rounded-control border border-separator bg-[color-mix(in_srgb,var(--sys-blue)_12%,transparent)] p-3.5 text-xs text-label-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 font-medium text-sys-blue">
-              <Clock className="h-4 w-4 animate-pulse" />
+              <Clock className="h-4 w-4" />
               <span>T+2 clearance active (2 business days)</span>
             </div>
             <span className="rounded-full bg-[color-mix(in_srgb,var(--sys-blue)_18%,transparent)] px-2 py-0.5 text-[10px] font-medium text-sys-blue">T+2 holding</span>
           </div>
           <p className="text-[11px] leading-relaxed">
-            <strong className="font-medium text-label">{money(clearingBalance)}</strong> is clearing from recent earnings. Funds unlock for withdrawal on{' '}
+            <strong className="font-medium text-label">{money(clearingBalance)}</strong> is clearing from recent earnings. Funds become available for withdrawal on{' '}
             <span className="font-medium text-label">{formattedClearingDate}</span>
             {formattedClearingTime ? ` at ${formattedClearingTime}` : ''}.
           </p>
@@ -163,7 +163,7 @@ export function CreatorWithdrawalPanel({ creator, clearance, withdrawals }: Read
       ) : (
         <div className="mt-3 flex items-center gap-1.5 text-[11px] font-medium text-label-3">
           <Clock className="h-3.5 w-3.5 shrink-0" />
-          <span>Earnings unlock 2 business days (T+2) after each sale or referral.</span>
+          <span>Earnings clear 2 business days (T+2) after each sale or referral.</span>
         </div>
       )}
 

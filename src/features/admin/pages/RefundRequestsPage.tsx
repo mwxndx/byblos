@@ -245,10 +245,10 @@ export default function RefundRequestsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(34,197,94,0.1)]"
+          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-2xl"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-semibold text-label tracking-tight italic">AUTHORIZE<span className="text-green-500">.</span></DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-label tracking-tight">Authorize Refund</DialogTitle>
           </DialogHeader>
 
           {selectedRequest && (
@@ -330,10 +330,10 @@ export default function RefundRequestsPage() {
         <DialogContent
           role="dialog"
           aria-modal="true"
-          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-[0_0_100px_rgba(239,68,68,0.1)]"
+          className="bg-surface-1 border border-separator text-label sm:rounded-card p-10 max-w-md shadow-2xl"
         >
           <DialogHeader className="mb-6">
-            <DialogTitle className="text-3xl font-semibold text-label tracking-tight italic">VETO<span className="text-red-500">.</span></DialogTitle>
+            <DialogTitle className="text-2xl font-semibold text-label tracking-tight">Reject Refund</DialogTitle>
           </DialogHeader>
 
           {selectedRequest && (

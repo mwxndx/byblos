@@ -142,7 +142,7 @@ export function RequiredBusinessPhotoModal({
                   />
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center text-slate-600 dark:text-white/70">
-                    <span className="text-3xl font-extrabold text-yellow-600 dark:text-yellow-400">
+                    <span className="text-3xl font-semibold text-yellow-600 dark:text-yellow-400">
                       {fallbackInitial}
                     </span>
                   </div>

@@ -58,7 +58,7 @@ export function AdminEntityModals({
                   aria-modal="true"
                   aria-labelledby="buyer-modal-title"
                 >
-                  <div className="bg-surface-1 backdrop-blur-3xl border border-separator rounded-2xl md:rounded-card w-full max-w-4xl max-h-[95vh] flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.1)] scale-in-95 duration-300">
+                  <div className="bg-surface-1 backdrop-blur-3xl border border-separator rounded-2xl md:rounded-card w-full max-w-4xl max-h-[95vh] flex flex-col shadow-2xl scale-in-95 duration-300">
                     <div className="flex items-center justify-between p-5 md:p-8 border-b border-separator bg-white/[0.02]">
                       <div className="flex items-center gap-4">
                         <div className="h-10 w-10 md:h-14 md:w-14 rounded-xl md:rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-inner">
@@ -66,32 +66,32 @@ export function AdminEntityModals({
                         </div>
                         <div>
                           <h3 id="buyer-modal-title" className="text-xl md:text-2xl font-semibold text-label tracking-tight">{buyer.name}</h3>
-                          <p className="text-xs md:text-sm text-label-2 font-medium">Customer Intelligence Report</p>
+                          <p className="text-xs md:text-sm text-label-2 font-medium">Buyer Profile</p>
                         </div>
                       </div>
-                      <button onClick={closeBuyerModal} className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-fill hover:bg-white/10 flex items-center justify-center transition-all border border-separator group">
-                        <X className="h-5 w-5 md:h-6 md:w-6 text-label-2 group-hover:text-white group-hover:rotate-90 transition-all" />
+                      <button onClick={closeBuyerModal} className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-fill hover:bg-white/10 flex items-center justify-center transition-colors border border-separator group">
+                        <X className="h-5 w-5 md:h-6 md:w-6 text-label-2 group-hover:text-white transition-colors" />
                       </button>
                     </div>
                     <div className="overflow-auto flex-1 p-5 md:p-8 custom-scrollbar space-y-6 md:space-y-8">
                       {isLoadingBuyer ? (
                         <div className="flex flex-col items-center justify-center h-60 space-y-4">
                           <Loader2 className="h-12 w-12 text-cyan-500 animate-spin" />
-                          <p className="text-label-2 font-semibold uppercase tracking-widest text-xs">Analyzing User Patterns...</p>
+                          <p className="text-label-2 font-semibold uppercase tracking-wider text-xs">Loading buyer details...</p>
                         </div>
                       ) : (
                         <>
                           <Card className="bg-white/[0.02] border border-transparent rounded-[2rem] p-8">
-                            <h4 className="text-xs font-semibold text-label-3 uppercase tracking-widest mb-8">Identity Protocol</h4>
+                            <h4 className="text-xs font-semibold text-label-3 uppercase tracking-wider mb-8">Identity & Account Details</h4>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                               {[
-                                { label: 'Full Legal Name', value: buyer.name },
-                                { label: 'Primary Communications', value: buyer.email },
-                                { label: 'Mobile Link', value: buyer.phone },
-                                { label: 'Primary City', value: buyer.city },
-                                { label: 'Last Known Location', value: buyer.location },
-                                { label: 'Account Status', value: buyer.status, isBadge: true },
-                                { label: 'Joined Network', value: safeFormatDate(buyer.createdAt) }
+                                { label: 'Full Name', value: buyer.name },
+                                { label: 'Email', value: buyer.email },
+                                { label: 'Phone', value: buyer.phone },
+                                { label: 'City', value: buyer.city },
+                                { label: 'Location', value: buyer.location },
+                                { label: 'Status', value: buyer.status, isBadge: true },
+                                { label: 'Joined', value: safeFormatDate(buyer.createdAt) }
                               ].map((info) => (
                                 <div key={info.label} className="flex justify-between items-center py-2 border-b border-separator">
                                   <span className="text-label-3 text-sm font-medium">{info.label}</span>
@@ -118,8 +118,8 @@ export function AdminEntityModals({
                       )}
                     </div>
                     <div className="p-8 border-t border-separator bg-white/[0.02] flex justify-end">
-                      <Button onClick={closeBuyerModal} className="bg-white text-black font-semibold uppercase tracking-widest px-10 py-4 rounded-2xl hover:bg-gray-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                        Close Report
+                      <Button onClick={closeBuyerModal} className="bg-white text-black font-semibold uppercase tracking-wider px-10 py-4 rounded-2xl hover:bg-gray-200 transition-colors shadow-sm">
+                        Close
                       </Button>
                     </div>
                   </div>

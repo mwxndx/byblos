@@ -127,7 +127,7 @@ export function SellerOrderActions({
                                                         <div className="space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-yellow-400 hover:bg-yellow-300 text-black text-xs font-semibold shadow-sm transition-colors duration-200"
                                                                 onClick={() => onConfirmBooking(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -150,7 +150,7 @@ export function SellerOrderActions({
                                                         <div className="space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-green-600 hover:bg-green-500 text-white text-xs font-semibold shadow-sm transition-colors duration-200"
                                                                 onClick={() => onMarkServiceReady(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -163,7 +163,7 @@ export function SellerOrderActions({
                                                         <div className="space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors duration-200"
                                                                 onClick={() => onReadyForPickup(order.id, 'shop_ready')}
                                                                 disabled={isUpdating}
                                                             >
@@ -177,7 +177,7 @@ export function SellerOrderActions({
                                                             <div className="space-y-1.5">
                                                                 <Button
                                                                     size="sm"
-                                                                    className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-label text-xs font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+                                                                    className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-sm transition-colors duration-200"
                                                                     onClick={() => onReadyForPickup(order.id, 'shop_ready')}
                                                                     disabled={isUpdating}
                                                                 >
@@ -199,7 +199,7 @@ export function SellerOrderActions({
                                                         )}
                                                     {order.status === 'CONFIRMED' && (
                                                         <div className="space-y-2">
-                                                            <Badge className="w-full justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-label text-xs sm:text-sm font-semibold px-3 py-1 rounded-full shadow-sm">
+                                                            <Badge className="w-full justify-center bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white/70 text-xs sm:text-sm font-semibold px-3 py-1 rounded-full">
                                                                 <Clock className="h-3 w-3 mr-1" />
                                                                 Pending Buyer Completion
                                                             </Badge>

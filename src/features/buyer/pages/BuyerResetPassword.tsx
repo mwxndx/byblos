@@ -73,7 +73,7 @@ export function BuyerResetPassword() {
                     </Button>
 
                     <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-lg flex items-center justify-center shrink-0 shadow-sm">
+                        <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center shrink-0 shadow-sm">
                             <ShoppingBag className="h-4 w-4 text-slate-950" />
                         </div>
                         <h1 className="text-xl sm:text-2xl font-bold text-slate-950 dark:text-white tracking-tight">
@@ -92,7 +92,7 @@ export function BuyerResetPassword() {
                         className="rounded-2xl border border-slate-200 dark:border-white/12 shadow-2xl p-6 bg-white dark:bg-surface-1 text-slate-950 dark:text-white transition-colors duration-200"
                     >
                         <div className="text-center mb-6">
-                            <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <div className="w-12 h-12 mx-auto mb-3 bg-yellow-400 rounded-xl flex items-center justify-center shadow-sm">
                                 <Lock className="h-6 w-6 text-black" />
                             </div>
                             <h1 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white mb-1">Reset Password</h1>

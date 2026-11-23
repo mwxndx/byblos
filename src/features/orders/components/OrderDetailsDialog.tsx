@@ -110,7 +110,7 @@ export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage,
                       Includes 2% Byblos service charge{serviceCharge > 0 ? ` (${formatOrderCurrency(serviceCharge, order.currency)})` : ''}
                     </p>
                   </div>
-                  <span className="text-2xl font-black text-emerald-600 dark:text-emerald-200 text-right">
+                  <span className="text-2xl font-semibold tabular-nums text-emerald-600 dark:text-emerald-200 text-right">
                     {formatOrderCurrency((order as unknown as Record<string, unknown>).total_amount as number || order.totalAmount, order.currency)}
                   </span>
                 </div>

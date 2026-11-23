@@ -98,7 +98,7 @@ const MzigoLoginPage = () => {
         >
           <div className="space-y-2">
             <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-yellow-500 dark:text-yellow-300">Logistics</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Sign in</h2>
             <p className="text-sm font-medium leading-6 text-slate-600 dark:text-white/55">Door-to-door logistics dashboard.</p>
           </div>
 

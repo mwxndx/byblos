@@ -183,7 +183,7 @@ export const AdminWithdrawalsTab = ({
                             variant="outline"
                             size="sm"
                             disabled={processingRequestId === request.id}
-                            className="h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 rounded-xl border-separator bg-fill text-green-500 hover:bg-green-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            className="h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 rounded-xl border-separator bg-fill text-green-500 hover:bg-green-500 hover:text-black font-semibold uppercase tracking-wider text-[10px] border transition-colors disabled:opacity-50 disabled:pointer-events-none"
                             onClick={() => onAction(request.id, 'approved')}
                           >
                             {processingRequestId === request.id ? (
@@ -197,7 +197,7 @@ export const AdminWithdrawalsTab = ({
                             variant="outline"
                             size="sm"
                             disabled={processingRequestId === request.id}
-                            className="h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            className="h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-wider text-[10px] border transition-colors disabled:opacity-50 disabled:pointer-events-none"
                             onClick={() => onAction(request.id, 'rejected')}
                           >
                             {processingRequestId === request.id ? (
@@ -209,7 +209,7 @@ export const AdminWithdrawalsTab = ({
                           </Button>
                         </>
                       ) : (
-                        <span className="text-[9px] md:text-[10px] font-semibold text-gray-500 uppercase tracking-widest italic">
+                        <span className="text-xs font-medium text-label-3 capitalize">
                           {request.status}
                         </span>
                       )}

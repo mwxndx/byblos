@@ -217,7 +217,7 @@ export function RefundConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={!canSubmit}
-            className="bg-yellow-400 font-extrabold text-black hover:bg-yellow-300 shadow-sm rounded-xl disabled:opacity-40"
+            className="bg-yellow-400 font-semibold text-black hover:bg-yellow-300 shadow-sm rounded-xl disabled:opacity-40"
           >
             {isSubmitting ? (
               <>

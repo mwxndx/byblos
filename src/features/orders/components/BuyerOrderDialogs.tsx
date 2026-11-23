@@ -74,7 +74,7 @@ export function BuyerOrderDialogs({
         <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
-              <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                 <XCircle className="h-4 w-4 text-label" />
               </div>
               Cancel Order
@@ -102,7 +102,7 @@ export function BuyerOrderDialogs({
             <Button
               onClick={onCancelOrder}
               disabled={isCancelling === currentOrderId}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-red-600 hover:bg-red-500 text-white font-bold shadow-sm transition-colors duration-200"
             >
               {isCancelling === currentOrderId ? (
                 <>
@@ -123,7 +123,7 @@ export function BuyerOrderDialogs({
         <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
-              <div className={`w-8 h-8 bg-gradient-to-r ${currentIsService ? 'from-purple-500 to-indigo-500' : 'from-green-500 to-emerald-500'} rounded-full flex items-center justify-center`}>
+              <div className={`w-8 h-8 ${currentIsService ? 'bg-yellow-400' : 'bg-green-600'} rounded-full flex items-center justify-center`}>
                 <CheckCircle className="h-4 w-4 text-label" />
               </div>
               {currentIsService ? 'Confirm Service Completion' : 'Confirm Package Receipt'}
@@ -136,7 +136,7 @@ export function BuyerOrderDialogs({
           {showPhysicalReceiptLocation && (
             <div className="bg-blue-50 dark:bg-blue-500/15 border border-blue-200 dark:border-blue-400/30 rounded-xl p-4 my-3">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <Package className="h-4 w-4 text-label" />
                 </div>
                 <div>
@@ -161,7 +161,7 @@ export function BuyerOrderDialogs({
             <Button
               onClick={onConfirmReceipt}
               disabled={isConfirming === currentOrderId}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
+              className="bg-green-600 hover:bg-green-500 text-white font-bold shadow-sm transition-colors duration-200"
             >
               {isConfirming === currentOrderId ? (
                 <>

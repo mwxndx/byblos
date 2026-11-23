@@ -47,7 +47,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
       <CardContent className="p-0">
         <div className="overflow-x-auto no-scrollbar touch-pan-x">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
+            <thead className="bg-fill text-xs font-medium text-label-3 uppercase tracking-wider">
               <tr>
                 <th className="px-5 md:px-8 py-4 md:py-6">Buyer</th>
                 <th className="px-5 md:px-8 py-4 md:py-6 hidden lg:table-cell">Contact</th>
@@ -58,15 +58,15 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
             </thead>
             <tbody className="divide-y divide-separator">
               {filtered.map((buyer) => (
-                <tr key={buyer.id} className="hover:bg-white/[0.02] transition-all group">
+                <tr key={buyer.id} className="hover:bg-white/[0.02] transition-colors group">
                   <td className="px-5 md:px-8 py-4 md:py-6">
                     <div className="flex items-center gap-3 md:gap-5">
-                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-fill flex items-center justify-center border border-separator group-hover:border-cyan-500/30 transition-all shadow-inner">
-                        <User className="w-4 h-4 md:w-6 md:h-6 text-label-3 group-hover:text-cyan-500 transition-all" />
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-fill flex items-center justify-center border border-separator group-hover:border-cyan-500/30 transition-colors shadow-inner">
+                        <User className="w-4 h-4 md:w-6 md:h-6 text-label-3 group-hover:text-cyan-500 transition-colors" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm md:text-base font-semibold text-label tracking-tight truncate">{buyer.name}</p>
-                        <p className="text-[9px] md:text-[10px] font-semibold text-label-3 uppercase tracking-widest opacity-50 truncate">UID: {String(buyer.id).slice(0, 12)}</p>
+                        <p className="text-[9px] md:text-[10px] font-semibold text-label-3 uppercase tracking-wider opacity-50 truncate">UID: {String(buyer.id).slice(0, 12)}</p>
                       </div>
                     </div>
                   </td>
@@ -94,7 +94,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-cyan-500 hover:bg-cyan-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all"
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-cyan-500 hover:bg-cyan-500 hover:text-black font-semibold uppercase tracking-wider text-[9px] md:text-[10px] border transition-colors"
                         onClick={() => onView(buyer.id)}
                       >
                         <Eye className="h-3 md:h-3.5 w-3 md:w-3.5" />
@@ -104,7 +104,7 @@ export const AdminBuyersTab = ({ buyers, searchQuery, onSearchChange, pagination
                         variant="outline"
                         size="sm"
                         disabled={deletingId === String(buyer.user_id) || String(buyer.status).toLowerCase() === 'deleted' || !buyer.user_id}
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-wider text-[9px] md:text-[10px] border transition-colors disabled:opacity-50 disabled:pointer-events-none"
                         onClick={() => onDelete(buyer.user_id, 'buyer')}
                       >
                         {deletingId === String(buyer.user_id)

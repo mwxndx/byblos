@@ -239,7 +239,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
 
               <div className="bg-white dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-2xl p-4 space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                  <div className="h-2 w-2 rounded-full bg-green-500" />
                   <span className="text-xs font-semibold text-slate-950 dark:text-white">Secure escrow protection</span>
                 </div>
                 <p className="text-[11px] sm:text-xs text-slate-600 dark:text-white/60 leading-relaxed font-medium">

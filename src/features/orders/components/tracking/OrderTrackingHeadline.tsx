@@ -2,7 +2,7 @@ function getProgressBarColor(state: string, isDeliveredOrCompleted: boolean, rid
   if (state === 'attention') return 'bg-red-500';
   if (state === 'delayed') return 'bg-amber-500';
   if (isDeliveredOrCompleted) return 'bg-emerald-500';
-  if (riderMoving) return 'bg-gradient-to-r from-yellow-500 via-amber-300 to-yellow-400 animate-pulse';
+  if (riderMoving) return 'bg-yellow-400';
   return 'bg-yellow-500 dark:bg-yellow-400';
 }
 

@@ -105,7 +105,7 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
         <ChartContainer title="Top Shops" description="Highest total sales (Top 6 shops)" className="col-span-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 h-full">
             {dashboardState.topShops?.length ? dashboardState.topShops.slice(0, 6).map((shop: { id?: string | number; shopName?: string; name?: string; totalSales?: number; [key: string]: unknown }, index: number) => (
-              <div key={String(shop.id || index)} className="flex items-center justify-between p-3 sm:p-4 bg-white/[0.03] rounded-2xl border border-separator hover:bg-white/10 transition-all duration-300 group/shop">
+              <div key={String(shop.id || index)} className="flex items-center justify-between p-3 sm:p-4 bg-white/[0.03] rounded-2xl border border-separator hover:bg-white/10 transition-colors duration-200 group/shop">
                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base font-semibold italic shadow-inner shrink-0 ${
                     index === 0 ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' :

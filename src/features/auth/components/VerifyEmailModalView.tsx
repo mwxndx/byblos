@@ -26,7 +26,7 @@ export function VerifyEmailModalView({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl overflow-hidden shadow-2xl transition-colors duration-200">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-white to-gray-200" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-yellow-400" />
 
         <DialogHeader className="pt-6">
           <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-white/20">

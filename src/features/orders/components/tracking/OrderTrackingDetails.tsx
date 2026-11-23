@@ -127,7 +127,7 @@ export function OrderTrackingDetails({
           <p className="mt-3 flex items-start gap-2 text-xs text-slate-600 dark:text-white/70 border-t border-slate-200/60 dark:border-separator pt-2.5">
             <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-300" />
             {isSeller
-              ? 'Settlement Notice: Your earnings unlock automatically upon verified delivery receipt.'
+              ? 'Settlement Notice: Your earnings are released automatically upon verified delivery receipt.'
               : 'Mzigo Ego Central Hub handles verification, package security, and milestone tracking.'}
           </p>
         </div>

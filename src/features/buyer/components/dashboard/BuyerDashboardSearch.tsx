@@ -45,7 +45,7 @@ export function BuyerDashboardSearch({
           value={productSearchQuery}
           onChange={event => onProductSearchChange(event.target.value)}
           aria-label="Search products"
-          placeholder="Search products..."
+          placeholder="Search products"
           className="flex-1 bg-transparent border-none outline-none text-label placeholder:text-label-3 text-xs sm:text-sm font-medium"
         />
       </div>

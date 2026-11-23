@@ -239,7 +239,7 @@ export function SellerOrderDialogs({
                         <Button
                             onClick={markAsReadyForPickup}
                             disabled={isUpdating}
-                            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200 h-8 text-xs"
+                            className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-sm transition-colors duration-200 h-8 text-xs"
                         >
                             {isUpdating ? (
                                 <>
@@ -292,7 +292,7 @@ export function SellerOrderDialogs({
                         <Button
                             onClick={cancelOrder}
                             disabled={isUpdating}
-                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-label font-bold shadow-sm hover:shadow-md transition-all duration-200"
+                            className="bg-red-600 hover:bg-red-500 text-white font-bold shadow-sm transition-colors duration-200"
                         >
                             {isUpdating ? (
                                 <>

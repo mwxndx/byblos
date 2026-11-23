@@ -115,7 +115,7 @@ export function useAuthActions({
 
       toast.success('Login successful', {
         id: `${role}-login-success`,
-        description: 'Welcome back to Byblos.',
+        description: 'Signed in successfully.',
         duration: 2000,
       });
 

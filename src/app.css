@@ -1086,10 +1086,10 @@ button.btn-primary svg {
   .seller-field      { @apply h-10 rounded-xl border border-slate-200 bg-white text-slate-950 placeholder:text-slate-400
                                focus:border-[var(--theme-accent,#f5c518)] focus:ring-[var(--theme-accent,#f5c518)]
                                dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/40; }
-  .seller-eyebrow    { @apply text-[10px] font-black uppercase tracking-[0.28em]
+  .seller-eyebrow    { @apply text-[10px] font-semibold tracking-wide
                                text-[var(--theme-accent,#f5c518)]; }
-  .text-eyebrow      { @apply text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-white/60; }
-  .seller-heading    { @apply text-2xl font-black tracking-tight text-slate-950 dark:text-white; }
+  .text-eyebrow      { @apply text-[10px] font-semibold tracking-wide text-slate-500 dark:text-white/60; }
+  .seller-heading    { @apply text-2xl font-semibold tracking-tight text-slate-950 dark:text-white; }
   .seller-subtext    { @apply text-xs font-medium text-slate-600 dark:text-white/60 sm:text-sm; }
   .seller-label      { @apply text-xs font-medium text-slate-500 dark:text-white/50; }
   .seller-value      { @apply text-sm font-semibold text-slate-950 dark:text-white; }

@@ -16,7 +16,7 @@ export function IosNotificationProfileRow() {
   return (
     <div className="rounded-xl border border-slate-200 dark:border-separator bg-slate-100/70 dark:bg-white/[0.04] p-3 transition-colors">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-600 dark:text-white/70">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-600 dark:text-white/70">
           <Bell className="h-3.5 w-3.5 text-[#F5C518]" />
           <span>iOS Push Notifications</span>
         </div>

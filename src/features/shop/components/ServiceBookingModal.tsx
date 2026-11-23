@@ -230,7 +230,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                             <MapPin className="h-6 w-6 text-yellow-400" />
                         </div>
                         <div className="space-y-1 text-center">
-                            <DialogTitle className="text-xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 dark:from-white dark:to-white/60 bg-clip-text text-transparent">Update My Location</DialogTitle>
+                            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">Update My Location</DialogTitle>
                             <DialogDescription className="text-sm font-medium text-slate-500 dark:text-[#666]">
                                 This location will be saved to your profile.
                             </DialogDescription>

@@ -105,7 +105,7 @@ export function BuyerDashboardHeader({
               value={searchQuery}
               onChange={(e) => onSearchQueryChange?.(e.target.value)}
               aria-label="Search products or shops"
-              placeholder="Search products or shops..."
+              placeholder="Search products or shops"
               className="flex-1 bg-transparent border-none outline-none text-label placeholder:text-label-3 text-xs sm:text-sm font-medium"
             />
             {searchQuery && (

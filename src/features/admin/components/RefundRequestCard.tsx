@@ -66,7 +66,7 @@ export function RefundRequestCard({ request, getStatusBadge, formatCurrency, onA
       key={request.id}
       className={`bg-surface-1 backdrop-blur-2xl border ${
         isOverdueActive
-          ? 'border-red-500/40 shadow-[0_0_40px_rgba(239,68,68,0.08)]'
+          ? 'border-red-500/40 shadow-lg'
           : 'border-separator'
       } rounded-card overflow-hidden shadow-2xl group hover:border-white/20 transition-all duration-500`}
     >
@@ -117,7 +117,7 @@ export function RefundRequestCard({ request, getStatusBadge, formatCurrency, onA
               <CardContent className="p-8 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
-                    <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest opacity-40">Subject Identification</p>
+                    <p className="text-[10px] font-semibold text-label-3 uppercase tracking-wider opacity-60">Customer Details</p>
                     <div className="flex items-center gap-4 bg-white/[0.02] p-4 rounded-2xl border border-separator">
                       <div className="w-12 h-12 rounded-xl bg-fill flex items-center justify-center border border-separator shadow-inner">
                         <User className="h-5 w-5 text-label-2" />
@@ -127,21 +127,21 @@ export function RefundRequestCard({ request, getStatusBadge, formatCurrency, onA
                         <p className="text-[10px] font-bold text-label-3 lowercase opacity-60">{request.buyer_email}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-1">
+                    <div className="flex items-center gap-3 text-[10px] font-semibold text-label-3 uppercase tracking-wider ml-1">
                       <Phone className="h-3 w-3" />
                       {request.buyer_phone}
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest opacity-40">Capital Breakdown</p>
+                    <p className="text-[10px] font-semibold text-label-3 uppercase tracking-wider opacity-60">Payment Breakdown</p>
                     <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-5 shadow-inner">
-                      <p className="text-[10px] text-green-400/60 font-semibold uppercase tracking-widest mb-1">Requested Reclamation</p>
+                      <p className="text-[10px] text-green-400/60 font-semibold uppercase tracking-wider mb-1">Requested Refund</p>
                       <p className="text-3xl font-semibold text-green-400 tracking-tight tabular-nums">
                         {formatCurrency(request.amount)}
                       </p>
                     </div>
-                    <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest ml-1 opacity-60">
+                    <p className="text-[10px] font-semibold text-label-3 uppercase tracking-wider ml-1 opacity-60">
                       Total Allocation: <span className="text-label ml-2 tabular-nums">{formatCurrency(request.buyer_current_refunds)}</span>
                     </p>
                   </div>
@@ -150,16 +150,16 @@ export function RefundRequestCard({ request, getStatusBadge, formatCurrency, onA
                 <div className="pt-6 border-t border-separator space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest opacity-40 mb-3">Protocol</p>
+                      <p className="text-[10px] font-semibold text-label-3 uppercase tracking-wider opacity-60 mb-3">Method</p>
                       <div className="p-4 bg-white/[0.02] rounded-2xl border border-separator text-xs font-bold text-label tracking-tight">
                         {request.payment_method}
                       </div>
                     </div>
                     <div>
-                      <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest opacity-40 mb-3">Endpoint Meta</p>
+                      <p className="text-[10px] font-semibold text-label-3 uppercase tracking-wider opacity-60 mb-3">Payment Gateway</p>
                       <div className="p-4 bg-white/[0.02] rounded-2xl border border-separator space-y-2">
-                        {details.phone && <p className="text-xs font-bold text-label-2">📱 {details.phone}</p>}
-                        {details.name && <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest">{details.name}</p>}
+                        {details.phone && <p className="text-xs font-bold text-label-2">{details.phone}</p>}
+                        {details.name && <p className="text-[10px] font-semibold text-label-3 uppercase tracking-wider">{details.name}</p>}
                         {!details.phone && !details.name && <p className="text-xs font-bold text-gray-600">Standard M-Pesa</p>}
                       </div>
                     </div>

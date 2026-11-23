@@ -177,7 +177,7 @@ const ShopPage = () => {
                 "bg-[var(--byblos-surface,#ffffff)] text-[var(--byblos-text,#0f0f0e)] placeholder:text-[var(--byblos-muted)]",
                 "focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 shadow-sm"
               )}
-              placeholder="Search products..."
+              placeholder="Search products"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

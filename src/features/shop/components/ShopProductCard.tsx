@@ -138,7 +138,7 @@ export function ShopProductCard({
 
           {/* Sleek horizontal watermark banner running across the center */}
           <div className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center py-1 bg-black/21 backdrop-blur-[1px]">
-            <p className="w-full text-center text-[10px] sm:text-xs font-normal uppercase tracking-widest text-white/48 drop-shadow-md truncate px-2 select-none">
+            <p className="w-full text-center text-[10px] sm:text-xs font-normal uppercase tracking-wider text-white/48 drop-shadow-md truncate px-2 select-none">
               @{product.seller?.shopName || product.seller?.fullName || 'Shop'} • Byblos
             </p>
           </div>

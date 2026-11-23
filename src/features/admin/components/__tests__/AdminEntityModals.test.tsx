@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { AdminEntityModals } from '../AdminEntityModals';
 import type { AdminBuyer } from '../../types/dashboard';
 
-describe('AdminEntityModals — Customer Intelligence Report', () => {
+describe('AdminEntityModals — Buyer Profile', () => {
   const deletedBuyer: AdminBuyer = {
     id: 24,
     user_id: 38,
@@ -29,7 +29,7 @@ describe('AdminEntityModals — Customer Intelligence Report', () => {
       />
     );
 
-    expect(screen.getByText('Customer Intelligence Report')).toBeInTheDocument();
+    expect(screen.getByText('Buyer Profile')).toBeInTheDocument();
     expect(screen.getAllByText('Deleted user').length).toBeGreaterThanOrEqual(1);
 
     const statusBadge = screen.getByText('deleted');

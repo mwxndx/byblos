@@ -139,7 +139,7 @@ export default function CreatorLogin() {
       <div className="mx-auto flex flex-1 w-full max-w-md flex-col px-4 py-5 min-h-[calc(100dvh-4rem)] min-h-[calc(100svh-4rem)] sm:min-h-[calc(100dvh-5rem)]">
         <form onSubmit={handleSubmit} className="my-auto w-full space-y-5 rounded-[2rem] border border-black/[0.08] dark:border-separator bg-white dark:bg-surface-1 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] transition-colors duration-200">
           <div className="space-y-1.5 text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Welcome back.</h2>
+            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">Sign in</h2>
           </div>
           <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" id="email" name="email" autoComplete="email" aria-label="Email" placeholder="Email" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <div className="relative">

@@ -58,7 +58,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionS
                   aria-modal="true"
                   aria-labelledby="seller-modal-title"
                 >
-                  <div className="bg-surface-1 backdrop-blur-3xl border border-separator rounded-2xl md:rounded-card w-full max-w-6xl max-h-[95dvh] flex flex-col shadow-[0_0_50px_rgba(245,158,11,0.1)] scale-in-95 duration-300">
+                  <div className="bg-surface-1 backdrop-blur-3xl border border-separator rounded-2xl md:rounded-card w-full max-w-6xl max-h-[95dvh] flex flex-col shadow-2xl scale-in-95 duration-300">
                     <div className="flex items-center justify-between p-5 md:p-8 border-b border-separator bg-white/[0.02]">
                       <div className="flex items-center gap-4">
                         <div className="h-14 w-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 shadow-inner">
@@ -75,8 +75,8 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionS
                           </div>
                         </div>
                       </div>
-                      <button onClick={onClose} className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-fill hover:bg-white/10 flex items-center justify-center transition-all border border-separator group">
-                        <X className="h-5 w-5 md:h-6 md:w-6 text-label-2 group-hover:text-white group-hover:rotate-90 transition-all" />
+                      <button onClick={onClose} className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-fill hover:bg-white/10 flex items-center justify-center transition-colors border border-separator group">
+                        <X className="h-5 w-5 md:h-6 md:w-6 text-label-2 group-hover:text-white transition-colors" />
                       </button>
                     </div>
                     <div className="overflow-auto flex-1 p-5 md:p-8 custom-scrollbar space-y-6 md:space-y-8">

@@ -105,7 +105,7 @@ export function BuyerRegister() {
           {isRegistered ? (
             <div className="text-center py-6 space-y-4">
               <div className="mx-auto flex items-center justify-center pb-2">
-                <Mail className="h-14 w-14 text-slate-900 dark:text-white animate-pulse" />
+                <Mail className="h-14 w-14 text-slate-900 dark:text-white" />
               </div>
               <div className="space-y-1.5">
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-white tracking-tight">Check your email</h3>

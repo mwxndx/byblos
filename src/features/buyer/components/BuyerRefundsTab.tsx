@@ -136,7 +136,7 @@ export function BuyerRefundsTab({ refundAmount }: Readonly<{ refundAmount: numbe
       )}
       {!isLoadingPending && !hasPendingRequest && isClearing && (
         <div className="flex items-center gap-2 rounded-xl border border-blue-400/25 bg-blue-50 p-3 text-xs font-medium text-blue-900 dark:bg-blue-500/10 dark:text-blue-200">
-          <Clock className="h-4 w-4 animate-pulse" />
+          <Clock className="h-4 w-4" />
           <span>
             <strong>{formatCurrency(clearingBalance)}</strong> is clearing under the T+2 holding period. Next available {nextDate}
             {nextTime ? ` at ${nextTime}` : ''}.

@@ -230,12 +230,12 @@ export const SellerRegistrationSteps = ({
                     setCurrentStep(4); // Move directly to verification
                   }}
                   variant="ghost"
-                  className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-all group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill uppercase tracking-wider bg-slate-50 dark:bg-fill text-center"
+                  className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-colors group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill bg-slate-50 dark:bg-fill text-center"
                 >
-                  <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Globe className="h-8 w-8 text-slate-500 dark:text-zinc-400 group-hover:text-slate-950 dark:group-hover:text-white" />
+                  <div className="flex items-center justify-center">
+                    <Globe className="h-8 w-8 text-slate-500 dark:text-zinc-400 group-hover:text-slate-950 dark:group-hover:text-white transition-colors" />
                   </div>
-                  <span className="font-bold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
+                  <span className="font-semibold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
                     Online Only
                   </span>
                 </Button>
@@ -243,12 +243,12 @@ export const SellerRegistrationSteps = ({
                   type="button"
                   onClick={() => setHasPhysicalShop(true)}
                   variant="ghost"
-                  className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-all group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill uppercase tracking-wider bg-slate-50 dark:bg-fill text-center"
+                  className="min-h-[100px] h-auto flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl transition-colors group active:scale-95 border border-slate-200 dark:border-separator hover:bg-slate-100 dark:hover:bg-fill bg-slate-50 dark:bg-fill text-center"
                 >
-                  <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Store className="h-8 w-8 text-slate-800 dark:text-white" />
+                  <div className="flex items-center justify-center">
+                    <Store className="h-8 w-8 text-slate-800 dark:text-white group-hover:text-yellow-400 transition-colors" />
                   </div>
-                  <span className="font-bold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
+                  <span className="font-semibold text-[10px] sm:text-xs text-slate-600 dark:text-label-2 group-hover:text-slate-950 dark:group-hover:text-white transition-colors leading-tight break-words">
                     Have a Shop
                   </span>
                 </Button>
