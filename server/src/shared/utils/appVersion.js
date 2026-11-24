@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 83;
-  const defaultName = '1.0.83';
+  const defaultCode = 84;
+  const defaultName = '1.0.84';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Accelerated marketplace discovery with database indexing and eliminated N+1 queries for faster shop and product browsing.',
-      'Modernized SEO infrastructure with full Schema.org structured data, dynamic OpenGraph previews, and automated canonicalization.',
-      'Introduced responsive optimistic UI for instant order cancellations, wishlist updates, and notification actions.'
+      'Fixed an infinite loading hang during native Android sign-in across buyer, seller, and creator accounts.',
+      'Corrected Android system status bar icon contrast so time, network, and battery indicators remain crisp in both light and dark modes.',
+      'Added automated native Android authentication and theme status-bar regression coverage for faster, more reliable releases.'
     ]
   };
 }

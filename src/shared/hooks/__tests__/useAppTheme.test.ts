@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { Style } from '@capacitor/status-bar';
 import {
   applyResolvedTheme,
   readScopePref,
@@ -6,15 +7,37 @@ import {
   writeScopePref,
 } from '../useAppTheme';
 
+const { mockSetStyle, mockSetBackgroundColor } = vi.hoisted(() => ({
+  mockSetStyle: vi.fn().mockResolvedValue(undefined),
+  mockSetBackgroundColor: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('@capacitor/status-bar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@capacitor/status-bar')>();
+  return {
+    ...actual,
+    StatusBar: {
+      setStyle: mockSetStyle,
+      setBackgroundColor: mockSetBackgroundColor,
+    },
+  };
+});
+
 describe('useAppTheme & Theme Synchronization', () => {
   beforeEach(() => {
     localStorage.clear();
+    mockSetStyle.mockClear();
+    mockSetBackgroundColor.mockClear();
     document.documentElement.className = '';
     document.documentElement.removeAttribute('data-theme');
     document.head.innerHTML = `
       <meta name="theme-color" content="#000000" id="theme-color-meta">
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     `;
+  });
+
+  afterEach(() => {
+    delete (window as unknown as { Capacitor?: unknown }).Capacitor;
   });
 
   it('resolves explicit light and dark themes accurately', () => {
@@ -76,5 +99,28 @@ describe('useAppTheme & Theme Synchronization', () => {
 
     localStorage.setItem('byblos-theme-buyer', 'light');
     expect(readScopePref('buyer')).toBe('light');
+  });
+
+  it('sets StatusBar Style.Light in light mode and Style.Dark in dark mode on native Android so icons remain visible', async () => {
+    (window as unknown as { Capacitor?: unknown }).Capacitor = {
+      isNative: true,
+      isNativePlatform: () => true,
+      getPlatform: () => 'android',
+    };
+
+    applyResolvedTheme('light');
+    await vi.waitFor(() => {
+      expect(mockSetStyle).toHaveBeenCalledWith({ style: Style.Light });
+      expect(mockSetBackgroundColor).toHaveBeenCalledWith({ color: '#FFFFFF' });
+    });
+
+    mockSetStyle.mockClear();
+    mockSetBackgroundColor.mockClear();
+
+    applyResolvedTheme('dark');
+    await vi.waitFor(() => {
+      expect(mockSetStyle).toHaveBeenCalledWith({ style: Style.Dark });
+      expect(mockSetBackgroundColor).toHaveBeenCalledWith({ color: '#000000' });
+    });
   });
 });

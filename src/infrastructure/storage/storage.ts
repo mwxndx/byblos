@@ -24,9 +24,14 @@ const LEGACY_AUTH_KEYS = [
   'mzigoLogisticsToken',
 ] as const;
 
-async function getSecureStorage() {
+// Never return the Capacitor plugin Proxy from an `async` function: JavaScript
+// Promise resolution probes `.then` on the returned object, which invokes the
+// Proxy's synthetic `then()` method and hangs or rejects with UNIMPLEMENTED.
+async function withSecureStorage<T>(
+  fn: (secureStorage: typeof import('@aparajita/capacitor-secure-storage').SecureStorage) => Promise<T>
+): Promise<T> {
   const { SecureStorage } = await import('@aparajita/capacitor-secure-storage');
-  return SecureStorage;
+  return fn(SecureStorage);
 }
 
 export const storage = {
@@ -41,8 +46,7 @@ export const storage = {
 
     // 1. Try native Keystore-backed SecureStorage first
     try {
-      const SecureStorage = await getSecureStorage();
-      const val = await SecureStorage.getItem(key);
+      const val = await withSecureStorage((s) => s.getItem(key));
       if (val !== null && val !== undefined) {
         return String(val);
       }
@@ -55,8 +59,7 @@ export const storage = {
       const { value } = await Preferences.get({ key });
       if (value !== null && value !== undefined) {
         try {
-          const SecureStorage = await getSecureStorage();
-          await SecureStorage.setItem(key, value);
+          await withSecureStorage((s) => s.setItem(key, value));
           await Preferences.remove({ key });
         } catch {
           // ignore migration write failure
@@ -86,8 +89,7 @@ export const storage = {
 
     // On native Android/iOS, write exclusively to Keystore-backed SecureStorage
     try {
-      const SecureStorage = await getSecureStorage();
-      await SecureStorage.setItem(key, value);
+      await withSecureStorage((s) => s.setItem(key, value));
       await Preferences.remove({ key }).catch(() => {});
     } catch {
       await Preferences.set({ key, value }).catch(() => {});
@@ -105,7 +107,7 @@ export const storage = {
     if (!isNativeApp()) return;
 
     await Promise.all([
-      getSecureStorage().then((s) => s.removeItem(key)).catch(() => {}),
+      withSecureStorage((s) => s.removeItem(key)).catch(() => {}),
       Preferences.remove({ key }).catch(() => {}),
     ]);
   },
@@ -121,7 +123,7 @@ export const storage = {
     if (!isNativeApp()) return;
 
     await Promise.all([
-      getSecureStorage().then((s) => s.clear()).catch(() => {}),
+      withSecureStorage((s) => s.clear()).catch(() => {}),
       Preferences.clear().catch(() => {}),
     ]);
   }
