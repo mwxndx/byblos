@@ -59,6 +59,14 @@ export function DashboardSkeleton() {
 
       {/* Floating Navigation Bar Skeleton */}
       <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-40"
+        style={{
+          height: 'calc(5.25rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+          background: 'linear-gradient(to top, var(--byblos-bg, #000000) 32%, transparent 100%)',
+        }}
+      />
+      <div
         className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-12 sm:h-13 rounded-[48px] sm:rounded-full border border-slate-300 dark:border-white/20 dashboard-floating-nav bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl px-4 flex items-center justify-between"
         style={{ bottom: 'max(1.125rem, calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px))))' }}
       >
