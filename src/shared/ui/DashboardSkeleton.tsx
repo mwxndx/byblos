@@ -60,7 +60,7 @@ export function DashboardSkeleton() {
       {/* Floating Navigation Bar Skeleton */}
       <div
         className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-12 sm:h-13 rounded-[48px] sm:rounded-full border border-slate-300 dark:border-white/20 dashboard-floating-nav bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl px-4 flex items-center justify-between"
-        style={{ bottom: 'calc(1rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+        style={{ bottom: 'max(0.75rem, var(--sab, env(safe-area-inset-bottom, 0px)))' }}
       >
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton key={i} className="h-6 w-6 rounded-md" />

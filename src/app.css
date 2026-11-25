@@ -49,13 +49,13 @@ body,
 @media (display-mode: standalone), (display-mode: fullscreen) {
     :root {
         --sat: max(env(safe-area-inset-top, 0px), 0px);
-        --sab: max(env(safe-area-inset-bottom, 0px), 20px);
+        --sab: max(env(safe-area-inset-bottom, 0px), 0px);
     }
 }
 
 html.pwa-standalone {
     --sat: max(env(safe-area-inset-top, 0px), 0px);
-    --sab: max(env(safe-area-inset-bottom, 0px), 20px);
+    --sab: max(env(safe-area-inset-bottom, 0px), 0px);
 }
 
 /* ── iOS Standalone PWA Status Bar Scrim for Light Mode ──
