@@ -33,7 +33,7 @@ export function BuyerBottomNav({
   return (
     <nav
       className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-[48px] sm:rounded-full border border-slate-300 dark:border-white/20 dashboard-floating-nav bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md px-2 py-1.5 transition-colors duration-200"
-      style={{ bottom: 'max(0.75rem, var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+      style={{ bottom: 'max(1.125rem, calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px))))' }}
       aria-label="Buyer navigation"
     >
       <div className="flex h-12 sm:h-13 items-center justify-between w-full">

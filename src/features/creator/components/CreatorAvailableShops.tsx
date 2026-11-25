@@ -142,7 +142,7 @@ export function CreatorAvailableShops({ searchQuery = '' }: Readonly<CreatorAvai
 
                 <div className="mt-5 flex items-center gap-2 border-t border-separator pt-3">
                   <Button asChild variant="outline" className="h-9 flex-1 text-xs">
-                    <Link to={previewUrl} target="_blank" rel="noopener noreferrer">
+                    <Link to={previewUrl}>
                       <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
                       Preview shop
                     </Link>

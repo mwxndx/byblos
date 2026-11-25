@@ -42,7 +42,7 @@ export default function CreatorDashboard() {
   useThemeScope('creator');
 
   const [analysisPeriod, setAnalysisPeriod] = useState<AnalysisPeriod>('monthly');
-  const [tab, setTab] = useState<DashboardTab>('performance');
+  const [tab, setTab] = useState<DashboardTab>('shops');
   const [respondingRequestId, setRespondingRequestId] = useState<number | null>(null);
   const [leavingShopSellerId, setLeavingShopSellerId] = useState<number | null>(null);
   const [leavingBusinessSellerId, setLeavingBusinessSellerId] = useState<number | null>(null);

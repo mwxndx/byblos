@@ -22,11 +22,14 @@ describe('CreatorDashboardTabs — Floating Navigation Bar', () => {
     expect(nav.className).toContain('rounded-[48px]');
     expect(nav).toHaveClass('border', 'border-slate-300', 'dark:border-white/20', 'dashboard-floating-nav');
 
-    // All 4 tabs present
-    expect(screen.getByRole('button', { name: 'Performance' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Withdrawals' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Shops' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Notifications' })).toBeInTheDocument();
+    // All 4 tabs present in order: Shops, Performance, Withdrawals, Notifications
+    const tabButtons = screen.getAllByRole('button');
+    expect(tabButtons.map((btn) => btn.getAttribute('aria-label'))).toEqual([
+      'Shops',
+      'Performance',
+      'Withdrawals',
+      'Notifications',
+    ]);
 
     // Badges
     expect(screen.getByText('2')).toBeInTheDocument();
