@@ -97,7 +97,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                             <div className="space-y-1.5">
                                 <Label htmlFor="service-time" className="text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-[#666]">Time</Label>
                                 <Select value={time} onValueChange={setTime}>
-                                    <SelectTrigger id="service-time" className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-transparent text-base sm:text-sm font-medium focus:ring-1 focus:ring-yellow-400 transition-all text-slate-950 dark:text-white">
+                                    <SelectTrigger id="service-time" className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-transparent text-base sm:text-sm font-medium focus:ring-1 focus:ring-yellow-400 transition-[transform,background-color,border-color,color,box-shadow,opacity] text-slate-950 dark:text-white">
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-4 h-4 text-slate-500 dark:text-[#666]" />
                                             <SelectValue placeholder="Select time" />
@@ -135,7 +135,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                                                 </Button>
                                             </div>
                                         ) : (
-                                            <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/5 hover:border-slate-200 dark:border-white/20 transition-all group">
+                                            <div className="flex items-start gap-4 p-4 bg-slate-100 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/5 hover:border-slate-200 dark:border-white/20 transition-[transform,background-color,border-color,color,box-shadow,opacity] group">
                                                 <div className="w-10 h-10 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-yellow-400/10 transition-colors">
                                                     <MapPin className="h-5 w-5 text-slate-500 dark:text-[#666] group-hover:text-yellow-400" />
                                                 </div>
@@ -159,7 +159,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                                         {!isShopless ? (
                                             // Always use seller profile address for In-Store (Task BUG-SHOP-12)
                                             <div
-                                                className="flex items-center gap-4 p-4 bg-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.1)] rounded-3xl border-2 border-yellow-400 transition-all cursor-default"
+                                                className="flex items-center gap-4 p-4 bg-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.1)] rounded-3xl border-2 border-yellow-400 transition-[transform,background-color,border-color,color,box-shadow,opacity] cursor-default"
                                             >
                                                 <div className="w-10 h-10 bg-black/10 rounded-2xl flex items-center justify-center shrink-0">
                                                     <MapPin className="h-5 w-5 text-black" />
@@ -205,7 +205,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                         onClick={handleConfirm}
                         disabled={!isValid}
                         aria-describedby={!isValid ? 'booking-disabled-reason' : undefined}
-                        className="btn-standard w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 font-bold text-sm shadow-md disabled:opacity-50 transition-all active:scale-[0.98]"
+                        className="btn-standard w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 font-bold text-sm shadow-md disabled:opacity-50 transition-[transform,background-color,border-color,color,box-shadow,opacity] active:scale-[0.98]"
                     >
                         Confirm Booking
                     </Button>
@@ -224,7 +224,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
             </DialogContent>
 
             <Dialog open={isChangingLocation} onOpenChange={setIsChangingLocation}>
-                <DialogContent className="flex flex-col w-[95vw] max-w-[450px] max-h-[90dvh] gap-0 p-0 overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/5 shadow-2xl bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white z-[60]">
+                <DialogContent className="flex flex-col w-[95vw] max-w-[450px] max-h-[90dvh] gap-0 p-0 overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/5 shadow-2xl bg-white dark:bg-[#0a0a0a] text-slate-900 dark:text-white z-[110]">
                     <DialogHeader className="p-6 pb-2 shrink-0 space-y-4 pt-8">
                         <div className="mx-auto w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center">
                             <MapPin className="h-6 w-6 text-yellow-400" />
@@ -253,7 +253,7 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
                         <Button
                             onClick={saveLocationToProfile}
                             disabled={isUpdatingProfile || !buyerLocation?.address}
-                            className="btn-standard w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 font-bold text-sm shadow-md disabled:opacity-50 transition-all active:scale-[0.98]"
+                            className="btn-standard w-full h-12 rounded-xl bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 font-bold text-sm shadow-md disabled:opacity-50 transition-[transform,background-color,border-color,color,box-shadow,opacity] active:scale-[0.98]"
                         >
                             {isUpdatingProfile ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                             Save & Use Location

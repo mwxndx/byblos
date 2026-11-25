@@ -23,10 +23,10 @@ export function AdminSellerRecentOrders({ recentOrders }: Readonly<AdminSellerRe
                               <table className="w-full text-left">
                                 <thead className="bg-white/[0.03] text-[10px] font-semibold text-label-3 uppercase tracking-widest border-b border-separator">
                                   <tr>
-                                    <th className="px-8 py-6">ID Reference</th>
-                                    <th className="px-8 py-6">End Consumer</th>
-                                    <th className="px-8 py-6">Transaction Value</th>
-                                    <th className="px-8 py-6">Operational Status</th>
+                                    <th className="px-3 py-3 sm:px-6 sm:py-4">ID Reference</th>
+                                    <th className="px-3 py-3 sm:px-6 sm:py-4">End Consumer</th>
+                                    <th className="px-3 py-3 sm:px-6 sm:py-4">Transaction Value</th>
+                                    <th className="px-3 py-3 sm:px-6 sm:py-4">Operational Status</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-separator">

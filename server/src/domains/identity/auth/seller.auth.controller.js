@@ -93,8 +93,8 @@ export const register = async (req, res) => {
     if (error.message.includes('exists')) {
       return res.status(409).json({ status: 'error', message: error.message });
     }
-    console.error('Registration error:', error);
-    res.status(500).json({ status: 'error', message: error.message });
+    logger.error('Registration error:', error);
+    res.status(500).json({ status: 'error', message: 'Registration failed. Please try again.' });
   }
 };
 
@@ -167,7 +167,7 @@ export const login = async (req, res) => {
         code: e.code
       });
     }
-    console.error('Seller login error:', e);
+    logger.error('Seller login error:', e);
     res.status(500).json({ status: 'error', message: 'Login failed. Please try again.' });
   }
 };
@@ -202,7 +202,7 @@ export const resetPassword = async (req, res) => {
       message: 'Password has been reset successfully.'
     });
   } catch (error) {
-    console.error('Reset password error:', error);
+    logger.error('Reset password error:', error);
     res.status(500).json({
       status: 'error',
       message: 'An error occurred while resetting your password.'
@@ -285,7 +285,7 @@ export const forgotPassword = async (req, res) => {
       message: 'If an account exists with this email, you will receive a password reset link.'
     });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logger.error('Forgot password error:', error);
     return res.status(500).json({
       status: 'error',
       message: 'An error occurred while processing your request'

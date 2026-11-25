@@ -111,9 +111,6 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
       return;
     }
 
-    const confirmed = window.confirm('Delete your saved shop location? Buyers will no longer see a physical pickup address until you add one again.');
-    if (!confirmed) return;
-
     setIsDeletingLocation(true);
 
     try {
@@ -265,9 +262,6 @@ export function useSellerSettingsForm({ sellerProfile, toast, updateSellerProfil
 
   const handleRemoveSocialLink = useCallback(async (field: 'instagramLink' | 'tiktokLink') => {
     const platformName = field === 'instagramLink' ? 'Instagram' : 'TikTok';
-    const confirmed = window.confirm(`Remove your ${platformName} link?`);
-    if (!confirmed) return;
-
     setIsSaving(true);
     try {
       const payload: Record<string, unknown> = {

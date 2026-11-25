@@ -68,7 +68,7 @@ export function SellerOrderCard({ order, isUpdating, isRequestingPickup, onReady
                                 && isPaid
                                 && ['PAID', 'AWAITING_SELLER_ACTION', 'DELIVERY_PENDING'].includes(order.status);
 
-                            let cardClasses = "transition-all duration-300 bg-black border hover:border-yellow-400/40 ";
+                            let cardClasses = "transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 bg-black border hover:border-yellow-400/40 ";
                             let itemClasses = "text-xs sm:text-sm text-label rounded-lg px-3 py-2 border ";
 
                             if (isService) {

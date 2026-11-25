@@ -108,6 +108,20 @@ describe('ShopProductCard', () => {
 
     const viewerImg = screen.getByAltText(/Byblos Silk Shirt - image 1/i);
     expect(viewerImg).toHaveAttribute('decoding', 'async');
+    expect(viewerImg).toHaveClass('object-contain', 'max-h-[70dvh]', 'w-auto', 'h-auto');
+
+    // Compact card dialog (not full-screen inset-0) with close button inside
+    expect(dialog).not.toHaveClass('inset-0');
+    expect(dialog).toHaveClass('max-w-md');
+    const closeBtn = screen.getByRole('button', { name: /^Close$/i });
+    expect(dialog.contains(closeBtn)).toBe(true);
+
+    // Next image & close work without triggering card onTap
+    fireEvent.click(screen.getByRole('button', { name: /Next image/i }));
+    expect(screen.getByAltText(/Byblos Silk Shirt - image 2/i)).toBeInTheDocument();
+    fireEvent.click(closeBtn);
+    expect(screen.queryByRole('dialog', { name: /Byblos Silk Shirt images/i })).not.toBeInTheDocument();
+    expect(handleTap).not.toHaveBeenCalled();
   });
 
   it('renders product photo with object-contain to avoid image clipping from being rendered too big', () => {

@@ -41,6 +41,11 @@
     (function () {
       try {
         var doc = document.documentElement;
+        var isNative = window.location.protocol === 'capacitor:' ||
+          Boolean(window.Capacitor && (window.Capacitor.isNative || (typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform())));
+        if (isNative) {
+          doc.classList.add('native-app', 'capacitor-native');
+        }
         var isStandalone = Boolean(
           (window.navigator && window.navigator.standalone) ||
           (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
@@ -177,10 +182,14 @@
       }
     }
 
-    /* Standalone PWA and native app cold launch: strictly locked to pure black (#000000) */
-    html.pwa-standalone #initial-splash,
+    /* Standalone PWA cold launch: strictly locked to pure black (#000000).
+       Native Capacitor apps already show the OS splash screen, so hide the redundant HTML splash. */
+    html.pwa-standalone #initial-splash {
+      background-color: #000000 !important;
+    }
     html.native-app #initial-splash,
     html.capacitor-native #initial-splash {
+      display: none !important;
       background-color: #000000 !important;
     }
 

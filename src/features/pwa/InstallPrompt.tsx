@@ -75,10 +75,24 @@ export function InstallPrompt() {
   // promptable event; otherwise there's nothing to install.
   if (kind === 'android-button' && !deferredPrompt) return null;
 
+  const hasFloatingBottomNav =
+    typeof document !== 'undefined' &&
+    Boolean(document.querySelector('.dashboard-floating-nav'));
+
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-separator bg-surface-1 px-4 pt-3 text-label shadow-[0_-4px_20px_rgba(0,0,0,0.25)]"
-      style={{ paddingBottom: 'calc(0.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+      className="fixed inset-x-0 z-50 border-t border-separator bg-surface-1 px-4 pt-3 text-label shadow-[0_-4px_20px_rgba(0,0,0,0.25)]"
+      style={
+        hasFloatingBottomNav
+          ? {
+              bottom: 'calc(5.25rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+              paddingBottom: '0.75rem',
+            }
+          : {
+              bottom: '0px',
+              paddingBottom: 'calc(0.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+            }
+      }
       role="dialog"
       aria-label="Install Byblos"
     >

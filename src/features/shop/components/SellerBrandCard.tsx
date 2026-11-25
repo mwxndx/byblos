@@ -83,7 +83,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[24px] border border-slate-300 dark:border-white/20 bg-white dark:bg-surface-1 p-3 sm:p-3.5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-slate-400 dark:hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
+                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[24px] border border-slate-300 dark:border-white/20 bg-white dark:bg-surface-1 p-3 sm:p-3.5 shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 hover:shadow-md hover:border-slate-400 dark:hover:border-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
                 className,
             )}
             role="link"
@@ -141,7 +141,7 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
                             rel="noopener noreferrer"
                             onClick={stop}
                             aria-label={`${shopName} location on the map`}
-                            className="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.06] p-1.5 shadow-sm transition-all hover:opacity-80"
+                            className="inline-flex items-center justify-center rounded-full border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/[0.06] p-1.5 shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:opacity-80"
                         >
                             <MapPin className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
                         </a>

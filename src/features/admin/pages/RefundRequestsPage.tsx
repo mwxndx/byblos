@@ -150,7 +150,7 @@ export default function RefundRequestsPage() {
                   setStatusFilter(status);
                   setIsOverdueOnly(false);
                 }}
-                className={`capitalize px-5 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all duration-300 ${statusFilter === status && !isOverdueOnly
+                className={`capitalize px-5 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 ${statusFilter === status && !isOverdueOnly
                   ? 'bg-white/10 text-label shadow-inner'
                   : 'text-label-3 hover:text-white hover:bg-fill'
                   }`}
@@ -164,7 +164,7 @@ export default function RefundRequestsPage() {
             <Button
               variant="ghost"
               onClick={() => setIsOverdueOnly(!isOverdueOnly)}
-              className={`px-4 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-all duration-300 flex items-center gap-1.5 ${
+              className={`px-4 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 flex items-center gap-1.5 ${
                 isOverdueOnly
                   ? 'bg-red-500/20 text-red-400 border border-red-500/30'
                   : 'text-label-3 hover:text-red-400 hover:bg-fill'
@@ -175,7 +175,7 @@ export default function RefundRequestsPage() {
             <Button
               variant="ghost"
               onClick={() => setSortBy(sortBy === 'urgency' ? 'newest' : 'urgency')}
-              className="px-4 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest text-label-3 hover:text-white hover:bg-fill transition-all duration-300"
+              className="px-4 h-10 rounded-xl text-[10px] font-semibold uppercase tracking-widest text-label-3 hover:text-white hover:bg-fill transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300"
             >
               {sortBy === 'urgency' ? '⚡ Urgency' : '📅 Newest'}
             </Button>

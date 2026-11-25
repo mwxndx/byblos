@@ -32,7 +32,7 @@ export function AdminDashboardTabs({ counts = {} }: Readonly<AdminDashboardTabsP
             <TabsTrigger
               key={tab.id}
               value={tab.id}
-              className="flex-shrink-0 md:flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3 md:px-4 py-2 sm:py-2.5 text-xs md:text-sm font-semibold whitespace-nowrap transition-all
+              className="flex-shrink-0 lg:flex-1 inline-flex items-center justify-center gap-1.5 sm:gap-2 rounded-xl px-2.5 sm:px-3 lg:px-4 py-2 sm:py-2.5 text-xs md:text-sm font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow,opacity]
               data-[state=active]:!bg-white data-[state=active]:!text-black data-[state=active]:border data-[state=active]:border-gray-200 data-[state=active]:shadow-sm
               data-[state=inactive]:text-label-2 data-[state=inactive]:hover:text-label data-[state=inactive]:hover:bg-white/10"
             >

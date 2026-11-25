@@ -17,7 +17,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-white dark:group-[.toaster]:bg-[#121212] [data-theme=light]_&:bg-white [data-theme=dark]_&:bg-[#121212] text-slate-900 dark:text-white [data-theme=light]_&:text-slate-900 [data-theme=dark]_&:text-white border-slate-200 dark:border-white/10 [data-theme=light]_&:border-slate-200 [data-theme=dark]_&:border-white/10 shadow-lg dark:shadow-2xl w-full sm:w-[356px] max-w-full sm:max-w-[400px] border rounded-2xl transition-all duration-200 p-4",
+            "group toast group-[.toaster]:bg-white dark:group-[.toaster]:bg-[#121212] [data-theme=light]_&:bg-white [data-theme=dark]_&:bg-[#121212] text-slate-900 dark:text-white [data-theme=light]_&:text-slate-900 [data-theme=dark]_&:text-white border-slate-200 dark:border-white/10 [data-theme=light]_&:border-slate-200 [data-theme=dark]_&:border-white/10 shadow-lg dark:shadow-2xl w-full sm:w-[356px] max-w-full sm:max-w-[400px] border rounded-2xl transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 p-4",
           description: "text-slate-500 dark:text-neutral-400 [data-theme=light]_&:text-slate-500 [data-theme=dark]_&:text-neutral-400 text-sm mt-1",
           actionButton:
             "bg-black text-white dark:bg-white dark:text-black [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=dark]_&:bg-white [data-theme=dark]_&:text-black font-semibold text-xs px-3 py-1.5 rounded-lg",

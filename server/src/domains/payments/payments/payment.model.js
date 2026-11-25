@@ -61,7 +61,13 @@ class Payment {
   }
 
   static async findById(id) {
-    const { rows } = await pool.query('SELECT * FROM payments WHERE id = $1', [id]);
+    const { rows } = await pool.query(`
+      SELECT id, invoice_id, order_id, amount, currency, status, payment_method,
+             mobile_payment, whatsapp_number, email, metadata, created_at, updated_at,
+             provider_reference, api_ref
+      FROM payments
+      WHERE id = $1
+    `, [id]);
     return rows[0];
   }
 

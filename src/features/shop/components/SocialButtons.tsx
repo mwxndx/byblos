@@ -21,7 +21,7 @@ const stop = (e: MouseEvent) => e.stopPropagation();
 export function SocialButtons({ instagramHref, tiktokHref, shopName = 'Shop', size = 'md', className }: Readonly<SocialButtonsProps>) {
   const dim = size === 'sm' ? 'h-4 w-4' : 'h-5 w-5';
   const pad = size === 'sm' ? 'p-1.5' : 'p-2';
-  const base = 'inline-flex items-center justify-center rounded-full border shadow-sm transition-all';
+  const base = 'inline-flex items-center justify-center rounded-full border shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity]';
   const enabled = 'border-[var(--byblos-border,rgba(255,255,255,0.14))] bg-[var(--byblos-surface-soft,rgba(255,255,255,0.06))] hover:opacity-80';
   const disabled = 'cursor-not-allowed border-white/10 bg-white/[0.03] opacity-35';
 

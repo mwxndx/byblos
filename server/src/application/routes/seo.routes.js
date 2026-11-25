@@ -1,11 +1,21 @@
 import { Router } from 'express';
 import { pool } from '../../infrastructure/database/database.js';
+import cacheService from '../../shared/utils/cache.service.js';
 
 const router = Router();
+const SITEMAP_CACHE_KEY = 'seo:sitemap:xml';
+const SITEMAP_CACHE_TTL_SECONDS = 3600;
 
 // Dynamic /sitemap.xml generating live sitemap with all active seller shops
 router.get('/sitemap.xml', async (req, res) => {
     try {
+        const cachedXml = await cacheService.get(SITEMAP_CACHE_KEY);
+        if (typeof cachedXml === 'string' && cachedXml.length > 0) {
+            res.header('Content-Type', 'application/xml');
+            res.header('Cache-Control', 'public, max-age=3600');
+            return res.send(cachedXml);
+        }
+
         const baseUrl = (process.env.FRONTEND_URL || 'https://www.byblosafrica.site').replace(/\/$/, '');
 
         // Static routes that genuinely exist in the application
@@ -52,6 +62,7 @@ router.get('/sitemap.xml', async (req, res) => {
 
         xml += `</urlset>`;
 
+        await cacheService.set(SITEMAP_CACHE_KEY, xml, SITEMAP_CACHE_TTL_SECONDS);
         res.header('Content-Type', 'application/xml');
         res.header('Cache-Control', 'public, max-age=3600');
         return res.send(xml);

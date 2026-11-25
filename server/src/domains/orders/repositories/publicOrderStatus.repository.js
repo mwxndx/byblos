@@ -18,7 +18,7 @@ const ORDER_STATUS_SELECT = `
          p.metadata AS payment_metadata
   FROM product_orders po
   LEFT JOIN LATERAL (
-    SELECT *
+    SELECT p.id, p.status, p.provider_reference, p.api_ref, p.created_at, p.metadata
     FROM payments p
     WHERE p.metadata->>'order_id' = po.id::text
        OR p.invoice_id = po.id::text

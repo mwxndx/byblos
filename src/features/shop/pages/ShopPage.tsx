@@ -172,7 +172,14 @@ const ShopPage = () => {
         sellerInitials={sellerInitials}
       />
       {/* Products */}
-      <main className="max-w-[1920px] mx-auto px-3 sm:px-6 pt-2 pb-6 sm:pt-4 sm:pb-8 lg:px-8">
+      <main
+        className={cn(
+          "max-w-[1920px] mx-auto px-3 sm:px-6 pt-2 sm:pt-4 lg:px-8",
+          isCreatorPreview
+            ? "pb-6 sm:pb-8"
+            : "pb-[calc(6rem+var(--sab,env(safe-area-inset-bottom,0px)))]"
+        )}
+      >
         <div className="mb-8">
           <div className="relative max-w-md mx-auto">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -189,7 +196,7 @@ const ShopPage = () => {
               type="text"
               aria-label="Search products"
               className={cn(
-                "block w-full pl-10 pr-3 py-3 border border-[var(--byblos-border,rgba(0,0,0,0.1))] rounded-2xl transition-all duration-300",
+                "block w-full pl-10 pr-3 py-3 border border-[var(--byblos-border,rgba(0,0,0,0.1))] rounded-2xl transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300",
                 "bg-[var(--byblos-surface,#ffffff)] text-[var(--byblos-text,#0f0f0e)] placeholder:text-[var(--byblos-muted)]",
                 "focus:outline-none focus:ring-2 focus:ring-yellow-400/50 focus:border-yellow-400 shadow-sm"
               )}
@@ -210,7 +217,7 @@ const ShopPage = () => {
                 href={getShopUrl(sellerInfo?.slug || sellerInfo?.shopName || routeShopName || '')}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-between gap-3 w-full p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-200 hover:bg-amber-500/25 transition-all shadow-sm group text-left"
+                className="flex items-center justify-between gap-3 w-full p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-950 dark:text-amber-200 hover:bg-amber-500/25 transition-[transform,background-color,border-color,color,box-shadow,opacity] shadow-sm group text-left"
               >
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Sparkles className="h-5 w-5 text-amber-500 shrink-0" />
@@ -226,7 +233,7 @@ const ShopPage = () => {
         </div>
 
         {filteredProducts.length > 0 ? (
-          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {filteredProducts.map((product) => {
               // Ensure the product has the seller info from the shop
               const rawImg = product.image_url || (product as unknown as { imageUrl?: string }).imageUrl || '';
@@ -263,7 +270,7 @@ const ShopPage = () => {
             })}
           </div>
         ) : (
-          <div className="shop-products-card text-center py-16 rounded-3xl p-8 transition-all duration-300 border border-transparent">
+          <div className="shop-products-card text-center py-16 rounded-3xl p-8 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 border border-transparent">
             <Package className="h-16 w-16 mx-auto text-[var(--byblos-muted)] mb-4" />
             <h3 className="text-xl font-bold text-[var(--byblos-text)] mb-2">
               No products found

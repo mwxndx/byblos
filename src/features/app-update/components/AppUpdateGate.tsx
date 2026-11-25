@@ -110,7 +110,7 @@ export function AppUpdateGate() {
         <button
           type="button"
           onClick={handleUpdateClick}
-          className="w-full py-3.5 px-6 rounded-xl bg-slate-950 hover:bg-slate-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-black font-semibold text-base shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          className="w-full py-3.5 px-6 rounded-xl bg-slate-950 hover:bg-slate-900 dark:bg-white dark:hover:bg-zinc-100 text-white dark:text-black font-semibold text-base shadow-lg transition-[transform,background-color,border-color,color,box-shadow,opacity] active:scale-[0.98] flex items-center justify-center gap-2"
         >
           <span>Update on Google Play</span>
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">

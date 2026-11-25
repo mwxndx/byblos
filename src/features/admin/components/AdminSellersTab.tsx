@@ -36,14 +36,14 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
             type="text"
             aria-label="Search sellers"
             placeholder="Search sellers..."
-            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-all font-medium text-xs sm:text-sm"
+            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-[transform,background-color,border-color,color,box-shadow,opacity] font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="overflow-x-auto no-scrollbar touch-pan-x">
+        <div className="overflow-x-auto touch-pan-x">
           <table className="w-full text-left border-collapse">
             <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
               <tr>
@@ -56,11 +56,11 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
             </thead>
             <tbody className="divide-y divide-separator">
               {filtered.map((seller) => (
-                <tr key={seller.id} className="hover:bg-white/[0.02] transition-all group">
+                <tr key={seller.id} className="hover:bg-white/[0.02] transition-[transform,background-color,border-color,color,box-shadow,opacity] group">
                   <td className="px-5 md:px-8 py-4 md:py-6">
                     <div className="flex items-center gap-3 md:gap-5">
-                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-fill flex items-center justify-center border border-separator group-hover:border-yellow-500/30 transition-all shadow-inner">
-                        <Store className="w-4 h-4 md:w-6 md:h-6 text-label-3 group-hover:text-yellow-500 transition-all" />
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-fill flex items-center justify-center border border-separator group-hover:border-yellow-500/30 transition-[transform,background-color,border-color,color,box-shadow,opacity] shadow-inner">
+                        <Store className="w-4 h-4 md:w-6 md:h-6 text-label-3 group-hover:text-yellow-500 transition-[transform,background-color,border-color,color,box-shadow,opacity]" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm md:text-base font-semibold text-label tracking-tight truncate">{seller.name}</p>
@@ -92,7 +92,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-yellow-500 hover:bg-yellow-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all"
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-yellow-500 hover:bg-yellow-500 hover:text-black font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-[transform,background-color,border-color,color,box-shadow,opacity]"
                         onClick={() => onView(seller.id)}
                       >
                         <Eye className="h-3 md:h-3.5 w-3 md:w-3.5" />
@@ -102,7 +102,7 @@ export const AdminSellersTab = ({ sellers, searchQuery, onSearchChange, paginati
                         variant="outline"
                         size="sm"
                         disabled={deletingId === String(seller.user_id) || String(seller.status).toLowerCase() === 'deleted' || !seller.user_id}
-                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-all disabled:opacity-50 disabled:pointer-events-none"
+                        className="h-9 md:h-10 px-3 md:px-4 rounded-xl border-separator bg-fill text-red-400 hover:bg-red-500 hover:text-white font-semibold uppercase tracking-widest text-[9px] md:text-[10px] border transition-[transform,background-color,border-color,color,box-shadow,opacity] disabled:opacity-50 disabled:pointer-events-none"
                         onClick={() => onDelete(seller.user_id, 'seller')}
                       >
                         {deletingId === String(seller.user_id)

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { createRequire } from 'node:module';
+import logger from '../utils/logger.js';
 
 dotenv.config();
 
@@ -10,7 +11,7 @@ let Redis = null;
 try {
     Redis = require('ioredis');
 } catch (error) {
-    console.warn('[Redis] ioredis unavailable; using in-memory no-op Redis fallback', error.message);
+    logger.warn('[Redis] ioredis unavailable; using in-memory no-op Redis fallback', error.message);
 }
 
 // FIFO-evicted in-memory fallback when ioredis is unavailable. Without a cap
@@ -106,7 +107,7 @@ const createRedisClient = () => {
 
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
-    console.log(`Initializing Redis client with URL: ${redisUrl}`);
+    logger.info(`Initializing Redis client with URL: ${redisUrl}`);
 
     const client = new Redis(redisUrl, {
         // Retry strategy: wait 1s, then 2s, then 4s, etc., up to max 10s
@@ -140,27 +141,27 @@ const createRedisClient = () => {
         if (err.code === 'ECONNREFUSED') {
             // Only log once, not repeatedly
             if (!client._connectionRefusedLogged) {
-                console.warn('Redis connection refused. Ensure Redis is running if you want persistence.');
+                logger.warn('Redis connection refused. Ensure Redis is running if you want persistence.');
                 client._connectionRefusedLogged = true;
             }
         } else {
-            console.error('Redis Client Error:', err.message);
+            logger.error('Redis Client Error:', err.message);
         }
     });
 
     client.on('connect', () => {
-        console.log('Redis client connected successfully');
+        logger.info('Redis client connected successfully');
         client._connectionRefusedLogged = false; // Reset the flag on successful connection
     });
 
     client.on('ready', () => {
-        console.log('Redis client is ready to accept commands');
+        logger.info('Redis client is ready to accept commands');
     });
 
     // Attempt to connect, but don't crash if it fails
     client.connect().catch((err) => {
-        console.warn('Redis initial connection failed:', err.message);
-        console.warn('Application will continue without Redis. Rate limiting will use memory store.');
+        logger.warn('Redis initial connection failed:', err.message);
+        logger.warn('Application will continue without Redis. Rate limiting will use memory store.');
     });
 
     return client;

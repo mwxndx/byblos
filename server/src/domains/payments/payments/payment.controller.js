@@ -141,7 +141,7 @@ class PaymentController {
         // (unexpected/programming errors), matching globalErrorHandler's own
         // "don't leak non-operational error details" rule.
         message: statusCode < 500 ? error.message : 'Product payment initiation failed',
-        error: error.message
+        ...(statusCode < 500 || process.env.NODE_ENV === 'development' ? { error: error.message } : {})
       });
     }
   }
@@ -198,7 +198,7 @@ class PaymentController {
       res.status(500).json({
         status: 'error',
         message: 'Payment status check failed',
-        error: error.message
+        ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {})
       });
     }
   }
@@ -209,7 +209,7 @@ class PaymentController {
       res.status(200).json({ status: 'success', data: status, timestamp: new Date().toISOString() });
     } catch (error) {
       logger.error('[PaymentController] Failed to get agent status:', error);
-      res.status(500).json({ status: 'error', message: 'Failed to get agent status', error: error.message });
+      res.status(500).json({ status: 'error', message: 'Failed to get agent status', ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {}) });
     }
   }
 
@@ -219,7 +219,7 @@ class PaymentController {
       res.status(200).json({ status: 'success', message: 'Payment provider HTTPS agent reset successfully', timestamp: new Date().toISOString() });
     } catch (error) {
       logger.error('[PaymentController] Failed to reset agent:', error);
-      res.status(500).json({ status: 'error', message: 'Failed to reset agent', error: error.message });
+      res.status(500).json({ status: 'error', message: 'Failed to reset agent', ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {}) });
     }
   }
 
@@ -229,7 +229,7 @@ class PaymentController {
       res.status(200).json({ status: 'success', data: results, timestamp: new Date().toISOString() });
     } catch (error) {
       logger.error('[PaymentController] Network check failed:', error);
-      res.status(500).json({ status: 'error', message: 'Network check failed', error: error.message });
+      res.status(500).json({ status: 'error', message: 'Network check failed', ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {}) });
     }
   }
 }

@@ -52,7 +52,7 @@ export default function SellerOrdersSection() {
         return (
             <div className="space-y-4 sm:space-y-6">
                 {[1, 2].map((i) => (
-                    <Card key={i} className="bg-black border border-white/15 transition-all duration-300">
+                    <Card key={i} className="bg-black border border-white/15 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300">
                         <CardContent className="p-4 sm:p-6">
                             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-4 lg:space-y-0">
                                 <div className="space-y-3 sm:space-y-4 flex-1">

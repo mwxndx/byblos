@@ -29,7 +29,7 @@ function ChunkUpdateFallback({ devError }: Readonly<{ devError?: Error | null }>
         </p>
         <Button
           onClick={() => window.location.reload()}
-          className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
+          className="w-full h-12 bg-white text-black hover:bg-gray-200 font-bold rounded-xl transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 flex items-center justify-center gap-2"
         >
           <RefreshCw className="w-4 h-4" />
           Refresh Now

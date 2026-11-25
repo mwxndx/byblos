@@ -72,7 +72,7 @@ export function StatCard({
     return (
       <div
         className={cn(
-          "rounded-card border p-5 shadow-sm transition-all hover:border-brand/40",
+          "rounded-card border p-5 shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:border-brand/40",
           colorClasses[color] || colorClasses.gray,
           className
         )}
@@ -118,7 +118,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "rounded-card border shadow-sm transition-all hover:border-brand/40",
+        "rounded-card border shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:border-brand/40",
         hero ? "p-5 md:p-6" : "p-4 md:p-5",
         colorClasses[color] || colorClasses.gray,
         className

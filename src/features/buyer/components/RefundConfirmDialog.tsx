@@ -53,7 +53,7 @@ export function RefundConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[92vw] sm:max-w-[480px] max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+      <DialogContent className="w-[92vw] sm:max-w-[480px] max-h-[90dvh] overflow-y-auto border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5C518]/20 text-[#F5C518]">

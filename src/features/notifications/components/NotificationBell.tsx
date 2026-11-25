@@ -41,7 +41,7 @@ export function NotificationBell({ variant = 'default', triggerClassName, role, 
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-[calc(100vw-2rem)] sm:w-[440px] md:w-[480px] max-w-[480px] p-0 overflow-hidden bg-white dark:bg-black border border-separator text-label shadow-[var(--shadow-pop)] rounded-2xl transition-all duration-200"
+        className="w-[calc(100vw-2rem)] sm:w-[440px] md:w-[480px] max-w-[480px] p-0 overflow-hidden bg-white dark:bg-black border border-separator text-label shadow-[var(--shadow-pop)] rounded-2xl transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
       >
         <NotificationList variant={variant} role={role} scrollClassName="max-h-[390px]" />
       </PopoverContent>

@@ -12,6 +12,7 @@ import {
     type SessionExpiredDetail,
 } from '@/infrastructure/navigation/navigationService';
 import { storage } from '@/infrastructure/storage/storage';
+import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 
 export { GlobalAuthContext } from './authContextObjects';
 
@@ -43,6 +44,9 @@ export function AuthCoreProvider({ children }: Readonly<{ children: ReactNode }>
     const [initializing, setInitializing] = useState<boolean>(() => {
         if (typeof window === 'undefined') return false;
         const currentPath = window.location.pathname || '/';
+        if (isNativeApp() && (currentPath === '/' || currentPath === '')) {
+            return true;
+        }
         return currentPath !== '/' && !isPublicRoute(currentPath);
     });
     const navigate = useNavigate();

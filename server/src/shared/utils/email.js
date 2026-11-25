@@ -316,7 +316,7 @@ export const sendProductOrderConfirmationEmail = async (email, orderData) => {
       text: `Thank you for your order! Order Number: ${orderData.order_number}`
     });
   } catch (error) {
-    console.error('Error sending product order confirmation email:', error);
+    logger.error('Error sending product order confirmation email:', error);
     throw error;
   }
 };
@@ -352,7 +352,7 @@ export const sendNewOrderNotificationEmail = async (email, orderData) => {
       text: `You have received a new order! Order Number: ${orderData.order_number}`
     });
   } catch (error) {
-    console.error('Error sending new order notification email:', error);
+    logger.error('Error sending new order notification email:', error);
     throw error;
   }
 };
@@ -398,7 +398,7 @@ export const sendPaymentReceiptEmail = async (email, orderData, isSeller = false
       text: `Payment Receipt for Order #${orderData.order_number}. Total amount: KSh ${orderData.total_amount}`
     });
   } catch (error) {
-    console.error('Error sending payment receipt email:', error);
+    logger.error('Error sending payment receipt email:', error);
     throw error;
   }
 };
@@ -420,7 +420,7 @@ export const sendWelcomeEmail = async (email, name) => {
       text: `Welcome to Byblos, ${name}! You can now log in to your account and start shopping and selling uniquely.`,
     });
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    logger.error('Error sending welcome email:', error);
     throw error;
   }
 };

@@ -78,7 +78,7 @@ export function BuyerInfoForm({
               aria-describedby={errors.firstName ? 'firstName-error' : undefined}
             />
             {errors.firstName && (
-              <p id="firstName-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.firstName}</p>
+              <p id="firstName-error" role="alert" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.firstName}</p>
             )}
           </div>
 
@@ -99,7 +99,7 @@ export function BuyerInfoForm({
               aria-describedby={errors.lastName ? 'lastName-error' : undefined}
             />
             {errors.lastName && (
-              <p id="lastName-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.lastName}</p>
+              <p id="lastName-error" role="alert" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.lastName}</p>
             )}
           </div>
         </div>
@@ -128,7 +128,7 @@ export function BuyerInfoForm({
             />
           </div>
           {errors.email && (
-            <p id="email-error" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.email}</p>
+            <p id="email-error" role="alert" className={`text-[10px] font-bold ${themeClasses.error}`}>{errors.email}</p>
           )}
         </div>
 
@@ -242,7 +242,7 @@ export function BuyerInfoForm({
         <Button
           type="submit"
           disabled={isLoading || !termsAccepted}
-          className={`w-full h-12 rounded-xl font-semibold text-base shadow-lg transition-all bg-yellow-400 hover:bg-yellow-500 text-black active:scale-[0.98] ${
+          className={`w-full h-12 rounded-xl font-semibold text-base shadow-lg transition-[transform,background-color,border-color,color,box-shadow,opacity] bg-yellow-400 hover:bg-yellow-500 text-black active:scale-[0.98] ${
             !termsAccepted ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >

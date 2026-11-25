@@ -1,5 +1,6 @@
 import NotificationService from './notification.service.js';
 import logger from '../../../shared/utils/logger.js';
+import { clampLimit } from '../../../shared/utils/pagination.js';
 
 const currentUserId = (req) => Number(req.user?.userId || req.user?.id || req.logisticsPartner?.userId);
 const currentRole = (req) => req.logisticsPartner ? 'logistics' : (req.user?.userType || req.user?.role);
@@ -79,7 +80,7 @@ export const listNotifications = async (req, res, next) => {
         const notifications = await NotificationService.listForUser({
             userId,
             role,
-            limit: req.query.limit,
+            limit: clampLimit(req.query.limit, 30, 100),
             unreadOnly: req.query.unreadOnly === 'true' || req.query.unread_only === 'true'
         });
 

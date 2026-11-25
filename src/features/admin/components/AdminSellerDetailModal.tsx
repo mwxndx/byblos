@@ -147,10 +147,10 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionS
                                     href={`https://byblosafrica.site/${encodeURIComponent(seller.slug || seller.shop_name?.toLowerCase() || '')}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block p-3 rounded-xl bg-fill border border-separator text-blue-400 font-bold text-xs truncate hover:bg-blue-500/10 hover:border-blue-500/20 transition-all flex items-center justify-between group/link"
+                                    className="block p-3 rounded-xl bg-fill border border-separator text-blue-400 font-bold text-xs truncate hover:bg-blue-500/10 hover:border-blue-500/20 transition-[transform,background-color,border-color,color,box-shadow,opacity] flex items-center justify-between group/link"
                                   >
                                     /{seller.slug || seller.shop_name?.toLowerCase()}
-                                    <ArrowUpRight className="h-4 w-4 opacity-0 group-hover/link:opacity-100 transition-all" />
+                                    <ArrowUpRight className="h-4 w-4 opacity-0 group-hover/link:opacity-100 transition-[transform,background-color,border-color,color,box-shadow,opacity]" />
                                   </a>
                                 </div>
 
@@ -165,7 +165,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionS
                                       href={social.link ? (social.link.startsWith('http') ? social.link : `https://${social.link}`) : '#'}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className={`h-12 rounded-xl bg-fill border border-separator flex items-center justify-center transition-all ${social.link ? 'text-label-2 ' + social.color + ' hover:bg-white/10' : 'text-gray-700 cursor-not-allowed opacity-30 hover:bg-transparent'}`}
+                                      className={`h-12 rounded-xl bg-fill border border-separator flex items-center justify-center transition-[transform,background-color,border-color,color,box-shadow,opacity] ${social.link ? 'text-label-2 ' + social.color + ' hover:bg-white/10' : 'text-gray-700 cursor-not-allowed opacity-30 hover:bg-transparent'}`}
                                       title={social.label}
                                     >
                                       {social.icon}
@@ -226,7 +226,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionS
                                 { label: 'Merchant Net', value: seller.metrics?.netSales, color: 'text-blue-400', icon: <TrendingUp className="h-4 w-4" /> },
                                 { label: 'Order Chain', value: seller.metrics?.totalOrders, color: 'text-purple-400', icon: <ShoppingCart className="h-4 w-4" />, noCurrency: true }
                               ].map((met) => (
-                                <div key={met.label} className="bg-white/[0.03] border border-separator rounded-3xl p-5 hover:bg-white/[0.05] transition-all group/met">
+                                <div key={met.label} className="bg-white/[0.03] border border-separator rounded-3xl p-5 hover:bg-white/[0.05] transition-[transform,background-color,border-color,color,box-shadow,opacity] group/met">
                                   <div className={`h-8 w-8 rounded-xl bg-fill flex items-center justify-center ${met.color} mb-3 shadow-inner group-hover/met:scale-110 transition-transform`}>{met.icon}</div>
                                   <p className="text-[10px] font-semibold text-label-3 uppercase tracking-widest">{met.label}</p>
                                   <p className={`text-xl font-semibold mt-1 ${met.color}`}>
@@ -243,7 +243,7 @@ export function AdminSellerDetailModal({ seller, isLoading, onClose, inspectionS
                     </div>
                     <div className="p-8 border-t border-separator bg-white/[0.02] flex justify-between items-center">
                       <p className="text-[10px] font-semibold text-gray-600 uppercase tracking-widest">Session ID: {inspectionSessionId}</p>
-                      <Button onClick={onClose} className="bg-white text-black font-semibold uppercase tracking-widest px-12 py-5 rounded-[1.5rem] hover:bg-gray-200 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.1)] active:scale-95 group">
+                      <Button onClick={onClose} className="bg-white text-black font-semibold uppercase tracking-widest px-12 py-5 rounded-[1.5rem] hover:bg-gray-200 transition-[transform,background-color,border-color,color,box-shadow,opacity] shadow-[0_10px_30px_rgba(255,255,255,0.1)] active:scale-95 group">
                         Close Inspection
                         <X className="ml-3 h-5 w-5 group-hover:rotate-90 transition-transform" />
                       </Button>

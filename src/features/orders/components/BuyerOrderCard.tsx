@@ -76,7 +76,7 @@ export function BuyerOrderCard({
     fulfillmentType: order.fulfillment_type,
   });
   const cardClasses = [
-    'overflow-hidden transition-all duration-300 bg-black border border-transparent shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40',
+    'overflow-hidden transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 bg-black border border-transparent shadow-[0_12px_32px_rgba(0,0,0,0.35)] hover:border-yellow-400/40',
     getBuyerOrderCardBorder(isService, isDigital)
   ].join(' ');
   const itemClasses = [

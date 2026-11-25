@@ -34,7 +34,7 @@ export function IosNotificationBanner({ className, role, allowAllWeb = true }: R
       role="region"
       aria-label="Notifications Setup"
       className={cn(
-        'rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-slate-900 dark:text-white shadow-sm transition-all',
+        'rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-slate-900 dark:text-white shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity]',
         className ?? 'mx-3 my-2.5'
       )}
     >

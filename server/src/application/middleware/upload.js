@@ -2,6 +2,7 @@ import multer from 'multer';
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
+import logger from '../../shared/utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,7 +52,7 @@ const cleanupTempFiles = (req, res, next) => {
   res.on('finish', () => {
     if (req.file?.path?.startsWith(tempDir)) {
       fs.unlink(req.file.path, (err) => {
-        if (err) console.error('Error cleaning up temp file:', err);
+        if (err) logger.error('Error cleaning up temp file:', err);
       });
     }
   });

@@ -486,7 +486,7 @@ class AuthService {
             return { alreadyVerified: false, user: newUser, profile };
         } catch (error) {
             await client.query('ROLLBACK');
-            console.error('[AUTH] Failed to create account from verification:', error);
+            logger.error('[AUTH] Failed to create account from verification:', error);
             throw new Error('An error occurred during account creation. Please try again.');
         } finally {
             client.release();

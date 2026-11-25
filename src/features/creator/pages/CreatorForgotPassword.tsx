@@ -35,7 +35,7 @@ export default function CreatorForgotPassword() {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/creator/login')}
-              className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-white hover:text-black"
+              className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 hover:bg-white hover:text-black"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               <span>Back</span>

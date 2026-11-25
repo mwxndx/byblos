@@ -390,7 +390,7 @@ export const getReferralPerformance = async (req, res, next) => {
  */
 export const getRecentActivity = async (req, res, next) => {
   try {
-    const limit = Math.min(Number.parseInt(req.query.limit) || 20, 50)
+    const limit = Math.min(Math.max(1, Number.parseInt(req.query.limit, 10) || 20), 50)
     const rows = await marketingAnalyticsRepository.findRecentActivity({ limit })
 
     res.status(200).json({

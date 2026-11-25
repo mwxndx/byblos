@@ -86,7 +86,7 @@ export const getWithdrawals = async (req, res, next) => {
     if (!sellerId) return next(new AppError('Authentication required', 401));
 
     const page = Math.max(1, Number.parseInt(req.query.page ?? '1', 10) || 1);
-    const limit = Math.min(50, Number.parseInt(req.query.limit ?? '20', 10) || 20);
+    const limit = Math.min(50, Math.max(1, Number.parseInt(req.query.limit ?? '20', 10) || 20));
     const offset = (page - 1) * limit;
 
     const ALLOWED_STATUSES = new Set(['processing', 'completed', 'failed', 'manual_review', 'compensation_required']);

@@ -64,7 +64,7 @@ export const AdminWithdrawalsTab = ({
             type="text"
             aria-label="Search payouts"
             placeholder="Search payouts..."
-            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-green-500/50 focus:ring-green-500/10 transition-all font-medium text-xs sm:text-sm"
+            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-green-500/50 focus:ring-green-500/10 transition-[transform,background-color,border-color,color,box-shadow,opacity] font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
@@ -116,7 +116,7 @@ export const AdminWithdrawalsTab = ({
         </div>
       </div>
       <CardContent className="p-0">
-        <div className="w-full overflow-x-auto no-scrollbar touch-pan-x overscroll-x-contain">
+        <div className="w-full overflow-x-auto touch-pan-x overscroll-x-contain">
           <table className="w-full min-w-[560px] text-left border-collapse">
             <thead className="bg-fill text-[10px] font-semibold text-label-3 uppercase tracking-widest">
               <tr>
@@ -129,7 +129,7 @@ export const AdminWithdrawalsTab = ({
             </thead>
             <tbody className="divide-y divide-separator">
               {withdrawalRequests?.map((request) => (
-                <tr key={request.id} className="hover:bg-white/[0.02] transition-all group">
+                <tr key={request.id} className="hover:bg-white/[0.02] transition-[transform,background-color,border-color,color,box-shadow,opacity] group">
                   <td className="px-3.5 sm:px-5 md:px-8 py-3.5 sm:py-4 md:py-6">
                     <div className="space-y-1">
                       <p className="text-sm md:text-base font-semibold text-label tracking-tight">{request.sellerName}</p>

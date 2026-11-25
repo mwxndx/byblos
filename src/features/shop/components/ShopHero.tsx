@@ -84,7 +84,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
               rel="noopener noreferrer"
               title="Location"
               aria-label="Open shop location on the map"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--byblos-surface-soft)] text-[var(--byblos-text)] border border-[var(--byblos-border)] shadow-sm transition-all hover:opacity-80"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--byblos-surface-soft)] text-[var(--byblos-text)] border border-[var(--byblos-border)] shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:opacity-80"
             >
               <MapPin className="h-4 w-4 text-current" />
               <span>Location</span>

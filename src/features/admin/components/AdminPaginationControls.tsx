@@ -26,7 +26,7 @@ export const AdminPaginationControls = ({ pagination, onPageChange }: AdminPagin
           size="sm"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="h-9 px-3 rounded-xl border-separator bg-fill text-label hover:bg-white/10 font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-40 disabled:pointer-events-none"
+          className="h-9 px-3 rounded-xl border-separator bg-fill text-label hover:bg-white/10 font-semibold uppercase tracking-widest text-[9px] border transition-[transform,background-color,border-color,color,box-shadow,opacity] disabled:opacity-40 disabled:pointer-events-none"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           <span className="ml-1">Prev</span>
@@ -37,7 +37,7 @@ export const AdminPaginationControls = ({ pagination, onPageChange }: AdminPagin
           size="sm"
           disabled={!hasMore}
           onClick={() => onPageChange(page + 1)}
-          className="h-9 px-3 rounded-xl border-separator bg-fill text-label hover:bg-white/10 font-semibold uppercase tracking-widest text-[9px] border transition-all disabled:opacity-40 disabled:pointer-events-none"
+          className="h-9 px-3 rounded-xl border-separator bg-fill text-label hover:bg-white/10 font-semibold uppercase tracking-widest text-[9px] border transition-[transform,background-color,border-color,color,box-shadow,opacity] disabled:opacity-40 disabled:pointer-events-none"
         >
           <span className="mr-1">Next</span>
           <ChevronRight className="h-3.5 w-3.5" />

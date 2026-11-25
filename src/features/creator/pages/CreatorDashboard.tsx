@@ -200,7 +200,7 @@ export default function CreatorDashboard() {
             type="button"
             onClick={openProfile}
             aria-label="Open profile"
-            className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2"
+            className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2 before:absolute before:-inset-1.5 before:content-['']"
           >
             <UserRound className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>

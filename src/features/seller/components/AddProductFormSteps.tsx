@@ -140,7 +140,7 @@ export const AddProductFormSteps = ({
                       }));
                     }}
                     className={cn(
-                      'flex flex-col items-center justify-center gap-1 p-2.5 rounded-control border text-center transition-all',
+                      'flex flex-col items-center justify-center gap-1 p-2.5 rounded-control border text-center transition-[transform,background-color,border-color,color,box-shadow,opacity]',
                       isSelected
                         ? 'border-brand bg-brand/10 text-brand font-semibold shadow-sm'
                         : 'border-separator bg-surface-1 text-label-2 hover:text-label hover:border-separator-2'
@@ -330,7 +330,7 @@ export const AddProductFormSteps = ({
 
             {uploadProgress > 0 && uploadProgress < 100 && (
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-fill">
-                <div className="h-full bg-brand transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
+                <div className="h-full bg-brand transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300" style={{ width: `${uploadProgress}%` }} />
               </div>
             )}
 

@@ -257,7 +257,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
               type="submit"
               disabled={isLoading}
               variant="secondary-byblos"
-              className="w-full h-10 sm:h-11 rounded-xl font-bold text-sm shadow-sm transition-all active:scale-[0.98]"
+              className="w-full h-10 sm:h-11 rounded-xl font-bold text-sm shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] active:scale-[0.98]"
             >
 
               {isLoading ? (

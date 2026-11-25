@@ -3,6 +3,7 @@ import LogisticsEtaService from './logisticsEta.service.js';
 import { setAuthCookie, setRefreshTokenCookie } from '../../shared/utils/cookie.utils.js';
 import { revokeSessionTokens, clearAuthCookies } from '../../shared/utils/sessionRevocation.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
+import { clampLimit, clampOffset } from '../../shared/utils/pagination.js';
 
 export const loginLogisticsPartner = async (req, res, next) => {
     try {
@@ -65,8 +66,8 @@ export const getLogisticsDashboardRequests = async (req, res, next) => {
         const dashboard = await LogisticsDashboardService.getDashboardRequests({
             partnerId,
             sort: req.query.sort,
-            limit: req.query.limit,
-            offset: req.query.offset
+            limit: clampLimit(req.query.limit, 50, 100),
+            offset: clampOffset(req.query.offset)
         });
 
         res.status(200).json({

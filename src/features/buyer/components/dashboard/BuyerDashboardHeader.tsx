@@ -40,7 +40,7 @@ export function BuyerDashboardHeader({
                 type="button"
                 onClick={() => navigate('/')}
                 aria-label="Back to landing page"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-white/12"
+                className="relative flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-white/[0.06] text-slate-900 dark:text-white transition-colors hover:bg-slate-200 dark:hover:bg-white/12 before:absolute before:-inset-1.5 before:content-['']"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -72,7 +72,7 @@ export function BuyerDashboardHeader({
               type="button"
               onClick={onToggleSearch}
               aria-label={isSearchOpen ? 'Close search' : 'Search products or shops'}
-              className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-slate-600 hover:text-slate-950 dark:text-white/70 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+              className="relative flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full text-slate-600 hover:text-slate-950 dark:text-white/70 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors before:absolute before:-inset-1.5 before:content-['']"
             >
               <Search className="h-4 w-4" />
             </button>

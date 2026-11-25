@@ -135,7 +135,7 @@ const NewAdminDashboard = () => {
             <h2 className="text-2xl font-semibold text-label tracking-tight">Something went wrong</h2>
             <p className="text-label-2 font-medium">{error}</p>
           </div>
-          <Button onClick={retryDashboard} className="w-full h-12 bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold rounded-2xl transition-all shadow-sm">
+          <Button onClick={retryDashboard} className="w-full h-12 bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold rounded-2xl transition-[transform,background-color,border-color,color,box-shadow,opacity] shadow-sm">
             Try again
           </Button>
         </div>
@@ -163,7 +163,7 @@ const NewAdminDashboard = () => {
               onClick={() => setIsBroadcastModalOpen(true)}
               aria-label="Broadcast Update"
               title="Broadcast Update"
-              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity]"
             >
               <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Broadcast Update</span>
@@ -176,7 +176,7 @@ const NewAdminDashboard = () => {
                 logout();
                 navigate('/admin/login', { replace: true });
               }}
-              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"
+              className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-8 sm:h-10 px-2.5 sm:px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-[transform,background-color,border-color,color,box-shadow,opacity]"
             >
               <LogOut className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
               <span className="hidden sm:inline">Sign out</span>

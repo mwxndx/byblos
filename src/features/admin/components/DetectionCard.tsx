@@ -21,7 +21,7 @@ export function DetectionCard({ earning, formatCurrency, onRelease, onReverse }:
   const isResolved = earning.metadata?.review_resolution !== undefined;
 
   return (
-    <Card className="bg-surface-1 backdrop-blur-2xl border border-orange-500/20 rounded-card overflow-hidden shadow-2xl group hover:border-orange-500/40 transition-all duration-500">
+    <Card className="bg-surface-1 backdrop-blur-2xl border border-orange-500/20 rounded-card overflow-hidden shadow-2xl group hover:border-orange-500/40 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-500">
       <CardHeader className="p-8 border-b border-separator bg-orange-500/[0.03]">
         <div className="flex justify-between items-start flex-wrap gap-3">
           <div>
@@ -102,7 +102,7 @@ export function DetectionCard({ earning, formatCurrency, onRelease, onReverse }:
           <div className="flex gap-4 pt-6">
             <Button
               onClick={onRelease}
-              className="flex-1 h-14 bg-green-500 hover:bg-green-400 text-black font-semibold text-[10px] uppercase tracking-widest rounded-2xl transition-all duration-300 shadow-lg shadow-green-500/10"
+              className="flex-1 h-14 bg-green-500 hover:bg-green-400 text-black font-semibold text-[10px] uppercase tracking-widest rounded-2xl transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 shadow-lg shadow-green-500/10"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Release — legitimate
@@ -110,7 +110,7 @@ export function DetectionCard({ earning, formatCurrency, onRelease, onReverse }:
             <Button
               variant="outline"
               onClick={onReverse}
-              className="flex-1 h-14 border-separator text-red-400 hover:bg-red-500 hover:text-white rounded-2xl bg-transparent font-semibold text-[10px] uppercase tracking-widest transition-all duration-300"
+              className="flex-1 h-14 border-separator text-red-400 hover:bg-red-500 hover:text-white rounded-2xl bg-transparent font-semibold text-[10px] uppercase tracking-widest transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300"
             >
               <Undo2 className="h-4 w-4 mr-2" />
               Reverse — confirmed

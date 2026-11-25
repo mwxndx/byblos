@@ -300,7 +300,7 @@ export const PaymentStatusModal = ({
                   type="button"
                   onClick={handleCancelAndRetry}
                   disabled={isCancelling}
-                  className="flex h-10 w-full items-center justify-center rounded-xl border border-slate-300 dark:border-white/20 bg-transparent text-xs font-semibold text-slate-700 dark:text-white/80 transition-all hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
+                  className="flex h-10 w-full items-center justify-center rounded-xl border border-slate-300 dark:border-white/20 bg-transparent text-xs font-semibold text-slate-700 dark:text-white/80 transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
                 >
                   {isCancelling ? (
                     <>
@@ -405,7 +405,7 @@ export const PaymentStatusModal = ({
                                 setGuestClaimStatus('idle');
                               }
                             }}
-                            className="mt-2 flex h-9 w-full items-center justify-center rounded-xl bg-yellow-400 text-xs font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98] disabled:opacity-50"
+                            className="mt-2 flex h-9 w-full items-center justify-center rounded-xl bg-yellow-400 text-xs font-bold text-black transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-yellow-300 active:scale-[0.98] disabled:opacity-50"
                           >
                             {guestClaimStatus === 'loading' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : 'Save Account & Track Order'}
                           </button>
@@ -430,7 +430,7 @@ export const PaymentStatusModal = ({
                         href={getAndroidDeepLink(orderNumber)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2.5 flex h-10 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-xs font-bold text-white dark:text-slate-950 transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
+                        className="mt-2.5 flex h-10 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-xs font-bold text-white dark:text-slate-950 transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
                       >
                         Open App / Get on Google Play
                       </a>
@@ -448,7 +448,7 @@ export const PaymentStatusModal = ({
                         href={APP_DOWNLOAD_URL}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2.5 flex h-10 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-xs font-bold text-white dark:text-slate-950 transition-all hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
+                        className="mt-2.5 flex h-10 w-full items-center justify-center rounded-xl bg-slate-950 dark:bg-white text-xs font-bold text-white dark:text-slate-950 transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-slate-800 dark:hover:bg-slate-100 active:scale-[0.98]"
                       >
                         Get it on Google Play
                       </a>
@@ -459,7 +459,7 @@ export const PaymentStatusModal = ({
               <div className="mt-2 w-full space-y-2">
                 <a
                   href="/buyer/orders"
-                  className="flex h-11 w-full items-center justify-center rounded-xl bg-yellow-400 text-sm font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98]"
+                  className="flex h-11 w-full items-center justify-center rounded-xl bg-yellow-400 text-sm font-bold text-black transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-yellow-300 active:scale-[0.98]"
                 >
                   View My Orders
                 </a>
@@ -489,7 +489,7 @@ export const PaymentStatusModal = ({
                   onCancelRetry?.();
                   onClose();
                 }}
-                className="h-11 w-full rounded-xl bg-yellow-400 text-sm font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98]"
+                className="h-11 w-full rounded-xl bg-yellow-400 text-sm font-bold text-black transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-yellow-300 active:scale-[0.98]"
               >
                 Try Again
               </button>
@@ -522,7 +522,7 @@ export const PaymentStatusModal = ({
                   type="button"
                   onClick={handleRecheck}
                   disabled={isCancelling}
-                  className="flex h-11 w-full items-center justify-center rounded-xl bg-yellow-400 text-sm font-bold text-black transition-all hover:bg-yellow-300 active:scale-[0.98] disabled:opacity-50"
+                  className="flex h-11 w-full items-center justify-center rounded-xl bg-yellow-400 text-sm font-bold text-black transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-yellow-300 active:scale-[0.98] disabled:opacity-50"
                 >
                   I entered my PIN — Check Again
                 </button>
@@ -530,7 +530,7 @@ export const PaymentStatusModal = ({
                   type="button"
                   onClick={handleCancelAndRetry}
                   disabled={isCancelling}
-                  className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 dark:border-white/20 bg-transparent text-sm font-semibold text-slate-800 dark:text-white transition-all hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
+                  className="flex h-11 w-full items-center justify-center rounded-xl border border-slate-300 dark:border-white/20 bg-transparent text-sm font-semibold text-slate-800 dark:text-white transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-slate-100 dark:hover:bg-white/10 active:scale-[0.98] disabled:opacity-50"
                 >
                   {isCancelling ? (
                     <>

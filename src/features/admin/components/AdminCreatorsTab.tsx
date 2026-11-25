@@ -51,7 +51,7 @@ export const AdminCreatorsTab = ({
             type="text"
             aria-label="Search creators"
             placeholder="Search creators..."
-            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-all font-medium text-xs sm:text-sm"
+            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-[transform,background-color,border-color,color,box-shadow,opacity] font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
@@ -76,7 +76,7 @@ export const AdminCreatorsTab = ({
         </div>
       </div>
       <CardContent className="p-0">
-        <div className="overflow-x-auto no-scrollbar touch-pan-x">
+        <div className="overflow-x-auto touch-pan-x">
           <table className="w-full text-left border-collapse">
             <thead className="bg-fill text-xs font-medium text-label-3 uppercase tracking-wider">
               <tr>

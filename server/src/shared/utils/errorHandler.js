@@ -181,3 +181,17 @@ export const handlePostgresForeignKeyError = (err) => {
   const message = `Invalid reference: ${detail}. This operation violates a database relationship.`;
   return new AppError(message, 400);
 };
+
+/**
+ * Forward unexpected controller errors to Express globalErrorHandler when `next`
+ * is available, falling back to a sanitized 500 JSON payload in direct calls.
+ */
+export const sendServerError = (res, next, error, fallbackMessage = 'Internal server error') => {
+  if (typeof next === 'function') {
+    return next(error instanceof Error ? error : new AppError(fallbackMessage, 500));
+  }
+  return res.status(500).json({
+    status: 'error',
+    message: fallbackMessage
+  });
+};

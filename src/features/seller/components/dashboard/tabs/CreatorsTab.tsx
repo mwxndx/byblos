@@ -254,7 +254,7 @@ export function CreatorsTab() {
                   type="button"
                   onClick={handleToggleMarketplace}
                   disabled={updateListingMutation.isPending}
-                  className={`h-11 px-5 font-semibold transition-all ${
+                  className={`h-11 px-5 font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] ${
                     isMarketplaceEnabled
                       ? 'border border-slate-300 dark:border-separator bg-transparent text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10'
                       : 'bg-yellow-400 text-black hover:bg-yellow-300'

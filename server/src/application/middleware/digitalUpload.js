@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import os from 'node:os';
 import { uploadToCloudinary } from '../../shared/utils/cloudinary.js';
+import logger from '../../shared/utils/logger.js';
 
 // Allowed extensions categorized strictly into Audio, Video, and Document
 export const DIGITAL_CATEGORIES = {
@@ -145,7 +146,7 @@ export const cloudinaryDigitalUpload = (req, res, next) => {
                 }
             } catch (_) { /* ignore cleanup errors */ }
 
-            console.error('[digitalUpload] Cloudinary upload failed:', uploadErr.message);
+            logger.error('[digitalUpload] Cloudinary upload failed:', uploadErr.message);
             return res.status(500).json({
                 status: 'error',
                 message: 'Failed to upload file to storage. Please try again.',

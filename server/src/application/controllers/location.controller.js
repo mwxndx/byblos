@@ -1,4 +1,5 @@
 import { searchLocations } from '../../domains/logistics/locationSearch.service.js';
+import logger from '../../shared/utils/logger.js';
 
 export async function getConfig(req, res) {
   const cartoApiKey = (process.env.CARTO_API_KEY || '').trim();
@@ -28,7 +29,7 @@ export async function search(req, res, next) {
       data: locations,
     });
   } catch (error) {
-    console.warn('[LocationSearch] Search failed:', {
+    logger.warn('[LocationSearch] Search failed:', {
       message: error.message,
       providerErrors: error.providerErrors || [],
     });

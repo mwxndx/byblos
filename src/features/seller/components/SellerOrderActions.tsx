@@ -63,7 +63,7 @@ export function SellerOrderActions({
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"
-                                                                className="w-full min-h-10 justify-center border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 text-xs font-semibold transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
                                                                 onClick={() => onSelectHubDropoff(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -76,7 +76,7 @@ export function SellerOrderActions({
                                                         <div className="mb-2 space-y-1.5">
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center bg-yellow-400 text-black hover:bg-yellow-300 text-xs font-semibold transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center bg-yellow-400 text-black hover:bg-yellow-300 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
                                                                 onClick={() => onRequestPickup(order)}
                                                                 disabled={isUpdating || isRequestingPickup}
                                                             >
@@ -95,7 +95,7 @@ export function SellerOrderActions({
                                                             </p>
                                                             <Button
                                                                 size="sm"
-                                                                className="w-full min-h-10 justify-center bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
                                                                 onClick={() => onReadyForPickup(order.id, 'hub_dropoff')}
                                                                 disabled={isUpdating}
                                                             >
@@ -114,7 +114,7 @@ export function SellerOrderActions({
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full text-red-200 hover:bg-red-500/10 border-red-400/20 hover:border-red-400/30 text-xs font-semibold transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full text-red-200 hover:bg-red-500/10 border-red-400/20 hover:border-red-400/30 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
                                                                 onClick={() => onCancel(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -137,7 +137,7 @@ export function SellerOrderActions({
                                                             <Button
                                                                 size="sm"
                                                                 variant="outline"
-                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full text-red-200 hover:bg-red-500/10 border-red-400/20 hover:border-red-400/30 text-xs font-semibold transition-all duration-200"
+                                                                className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full text-red-200 hover:bg-red-500/10 border-red-400/20 hover:border-red-400/30 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
                                                                 onClick={() => onCancel(order.id)}
                                                                 disabled={isUpdating}
                                                             >
@@ -188,7 +188,7 @@ export function SellerOrderActions({
                                                                 <Button
                                                                     size="sm"
                                                                     variant="outline"
-                                                                    className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full text-red-200 hover:bg-red-500/10 border-red-400/20 hover:border-red-400/30 text-xs font-semibold transition-all duration-200"
+                                                                    className="w-full min-h-10 justify-center sm:w-auto sm:justify-start lg:w-full text-red-200 hover:bg-red-500/10 border-red-400/20 hover:border-red-400/30 text-xs font-semibold transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
                                                                     onClick={() => onCancel(order.id)}
                                                                     disabled={isUpdating}
                                                                 >

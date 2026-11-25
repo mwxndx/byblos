@@ -53,7 +53,7 @@ export function BuyerForgotPassword() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => navigate('/buyer/login')}
-                                className="text-slate-700 dark:text-white/75 hover:text-slate-950 dark:hover:text-white hover:bg-yellow-400 hover:text-black dark:hover:bg-yellow-400/20 transition-all duration-200 rounded-xl px-3 py-2 text-sm"
+                                className="text-slate-700 dark:text-white/75 hover:text-slate-950 dark:hover:text-white hover:bg-yellow-400 hover:text-black dark:hover:bg-yellow-400/20 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 rounded-xl px-3 py-2 text-sm"
                             >
                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                 <span className="hidden sm:inline">Back</span>

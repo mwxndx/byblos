@@ -79,7 +79,7 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
         {onOpenBroadcastModal && (
           <Button
             onClick={onOpenBroadcastModal}
-            className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-9 sm:h-10 px-4 sm:px-5 rounded-xl flex items-center gap-2 transition-all w-full sm:w-auto justify-center shrink-0 shadow-sm"
+            className="bg-white hover:bg-gray-100 text-black border border-gray-200 font-semibold text-xs sm:text-sm h-9 sm:h-10 px-4 sm:px-5 rounded-xl flex items-center gap-2 transition-[transform,background-color,border-color,color,box-shadow,opacity] w-full sm:w-auto justify-center shrink-0 shadow-sm"
           >
             <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             <span>Broadcast Update</span>
@@ -90,7 +90,7 @@ export function AdminOverviewTab({ dashboardState, onOpenBroadcastModal }: Reado
       {/* Analytics */}
       <div>
         <p className="mb-2 sm:mb-3 text-xs sm:text-sm font-semibold text-label-2">Analytics</p>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <SalesChart data={asChartData(analytics.salesTrends)} />
           <RevenueChart data={asChartData(analytics.revenueTrends)} />
           <UserGrowthChart data={asChartData(analytics.userGrowth)} />

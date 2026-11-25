@@ -108,7 +108,7 @@ export function AdminBroadcastModal({ isOpen, onClose }: Readonly<AdminBroadcast
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6 bg-surface-1 border border-separator rounded-2xl sm:rounded-3xl">
+      <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md max-h-[90dvh] overflow-y-auto p-4 sm:p-6 bg-surface-1 border border-separator rounded-2xl sm:rounded-3xl">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 shrink-0">

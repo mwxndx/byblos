@@ -83,7 +83,7 @@ const TermsModal = ({ isOpen, onClose, onAccept, initialSection = 'privacy' }: T
               <button
                 key={s.id}
                 onClick={() => scrollTo(s.id)}
-                className={`w-full text-left text-xs px-3 py-2.5 rounded-lg mb-1 transition-all duration-150 leading-tight
+                className={`w-full text-left text-xs px-3 py-2.5 rounded-lg mb-1 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-150 leading-tight
                   ${activeSection === s.id
                     ? 'bg-[#c9a84c] text-[#1a1a1a] font-bold shadow-sm'
                     : 'text-gray-400 hover:text-white hover:bg-white/5'

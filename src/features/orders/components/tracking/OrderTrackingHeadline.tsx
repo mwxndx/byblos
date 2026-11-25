@@ -42,7 +42,7 @@ export function OrderTrackingHeadline({ order, state }: Readonly<OrderTrackingHe
       <div className="overflow-hidden rounded-full bg-slate-200 dark:bg-white/10 p-0.5">
         <div
           className={cn(
-            'h-1.5 rounded-full transition-all duration-500',
+            'h-1.5 rounded-full transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-500',
             getProgressBarColor(journey.state, journey.isDelivered || order.status === 'COMPLETED', riderMoving)
           )}
           style={{ width: `${Math.min(100, Math.max(8, dynamicProgressPercent))}%` }}

@@ -92,7 +92,7 @@ export function BagSheet() {
           <button type="button" aria-label="Close bag" onClick={bag.close} className="absolute inset-0 bg-black/50 backdrop-blur-xs" />
           <form
             onSubmit={handlePaymentInitiate}
-            className="relative flex max-h-[92vh] flex-col rounded-t-3xl border-t shadow-2xl"
+            className="relative flex max-h-[92dvh] flex-col rounded-t-3xl border-t shadow-2xl"
             style={{ backgroundColor: 'var(--byblos-surface, #ffffff)', color: 'var(--byblos-text, #0f0f0e)', borderColor: 'var(--byblos-border, rgba(0,0,0,0.12))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
           >
             {/* ── Pinned: header + items + summary (stagnant, above door delivery) ── */}
@@ -104,7 +104,7 @@ export function BagSheet() {
               </div>
             </div>
 
-            <div className="max-h-[26vh] shrink-0 overflow-y-auto px-5 pt-3">
+            <div className="max-h-[26dvh] shrink-0 overflow-y-auto px-5 pt-3">
               <ul className="space-y-2">
                 {bag.items.map((line) => (
                   <li key={String(line.product.id)} className="flex items-center gap-3 rounded-2xl border p-2" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.1))' }}>
@@ -120,12 +120,12 @@ export function BagSheet() {
                     </div>
                     {!checkout.hasService && (
                       <div className="flex items-center gap-1.5">
-                        <button type="button" aria-label="Decrease" onClick={() => bag.setQuantity(line.product.id, line.quantity - 1)} className="flex h-7 w-7 items-center justify-center rounded-full border" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.15))' }}><Minus className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label="Decrease" onClick={() => bag.setQuantity(line.product.id, line.quantity - 1)} className="relative flex h-7 w-7 items-center justify-center rounded-full border before:absolute before:-inset-1.5 before:content-['']" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.15))' }}><Minus className="h-3.5 w-3.5" /></button>
                         <span className="w-5 text-center text-sm font-semibold tabular-nums">{line.quantity}</span>
-                        <button type="button" aria-label="Increase" onClick={() => bag.setQuantity(line.product.id, line.quantity + 1)} className="flex h-7 w-7 items-center justify-center rounded-full border" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.15))' }}><Plus className="h-3.5 w-3.5" /></button>
+                        <button type="button" aria-label="Increase" onClick={() => bag.setQuantity(line.product.id, line.quantity + 1)} className="relative flex h-7 w-7 items-center justify-center rounded-full border before:absolute before:-inset-1.5 before:content-['']" style={{ borderColor: 'var(--byblos-border, rgba(0,0,0,0.15))' }}><Plus className="h-3.5 w-3.5" /></button>
                       </div>
                     )}
-                    <button type="button" aria-label={`Remove ${line.product.name}`} onClick={() => bag.removeProduct(line.product.id)} className="rounded-full p-1.5 text-red-400 hover:bg-red-500/10"><Trash2 className="h-4 w-4" /></button>
+                    <button type="button" aria-label={`Remove ${line.product.name}`} onClick={() => bag.removeProduct(line.product.id)} className="relative rounded-full p-2 text-red-400 hover:bg-red-500/10 before:absolute before:-inset-1 before:content-['']"><Trash2 className="h-4 w-4" /></button>
                   </li>
                 ))}
               </ul>

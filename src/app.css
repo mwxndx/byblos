@@ -5,15 +5,6 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html {
-    font-size: 14px;
-}
-@media (min-width: 640px) {
-    html {
-        font-size: 15px;
-    }
-}
-
 html,
 body,
 #root {
@@ -31,6 +22,7 @@ body,
        is ignored on Android/Windows so Inter is used there, not Roboto. */
     font-family: -apple-system, 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 :root {
@@ -1403,6 +1395,26 @@ nav,
 
 [data-theme="light"] .auth-page header {
     border-bottom-color: #ffffff !important;
+}
+
+/* ── Design-engineering polish: balanced headings, pretty descriptions, neutral image edge outlines ── */
+h1, h2, h3, h4 {
+    text-wrap: balance;
+}
+
+p:not(.truncate),
+dd,
+li {
+    text-wrap: pretty;
+}
+
+:is(.shop-page-root, .buyer-surface, .seller-surface, .creator-surface) img:is(.object-cover, .object-contain) {
+    outline: 1px solid rgba(255, 255, 255, 0.1);
+    outline-offset: -1px;
+}
+
+[data-theme="light"] :is(.shop-page-root, .buyer-surface, .seller-surface, .creator-surface) img:is(.object-cover, .object-contain) {
+    outline-color: rgba(0, 0, 0, 0.08);
 }
 
 

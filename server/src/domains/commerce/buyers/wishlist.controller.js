@@ -1,5 +1,6 @@
 import * as wishlistRepository from '../repositories/wishlist.repository.js';
 import { sanitizePublicProduct } from '../../../shared/utils/sanitize.js';
+import logger from '../../../shared/utils/logger.js';
 
 // Get the buyer's wishlist
 export const getWishlist = async (req, res) => {
@@ -36,11 +37,11 @@ export const getWishlist = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error in getWishlist:', error);
+    logger.error('Error in getWishlist:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to get wishlist',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {})
     });
   }
 };
@@ -76,7 +77,7 @@ export const addToWishlist = async (req, res) => {
       message: 'Product added to wishlist successfully'
     });
   } catch (error) {
-    console.error('Error in addToWishlist:', error);
+    logger.error('Error in addToWishlist:', error);
     if (error.code === '23505' || error.code === 'DUPLICATE_WISHLIST_ITEM') { // Unique violation or duplicate
       return res.status(409).json({
         success: false,
@@ -86,7 +87,7 @@ export const addToWishlist = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to add to wishlist',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {})
     });
   }
 };
@@ -120,11 +121,11 @@ export const removeFromWishlist = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Error in removeFromWishlist:', error);
+    logger.error('Error in removeFromWishlist:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to remove from wishlist',
-      error: error.message
+      ...(process.env.NODE_ENV === 'development' ? { error: error.message } : {})
     });
   }
 };

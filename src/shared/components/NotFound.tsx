@@ -25,14 +25,14 @@ const NotFound = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             to="/"
-            className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-yellow-400 text-black font-bold text-sm transition-all hover:bg-yellow-300 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-yellow-400 text-black font-bold text-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-yellow-300 active:scale-95"
           >
             <Home className="h-4 w-4" />
             Go Home
           </Link>
           <button
             onClick={() => window.history.back()}
-            className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-white/5 border border-white/10 text-white font-semibold text-sm transition-all hover:bg-white/10 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-xl bg-white/5 border border-white/10 text-white font-semibold text-sm transition-[transform,background-color,border-color,color,box-shadow,opacity] hover:bg-white/10 active:scale-95"
           >
             <ArrowLeft className="h-4 w-4" />
             Go Back

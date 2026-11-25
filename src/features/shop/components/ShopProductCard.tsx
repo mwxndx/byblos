@@ -1,7 +1,7 @@
 import { useState, useMemo, type MouseEvent } from 'react';
-import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, Heart, Image as ImageIcon, Info, Package, X } from '@/shared/ui/icons';
 import { Card } from '@/shared/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/shared/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import type { Product } from '@/shared/types';
 import { cn, formatCurrency, getImageUrl } from '@/shared/utils/formatting';
@@ -114,7 +114,7 @@ export function ShopProductCard({
           borderColor: 'var(--product-card-border, transparent)',
         }}
         className={cn(
-          'product-card-item group relative flex h-full flex-col overflow-hidden rounded-xl border border-transparent transition-all duration-300 sm:rounded-2xl',
+          'product-card-item group relative flex h-full flex-col overflow-hidden rounded-xl border border-transparent transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 sm:rounded-2xl',
           'shadow-[0_4px_16px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_24px_rgba(0,0,0,0.45),0_1px_2px_rgba(255,255,255,0.05)]',
           isSold
             ? 'cursor-not-allowed opacity-70'
@@ -156,7 +156,7 @@ export function ShopProductCard({
               onClick={handleToggleWishlistClick}
               aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
               className={cn(
-                'absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 active:scale-95',
+                'absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full shadow-sm backdrop-blur-sm transition-[transform,background-color,color,box-shadow] duration-200 hover:scale-110 active:scale-95 before:absolute before:-inset-1.5 before:content-[\'\']',
                 wishlisted
                   ? 'bg-white/95 text-red-500 shadow-md dark:bg-zinc-900/90'
                   : 'bg-white/90 text-slate-400 hover:text-slate-600 dark:bg-black/60 dark:text-zinc-400 dark:hover:text-zinc-200 border border-black/5 dark:border-white/10'
@@ -200,7 +200,7 @@ export function ShopProductCard({
               type="button"
               onClick={(e) => { stop(e); setActiveImageIndex(0); setShowImages(true); }}
               aria-label={`View ${product.name} images`}
-              className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0"
+              className="relative flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-[transform,background-color] text-label shrink-0 before:absolute before:-inset-1.5 before:content-['']"
             >
               <ImageIcon className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
             </button>
@@ -221,7 +221,7 @@ export function ShopProductCard({
                   onMouseDown={(e) => e.stopPropagation()}
                   aria-label={`View ${product.name} description`}
                   title="View description"
-                  className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-all text-label shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+                  className="relative flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 active:scale-95 transition-[transform,background-color] text-label shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)] before:absolute before:-inset-1.5 before:content-['']"
                 >
                   <Info className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
                 </button>
@@ -244,46 +244,43 @@ export function ShopProductCard({
         </div>
       </Card>
 
-      {/* Full Image viewer — borderless, clean overlay with only image and close icon */}
-      {showImages && typeof document !== 'undefined' && createPortal(
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 select-none"
-          role="dialog"
-          aria-modal="true"
+      {/* Compact centered image viewer — preserves real proportions without covering the full screen */}
+      <Dialog open={showImages} onOpenChange={setShowImages}>
+        <DialogContent
+          hideCloseButton
+          overlayClassName="bg-black/25 backdrop-blur-[2px]"
           aria-label={`${product.name} images`}
+          onClick={stop}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="w-[88vw] max-w-md max-h-[85dvh] p-2.5 sm:p-3 gap-0 rounded-2xl border border-separator bg-surface-1 shadow-2xl overflow-hidden select-none"
         >
-          {/* Backdrop */}
-          <button
-            type="button"
-            aria-label="Close image viewer"
-            onClick={() => setShowImages(false)}
-            className="absolute inset-0 bg-black/90 backdrop-blur-sm cursor-default transition-opacity duration-200"
-          />
+          <DialogTitle className="sr-only">{product.name} images</DialogTitle>
+          <DialogDescription className="sr-only">
+            Preview images for {product.name}
+          </DialogDescription>
 
-          {/* Close button (top right, safe-area aware) */}
-          <button
-            type="button"
-            onClick={() => setShowImages(false)}
-            aria-label="Close"
-            className="absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white/90 hover:text-white hover:bg-black/80 transition-colors shadow-lg focus:outline-none"
-            style={{ top: 'max(1rem, env(safe-area-inset-top, 1rem))' }}
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="relative flex w-full items-center justify-center rounded-xl bg-black/5 dark:bg-black/30 overflow-hidden">
+            {/* Close button inside the card */}
+            <button
+              type="button"
+              onClick={(e) => { stop(e); setShowImages(false); }}
+              aria-label="Close"
+              className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 before:absolute before:-inset-1.5 before:content-['']"
+            >
+              <X className="h-4 w-4" />
+            </button>
 
-          {/* Center full image container (no border, no card background) */}
-          <div className="relative z-10 flex h-full max-h-[90vh] w-full max-w-4xl items-center justify-center">
             {productImages.length > 0 ? (
               <img
                 src={productImages[activeImageIndex]}
                 alt={`${product.name} - image ${activeImageIndex + 1}`}
-                className="max-h-[85vh] max-w-[95vw] w-auto h-auto object-contain select-none pointer-events-auto rounded-lg shadow-2xl transition-opacity duration-200"
+                className="w-auto h-auto max-w-full max-h-[70dvh] object-contain select-none rounded-lg"
                 decoding="async"
                 onContextMenu={(e) => e.preventDefault()}
               />
             ) : (
-              <div className="flex h-64 w-64 items-center justify-center text-white/40">
-                <Package className="h-16 w-16" />
+              <div className="flex h-48 w-full items-center justify-center text-label-3">
+                <Package className="h-12 w-12" />
               </div>
             )}
 
@@ -297,9 +294,9 @@ export function ShopProductCard({
                     setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
                   }}
                   aria-label="Previous image"
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:scale-110 hover:bg-black/80 active:scale-95"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md transition-[transform,background-color] hover:scale-105 hover:bg-black/80 active:scale-95"
                 >
-                  <ChevronLeft className="h-6 w-6 sm:h-7 sm:w-7" />
+                  <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
                   type="button"
@@ -308,16 +305,13 @@ export function ShopProductCard({
                     setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
                   }}
                   aria-label="Next image"
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-black/60 text-white shadow-lg transition hover:scale-110 hover:bg-black/80 active:scale-95"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md transition-[transform,background-color] hover:scale-105 hover:bg-black/80 active:scale-95"
                 >
-                  <ChevronRight className="h-6 w-6 sm:h-7 sm:w-7" />
+                  <ChevronRight className="h-5 w-5" />
                 </button>
 
                 {/* Subtle bottom indicator dots */}
-                <div
-                  className="absolute bottom-2 inset-x-0 flex items-center justify-center gap-2 pointer-events-auto"
-                  style={{ bottom: 'max(0.75rem, env(safe-area-inset-bottom, 0.75rem))' }}
-                >
+                <div className="absolute bottom-2 inset-x-0 z-20 flex items-center justify-center gap-1.5 pointer-events-auto">
                   {productImages.map((imgUrl, idx) => (
                     <button
                       key={`dot-${product.id}-${imgUrl || idx}`}
@@ -328,10 +322,10 @@ export function ShopProductCard({
                         setActiveImageIndex(idx);
                       }}
                       className={cn(
-                        "h-2 rounded-full transition-all duration-200",
+                        "h-2 rounded-full transition-[width,background-color] duration-200",
                         activeImageIndex === idx
-                          ? "w-6 bg-white shadow"
-                          : "w-2 bg-white/40 hover:bg-white/70"
+                          ? "w-5 bg-white shadow"
+                          : "w-2 bg-white/45 hover:bg-white/75"
                       )}
                     />
                   ))}
@@ -339,9 +333,8 @@ export function ShopProductCard({
               </>
             )}
           </div>
-        </div>,
-        document.body
-      )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

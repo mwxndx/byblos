@@ -54,7 +54,7 @@ export const SellerProductCards = memo(function SellerProductCards({
               onClick={() => onEdit(product.id)}
               aria-label="Edit product"
               title="Edit product"
-              className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:text-white/40 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)]"
+              className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:text-white/40 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.06] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--theme-accent,#f5c518)] before:absolute before:-inset-1.5 before:content-['']"
             >
               <Pencil className="h-4 w-4" />
             </button>
@@ -66,7 +66,7 @@ export const SellerProductCards = memo(function SellerProductCards({
               disabled={isDeleting}
               aria-label="Delete product"
               title="Delete product"
-              className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+              className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg text-red-500/70 hover:text-red-500 hover:bg-red-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 before:absolute before:-inset-1.5 before:content-['']"
             >
               {isDeleting ? (
                 <Loader2 className="h-4 w-4 animate-spin text-red-500" />

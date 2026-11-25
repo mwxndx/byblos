@@ -84,19 +84,19 @@ const LandingHome = () => (
           {/* Three white buttons with black text, gap-6 spacing, and elevated lift effect */}
           <div className="flex w-full flex-col items-center gap-6">
             <Link to="/buyer/dashboard" className="w-full">
-              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
+              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 ease-ios">
                 View Brands
               </Button>
             </Link>
 
             <Link to="/seller/register" className="w-full">
-              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
+              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 ease-ios">
                 Add Brand
               </Button>
             </Link>
 
             <Link to="/creator/login" className="w-full">
-              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-all duration-200 ease-ios">
+              <Button className="w-full h-11 rounded-full bg-white text-black font-semibold shadow-[0_8px_20px_-4px_rgba(255,255,255,0.2),0_4px_8px_-2px_rgba(0,0,0,0.2)] hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-[0_12px_28px_-4px_rgba(255,255,255,0.3),0_6px_12px_-2px_rgba(0,0,0,0.25)] active:translate-y-0 active:scale-[0.98] active:shadow-md transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 ease-ios">
                 Creator
               </Button>
             </Link>

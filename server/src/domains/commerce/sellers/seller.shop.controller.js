@@ -4,8 +4,10 @@ import { findSellersByLocation, findSellerProducts } from './seller.repository.j
 import { findSellerByShopName, isShopNameAvailable, findSellerById, normalizeShopName } from './seller.model.js';
 import { sanitizeSeller, sanitizePublicSeller } from '../../../shared/utils/sanitize.js';
 import cacheService from '../../../shared/utils/cache.service.js';
+import logger from '../../../shared/utils/logger.js';
+import { sendServerError } from '../../../shared/utils/errorHandler.js';
 
-export const checkShopNameAvailability = async (req, res) => {
+export const checkShopNameAvailability = async (req, res, next) => {
   try {
     const { shopName } = req.query;
 
@@ -49,15 +51,12 @@ export const checkShopNameAvailability = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error checking shop name availability:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error'
-    });
+    logger.error('Error checking shop name availability:', error);
+    return sendServerError(res, next, error, 'Internal server error');
   }
 };
 
-export const getSellerByShopName = async (req, res) => {
+export const getSellerByShopName = async (req, res, next) => {
   try {
     const { shopName } = req.params;
     const normalizedName = String(shopName || '').toLowerCase().trim();
@@ -94,18 +93,15 @@ export const getSellerByShopName = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get seller by shop name error:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error'
-    });
+    logger.error('Get seller by shop name error:', error);
+    return sendServerError(res, next, error, 'Internal server error');
   }
 };
 
 // @desc    Search sellers by city and location
 // @route   GET /api/sellers/search
 // @access  Public
-export const searchSellers = async (req, res) => {
+export const searchSellers = async (req, res, next) => {
   try {
     const { city, location } = req.query;
 
@@ -134,11 +130,8 @@ export const searchSellers = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error searching for sellers:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error'
-    });
+    logger.error('Error searching for sellers:', error);
+    return sendServerError(res, next, error, 'Internal server error');
   }
 };
 
@@ -164,7 +157,7 @@ function boundedOffset(rawPage, limit) {
 // @desc    Get products for a specific seller
 // @route   GET /api/sellers/:sellerId/products
 // @access  Public
-export const getSellerProducts = async (req, res) => {
+export const getSellerProducts = async (req, res, next) => {
   try {
     const { sellerId } = req.params;
 
@@ -202,17 +195,14 @@ export const getSellerProducts = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error fetching seller products:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Internal server error'
-    });
+    logger.error('Error fetching seller products:', error);
+    return sendServerError(res, next, error, 'Internal server error');
   }
 };
 
 
 
-export const getSellerById = async (req, res) => {
+export const getSellerById = async (req, res, next) => {
   try {
     const seller = await findSellerById(req.params.id);
 
@@ -235,11 +225,8 @@ export const getSellerById = async (req, res) => {
       data: responseData
     });
   } catch (error) {
-    console.error('Error fetching seller:', error);
-    res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to fetch seller information'
-    });
+    logger.error('Error fetching seller:', error);
+    return sendServerError(res, next, error, 'Failed to fetch seller information');
   }
 };
 

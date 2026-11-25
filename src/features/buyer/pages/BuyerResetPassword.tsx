@@ -44,7 +44,7 @@ export function BuyerResetPassword() {
                     </div>
                     <Button
                         onClick={() => navigate('/buyer/login')}
-                        className="w-full h-11 bg-slate-200 dark:bg-zinc-800 text-slate-950 dark:text-white hover:bg-slate-300 dark:hover:bg-zinc-700 rounded-xl font-bold transition-all"
+                        className="w-full h-11 bg-slate-200 dark:bg-zinc-800 text-slate-950 dark:text-white hover:bg-slate-300 dark:hover:bg-zinc-700 rounded-xl font-bold transition-[transform,background-color,border-color,color,box-shadow,opacity]"
                     >
                         Back to Login
                     </Button>
@@ -66,7 +66,7 @@ export function BuyerResetPassword() {
                         variant="ghost"
                         size="sm"
                         onClick={() => navigate('/buyer/login')}
-                        className="text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-all duration-200 rounded-xl px-3 py-2 text-sm"
+                        className="text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 rounded-xl px-3 py-2 text-sm"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         <span>Back</span>
@@ -211,7 +211,7 @@ export function BuyerResetPassword() {
                         <div className="mt-6 text-center">
                             <button
                                 onClick={() => navigate('/buyer/login')}
-                                className="font-medium text-yellow-400 hover:text-yellow-300 hover:underline text-sm transition-all"
+                                className="font-medium text-yellow-400 hover:text-yellow-300 hover:underline text-sm transition-[transform,background-color,border-color,color,box-shadow,opacity]"
                             >
                                 Back to Login
                             </button>

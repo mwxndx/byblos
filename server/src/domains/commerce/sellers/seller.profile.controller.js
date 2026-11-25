@@ -34,7 +34,7 @@ export const getProfile = async (req, res) => {
       data: { seller: sanitizeSeller(seller) }
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    logger.error('Get profile error:', error);
     return res.status(500).json({ status: 'error', message: 'Internal server error' });
   }
 };
@@ -145,7 +145,7 @@ export const updateProfile = async (req, res) => {
 
     res.status(200).json({ status: 'success', data: { seller: sanitizeSeller(seller) } });
   } catch (error) {
-    console.error('Error updating profile:', error);
+    logger.error('Error updating profile:', error);
     res.status(500).json({ status: 'error', message: 'Failed to update profile' });
   }
 };
@@ -193,7 +193,7 @@ export const updateTheme = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error updating theme:', error);
+    logger.error('Error updating theme:', error);
     res.status(500).json({
       status: 'error',
       message: 'Failed to update theme',

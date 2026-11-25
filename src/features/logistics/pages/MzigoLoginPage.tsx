@@ -73,7 +73,7 @@ const MzigoLoginPage = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
-                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-all duration-200 hover:bg-yellow-100 hover:text-black"
+                className="rounded-xl px-3 py-2 text-sm text-slate-700 dark:text-white/75 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 hover:bg-yellow-100 hover:text-black"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 <span>Back</span>
@@ -140,7 +140,7 @@ const MzigoLoginPage = () => {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-12 w-full rounded-2xl bg-yellow-400 font-bold text-black hover:bg-yellow-300 transition-all duration-200"
+            className="h-12 w-full rounded-2xl bg-yellow-400 font-bold text-black hover:bg-yellow-300 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200"
           >
             {isSubmitting ? (
               <>

@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from 'node:fs';
+import logger from './logger.js';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -34,7 +35,7 @@ export const uploadToCloudinary = async (filePath, folder = 'products', resource
 
     return result;
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    logger.error('Cloudinary upload error:', error);
     // Delete the temporary file in case of error
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
@@ -52,7 +53,7 @@ export const deleteFromCloudinary = async (publicId, resourceType = 'image') => 
       invalidate: true,
     });
   } catch (error) {
-    console.error('Error deleting from Cloudinary:', error);
+    logger.error('Error deleting from Cloudinary:', error);
     throw error;
   }
 };
@@ -88,7 +89,7 @@ const looksLikeAbsoluteUrl = (value) => {
 export const getDigitalAssetUrls = (publicId, expiresInSeconds = 300) => {
   if (!publicId) return [];
   if (looksLikeAbsoluteUrl(publicId)) {
-    console.warn(
+    logger.warn(
       '[CLOUDINARY] Refusing absolute URL as digital asset public_id; expected Cloudinary public_id only'
     );
     return [];
@@ -110,7 +111,7 @@ export const getDigitalAssetUrls = (publicId, expiresInSeconds = 300) => {
 export const generateSignedDownloadUrl = (publicId, expiresInSeconds = 300, resourceType = 'raw') => {
   if (!publicId) return '';
   if (looksLikeAbsoluteUrl(publicId)) {
-    console.warn(
+    logger.warn(
       '[CLOUDINARY] Refusing absolute URL in generateSignedDownloadUrl; expected Cloudinary public_id only'
     );
     return '';

@@ -62,7 +62,7 @@ export function SellerProfileHero({
       <button
         type="button"
         onClick={() => toggleMetric(key)}
-        className="text-left text-sm min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white truncate transition-transform active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-yellow-400 rounded cursor-pointer"
+        className="text-left text-xs min-[380px]:text-base sm:text-lg lg:text-xl font-bold tabular-nums tracking-tight text-slate-900 dark:text-white break-words transition-transform active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-yellow-400 rounded cursor-pointer"
         title={isCompactable ? (isExpanded ? 'Click to show compact' : 'Click to show full amount') : undefined}
         aria-label={`${key}: ${formatCurrency(val)}`}
       >
@@ -72,7 +72,7 @@ export function SellerProfileHero({
   };
 
   return (
-    <div className="flex flex-row items-start md:items-center gap-5 min-[380px]:gap-6 sm:gap-8 md:gap-8 lg:gap-10 w-full md:w-auto">
+    <div className="flex flex-row items-start md:items-center gap-4 min-[380px]:gap-5 sm:gap-8 md:gap-8 lg:gap-10 w-full md:w-auto">
       {/* Business profile photo and shop link button aligned to the left */}
       <div className="flex shrink-0 flex-col items-start text-left md:contents">
         <div className="relative md:order-1 shrink-0">
@@ -94,7 +94,7 @@ export function SellerProfileHero({
               onClick={() => setIsEditingMedia(true)}
               aria-label="Edit profile photo"
               title="Edit profile photo"
-              className="btn-standard absolute bottom-0 right-0 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[var(--bg)] bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 shadow-sm transition-transform active:scale-95"
+              className="btn-standard absolute bottom-0 right-0 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[var(--bg)] bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 shadow-sm transition-transform active:scale-95 before:absolute before:-inset-2 before:content-['']"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -127,7 +127,7 @@ export function SellerProfileHero({
       {hasMetrics && (
         <div className="flex flex-1 md:contents flex-col min-w-0 pt-1.5 sm:pt-2">
           {/* Mobile grid: 3 cols (Sales, Revenue, Balance on row 1; Clicks, Wishlist on row 2). Desktop: dissolved into parent flex center row */}
-          <div className="grid grid-cols-3 md:contents gap-x-4 min-[380px]:gap-x-5 sm:gap-x-8 lg:gap-x-10 gap-y-2.5 sm:gap-y-3 min-w-0">
+          <div className="grid grid-cols-3 md:contents gap-x-2 min-[380px]:gap-x-4 sm:gap-x-8 lg:gap-x-10 gap-y-2.5 sm:gap-y-3 min-w-0">
             {/* Sales */}
             <div className="col-start-1 row-start-1 md:order-2 flex flex-col min-w-0 shrink-0">
               {renderMetricValue('sales', totalSales)}

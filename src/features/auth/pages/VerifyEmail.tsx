@@ -149,7 +149,7 @@ const VerifyEmail = () => {
                     {status !== 'loading' && (
                         <Button
                             onClick={handleBackToLogin}
-                            className={`w-full h-12 text-lg font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${status === 'success' || status === 'check-email'
+                            className={`w-full h-12 text-lg font-semibold rounded-xl transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-300 flex items-center justify-center gap-2 ${status === 'success' || status === 'check-email'
                                 ? 'bg-yellow-400 text-black hover:bg-yellow-300'
                                 : 'bg-slate-100 dark:bg-white/[0.05] text-slate-950 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-300 dark:border-separator'
                                 }`}

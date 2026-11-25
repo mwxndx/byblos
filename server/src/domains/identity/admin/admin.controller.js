@@ -1,6 +1,7 @@
 import FulfillmentQueueService from '../../orders/fulfillment/fulfillmentQueue.service.js';
 import NotificationService from '../../communication/notifications/notification.service.js';
 import { getAppVersionPolicy, updateAppVersionPolicy } from '../../../shared/utils/appVersion.js';
+import { clampLimit, clampOffset } from '../../../shared/utils/pagination.js';
 
 import dotenv from 'dotenv';
 import { AppError } from '../../../shared/utils/errorHandler.js';
@@ -196,7 +197,7 @@ const getAllProducts = async (req, res, next) => {
       }))
     });
   } catch (error) {
-    console.error('Error getting products:', error);
+    logger.error('Error getting products:', error);
     // Return empty array if there's an error
     res.status(200).json({
       status: 'success',
@@ -227,7 +228,7 @@ const getSellerProducts = async (req, res, next) => {
       }))
     });
   } catch (error) {
-    console.error('Error getting seller products:', error);
+    logger.error('Error getting seller products:', error);
     // Return empty array if there's an error
     res.status(200).json({
       status: 'success',
@@ -262,7 +263,7 @@ const getMonthlyMetrics = async (req, res, next) => {
       data: monthlyMetrics
     });
   } catch (error) {
-    console.error('Error fetching monthly metrics:', {
+    logger.error('Error fetching monthly metrics:', {
       message: error.message,
       code: error.code,
       detail: error.detail,
@@ -400,7 +401,7 @@ const getAllBuyers = async (req, res, next) => {
       data: buyers
     });
   } catch (error) {
-    console.error('Error fetching buyers:', error);
+    logger.error('Error fetching buyers:', error);
     next(new AppError('Failed to fetch buyers', 500));
   }
 };
@@ -420,7 +421,7 @@ const getBuyerById = async (req, res, next) => {
       data: buyer
     });
   } catch (error) {
-    console.error('Error fetching buyer:', error);
+    logger.error('Error fetching buyer:', error);
     next(new AppError('Failed to fetch buyer', 500));
   }
 };
@@ -436,7 +437,7 @@ const deleteUser = async (req, res, next) => {
       data: result
     });
   } catch (error) {
-    console.error('Error deleting user:', error);
+    logger.error('Error deleting user:', error);
     next(new AppError(error.message || 'Failed to delete user account', error.statusCode || 500));
   }
 };
@@ -486,8 +487,8 @@ const getAdminLogisticsRequests = async (req, res, next) => {
     const data = await LogisticsDashboardService.getAdminRequests({
       status: req.query.status,
       sort: req.query.sort,
-      limit: req.query.limit,
-      offset: req.query.offset
+      limit: clampLimit(req.query.limit, 50, 100),
+      offset: clampOffset(req.query.offset)
     });
 
     res.status(200).json({
@@ -698,8 +699,8 @@ const broadcastAppUpdate = async (req, res, next) => {
 
 const getDeadLetterJobs = async (req, res, next) => {
   try {
-    const limit = Number.parseInt(req.query.limit, 10) || 50;
-    const offset = Number.parseInt(req.query.offset, 10) || 0;
+    const limit = clampLimit(req.query.limit, 50, 100);
+    const offset = clampOffset(req.query.offset);
     const jobs = await FulfillmentQueueService.getDeadLetterJobs({ limit, offset });
     res.status(200).json({
       status: 'success',
@@ -755,8 +756,8 @@ const getLedgerStatus = async (req, res, next) => {
 
 const getLedgerEpochs = async (req, res, next) => {
   try {
-    const limit = Number.parseInt(req.query.limit, 10) || 50;
-    const offset = Number.parseInt(req.query.offset, 10) || 0;
+    const limit = clampLimit(req.query.limit, 50, 100);
+    const offset = clampOffset(req.query.offset);
     const result = await AdminService.getLedgerEpochs({ limit, offset });
     res.status(200).json({ status: 'success', data: result });
   } catch (error) {
