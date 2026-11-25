@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Copy, LogOut, Loader2, Store, ExternalLink, AlertCircle } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
-import { getCreatorShopUrl, getShopUsername, resolveShareOrigin } from '@/shared/utils/shopLinks';
+import { getCreatorShopUrl, getShopUsername } from '@/shared/utils/shopLinks';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { money, type LinkedShop } from '@/features/creator/utils/creatorDashboardUtils';
 
@@ -59,7 +59,7 @@ export function CreatorLinkedShops({
             // Read-only preview: the shop opens in creator-preview mode, which
             // hides add-to-bag and wishlist so the creator can't act on their own
             // shop. The shareable tracking link (for shoppers) stays on Copy link.
-            const previewPath = `/${shop.slug || shop.shop_name}?view=creator-preview&rate=${Number(shop.commission_rate || 0.01)}`;
+            const previewPath = `/shop/${encodeURIComponent(shop.slug || shop.shop_name || '')}?view=creator-preview&rate=${Number(shop.commission_rate || 0.01)}`;
             const sellerId = Number(shop.seller_id);
             const isLeaving = leavingSellerId === sellerId;
             return (

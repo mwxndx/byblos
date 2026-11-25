@@ -116,6 +116,10 @@ export const routes = [
   // Standard public seller short link wildcard (must be matched after specific subpaths)
   {
     path: '/:shopName',
-    element: <ShopPage />,
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <ShopPage />
+      </Suspense>
+    ),
   },
 ];

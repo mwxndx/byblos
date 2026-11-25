@@ -93,7 +93,7 @@ export function CreatorAvailableShops({ searchQuery = '' }: Readonly<CreatorAvai
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredShops.map((shop) => {
             const commissionPercent = (shop.creatorCommissionRate * 100).toFixed(1).replace(/\.0$/, '');
-            const previewUrl = `/${shop.slug || shop.shopName}?view=creator-preview&rate=${shop.creatorCommissionRate}`;
+            const previewUrl = `/shop/${encodeURIComponent(shop.slug || shop.shopName)}?view=creator-preview&rate=${shop.creatorCommissionRate}`;
             const isRequesting = requestingShopId === shop.id;
 
             return (

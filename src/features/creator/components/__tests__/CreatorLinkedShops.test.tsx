@@ -1,7 +1,10 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CreatorLinkedShops } from '../CreatorLinkedShops';
 import type { LinkedShop } from '@/features/creator/utils/creatorDashboardUtils';
+
+const render = (ui: React.ReactElement) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe('CreatorLinkedShops', () => {
   const mockOnCopy = vi.fn();
