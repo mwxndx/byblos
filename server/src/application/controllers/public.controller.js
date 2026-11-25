@@ -115,9 +115,12 @@ async function syncPendingPaymentFromProvider(row) {
   return await publicOrderStatusRepository.findStatusByIdentifier(row.order_number) || row;
 }
 
+const PUBLIC_CATALOG_CACHE_CONTROL = 'public, max-age=30, s-maxage=60, stale-while-revalidate=120';
+
 // Get all products (public)
 export const getProducts = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', PUBLIC_CATALOG_CACHE_CONTROL);
     const { aesthetic, city, location, page = 1, limit = 20 } = req.query;
     const pageNum = Math.max(1, Number.parseInt(page, 10));
     const limitNum = Math.min(50, Math.max(1, Number.parseInt(limit, 10)));
@@ -193,6 +196,7 @@ export const getProducts = async (req, res) => {
 // Get a single product (public)
 export const getProduct = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', PUBLIC_CATALOG_CACHE_CONTROL);
     const { id } = req.params;
     const cacheKey = `product:public:${id}`;
     const cachedData = await cacheService.get(cacheKey);
@@ -237,6 +241,7 @@ export const getProduct = async (req, res) => {
 // Get all unique aesthetics
 export const getAesthetics = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600, stale-while-revalidate=600');
     const cacheKey = 'products:aesthetics';
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) return res.status(200).json(cachedData);
@@ -266,6 +271,7 @@ export const getAesthetics = async (req, res) => {
 // Get seller public info
 export const getSellerPublicInfo = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', PUBLIC_CATALOG_CACHE_CONTROL);
     const { id } = req.params;
     const cacheKey = `seller:public:${id}`;
     const cachedData = await cacheService.get(cacheKey);
@@ -303,6 +309,7 @@ export const getSellerPublicInfo = async (req, res) => {
 // Get all active sellers with wishlist count
 export const getSellers = async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=60, stale-while-revalidate=120');
     const page = Math.max(1, Number.parseInt(req.query.page || '1', 10) || 1);
     const pageSize = Math.min(50, Math.max(1, Number.parseInt(req.query.limit || req.query.pageSize || '24', 10) || 24));
     const offset = (page - 1) * pageSize;

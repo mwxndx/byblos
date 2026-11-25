@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/shared/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GlobalAuthProvider } from "@/features/auth/contexts";
 import { ForegroundNotificationListener } from "@/features/notifications/components/ForegroundNotificationListener";
+import { setupPublicQueryPersistence } from "@/shared/utils/publicQueryPersistence";
 
 
 const queryClient = new QueryClient({
@@ -16,6 +17,10 @@ const queryClient = new QueryClient({
         },
     },
 });
+
+if (typeof window !== 'undefined') {
+    setupPublicQueryPersistence(queryClient);
+}
 
 export const AppProviders = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
