@@ -244,97 +244,106 @@ export function ShopProductCard({
         </div>
       </Card>
 
-      {/* Compact centered image viewer — preserves real proportions without covering the full screen */}
-      <Dialog open={showImages} onOpenChange={setShowImages}>
-        <DialogContent
-          hideCloseButton
-          overlayClassName="bg-black/25 backdrop-blur-[2px]"
-          aria-label={`${product.name} images`}
-          onClick={stop}
-          onPointerDown={(e) => e.stopPropagation()}
-          className="w-[88vw] max-w-md max-h-[85dvh] p-2.5 sm:p-3 gap-0 rounded-2xl border border-separator bg-surface-1 shadow-2xl overflow-hidden select-none"
-        >
-          <DialogTitle className="sr-only">{product.name} images</DialogTitle>
-          <DialogDescription className="sr-only">
-            Preview images for {product.name}
-          </DialogDescription>
+      {/* Compact borderless image viewer — preserves real proportions without covering the full screen */}
+      <div
+        onClick={stop}
+        onPointerDown={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <Dialog open={showImages} onOpenChange={setShowImages}>
+          <DialogContent
+            disableAnimation
+            hideCloseButton
+            overlayClassName="bg-black/25 backdrop-blur-none cursor-pointer"
+            onOverlayClick={(e) => {
+              stop(e);
+              setShowImages(false);
+            }}
+            aria-label={`${product.name} images`}
+            className="w-fit max-w-[92vw] sm:max-w-xl max-h-[85dvh] p-0 gap-0 border-0 bg-transparent shadow-none overflow-hidden select-none"
+          >
+            <DialogTitle className="sr-only">{product.name} images</DialogTitle>
+            <DialogDescription className="sr-only">
+              Preview images for {product.name}
+            </DialogDescription>
 
-          <div className="relative flex w-full items-center justify-center rounded-xl bg-black/5 dark:bg-black/30 overflow-hidden">
-            {/* Close button inside the card */}
-            <button
-              type="button"
-              onClick={(e) => { stop(e); setShowImages(false); }}
-              aria-label="Close"
-              className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 before:absolute before:-inset-1.5 before:content-['']"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="relative flex items-center justify-center overflow-hidden rounded-xl">
+              {/* Close button inside the image */}
+              <button
+                type="button"
+                onClick={(e) => { stop(e); setShowImages(false); }}
+                aria-label="Close"
+                className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 before:absolute before:-inset-1.5 before:content-['']"
+              >
+                <X className="h-4 w-4" />
+              </button>
 
-            {productImages.length > 0 ? (
-              <img
-                src={productImages[activeImageIndex]}
-                alt={`${product.name} - image ${activeImageIndex + 1}`}
-                className="w-auto h-auto max-w-full max-h-[70dvh] object-contain select-none rounded-lg"
-                decoding="async"
-                onContextMenu={(e) => e.preventDefault()}
-              />
-            ) : (
-              <div className="flex h-48 w-full items-center justify-center text-label-3">
-                <Package className="h-12 w-12" />
-              </div>
-            )}
-
-            {/* Navigation buttons if multiple images */}
-            {productImages.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    stop(e);
-                    setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
-                  }}
-                  aria-label="Previous image"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md transition-[transform,background-color] hover:scale-105 hover:bg-black/80 active:scale-95"
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    stop(e);
-                    setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
-                  }}
-                  aria-label="Next image"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md transition-[transform,background-color] hover:scale-105 hover:bg-black/80 active:scale-95"
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-
-                {/* Subtle bottom indicator dots */}
-                <div className="absolute bottom-2 inset-x-0 z-20 flex items-center justify-center gap-1.5 pointer-events-auto">
-                  {productImages.map((imgUrl, idx) => (
-                    <button
-                      key={`dot-${product.id}-${imgUrl || idx}`}
-                      type="button"
-                      aria-label={`Go to image ${idx + 1}`}
-                      onClick={(e) => {
-                        stop(e);
-                        setActiveImageIndex(idx);
-                      }}
-                      className={cn(
-                        "h-2 rounded-full transition-[width,background-color] duration-200",
-                        activeImageIndex === idx
-                          ? "w-5 bg-white shadow"
-                          : "w-2 bg-white/45 hover:bg-white/75"
-                      )}
-                    />
-                  ))}
+              {productImages.length > 0 ? (
+                <img
+                  src={productImages[activeImageIndex]}
+                  alt={`${product.name} - image ${activeImageIndex + 1}`}
+                  className="w-auto h-auto max-w-full max-h-[85dvh] object-contain select-none rounded-xl shadow-2xl"
+                  decoding="async"
+                  onContextMenu={(e) => e.preventDefault()}
+                />
+              ) : (
+                <div className="flex h-48 w-48 items-center justify-center rounded-xl bg-surface-1 text-label-3">
+                  <Package className="h-12 w-12" />
                 </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+              )}
+
+              {/* Navigation buttons if multiple images */}
+              {productImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      stop(e);
+                      setActiveImageIndex((prev) => (prev === 0 ? productImages.length - 1 : prev - 1));
+                    }}
+                    aria-label="Previous image"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md transition-[transform,background-color] hover:scale-105 hover:bg-black/80 active:scale-95"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      stop(e);
+                      setActiveImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
+                    }}
+                    aria-label="Next image"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white shadow-md transition-[transform,background-color] hover:scale-105 hover:bg-black/80 active:scale-95"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+
+                  {/* Subtle bottom indicator dots */}
+                  <div className="absolute bottom-2 inset-x-0 z-20 flex items-center justify-center gap-1.5 pointer-events-auto">
+                    {productImages.map((imgUrl, idx) => (
+                      <button
+                        key={`dot-${product.id}-${imgUrl || idx}`}
+                        type="button"
+                        aria-label={`Go to image ${idx + 1}`}
+                        onClick={(e) => {
+                          stop(e);
+                          setActiveImageIndex(idx);
+                        }}
+                        className={cn(
+                          "h-2 rounded-full transition-[width,background-color] duration-200",
+                          activeImageIndex === idx
+                            ? "w-5 bg-white shadow"
+                            : "w-2 bg-white/45 hover:bg-white/75"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
     </>
   );
 }

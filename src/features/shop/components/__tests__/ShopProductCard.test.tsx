@@ -108,11 +108,18 @@ describe('ShopProductCard', () => {
 
     const viewerImg = screen.getByAltText(/Byblos Silk Shirt - image 1/i);
     expect(viewerImg).toHaveAttribute('decoding', 'async');
-    expect(viewerImg).toHaveClass('object-contain', 'max-h-[70dvh]', 'w-auto', 'h-auto');
+    expect(viewerImg).toHaveClass('object-contain', 'max-h-[85dvh]', 'w-auto', 'h-auto');
 
-    // Compact card dialog (not full-screen inset-0) with close button inside
+    // Compact borderless dialog (no black border, no exit animation flash) with close button inside
     expect(dialog).not.toHaveClass('inset-0');
-    expect(dialog).toHaveClass('max-w-md');
+    expect(dialog).toHaveClass('border-0', 'bg-transparent', 'p-0', 'animate-none');
+    expect(dialog).not.toHaveClass('zoom-out-95');
+
+    // Backdrop has no blur
+    const overlay = document.body.querySelector('[class*="fixed inset-0"]');
+    expect(overlay).not.toBeNull();
+    expect(overlay?.className).toContain('backdrop-blur-none');
+
     const closeBtn = screen.getByRole('button', { name: /^Close$/i });
     expect(dialog.contains(closeBtn)).toBe(true);
 
@@ -120,6 +127,14 @@ describe('ShopProductCard', () => {
     fireEvent.click(screen.getByRole('button', { name: /Next image/i }));
     expect(screen.getByAltText(/Byblos Silk Shirt - image 2/i)).toBeInTheDocument();
     fireEvent.click(closeBtn);
+    expect(screen.queryByRole('dialog', { name: /Byblos Silk Shirt images/i })).not.toBeInTheDocument();
+    expect(handleTap).not.toHaveBeenCalled();
+
+    // Clicking outside (overlay) also closes without triggering card onTap
+    fireEvent.click(imageBtn);
+    const reopenedOverlay = document.body.querySelector('[class*="fixed inset-0"]');
+    expect(reopenedOverlay).not.toBeNull();
+    fireEvent.click(reopenedOverlay!);
     expect(screen.queryByRole('dialog', { name: /Byblos Silk Shirt images/i })).not.toBeInTheDocument();
     expect(handleTap).not.toHaveBeenCalled();
   });

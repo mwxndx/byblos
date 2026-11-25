@@ -32,11 +32,13 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     disableAnimation?: boolean;
     overlayClassName?: string;
+    onOverlayClick?: React.MouseEventHandler<HTMLDivElement>;
     hideCloseButton?: boolean;
   }
->(({ className, children, disableAnimation, overlayClassName, hideCloseButton, ...props }, ref) => (
+>(({ className, children, disableAnimation, overlayClassName, onOverlayClick, hideCloseButton, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay
+      onClick={onOverlayClick}
       className={cn(
         disableAnimation
           ? "animate-none transition-none duration-0 data-[state=open]:animate-none data-[state=closed]:animate-none"
