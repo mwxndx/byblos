@@ -162,11 +162,30 @@ export function formatDate(dateInput: string | Date, format: 'full' | 'date' | '
   }
 }
 
+const CLOUDINARY_UPLOAD_SEGMENT = '/image/upload/';
+
+function optimizeCloudinaryUrl(url: string, width?: number): string {
+  if (!url.includes('res.cloudinary.com') || !url.includes(CLOUDINARY_UPLOAD_SEGMENT)) {
+    return url;
+  }
+
+  const [prefix, rest] = url.split(CLOUDINARY_UPLOAD_SEGMENT);
+  if (!rest) return url;
+
+  const firstSegment = rest.split('/')[0] || '';
+  if (firstSegment.includes('f_auto') || firstSegment.includes('q_auto')) {
+    return url;
+  }
+
+  const transforms = width ? `f_auto,q_auto,w_${width},c_limit` : 'f_auto,q_auto';
+  return `${prefix}${CLOUDINARY_UPLOAD_SEGMENT}${transforms}/${rest}`;
+}
+
 /**
  * Normalizes an image path or URL to a full URL
  * Handles base64, absolute URLs, relative paths, and Capacitor Native environment paths
  */
-export function getImageUrl(path: string | undefined | null): string {
+export function getImageUrl(path: string | undefined | null, width?: number): string {
   const placeholder = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect width="400" height="400" fill="%23111111"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23666666"%3ENo Image%3C/text%3E%3C/svg%3E';
 
   // Return placeholder image if no path provided or string is 'null'/'undefined'
@@ -179,7 +198,7 @@ export function getImageUrl(path: string | undefined | null): string {
 
   // 1. If it's already a full URL (http/https), a data URL (base64), or a blob URL, return it as is
   if (trimmed.startsWith('http') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
-    return trimmed;
+    return trimmed.startsWith('http') ? optimizeCloudinaryUrl(trimmed, width) : trimmed;
   }
 
   // 2. Identify the backend base URL

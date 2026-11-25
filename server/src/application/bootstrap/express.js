@@ -57,8 +57,8 @@ export default async (app) => {
             if (/\.(html?|svg|xml|js|mjs|css)$/i.test(filePath)) {
                 res.setHeader('Content-Type', 'text/plain; charset=utf-8');
             }
-            if (/\.(jpg|jpeg|png|webp)$/.test(filePath)) {
-                res.setHeader('Cache-Control', 'public, max-age=86400');
+            if (/\.(jpg|jpeg|png|webp|avif|gif)$/i.test(filePath)) {
+                res.setHeader('Cache-Control', 'public, max-age=2592000, stale-while-revalidate=86400');
             }
         }
     }));

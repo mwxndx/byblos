@@ -17,9 +17,13 @@ describe('getImageUrl utility', () => {
     expect(getImageUrl(' null ')).toBe(placeholder);
   });
 
-  it('preserves full http/https, data, and blob URLs', () => {
+  it('preserves non-Cloudinary full http/https, data, and blob URLs and optimizes Cloudinary URLs', () => {
     expect(getImageUrl('https://res.cloudinary.com/byblos/image/upload/sample.jpg'))
-      .toBe('https://res.cloudinary.com/byblos/image/upload/sample.jpg');
+      .toBe('https://res.cloudinary.com/byblos/image/upload/f_auto,q_auto/sample.jpg');
+    expect(getImageUrl('https://res.cloudinary.com/byblos/image/upload/v1700000000/sample.jpg', 600))
+      .toBe('https://res.cloudinary.com/byblos/image/upload/f_auto,q_auto,w_600,c_limit/v1700000000/sample.jpg');
+    expect(getImageUrl('https://res.cloudinary.com/byblos/image/upload/f_auto,q_auto/sample.jpg'))
+      .toBe('https://res.cloudinary.com/byblos/image/upload/f_auto,q_auto/sample.jpg');
     expect(getImageUrl('http://example.com/pic.png'))
       .toBe('http://example.com/pic.png');
     expect(getImageUrl('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='))
