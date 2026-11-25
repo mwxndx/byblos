@@ -4,6 +4,7 @@ import { updateSellerTheme, updateSellerBusinessPhoto } from './seller.repositor
 import { invalidateAuthCache } from '../../../shared/utils/authCache.js';
 import logger from '../../../shared/utils/logger.js';
 import ImageService from '../../../infrastructure/storage/image.service.js';
+import { validateProductImage } from '../products/productValidationRules.js';
 import { getTokenFromRequest } from '../../../shared/utils/jwt.js';
 import { findSellerByUserId, findSellerById, isShopNameAvailable, updateSeller, normalizeShopName } from './seller.model.js';
 import { sanitizeSeller } from '../../../shared/utils/sanitize.js';
@@ -63,17 +64,19 @@ export const updateProfile = async (req, res) => {
 
     if (req.body.avatarUrl !== undefined || req.body.avatar_url !== undefined) {
       const avatarUrl = String(req.body.avatarUrl ?? req.body.avatar_url ?? '').trim();
-      const isAllowedAvatar =
-        avatarUrl === '' ||
-        avatarUrl.startsWith('/') ||
-        avatarUrl.startsWith('http://') ||
-        avatarUrl.startsWith('https://');
-
-      if (!isAllowedAvatar || avatarUrl.length > 2048) {
-        return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image URL' });
+      let validatedAvatar = null;
+      if (avatarUrl !== '') {
+        if (avatarUrl.length > 2048 || avatarUrl.startsWith('data:')) {
+          return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image URL' });
+        }
+        try {
+          validatedAvatar = validateProductImage(avatarUrl);
+        } catch {
+          return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image URL' });
+        }
       }
 
-      req.body.avatarUrl = avatarUrl || null;
+      req.body.avatarUrl = validatedAvatar;
       delete req.body.avatar_url;
     }
 
@@ -223,6 +226,12 @@ export const uploadBusinessPhoto = async (req, res) => {
       businessPhoto = await ImageService.base64ToFile(base64String, 'seller_business_photo');
     } else if (businessPhoto && ImageService.isBase64Image(businessPhoto)) {
       businessPhoto = await ImageService.base64ToFile(businessPhoto, 'seller_business_photo');
+    } else if (businessPhoto) {
+      try {
+        businessPhoto = validateProductImage(businessPhoto);
+      } catch {
+        return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image' });
+      }
     }
 
     const businessPhotoValue = businessPhoto === '' ? null : businessPhoto;

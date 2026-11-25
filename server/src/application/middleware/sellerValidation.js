@@ -35,8 +35,14 @@ export const sellerRegistrationSchema = z.object({
     physicalAddress: z.string().optional(),
     latitude: z.number().optional(),
     longitude: z.number().optional(),
-    businessPhoto: z.string().optional(),
-    avatarUrl: z.string().optional(),
+    businessPhoto: z.string().max(7 * 1024 * 1024).refine(
+        (val) => !val || val.startsWith('data:image/') || val.startsWith('/uploads/') || val.startsWith('https://'),
+        'Business photo must be a valid image'
+    ).optional(),
+    avatarUrl: z.string().max(2048).refine(
+        (val) => !val || val.startsWith('/uploads/') || val.startsWith('https://'),
+        'Avatar URL must be a valid HTTPS or upload path'
+    ).optional(),
     referralCode: z.string().regex(/^BY[A-Z0-9]{6}$/i, 'Invalid referral code').optional(),
     referral_code: z.string().regex(/^BY[A-Z0-9]{6}$/i, 'Invalid referral code').optional(),
     termsAccepted: z.literal(true, { errorMap: () => ({ message: 'You must accept the terms and conditions' }) }).optional()

@@ -1,9 +1,9 @@
 import multer from 'multer';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import os from 'node:os';
 import fs from 'node:fs';
 import { unlink } from 'node:fs/promises';
-import os from 'node:os';
 import { uploadToCloudinary } from '../../shared/utils/cloudinary.js';
 import logger from '../../shared/utils/logger.js';
 
@@ -84,6 +84,8 @@ const multerInstance = multer({
     fileFilter,
     limits: {
         fileSize: MAX_DIGITAL_FILE_SIZE_BYTES, // NOSONAR 60 MB limit safely streamed to os.tmpdir diskStorage
+        files: 1,
+        fields: 10,
     },
 });
 
@@ -122,6 +124,35 @@ export const cloudinaryDigitalUpload = (req, res, next) => {
         const tempFilePath = req.file.path;
 
         try {
+            // Verify magic bytes on the uploaded temp file before sending to Cloudinary
+            const fd = await fs.promises.open(tempFilePath, 'r');
+            const headerBuf = Buffer.alloc(16);
+            try {
+                await fd.read(headerBuf, 0, 16, 0);
+            } finally {
+                await fd.close();
+            }
+
+            const ext = path.extname(req.file.originalname).toLowerCase();
+            const isValidDigitalHeader = (() => {
+                if (ext === '.pdf') return headerBuf.subarray(0, 5).toString('ascii') === '%PDF-';
+                if (ext === '.zip') return headerBuf[0] === 0x50 && headerBuf[1] === 0x4b;
+                if (ext === '.mp3') return headerBuf.subarray(0, 3).toString('ascii') === 'ID3' || (headerBuf[0] === 0xff && (headerBuf[1] & 0xe0) === 0xe0);
+                if (ext === '.wav') return headerBuf.subarray(0, 4).toString('ascii') === 'RIFF' && headerBuf.subarray(8, 12).toString('ascii') === 'WAVE';
+                if (ext === '.ogg') return headerBuf.subarray(0, 4).toString('ascii') === 'OggS';
+                if (ext === '.flac') return headerBuf.subarray(0, 4).toString('ascii') === 'fLaC';
+                if (ext === '.mp4' || ext === '.m4a' || ext === '.mov') return headerBuf.subarray(4, 8).toString('ascii') === 'ftyp';
+                return true;
+            })();
+
+            if (!isValidDigitalHeader) {
+                await fs.promises.unlink(tempFilePath).catch(() => {});
+                return res.status(400).json({
+                    status: 'error',
+                    message: 'Uploaded digital file content does not match its declared extension.',
+                });
+            }
+
             // uploadToCloudinary deletes the temp file on completion (success or error)
             const cloudinaryResult = await uploadToCloudinary(
                 tempFilePath,

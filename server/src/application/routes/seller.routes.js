@@ -134,11 +134,11 @@ router.get('/:id(\\d+)', sellerController.getSellerById);
 // Product management routes for the authenticated seller
 router.route('/products')
   .get(productController.getSellerProducts)  // Get all products for the current seller
-  .post(productController.createProduct);    // Create a new product
+  .post(uploadRateLimiter, productController.createProduct);    // Create a new product
 
 router.route('/products/:id')
   .get(productController.getProduct)         // Get a single product
-  .patch(productController.updateProduct)     // Update a product
+  .patch(uploadRateLimiter, productController.updateProduct)     // Update a product
   .delete(productController.deleteProduct);   // Delete a product
 
 // Update product inventory

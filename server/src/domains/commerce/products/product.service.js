@@ -80,7 +80,18 @@ class ProductService {
         // Image Handling with SSRF verification
         let imageData = image_url || image || null;
         if (imageData) {
-            validateProductImage(imageData);
+            imageData = validateProductImage(imageData);
+        }
+
+        let normalizedImages = [];
+        if (data.images) {
+            const parsedImages = Array.isArray(data.images)
+                ? data.images
+                : (typeof data.images === 'string' ? JSON.parse(data.images) : []);
+            if (!Array.isArray(parsedImages) || parsedImages.length > 10) {
+                throw new Error('Too many images: maximum 10 images allowed per product');
+            }
+            normalizedImages = parsedImages.map((img) => validateProductImage(img)).filter(Boolean);
         }
 
         let finalProductType = product_type;
@@ -91,7 +102,7 @@ class ProductService {
             price: priceValue,
             description: description.trim(),
             image_url: imageData,
-            images: data.images ? JSON.stringify(data.images) : '[]',
+            images: JSON.stringify(normalizedImages),
             seller_id: sellerId,
             aesthetic,
             is_digital: is_digital || false,
@@ -202,9 +213,19 @@ class ProductService {
                 updateFields.price = ProductService.parseAndValidatePrice(price);
             }
             if (description !== undefined) updateFields.description = description;
-            if (image_url !== undefined) updateFields.image_url = image_url;
+            if (image_url !== undefined) {
+                updateFields.image_url = image_url ? validateProductImage(image_url) : null;
+            }
             if (images !== undefined) {
-                updateFields.images = Array.isArray(images) ? JSON.stringify(images) : images;
+                const parsedImages = Array.isArray(images)
+                    ? images
+                    : (typeof images === 'string' ? JSON.parse(images) : []);
+                if (!Array.isArray(parsedImages) || parsedImages.length > 10) {
+                    throw new Error('Too many images: maximum 10 images allowed per product');
+                }
+                updateFields.images = JSON.stringify(
+                    parsedImages.map((img) => validateProductImage(img)).filter(Boolean)
+                );
             }
             if (aesthetic !== undefined) updateFields.aesthetic = aesthetic;
             if (data.digital_category !== undefined) {

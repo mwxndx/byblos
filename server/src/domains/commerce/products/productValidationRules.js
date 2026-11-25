@@ -1,33 +1,62 @@
 
+const isPrivateOrReservedHost = (hostname) => {
+    const clean = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+    if (
+        clean === 'localhost' ||
+        clean === '0.0.0.0' ||
+        clean === '::1' ||
+        clean.startsWith('127.') ||
+        clean.startsWith('10.') ||
+        clean.startsWith('192.168.') ||
+        clean.startsWith('169.254.') ||
+        clean.startsWith('fc') ||
+        clean.startsWith('fd') ||
+        clean.startsWith('fe80:') ||
+        clean.endsWith('.local') ||
+        clean.endsWith('.internal')
+    ) {
+        return true;
+    }
+
+    const rfc172 = /^172\.(\d{1,3})\./.exec(clean);
+    if (rfc172) {
+        const secondOctet = Number(rfc172[1]);
+        if (secondOctet >= 16 && secondOctet <= 31) return true;
+    }
+
+    return false;
+};
+
 /**
  * Validate and sanitize image URL/data with SSRF protection.
  */
 export const validateProductImage = (imageData) => {
     if (!imageData) return null;
+    if (typeof imageData !== 'string') {
+        throw new Error('Invalid image format. Expected base64, local path, or remote URL.');
+    }
 
-    const isBase64 = imageData.startsWith('data:image/');
-    const isLocal = imageData.startsWith('/uploads/');
-    const isRemote = imageData.startsWith('http');
+    const trimmed = imageData.trim();
+    if (!trimmed) return null;
+
+    const isBase64 = /^data:image\/(jpeg|jpg|png|webp|avif);base64,/i.test(trimmed);
+    const isLocal = trimmed.startsWith('/uploads/') && !trimmed.includes('..');
+    const isRemote = trimmed.startsWith('https://') || trimmed.startsWith('http://');
 
     if (isRemote) {
+        let url;
         try {
-            const url = new URL(imageData);
-            const hostname = url.hostname.toLowerCase();
+            url = new URL(trimmed);
+        } catch {
+            throw new Error('Invalid remote image URL format.');
+        }
 
-            // Block internal/private IPs and localhost
-            const isInternal = hostname === 'localhost' ||
-                hostname === '127.0.0.1' ||
-                hostname.startsWith('192.168.') ||
-                hostname.startsWith('10.') ||
-                hostname.startsWith('172.16.') ||
-                hostname.endsWith('.local') ||
-                hostname.endsWith('.internal');
+        if (url.protocol !== 'https:') {
+            throw new Error('Invalid remote image URL: Only HTTPS URLs are allowed.');
+        }
 
-            if (isInternal) {
-                throw new Error('Invalid remote image URL: Internal addresses are not allowed.');
-            }
-        } catch (e) {
-            throw new Error(e.message.includes('Internal addresses') ? e.message : 'Invalid remote image URL format.');
+        if (isPrivateOrReservedHost(url.hostname)) {
+            throw new Error('Invalid remote image URL: Internal addresses are not allowed.');
         }
     }
 
@@ -37,13 +66,13 @@ export const validateProductImage = (imageData) => {
 
     // Size validation only applies to raw base64 data before upload
     if (isBase64) {
-        const imageSize = (imageData.length * 0.75);
+        const imageSize = (trimmed.length * 0.75);
         if (imageSize > 5 * 1024 * 1024) { // 5MB limit
             throw new Error('Image size exceeds 5MB limit');
         }
     }
 
-    return imageData;
+    return trimmed;
 };
 
 /**

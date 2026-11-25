@@ -11,6 +11,7 @@ import PendingRegistration from '../../../shared/utils/pendingRegistration.model
 import ReferralService from '../../growth/referrals/referral.service.js';
 import ProfileProvisioningService from '../users/profileProvisioning.service.js';
 import ImageService from '../../../infrastructure/storage/image.service.js';
+import { validateProductImage } from '../../commerce/products/productValidationRules.js';
 import refundAccountingService from '../../payments/refunds/refundAccounting.service.js';
 import { AppError } from '../../../shared/utils/errorHandler.js';
 import {
@@ -208,8 +209,16 @@ class AuthService {
             throw new AppError('You must accept the terms and conditions to create an account.', 400);
         }
 
-        // Process seller business photo if provided
-        let avatarUrl = data.avatarUrl || null;
+        // 1. Check if user already exists in unified users table BEFORE processing uploads
+        const existingUser = await User.findByEmail(normalizedEmail);
+
+        if (existingUser && !existingUser.is_verified) {
+            await AuthService.resendVerificationEmail(normalizedEmail, type);
+            return { status: 'pending_verification', email: normalizedEmail };
+        }
+
+        // Process seller business photo only after registration eligibility checks
+        let avatarUrl = data.avatarUrl ? validateProductImage(data.avatarUrl) : null;
         if (type === 'seller' && data.businessPhoto) {
             if (ImageService.isBase64Image(data.businessPhoto)) {
                 try {
@@ -219,20 +228,11 @@ class AuthService {
                     avatarUrl = null;
                 }
             } else {
-                avatarUrl = data.businessPhoto;
+                avatarUrl = validateProductImage(data.businessPhoto);
             }
         }
 
-        // 1. Check if user already exists in unified users table
-        const existingUser = await User.findByEmail(normalizedEmail);
-
         if (existingUser) {
-            // Already a user - check if they are verified
-            if (!existingUser.is_verified) {
-                // Trigger verification resend and return pending status
-                await AuthService.resendVerificationEmail(normalizedEmail, type);
-                return { status: 'pending_verification', email: normalizedEmail };
-            }
 
             // Already a verified user - check if they already have this profile type
             switch (type) {

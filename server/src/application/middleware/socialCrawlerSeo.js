@@ -38,11 +38,22 @@ export async function handleSocialCrawlerSeo(req, res, next) {
 
         if (result.rows.length === 0) return next();
 
+        const escapeHtmlAttr = (val) => String(val ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
         const seller = result.rows[0];
-        const title = `${seller.shop_name || seller.business_name} | Byblos`;
-        const description = seller.bio || `Explore products and order securely from ${seller.shop_name || seller.business_name} on Byblos.`;
-        const image = seller.business_photo_url || seller.banner_url || 'https://www.byblosafrica.site/images/og-image.jpg';
-        const url = `https://www.byblosafrica.site/shop/${seller.shop_slug}`;
+        const title = escapeHtmlAttr(`${seller.shop_name || seller.business_name} | Byblos`);
+        const description = escapeHtmlAttr(seller.bio || `Explore products and order securely from ${seller.shop_name || seller.business_name} on Byblos.`);
+        const rawImage = seller.business_photo_url || seller.banner_url || 'https://www.byblosafrica.site/images/og-image.jpg';
+        const safeImage = /^https?:\/\//i.test(rawImage) || rawImage.startsWith('/')
+            ? escapeHtmlAttr(rawImage)
+            : 'https://www.byblosafrica.site/images/og-image.jpg';
+        const image = safeImage;
+        const url = escapeHtmlAttr(`https://www.byblosafrica.site/shop/${seller.shop_slug}`);
 
         const html = `<!DOCTYPE html>
 <html lang="en">

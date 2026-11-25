@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
 import logger from '../../shared/utils/logger.js';
 import { AppError } from '../../shared/utils/errorHandler.js';
 
@@ -48,18 +49,38 @@ class ImageService {
                 'image/jpeg': 'jpg',
                 'image/png': 'png',
                 'image/webp': 'webp',
-                'image/avif': 'avif',
-                'image/gif': 'gif'
+                'image/avif': 'avif'
             };
             const extension = allowedTypes[mimeType];
             if (!extension) {
-                throw new AppError('Unsupported image type. Use JPEG, PNG, WebP, AVIF, or GIF.', 400);
+                throw new AppError('Unsupported image type. Use JPEG, PNG, WebP, or AVIF.', 400);
             }
 
             const imageData = matches[2].replace(/\s/g, '');
-            const buffer = Buffer.from(imageData, 'base64');
-            if (!this.hasExpectedMagicBytes(buffer, mimeType)) {
+            const rawBuffer = Buffer.from(imageData, 'base64');
+            if (!this.hasExpectedMagicBytes(rawBuffer, mimeType)) {
                 throw new AppError('Image content does not match the declared type.', 400);
+            }
+
+            // Re-encode through sharp to strip EXIF/GPS metadata, reject decompression bombs,
+            // and neutralize polyglot payloads appended after valid image headers.
+            let buffer;
+            try {
+                const pipeline = sharp(rawBuffer, { limitInputPixels: 40_000_000 })
+                    .rotate()
+                    .resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true });
+
+                if (mimeType === 'image/png') {
+                    buffer = await pipeline.png({ compressionLevel: 9 }).toBuffer();
+                } else if (mimeType === 'image/webp') {
+                    buffer = await pipeline.webp({ quality: 85 }).toBuffer();
+                } else if (mimeType === 'image/avif') {
+                    buffer = await pipeline.avif({ quality: 80 }).toBuffer();
+                } else {
+                    buffer = await pipeline.jpeg({ quality: 88, mozjpeg: true }).toBuffer();
+                }
+            } catch {
+                throw new AppError('Invalid or corrupted image content.', 400);
             }
 
             // Using SHA-256 for secure hashing (SonarQube compliance)
@@ -116,8 +137,17 @@ class ImageService {
      * @returns {Promise<Array<string>>} - Array of short URL paths
      */
     async convertMultiple(base64Strings, prefix = 'img') {
-        const promises = base64Strings.map(base64 => this.base64ToFile(base64, prefix));
-        return await Promise.all(promises);
+        if (!Array.isArray(base64Strings)) {
+            throw new AppError('Images payload must be an array.', 400);
+        }
+        if (base64Strings.length > 10) {
+            throw new AppError('Too many images: maximum 10 images allowed.', 400);
+        }
+        const results = [];
+        for (const base64 of base64Strings) {
+            results.push(await this.base64ToFile(base64, prefix));
+        }
+        return results;
     }
 
     /**

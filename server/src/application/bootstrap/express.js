@@ -54,6 +54,7 @@ export default async (app) => {
     app.use('/uploads', express.static(uploadsDir, {
         setHeaders: (res, filePath) => {
             res.setHeader('X-Content-Type-Options', 'nosniff');
+            res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox;");
             if (/\.(html?|svg|xml|js|mjs|css)$/i.test(filePath)) {
                 res.setHeader('Content-Type', 'text/plain; charset=utf-8');
             }
