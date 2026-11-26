@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 85;
-  const defaultName = '1.0.85';
+  const defaultCode = 86;
+  const defaultName = '1.0.86';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Fixed an infinite loading hang during native Android sign-in across buyer, seller, and creator accounts.',
-      'Corrected Android system status bar icon contrast so time, network, and battery indicators remain crisp in both light and dark modes.',
-      'Added automated native Android authentication and theme status-bar regression coverage for faster, more reliable releases.'
+      'Added customizable shop banners to the Seller Dashboard and Seller Shop pages with Cloudinary optimization and caching.',
+      'Fixed creator collaboration request and leave flows so re-requests and seller creator lists stay accurately synchronized.',
+      'Improved light-mode visibility for the buyer sign-in button and product list dividers across dashboards.'
     ]
   };
 }
