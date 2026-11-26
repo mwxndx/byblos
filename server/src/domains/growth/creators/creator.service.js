@@ -369,6 +369,12 @@ class CreatorService {
          RETURNING *`,
         [invite.id]
       );
+      await client.query(
+        `UPDATE creator_shop_requests
+         SET status = 'accepted', updated_at = NOW()
+         WHERE creator_id = $1 AND seller_id = $2 AND status = 'pending'`,
+        [creatorId, invite.seller_id]
+      );
       await client.query('COMMIT');
       return { status: 'accepted', invite: this.decorateInvite({ ...accepted.rows[0], code, shop_name: invite.shop_name, commission_rate: commissionRate }) };
     } catch (error) {
@@ -425,6 +431,14 @@ class CreatorService {
             SET status = 'left', updated_at = NOW()
           WHERE id = $1`,
         [linkRes.rows[0].id]
+      );
+
+      await client.query(
+        `UPDATE creator_shop_requests
+            SET status = 'left', updated_at = NOW()
+          WHERE creator_id = $1 AND seller_id = $2
+            AND status IN ('accepted', 'pending')`,
+        [creatorId, sid]
       );
 
       await client.query('COMMIT');
@@ -553,6 +567,14 @@ class CreatorService {
             SET status = 'removed', updated_at = NOW()
           WHERE id = $1`,
         [linkRes.rows[0].id]
+      );
+
+      await client.query(
+        `UPDATE creator_shop_requests
+            SET status = 'removed', updated_at = NOW()
+          WHERE creator_id = $1 AND seller_id = $2
+            AND status IN ('accepted', 'pending')`,
+        [cid, sellerId]
       );
 
       await client.query('COMMIT');
@@ -1775,7 +1797,7 @@ class CreatorService {
               s.physical_address,
               s.creator_commission_rate,
               COALESCE(p_count.total_products, 0) AS product_count,
-              COALESCE(scl.status, csr.status, 'none') AS collaboration_status,
+              COALESCE(scl.status, CASE WHEN csr.status IN ('pending', 'denied') THEN csr.status ELSE 'none' END, 'none') AS collaboration_status,
               scl.code AS link_code
        FROM sellers s
        LEFT JOIN (
@@ -1828,7 +1850,7 @@ class CreatorService {
     }
 
     const activeLink = await pool.query(
-      `SELECT id, code FROM seller_creator_links WHERE seller_id = $1 AND creator_id = $2 AND status = 'active' LIMIT 1`,
+      `SELECT id, code FROM seller_creator_links WHERE seller_id = $1 AND creator_id = $2 AND status IN ('active', 'paused') LIMIT 1`,
       [sellerId, creatorId]
     );
     if (activeLink.rows[0]) {
@@ -1849,9 +1871,6 @@ class CreatorService {
       const { status, updated_at } = existingReq.rows[0];
       if (status === 'pending') {
         throw new AppError('You already have a pending collaboration request for this shop.', 400);
-      }
-      if (status === 'accepted') {
-        throw new AppError('You already have an accepted collaboration with this shop.', 400);
       }
       if (status === 'denied') {
         const DENIED_COOLDOWN_DAYS = 14;

@@ -313,4 +313,60 @@ describe('creator collaboration requests — state guards and duplicate preventi
       /declined by this shop/
     );
   });
+
+  test('allows creator to re-request after leaving or being removed and closes pending requests when invite is accepted', async (t) => {
+    let seller;
+    let creator;
+
+    t.after(async () => {
+      if (creator) {
+        await pool.query('DELETE FROM seller_creator_invites WHERE accepted_creator_id = $1', [creator.id]).catch(() => {});
+        await cleanupCreatorFinancials(creator.id);
+        await cleanupCreator(creator.id).catch(() => {});
+      }
+      if (seller) await cleanupSeller(seller.id).catch(() => {});
+    });
+
+    seller = await createSeller({ isCreatorMarketplaceEnabled: true });
+    creator = await createCreator({});
+
+    // 1. Creator requests -> Seller accepts -> Creator leaves
+    const req1 = await CreatorService.requestCollaboration(creator.id, seller.id, 'First request');
+    await CreatorService.respondToCreatorCollaborationRequest(seller.id, req1.id, 'accept');
+    await CreatorService.leavePromotedShop(creator.id, seller.id);
+
+    const sellerDashAfterLeave = await CreatorService.getSellerCreatorsDashboard(seller.id);
+    assert.equal(sellerDashAfterLeave.activeCreators.length, 0);
+
+    const availableAfterLeave = await CreatorService.getAvailableShops(creator.id);
+    const shopAfterLeave = availableAfterLeave.find((s) => Number(s.id) === Number(seller.id));
+    assert.ok(shopAfterLeave, 'shop should reappear in available shops after leaving');
+    assert.equal(shopAfterLeave.collaborationStatus, 'none');
+
+    const req2 = await CreatorService.requestCollaboration(creator.id, seller.id, 'Re-applying after leave');
+    assert.equal(req2.status, 'pending');
+
+    // 2. Seller accepts -> Seller removes creator -> Creator can re-request
+    await CreatorService.respondToCreatorCollaborationRequest(seller.id, req2.id, 'accept');
+    await CreatorService.sellerRemoveCreator(seller.id, creator.id);
+
+    const req3 = await CreatorService.requestCollaboration(creator.id, seller.id, 'Re-applying after removal');
+    assert.equal(req3.status, 'pending');
+
+    // 3. Creator accepts a direct seller invite while req3 is pending -> pending request is closed
+    const inviteRes = await pool.query(
+      `INSERT INTO seller_creator_invites (seller_id, email, invite_token, status, accepted_creator_id, expires_at)
+       VALUES ($1, $2, $3, 'pending', $4, NOW() + INTERVAL '7 days')
+       RETURNING id`,
+      [seller.id, creator.email, `tok_${Date.now()}`, creator.id]
+    );
+    await CreatorService.respondToShopRequest({
+      creatorId: creator.id,
+      inviteId: inviteRes.rows[0].id,
+      action: 'accept'
+    });
+
+    const sellerDashAfterInvite = await CreatorService.getSellerCreatorsDashboard(seller.id);
+    assert.equal(sellerDashAfterInvite.incomingRequests.length, 0, 'pending request should be closed when invite is accepted');
+  });
 });
