@@ -162,10 +162,15 @@ describe('ShopHero Component (TDD)', () => {
 
     const backdrop = screen.getByTestId('seller-banner-backdrop');
     expect(backdrop).toBeInTheDocument();
+    expect(backdrop.className).toContain('z-0');
     const img = backdrop.querySelector('img');
     expect(img).toHaveAttribute(
       'src',
       'https://res.cloudinary.com/byblos/image/upload/f_auto,q_auto,w_1200,c_limit/v1/banners/hero.jpg'
     );
+
+    const initialsEl = screen.getByText('JB');
+    const overlayContainer = initialsEl.closest('.relative.z-10');
+    expect(overlayContainer).toBeInTheDocument();
   });
 });

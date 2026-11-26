@@ -97,6 +97,7 @@ export function useShopPage() {
       facebookLink: seller.facebookLink || '',
       bio: seller.bio || '',
       avatarUrl: seller.avatarUrl || seller.avatar_url || '',
+      bannerUrl: seller.bannerUrl || seller.banner_url || '',
       hasPhysicalShop: !!seller.physicalAddress,
       physicalAddress: seller.physicalAddress,
       latitude: seller.latitude,

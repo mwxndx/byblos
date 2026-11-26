@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Image as ImageIcon, Megaphone, MoreHorizontal, Package, Plus, Search, X } from '@/shared/ui/icons';
+import { Megaphone, MoreHorizontal, Package, Pencil, Plus, Search, X } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
@@ -101,15 +101,16 @@ export function ProductsTab({
             </div>
           )}
 
-          {/* Add / Edit banner action + recommended dimensions */}
-          <div className="flex flex-wrap items-center md:justify-center gap-2.5">
+          {/* Banner edit pencil icon + recommended dimensions */}
+          <div className="flex flex-wrap items-center md:justify-center gap-2">
             <button
               type="button"
               onClick={() => setIsEditingBanner(true)}
-              className="btn-standard inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/15 bg-white/85 dark:bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-white dark:hover:bg-black/80 shadow-sm transition-colors"
+              aria-label={bannerUrl ? 'Edit banner' : 'Add banner'}
+              title={bannerUrl ? 'Edit banner' : 'Add banner'}
+              className="btn-standard flex h-7 w-7 items-center justify-center rounded-full border-2 border-[var(--bg)] bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90 shadow-sm transition-transform active:scale-95"
             >
-              <ImageIcon className="h-3.5 w-3.5" />
-              {bannerUrl ? 'Edit banner' : 'Add banner'}
+              <Pencil className="h-3.5 w-3.5" />
             </button>
             <span className="text-[11px] font-medium text-slate-600 dark:text-white/70">
               {SELLER_BANNER_DIMENSIONS}
