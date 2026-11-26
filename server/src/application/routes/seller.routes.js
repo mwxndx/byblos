@@ -95,6 +95,7 @@ router.use(requireSellerProfile);
 router.get('/profile', sellerController.getProfile);
 router.patch('/profile', sellerController.updateProfile);
 router.post('/upload-business-photo', uploadRateLimiter, upload.single('businessPhoto'), sellerController.uploadBusinessPhoto);
+router.post('/upload-banner', uploadRateLimiter, upload.single('banner'), sellerController.uploadBanner);
 router.patch('/theme', sellerController.updateTheme);
 
 // Seller analytics

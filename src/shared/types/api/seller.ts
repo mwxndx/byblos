@@ -61,6 +61,8 @@ export interface ApiSeller {
   longitude?: number;
   bannerImage?: string;
   banner_image?: string;
+  bannerUrl?: string;
+  banner_url?: string;
   bio?: string;
   avatarUrl?: string;
   avatar_url?: string;

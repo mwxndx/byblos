@@ -36,6 +36,7 @@ export interface SellerProfile extends BaseUser {
   latitude?: number;
   longitude?: number;
   bannerImage?: string;
+  bannerUrl?: string | null;
   avatarUrl?: string | null;
   bio?: string;
   theme?: string;

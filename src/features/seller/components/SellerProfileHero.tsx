@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Heart, Info, Link2, MousePointerClick, Pencil } from '@/shared/ui/icons';
-import { formatCurrency, formatCompactCurrency } from '@/shared/utils/formatting';
+import { formatCurrency, formatCompactCurrency, getImageUrl } from '@/shared/utils/formatting';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import type { SellerProfile } from '@/features/auth/types/authTypes';
 import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUtils';
@@ -78,7 +78,7 @@ export function SellerProfileHero({
         <div className="relative md:order-1 shrink-0">
           <div className="h-24 w-24 overflow-hidden rounded-full bg-surface-2">
             {avatar ? (
-              <img src={avatar} alt={shopName} className="h-full w-full object-cover" />
+              <img src={getImageUrl(avatar, 256)} alt={shopName} className="h-full w-full object-cover" />
             ) : (
               <div
                 className="flex h-full w-full items-center justify-center text-2xl font-semibold bg-white text-black dark:bg-white dark:text-black [data-theme=light]_&:bg-black [data-theme=light]_&:text-white"

@@ -3,21 +3,28 @@ import { calculateShopPriorityScore, compareSellersByPriority } from '../shopPri
 import type { ApiPublicSeller } from '@/shared/types/api/seller';
 
 describe('shopPrioritization', () => {
-  it('calculates highest score for shops with photo, instagram, and tiktok', () => {
+  it('calculates highest score for shops with photo, banner, instagram, and tiktok', () => {
     const completeShop: Partial<ApiPublicSeller> = {
       avatarUrl: 'https://example.com/avatar.jpg',
+      bannerUrl: 'https://example.com/banner.jpg',
       instagramLink: 'https://instagram.com/myshop',
       tiktokLink: 'https://tiktok.com/@myshop'
     };
-    expect(calculateShopPriorityScore(completeShop)).toBe(1200);
+    expect(calculateShopPriorityScore(completeShop)).toBe(1300);
   });
 
-  it('calculates score for partial matches', () => {
+  it('calculates score for partial matches including banner', () => {
     const photoAndIg: Partial<ApiPublicSeller> = {
       avatarUrl: 'https://example.com/avatar.jpg',
       instagramLink: 'myshop'
     };
     expect(calculateShopPriorityScore(photoAndIg)).toBe(150);
+
+    const photoAndBanner: Partial<ApiPublicSeller> = {
+      avatarUrl: 'https://example.com/avatar.jpg',
+      bannerUrl: 'https://example.com/banner.jpg'
+    };
+    expect(calculateShopPriorityScore(photoAndBanner)).toBe(200);
 
     const photoOnly: Partial<ApiPublicSeller> = {
       avatarUrl: 'https://example.com/avatar.jpg'
@@ -34,7 +41,7 @@ describe('shopPrioritization', () => {
     expect(calculateShopPriorityScore(none)).toBe(0);
   });
 
-  it('sorts shops with photo, instagram, and tiktok first', () => {
+  it('sorts shops with photo, banner, instagram, and tiktok first', () => {
     const incomplete: ApiPublicSeller = {
       id: '1',
       shopName: 'Incomplete Shop',
@@ -55,6 +62,7 @@ describe('shopPrioritization', () => {
       shopName: 'Complete Shop',
       fullName: 'Seller 3',
       avatarUrl: 'https://example.com/avatar.jpg',
+      bannerUrl: 'https://example.com/banner.jpg',
       instagramLink: 'myshop',
       tiktokLink: 'myshop',
       totalWishlistCount: 0

@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin } from '@/shared/ui/icons';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { socialUrl, coordsMapUrl } from '../utils/socialLinks';
 import { SocialButtons } from './SocialButtons';
+import { SellerBannerBackdrop } from '@/shared/ui/SellerBannerBackdrop';
 import type { ShopSeller } from '../utils/shopPage.shared';
 
 interface ShopHeroProps {
@@ -27,9 +28,14 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
   const tiktokHref = socialUrl('tiktok', sellerInfo?.tiktokLink);
   const mapHref = coordsMapUrl(sellerInfo?.latitude, sellerInfo?.longitude);
 
+  const bannerUrl = sellerInfo?.bannerUrl || sellerInfo?.banner_url || null;
+
   return (
-    <div className="relative w-full max-w-4xl mx-auto px-4 pt-2 pb-3 sm:pt-4 sm:pb-4">
-      {/* Top Navigation Row */}
+    <div className="relative w-full overflow-hidden">
+      <SellerBannerBackdrop bannerUrl={bannerUrl} alt={`${sellerInfo?.shopName || 'Shop'} banner`} />
+
+      <div className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-2 pb-3 sm:pt-4 sm:pb-4">
+        {/* Top Navigation Row */}
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <Button
           type="button"
@@ -93,6 +99,7 @@ export function ShopHero({ sellerInfo, showSellerAvatar, setAvatarLoadFailed, se
 
           <SocialButtons instagramHref={instagramHref} tiktokHref={tiktokHref} shopName={sellerInfo?.shopName || 'Shop'} />
         </div>
+      </div>
       </div>
     </div>
   );

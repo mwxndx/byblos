@@ -46,6 +46,21 @@ export function useUploadBusinessPhotoMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['seller-profile'] });
       queryClient.invalidateQueries({ queryKey: sellerQueryKeys.summary() });
+      queryClient.invalidateQueries({ queryKey: ['seller-shop'] });
+      queryClient.invalidateQueries({ queryKey: ['public-sellers'] });
+    },
+  });
+}
+
+export function useUploadBannerMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (base64Image: string) => sellerApi.uploadBanner(base64Image),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['seller-profile'] });
+      queryClient.invalidateQueries({ queryKey: sellerQueryKeys.summary() });
+      queryClient.invalidateQueries({ queryKey: ['seller-shop'] });
+      queryClient.invalidateQueries({ queryKey: ['public-sellers'] });
     },
   });
 }

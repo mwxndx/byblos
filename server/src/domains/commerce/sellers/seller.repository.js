@@ -47,6 +47,7 @@ export async function findActiveWithStats({ limit, offset }) {
       s.shop_name,
       s.slug,
       s.avatar_url,
+      s.banner_url,
       s.bio,
       s.physical_address,
       s.latitude,
@@ -94,12 +95,14 @@ export async function findActiveWithStats({ limit, offset }) {
       (
         CASE 
           WHEN (s.avatar_url IS NOT NULL AND TRIM(s.avatar_url) != '')
+           AND (s.banner_url IS NOT NULL AND TRIM(s.banner_url) != '')
            AND (s.instagram_link IS NOT NULL AND TRIM(s.instagram_link) != '')
            AND (s.tiktok_link IS NOT NULL AND TRIM(s.tiktok_link) != '')
           THEN 1000
           ELSE 0
         END +
         CASE WHEN s.avatar_url IS NOT NULL AND TRIM(s.avatar_url) != '' THEN 100 ELSE 0 END +
+        CASE WHEN s.banner_url IS NOT NULL AND TRIM(s.banner_url) != '' THEN 100 ELSE 0 END +
         CASE WHEN s.instagram_link IS NOT NULL AND TRIM(s.instagram_link) != '' THEN 50 ELSE 0 END +
         CASE WHEN s.tiktok_link IS NOT NULL AND TRIM(s.tiktok_link) != '' THEN 50 ELSE 0 END
       ) DESC,
@@ -187,9 +190,27 @@ export async function updateSellerBusinessPhoto(sellerId, avatarUrl) {
     UPDATE sellers
     SET avatar_url = $1
     WHERE id = $2
-    RETURNING id, avatar_url AS "avatarUrl"
+    RETURNING id, shop_name, avatar_url AS "avatarUrl"
   `;
   const { rows } = await query(sql, [avatarUrl, sellerId]);
+  return rows[0];
+}
+
+/**
+ * Updates seller shop banner URL.
+ *
+ * @param {number|string} sellerId
+ * @param {string|null} bannerUrl
+ * @returns {Promise<{id: number, shop_name: string, bannerUrl: string|null}|undefined>}
+ */
+export async function updateSellerBanner(sellerId, bannerUrl) {
+  const sql = `
+    UPDATE sellers
+    SET banner_url = $1
+    WHERE id = $2
+    RETURNING id, shop_name, banner_url AS "bannerUrl"
+  `;
+  const { rows } = await query(sql, [bannerUrl, sellerId]);
   return rows[0];
 }
 

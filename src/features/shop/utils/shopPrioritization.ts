@@ -2,26 +2,30 @@ import type { ApiPublicSeller } from '@/shared/types/api/seller';
 
 /**
  * Calculates a priority score for a shop:
- * - Shops with Business Profile Photo + Instagram + TikTok get a 1000-point completeness bonus
+ * - Shops with Business Profile Photo + Banner + Instagram + TikTok get a 1000-point completeness bonus
  *   guaranteeing they are displayed as the first shops.
  * - Business profile photo adds 100 points.
+ * - Shop banner adds 100 points.
  * - Instagram link/handle adds 50 points.
  * - TikTok link/handle adds 50 points.
  */
 export function calculateShopPriorityScore(seller: Partial<ApiPublicSeller>): number {
   const avatar = String(seller.avatarUrl || (seller as unknown as { avatar_url?: string }).avatar_url || '').trim();
+  const banner = String(seller.bannerUrl || (seller as unknown as { banner_url?: string }).banner_url || '').trim();
   const instagram = String(seller.instagramLink || (seller as unknown as { instagram_link?: string }).instagram_link || '').trim();
   const tiktok = String(seller.tiktokLink || (seller as unknown as { tiktok_link?: string }).tiktok_link || '').trim();
 
   const hasAvatar = Boolean(avatar);
+  const hasBanner = Boolean(banner);
   const hasInstagram = Boolean(instagram);
   const hasTiktok = Boolean(tiktok);
 
   let score = 0;
-  if (hasAvatar && hasInstagram && hasTiktok) {
+  if (hasAvatar && hasBanner && hasInstagram && hasTiktok) {
     score += 1000;
   }
   if (hasAvatar) score += 100;
+  if (hasBanner) score += 100;
   if (hasInstagram) score += 50;
   if (hasTiktok) score += 50;
 

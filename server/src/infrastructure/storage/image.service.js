@@ -93,7 +93,12 @@ class ImageService {
 
             // 2. If Cloudinary is configured, upload and return secure_url with guaranteed cleanup
             if (this.useCloudinary) {
-                const folder = prefix.includes('product') ? 'products' : 'profiles';
+                let folder = 'profiles';
+                if (prefix.includes('product')) {
+                    folder = 'products';
+                } else if (prefix.includes('banner')) {
+                    folder = 'banners';
+                }
                 try {
                     const result = await uploadToCloudinary(filepath, folder);
                     logger.info(`Uploaded to Cloudinary: ${result.secure_url}`);
@@ -148,6 +153,40 @@ class ImageService {
             results.push(await this.base64ToFile(base64, prefix));
         }
         return results;
+    }
+
+    /**
+     * Uniform image saving entrypoint for multipart files, base64 data URIs,
+     * pre-validated URLs, or empty removal values.
+     */
+    async saveUploadedImage({
+        file = null,
+        value = '',
+        prefix = 'img',
+        fallbackValidator = null,
+        errorMessage = 'Invalid image',
+    } = {}) {
+        if (file?.buffer && file?.mimetype) {
+            const base64String = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+            return this.base64ToFile(base64String, prefix);
+        }
+
+        if (value && this.isBase64Image(value)) {
+            return this.base64ToFile(value, prefix);
+        }
+
+        if (value) {
+            if (typeof fallbackValidator === 'function') {
+                try {
+                    return fallbackValidator(value);
+                } catch {
+                    throw new AppError(errorMessage, 400);
+                }
+            }
+            return value;
+        }
+
+        return null;
     }
 
     /**

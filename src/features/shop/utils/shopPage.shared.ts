@@ -39,6 +39,8 @@ export interface ShopSeller extends Omit<Seller, 'bannerUrl'> {
   bio?: string;
   avatarUrl?: string;
   avatar_url?: string;
+  bannerUrl?: string | null;
+  banner_url?: string | null;
   creatorCommissionRate?: number;
   isCreatorMarketplaceEnabled?: boolean;
 }

@@ -40,6 +40,7 @@ export const transformSeller = (data: unknown): ApiSeller => {
     latitude: optNum(seller.latitude),
     longitude: optNum(seller.longitude),
     bannerImage: str(seller.bannerImage || seller.banner_image) || undefined,
+    bannerUrl: str(seller.bannerUrl || seller.banner_url) || undefined,
     bio: str(seller.bio),
     avatarUrl: str(seller.avatarUrl || seller.avatar_url),
     theme: (seller.theme || 'default') as ApiSeller['theme'],
@@ -348,6 +349,13 @@ export const sellerProfileApi = {
 
   async uploadBusinessPhoto(businessPhoto: string): Promise<{ businessPhotoUrl: string; avatarUrl: string }> {
     const response = await sellerApiInstance.post<{ data: { businessPhotoUrl: string; avatarUrl: string } }>('/sellers/upload-business-photo', { businessPhoto }, {
+      timeout: 2 * 60 * 1000,
+    });
+    return response.data.data;
+  },
+
+  async uploadBanner(banner: string): Promise<{ bannerUrl: string }> {
+    const response = await sellerApiInstance.post<{ data: { bannerUrl: string } }>('/sellers/upload-banner', { banner }, {
       timeout: 2 * 60 * 1000,
     });
     return response.data.data;

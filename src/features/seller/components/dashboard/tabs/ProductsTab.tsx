@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Megaphone, MoreHorizontal, Package, Plus, Search, X } from '@/shared/ui/icons';
+import { Image as ImageIcon, Megaphone, MoreHorizontal, Package, Plus, Search, X } from '@/shared/ui/icons';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import { cn, formatCurrency } from '@/shared/utils/formatting';
+import { SellerBannerBackdrop } from '@/shared/ui/SellerBannerBackdrop';
+import { SellerMediaEditDialog, SELLER_BANNER_DIMENSIONS } from '../../SellerMediaEditDialog';
 import { SellerProfileHero } from '../../SellerProfileHero';
 import { AddProductForm } from '../../AddProductForm';
 import { ProductsList } from '../../ProductsList';
@@ -53,9 +55,12 @@ export function ProductsTab({
 }: Readonly<ProductsTabProps>) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isEditingBanner, setIsEditingBanner] = useState(false);
 
   const hasProducts = products.length > 0;
   const activeProductsCount = products.length || analytics?.totalProducts || 0;
+  const bannerUrl = sellerProfile?.bannerUrl || null;
+  const bannerInitial = (sellerProfile?.shopName?.trim() || 'S').charAt(0).toUpperCase();
 
   const currentBalance = balance ?? analytics?.availableBalance ?? analytics?.balance;
   const currentTotalSales = totalSales ?? analytics?.totalSales ?? 0;
@@ -66,30 +71,61 @@ export function ProductsTab({
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      {/* Shop profile hero with Sales (clicks below), Revenue (wishlist below), and Balance - centered in desktop mode */}
-      <div className="w-full flex md:justify-center">
-        <SellerProfileHero
-          sellerProfile={sellerProfile}
-          shopUsername={shopUsername}
-          onCopyShopLink={onCopyShopLink}
-          canEdit
-          balance={currentBalance}
-          revenue={currentRevenue}
-          totalSales={currentTotalSales}
-          clicks={currentClicks}
-          wishlist={currentWishlist}
-        />
+      {/* Seller profile section: banner starts at bottom of dashboard header and fades out at top of active products pill */}
+      <div className="relative -mx-4 -mt-4 px-4 pt-4 pb-4 sm:-mx-6 sm:-mt-5 sm:px-6 sm:pt-5 lg:-mx-8 lg:-mt-6 lg:px-8 lg:pt-6">
+        <SellerBannerBackdrop bannerUrl={bannerUrl} />
+
+        <div className="relative z-10 space-y-4">
+          {/* Shop profile hero with Sales (clicks below), Revenue (wishlist below), and Balance - centered in desktop mode */}
+          <div className="w-full flex md:justify-center">
+            <SellerProfileHero
+              sellerProfile={sellerProfile}
+              shopUsername={shopUsername}
+              onCopyShopLink={onCopyShopLink}
+              canEdit
+              balance={currentBalance}
+              revenue={currentRevenue}
+              totalSales={currentTotalSales}
+              clicks={currentClicks}
+              wishlist={currentWishlist}
+            />
+          </div>
+
+          {/* Creator sales recognition pill (only visible when creator sales exist) */}
+          {currentCreatorSales > 0 && (
+            <div className="flex flex-wrap items-center md:justify-center gap-2">
+              <span className="inline-flex items-center gap-1 rounded-full border border-transparent bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:text-white/80">
+                <Megaphone className="h-3 w-3" style={{ color: 'var(--theme-accent, #f5c518)' }} />
+                {formatCurrency(currentCreatorSales)} creator sales
+              </span>
+            </div>
+          )}
+
+          {/* Add / Edit banner action + recommended dimensions */}
+          <div className="flex flex-wrap items-center md:justify-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsEditingBanner(true)}
+              className="btn-standard inline-flex items-center gap-1.5 rounded-full border border-slate-200 dark:border-white/15 bg-white/85 dark:bg-black/60 backdrop-blur-sm px-3 py-1.5 text-xs font-semibold text-slate-900 dark:text-white hover:bg-white dark:hover:bg-black/80 shadow-sm transition-colors"
+            >
+              <ImageIcon className="h-3.5 w-3.5" />
+              {bannerUrl ? 'Edit banner' : 'Add banner'}
+            </button>
+            <span className="text-[11px] font-medium text-slate-600 dark:text-white/70">
+              {SELLER_BANNER_DIMENSIONS}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Creator sales recognition pill (only visible when creator sales exist) */}
-      {currentCreatorSales > 0 && (
-        <div className="flex flex-wrap items-center md:justify-center gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full border border-transparent bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 text-[11px] font-bold text-slate-500 dark:text-white/80">
-            <Megaphone className="h-3 w-3" style={{ color: 'var(--theme-accent, #f5c518)' }} />
-            {formatCurrency(currentCreatorSales)} creator sales
-          </span>
-        </div>
-      )}
+      <SellerMediaEditDialog
+        open={isEditingBanner}
+        onOpenChange={setIsEditingBanner}
+        avatarUrl={sellerProfile?.avatarUrl || undefined}
+        bannerUrl={bannerUrl}
+        fallbackInitial={bannerInitial}
+        mode="banner"
+      />
 
       {/* Single controlled add-product dialog, opened from the action button or the empty-state plus. */}
       <Dialog open={isAddProductModalOpen} onOpenChange={setIsAddProductModalOpen}>

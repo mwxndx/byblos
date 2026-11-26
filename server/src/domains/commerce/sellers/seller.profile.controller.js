@@ -1,6 +1,6 @@
 // Seller profile/settings handlers (profile read/update, theme, image uploads).
 // Split from seller.controller.js in Phase 15.7b; re-exported via that barrel.
-import { updateSellerTheme, updateSellerBusinessPhoto } from './seller.repository.js';
+import { updateSellerTheme, updateSellerBusinessPhoto, updateSellerBanner } from './seller.repository.js';
 import { invalidateAuthCache } from '../../../shared/utils/authCache.js';
 import logger from '../../../shared/utils/logger.js';
 import ImageService from '../../../infrastructure/storage/image.service.js';
@@ -62,22 +62,31 @@ export const updateProfile = async (req, res) => {
       req.body.bio = bio;
     }
 
-    if (req.body.avatarUrl !== undefined || req.body.avatar_url !== undefined) {
-      const avatarUrl = String(req.body.avatarUrl ?? req.body.avatar_url ?? '').trim();
-      let validatedAvatar = null;
-      if (avatarUrl !== '') {
-        if (avatarUrl.length > 2048 || avatarUrl.startsWith('data:')) {
-          return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image URL' });
-        }
-        try {
-          validatedAvatar = validateProductImage(avatarUrl);
-        } catch {
-          return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image URL' });
-        }
-      }
+const validateOptionalImageUrlField = (rawValue, label) => {
+  const url = String(rawValue ?? '').trim();
+  if (url === '') return null;
+  if (url.length > 2048 || url.startsWith('data:')) {
+    throw new Error(`${label} must be a valid image URL`);
+  }
+  return validateProductImage(url);
+};
 
-      req.body.avatarUrl = validatedAvatar;
+    if (req.body.avatarUrl !== undefined || req.body.avatar_url !== undefined) {
+      try {
+        req.body.avatarUrl = validateOptionalImageUrlField(req.body.avatarUrl ?? req.body.avatar_url, 'Business photo');
+      } catch (err) {
+        return res.status(400).json({ status: 'error', message: err.message });
+      }
       delete req.body.avatar_url;
+    }
+
+    if (req.body.bannerUrl !== undefined || req.body.banner_url !== undefined) {
+      try {
+        req.body.bannerUrl = validateOptionalImageUrlField(req.body.bannerUrl ?? req.body.banner_url, 'Shop banner');
+      } catch (err) {
+        return res.status(400).json({ status: 'error', message: err.message });
+      }
+      delete req.body.banner_url;
     }
 
     if (req.body.creatorCommissionRate !== undefined || req.body.creator_commission_rate !== undefined) {
@@ -205,10 +214,16 @@ export const updateTheme = async (req, res) => {
   }
 };
 
-// @desc    Upload a business photo for the seller
-// @route   POST /api/sellers/upload-business-photo
-// @access  Private
-export const uploadBusinessPhoto = async (req, res) => {
+const handleSellerMediaUpload = async ({
+  req,
+  res,
+  fieldName,
+  filePrefix,
+  updateFn,
+  responseMapper,
+  invalidUrlMessage,
+  failureMessage,
+}) => {
   try {
     const sellerId = req.user?.sellerId;
 
@@ -219,24 +234,15 @@ export const uploadBusinessPhoto = async (req, res) => {
       });
     }
 
-    let { businessPhoto } = req.body;
+    const mediaUrl = await ImageService.saveUploadedImage({
+      file: req.file,
+      value: req.body?.[fieldName],
+      prefix: filePrefix,
+      fallbackValidator: validateProductImage,
+      errorMessage: invalidUrlMessage,
+    });
 
-    if (req.file) {
-      const base64String = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
-      businessPhoto = await ImageService.base64ToFile(base64String, 'seller_business_photo');
-    } else if (businessPhoto && ImageService.isBase64Image(businessPhoto)) {
-      businessPhoto = await ImageService.base64ToFile(businessPhoto, 'seller_business_photo');
-    } else if (businessPhoto) {
-      try {
-        businessPhoto = validateProductImage(businessPhoto);
-      } catch {
-        return res.status(400).json({ status: 'error', message: 'Business photo must be a valid image' });
-      }
-    }
-
-    const businessPhotoValue = businessPhoto === '' ? null : businessPhoto;
-
-    const updated = await updateSellerBusinessPhoto(sellerId, businessPhotoValue);
+    const updated = await updateFn(sellerId, mediaUrl);
 
     if (!updated) {
       return res.status(404).json({
@@ -245,30 +251,70 @@ export const uploadBusinessPhoto = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    const currentToken = getTokenFromRequest(req);
+    invalidateAuthCache(currentToken);
+
+    if (updated.shop_name) {
+      await cacheService.delete(`seller:shop:${String(updated.shop_name).toLowerCase().trim()}`);
+    }
+    await cacheService.delete(`seller:public:${sellerId}`);
+
+    return res.status(200).json({
       status: 'success',
-      data: {
-        businessPhotoUrl: updated.avatarUrl || '',
-        avatarUrl: updated.avatarUrl || ''
-      }
+      data: responseMapper(updated)
     });
   } catch (error) {
     if (error.isOperational) {
-      logger.warn(`Business photo upload validation failed: ${error.message} for seller ${req.user?.sellerId}`);
+      logger.warn(`${fieldName} upload validation failed: ${error.message} for seller ${req.user?.sellerId}`);
       return res.status(error.statusCode || 400).json({
         status: 'error',
         message: error.message
       });
     }
-    logger.error('Error uploading business photo:', {
+    logger.error(`Error uploading ${fieldName}:`, {
       error: error.message,
       stack: error.stack,
       sellerId: req.user?.sellerId
     });
-    res.status(500).json({
+    return res.status(500).json({
       status: 'error',
-      message: 'Failed to upload business photo',
+      message: failureMessage,
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
+
+// @desc    Upload a business photo for the seller
+// @route   POST /api/sellers/upload-business-photo
+// @access  Private
+export const uploadBusinessPhoto = async (req, res) =>
+  handleSellerMediaUpload({
+    req,
+    res,
+    fieldName: 'businessPhoto',
+    filePrefix: 'seller_business_photo',
+    updateFn: updateSellerBusinessPhoto,
+    responseMapper: (updated) => ({
+      businessPhotoUrl: updated.avatarUrl || '',
+      avatarUrl: updated.avatarUrl || ''
+    }),
+    invalidUrlMessage: 'Business photo must be a valid image',
+    failureMessage: 'Failed to upload business photo',
+  });
+
+// @desc    Upload a shop banner for the seller
+// @route   POST /api/sellers/upload-banner
+// @access  Private
+export const uploadBanner = async (req, res) =>
+  handleSellerMediaUpload({
+    req,
+    res,
+    fieldName: 'banner',
+    filePrefix: 'seller_banner',
+    updateFn: updateSellerBanner,
+    responseMapper: (updated) => ({
+      bannerUrl: updated.bannerUrl || ''
+    }),
+    invalidUrlMessage: 'Shop banner must be a valid image',
+    failureMessage: 'Failed to upload shop banner',
+  });

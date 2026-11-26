@@ -54,7 +54,7 @@ export const findSellerByEmail = async (email) => {
   if (!email) return null;
   const result = await query(
     `SELECT id, user_id, full_name, shop_name, slug, email, whatsapp_number,
-            city, location, bio, avatar_url, total_sales, net_revenue,
+            city, location, bio, avatar_url, banner_url, total_sales, net_revenue,
             balance, instagram_link, tiktok_link, facebook_link,
             creator_commission_rate, physical_address, latitude, longitude,
             terms_accepted, created_at, updated_at
@@ -88,6 +88,7 @@ export const findSellerByUserId = async (userId) => {
       location,
       bio,
       avatar_url AS "avatarUrl",
+      banner_url AS "bannerUrl",
       total_sales AS "totalSales",
       net_revenue AS "netRevenue",
       balance,
@@ -133,6 +134,7 @@ export const findSellerByShopName = async (shopName) => {
       s.longitude,
       s.bio,
       s.avatar_url AS "avatarUrl",
+      s.banner_url AS "bannerUrl",
       s.instagram_link AS "instagramLink",
       s.tiktok_link AS "tiktokLink",
       s.facebook_link AS "facebookLink",
@@ -231,6 +233,7 @@ export const findSellerById = async (id) => {
       longitude,
       bio,
       avatar_url AS "avatarUrl",
+      banner_url AS "bannerUrl",
       instagram_link AS "instagramLink",
       tiktok_link AS "tiktokLink",
       facebook_link AS "facebookLink",
@@ -348,6 +351,13 @@ export const updateSeller = async (id, updates) => {
     values.push(avatarUrlToUpdate || null);
   }
 
+  if (updates.bannerUrl !== undefined || updates.banner_url !== undefined) {
+    const bannerUrlToUpdate = updates.bannerUrl !== undefined ? updates.bannerUrl : updates.banner_url;
+    paramCount++;
+    updatesList.push(`banner_url = $${paramCount}`);
+    values.push(bannerUrlToUpdate || null);
+  }
+
   const creatorCommissionRateToUpdate = creatorCommissionRate !== undefined ? creatorCommissionRate : creator_commission_rate;
   if (creatorCommissionRateToUpdate !== undefined) {
     const normalizedRate = Number(creatorCommissionRateToUpdate);
@@ -414,6 +424,7 @@ export const updateSeller = async (id, updates) => {
       longitude,
       bio,
       avatar_url AS "avatarUrl",
+      banner_url AS "bannerUrl",
       created_at AS "createdAt"
     `;
 

@@ -114,4 +114,58 @@ describe('ShopHero Component (TDD)', () => {
     const rowContainer = locationLink.parentElement;
     expect(rowContainer?.className).toContain('flex-row');
   });
+
+  it('renders banner backdrop when bannerUrl is set and omits it with no alert when unset', () => {
+    const baseSeller: ShopSeller = {
+      id: '123',
+      fullName: 'Jane Doe',
+      shopName: 'Jane Boutique',
+      phone: '0712345678',
+      whatsappNumber: '0712345678',
+      email: 'jane@example.com',
+      bio: 'Quality goods',
+      avatarUrl: '',
+      latitude: -1.286389,
+      longitude: 36.817223,
+      createdAt: new Date().toISOString(),
+      isCreatorMarketplaceEnabled: true,
+      hasPhysicalShop: false,
+    };
+
+    const { rerender } = render(
+      <MemoryRouter>
+        <ShopHero
+          sellerInfo={baseSeller}
+          showSellerAvatar={false}
+          setAvatarLoadFailed={vi.fn()}
+          sellerInitials="JB"
+        />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByTestId('seller-banner-backdrop')).not.toBeInTheDocument();
+    expect(screen.queryByText(/no banner/i)).not.toBeInTheDocument();
+
+    rerender(
+      <MemoryRouter>
+        <ShopHero
+          sellerInfo={{
+            ...baseSeller,
+            bannerUrl: 'https://res.cloudinary.com/byblos/image/upload/v1/banners/hero.jpg',
+          }}
+          showSellerAvatar={false}
+          setAvatarLoadFailed={vi.fn()}
+          sellerInitials="JB"
+        />
+      </MemoryRouter>
+    );
+
+    const backdrop = screen.getByTestId('seller-banner-backdrop');
+    expect(backdrop).toBeInTheDocument();
+    const img = backdrop.querySelector('img');
+    expect(img).toHaveAttribute(
+      'src',
+      'https://res.cloudinary.com/byblos/image/upload/f_auto,q_auto,w_1200,c_limit/v1/banners/hero.jpg'
+    );
+  });
 });

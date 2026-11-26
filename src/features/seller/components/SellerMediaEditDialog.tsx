@@ -4,13 +4,17 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/shared/ui/button';
 import { toast } from '@/shared/hooks/use-toast';
 import { getImageUrl } from '@/shared/utils/formatting';
-import { useUploadBusinessPhotoMutation } from '@/features/seller/hooks/useSellerProfile';
+import { useUploadBannerMutation, useUploadBusinessPhotoMutation } from '@/features/seller/hooks/useSellerProfile';
+
+export const SELLER_BANNER_DIMENSIONS = '1200 × 400 px (3:1)';
 
 interface SellerMediaEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   avatarUrl?: string;
+  bannerUrl?: string | null;
   fallbackInitial: string;
+  mode?: 'photo' | 'banner';
 }
 
 const fileToBase64 = (file: File) => new Promise<string>((resolve, reject) => {
@@ -25,9 +29,20 @@ const previewSrc = (url?: string | null) => {
   return url.startsWith('blob:') || url.startsWith('data:') ? url : getImageUrl(url);
 };
 
-export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackInitial }: Readonly<SellerMediaEditDialogProps>) {
+export function SellerMediaEditDialog({
+  open,
+  onOpenChange,
+  avatarUrl,
+  bannerUrl,
+  fallbackInitial,
+  mode = 'photo',
+}: Readonly<SellerMediaEditDialogProps>) {
   const photoMutation = useUploadBusinessPhotoMutation();
-  const [busy, setBusy] = useState<null | 'photo'>(null);
+  const bannerMutation = useUploadBannerMutation();
+  const [busy, setBusy] = useState<null | 'photo' | 'banner'>(null);
+
+  const isBannerMode = mode === 'banner';
+  const activeField = isBannerMode ? 'banner' : 'photo';
 
   const runUpload = async (
     file: File | null,
@@ -44,7 +59,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
       toast({ title: 'File too large', description: `Maximum ${label.toLowerCase()} size is ${maxMb}MB.`, variant: 'destructive' });
       return;
     }
-    setBusy('photo');
+    setBusy(activeField);
     try {
       const b64 = await fileToBase64(file);
       await upload(b64);
@@ -61,7 +76,7 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
     upload: (b64: string) => Promise<unknown>,
     label: string
   ) => {
-    setBusy('photo');
+    setBusy(activeField);
     try {
       await upload('');
       toast({ title: `${label} removed` });
@@ -74,63 +89,112 @@ export function SellerMediaEditDialog({ open, onOpenChange, avatarUrl, fallbackI
   };
 
   const photoPreview = previewSrc(avatarUrl);
+  const bannerPreview = previewSrc(bannerUrl);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[90vw] max-w-sm sm:max-w-[380px] border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white">
+      <DialogContent className="w-[90vw] max-w-sm sm:max-w-[400px] border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white">
         <DialogHeader>
-          <DialogTitle className="text-slate-950 dark:text-white font-bold">Edit Business Photo</DialogTitle>
-          <DialogDescription className="text-slate-600 dark:text-white/55 font-medium">Update how your shop logo/photo looks to buyers.</DialogDescription>
+          <DialogTitle className="text-slate-950 dark:text-white font-bold">
+            {isBannerMode ? 'Edit Shop Banner' : 'Edit Business Photo'}
+          </DialogTitle>
+          <DialogDescription className="text-slate-600 dark:text-white/55 font-medium">
+            {isBannerMode
+              ? `Upload a wide banner for your dashboard and shop page. Recommended dimensions: ${SELLER_BANNER_DIMENSIONS}.`
+              : 'Update how your shop logo/photo looks to buyers.'}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* Business photo */}
-          <div className="flex items-center gap-4">
-            <div
-              className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-slate-300 dark:border-white/20 bg-white dark:bg-[#141414]"
-            >
-              {photoPreview ? (
-                <img src={photoPreview} alt="Business photo" className="h-full w-full object-cover" />
-              ) : (
-                <div
-                  className="flex h-full w-full items-center justify-center text-xl font-semibold bg-black text-white dark:bg-white dark:text-black"
-                >
-                  {fallbackInitial}
-                </div>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Business photo</p>
-              <div className="mt-2 flex flex-wrap gap-2">
+          {isBannerMode ? (
+            <div className="space-y-3">
+              <div className="h-28 w-full overflow-hidden rounded-xl border border-slate-200 dark:border-white/15 bg-slate-100 dark:bg-[#141414]">
+                {bannerPreview ? (
+                  <img src={bannerPreview} alt="Shop banner preview" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-xs font-medium text-slate-500 dark:text-white/50">
+                    No banner set ({SELLER_BANNER_DIMENSIONS})
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   size="sm"
                   className="btn-standard relative h-8 font-bold bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
-                  disabled={busy === 'photo'}
+                  disabled={busy === 'banner'}
                 >
                   <input
                     type="file"
                     accept="image/*"
+                    aria-label="Upload shop banner"
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                    disabled={busy === 'photo'}
-                    onChange={(e) => { const f = e.target.files?.[0] || null; e.target.value = ''; void runUpload(f, 5, (b) => photoMutation.mutateAsync(b), 'Business photo'); }}
+                    disabled={busy === 'banner'}
+                    onChange={(e) => { const f = e.target.files?.[0] || null; e.target.value = ''; void runUpload(f, 5, (b) => bannerMutation.mutateAsync(b), 'Shop banner'); }}
                   />
-                  {busy === 'photo' ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="mr-1.5 h-3.5 w-3.5" />}
+                  {busy === 'banner' ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="mr-1.5 h-3.5 w-3.5" />}
                   Upload
                 </Button>
-                {avatarUrl && (
+                {bannerUrl && (
                   <Button
                     size="sm"
                     variant="outline"
                     className="h-8 border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
-                    disabled={busy === 'photo'}
-                    onClick={() => { void runRemove((b) => photoMutation.mutateAsync(b), 'Business photo'); }}
+                    disabled={busy === 'banner'}
+                    onClick={() => { void runRemove((b) => bannerMutation.mutateAsync(b), 'Shop banner'); }}
                   >
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Remove
                   </Button>
                 )}
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <div
+                className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-slate-300 dark:border-white/20 bg-white dark:bg-[#141414]"
+              >
+                {photoPreview ? (
+                  <img src={photoPreview} alt="Business photo" className="h-full w-full object-cover" />
+                ) : (
+                  <div
+                    className="flex h-full w-full items-center justify-center text-xl font-semibold bg-black text-white dark:bg-white dark:text-black"
+                  >
+                    {fallbackInitial}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-slate-900 dark:text-white">Business photo</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    className="btn-standard relative h-8 font-bold bg-white text-black hover:bg-white/90 dark:bg-white dark:text-black dark:hover:bg-white/90 [data-theme=light]_&:bg-black [data-theme=light]_&:text-white [data-theme=light]_&:hover:bg-black/90"
+                    disabled={busy === 'photo'}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      disabled={busy === 'photo'}
+                      onChange={(e) => { const f = e.target.files?.[0] || null; e.target.value = ''; void runUpload(f, 5, (b) => photoMutation.mutateAsync(b), 'Business photo'); }}
+                    />
+                    {busy === 'photo' ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <UploadCloud className="mr-1.5 h-3.5 w-3.5" />}
+                    Upload
+                  </Button>
+                  {avatarUrl && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 border-slate-200 dark:border-separator bg-slate-100 dark:bg-white/[0.04] text-slate-900 dark:text-white hover:bg-white/10"
+                      disabled={busy === 'photo'}
+                      onClick={() => { void runRemove((b) => photoMutation.mutateAsync(b), 'Business photo'); }}
+                    >
+                      <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Remove
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

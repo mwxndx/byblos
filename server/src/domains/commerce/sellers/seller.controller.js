@@ -24,4 +24,5 @@ export {
   updateProfile,
   updateTheme,
   uploadBusinessPhoto,
+  uploadBanner,
 } from './seller.profile.controller.js';
