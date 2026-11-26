@@ -64,5 +64,10 @@ describe('BuyerProfileSheet', () => {
 
     const aside = screen.getByRole('complementary', { name: 'Profile' });
     expect(aside).toHaveClass('buyer-surface');
+
+    const signInButton = screen.getByRole('button', { name: 'Sign In' });
+    expect(signInButton).toBeInTheDocument();
+    expect(signInButton.className).toContain('bg-[#F5C518]');
+    expect(signInButton.className).toContain('text-black');
   });
 });

@@ -1251,9 +1251,9 @@ html.light #root {
 
 /* ── Dashboard surface cards — light mode physical elevation & background-matching borders ──────────────── */
 [data-theme="light"] :is(.seller-surface, .buyer-surface, .creator-surface, .mzigo-surface, .mzigo-light-dashboard) :is(
-    [class*="rounded-xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav),
-    [class*="rounded-2xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav),
-    [class*="rounded-3xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav),
+    [class*="rounded-xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav):not(button):not([role="button"]),
+    [class*="rounded-2xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav):not(button):not([role="button"]),
+    [class*="rounded-3xl"]:not(.theme-swatch):not(.dashboard-floating-nav):not(nav):not(button):not([role="button"]),
     section
 ) {
     background-color: #ffffff !important;
