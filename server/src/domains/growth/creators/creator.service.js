@@ -13,6 +13,7 @@ import { signToken } from '../../../shared/utils/jwt.js';
 import { sendEmail } from '../../../shared/utils/email.js';
 import Fees from '../../../shared/config/fees.js';
 import logger from '../../../shared/utils/logger.js';
+import cacheService from '../../../shared/utils/cache.service.js';
 import notificationService from '../../communication/notifications/notification.service.js';
 import WithdrawalService from '../../payments/withdrawals/withdrawal.service.js';
 import LedgerService from '../../finance/ledger/LedgerService.js';
@@ -1275,7 +1276,7 @@ class CreatorService {
     const link = linkRows[0];
     if (!link) return null;
 
-    if (!link.is_creator_marketplace_enabled || link.status !== 'active') {
+    if (!link.is_creator_marketplace_enabled) {
       return {
         active: false,
         sellerCreatorModeOff: true,
@@ -1283,6 +1284,17 @@ class CreatorService {
         creatorId: link.creator_id,
         shopName: link.shop_name,
         message: `${link.shop_name || 'This seller'} has switched off creator mode.`
+      };
+    }
+
+    if (link.status !== 'active') {
+      return {
+        active: false,
+        sellerCreatorModeOff: false,
+        sellerId: link.seller_id,
+        creatorId: link.creator_id,
+        shopName: link.shop_name,
+        status: link.status
       };
     }
 
@@ -2034,7 +2046,7 @@ class CreatorService {
     }
 
     const { rows: currentSellerRows } = await pool.query(
-      `SELECT id, shop_name, is_creator_marketplace_enabled FROM sellers WHERE id = $1`,
+      `SELECT id, shop_name, slug, is_creator_marketplace_enabled FROM sellers WHERE id = $1`,
       [sellerId]
     );
     const currentSeller = currentSellerRows[0];
@@ -2050,6 +2062,9 @@ class CreatorService {
 
     const turningOn = isCreatorMarketplaceEnabled !== undefined &&
       !currentSeller.is_creator_marketplace_enabled &&
+      Boolean(isCreatorMarketplaceEnabled) === true;
+
+    const ensureLinksActive = isCreatorMarketplaceEnabled !== undefined &&
       Boolean(isCreatorMarketplaceEnabled) === true;
 
     if (isCreatorMarketplaceEnabled !== undefined) {
@@ -2110,7 +2125,7 @@ class CreatorService {
             }
           }
         }
-      } else if (turningOn) {
+      } else if (ensureLinksActive) {
         const { rows: pausedLinks } = await client.query(
           `SELECT scl.id, scl.creator_id, c.user_id AS creator_user_id
            FROM seller_creator_links scl
@@ -2127,23 +2142,34 @@ class CreatorService {
             [sellerId]
           );
 
-          for (const link of pausedLinks) {
-            if (link.creator_user_id) {
-              notificationService.send({
-                recipientUserId: link.creator_user_id,
-                recipientRole: 'creator',
-                type: 'creator_mode_enabled',
-                title: `${currentSeller.shop_name} re-enabled Creator Mode`,
-                body: `${currentSeller.shop_name} has re-enabled creator mode. Your collaboration link is active again!`,
-                data: { path: '/creator/dashboard', sellerId },
-                channels: ['in_app', 'push']
-              }).catch((error) => logger.warn('[CreatorService] Notification failed', { creatorId: link.creator_id, error: error.message }));
+          if (turningOn) {
+            for (const link of pausedLinks) {
+              if (link.creator_user_id) {
+                notificationService.send({
+                  recipientUserId: link.creator_user_id,
+                  recipientRole: 'creator',
+                  type: 'creator_mode_enabled',
+                  title: `${currentSeller.shop_name} re-enabled Creator Mode`,
+                  body: `${currentSeller.shop_name} has re-enabled creator mode. Your collaboration link is active again!`,
+                  data: { path: '/creator/dashboard', sellerId },
+                  channels: ['in_app', 'push']
+                }).catch((error) => logger.warn('[CreatorService] Notification failed', { creatorId: link.creator_id, error: error.message }));
+              }
             }
           }
         }
       }
 
       await client.query('COMMIT');
+
+      const cacheKeys = [`seller:public:${sellerId}`];
+      if (currentSeller.shop_name) {
+        cacheKeys.push(`seller:shop:${String(currentSeller.shop_name).toLowerCase().trim()}`);
+      }
+      if (currentSeller.slug) {
+        cacheKeys.push(`seller:shop:${String(currentSeller.slug).toLowerCase().trim()}`);
+      }
+      await Promise.all([...new Set(cacheKeys)].map((k) => cacheService.delete(k).catch(() => {})));
 
       return {
         isCreatorMarketplaceEnabled: Boolean(rows[0].is_creator_marketplace_enabled),

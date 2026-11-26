@@ -369,4 +369,36 @@ describe('creator collaboration requests — state guards and duplicate preventi
     const sellerDashAfterInvite = await CreatorService.getSellerCreatorsDashboard(seller.id);
     assert.equal(sellerDashAfterInvite.incomingRequests.length, 0, 'pending request should be closed when invite is accepted');
   });
+
+  test('reactivates paused links when creator mode is enabled and distinguishes left links from disabled creator mode', async (t) => {
+    let seller;
+    let creator;
+
+    t.after(async () => {
+      if (creator) {
+        await cleanupCreatorFinancials(creator.id);
+        await cleanupCreator(creator.id).catch(() => {});
+      }
+      if (seller) await cleanupSeller(seller.id).catch(() => {});
+    });
+
+    seller = await createSeller({ isCreatorMarketplaceEnabled: true });
+    creator = await createCreator({});
+    const link = await createSellerCreatorLink({ sellerId: seller.id, creatorId: creator.id });
+
+    // Simulate a link stuck in 'paused' while is_creator_marketplace_enabled is already TRUE
+    await pool.query(`UPDATE seller_creator_links SET status = 'paused' WHERE id = $1`, [link.id]);
+
+    await CreatorService.updateSellerCreatorListing(seller.id, { isCreatorMarketplaceEnabled: true });
+
+    const clickWhileActive = await CreatorService.recordLinkClick({ code: link.code });
+    assert.equal(clickWhileActive?.active, true);
+    assert.equal(clickWhileActive?.sellerCreatorModeOff, false);
+
+    // Leaving the shop should NOT report sellerCreatorModeOff: true when marketplace is still enabled
+    await CreatorService.leavePromotedShop(creator.id, seller.id);
+    const clickAfterLeave = await CreatorService.recordLinkClick({ code: link.code });
+    assert.equal(clickAfterLeave?.active, false);
+    assert.equal(clickAfterLeave?.sellerCreatorModeOff, false);
+  });
 });
