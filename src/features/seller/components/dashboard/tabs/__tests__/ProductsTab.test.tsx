@@ -210,4 +210,20 @@ describe('ProductsTab', () => {
     expect(addProductBtn.className).toMatch(/\[data-theme=light\]_&:bg-black/);
     expect(addProductBtn.className).toMatch(/\[data-theme=light\]_&:text-white/);
   });
+
+  it('keeps borders and divider lines between products invisible in both light and dark themes', () => {
+    render(
+      <QueryClientProvider client={queryClient}>
+        <ProductsTab {...defaultProps} />
+      </QueryClientProvider>
+    );
+
+    const card = screen.getByTestId('product-card-prod-1');
+    expect(card).toHaveClass('border-transparent');
+    expect(card.className).not.toContain('border-slate-200/80');
+    expect(card.className).not.toContain('dark:border-white/10');
+
+    const dividerRow = card.querySelector('.border-t');
+    expect(dividerRow).toBeNull();
+  });
 });

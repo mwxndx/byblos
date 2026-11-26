@@ -46,7 +46,7 @@ export const SellerProductCards = memo(function SellerProductCards({
           <div
             key={product.id}
             data-testid={`product-card-${product.id}`}
-            className="relative flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-surface-1 p-3.5 sm:p-4 md:px-5 md:py-4 md:pr-16 hover:border-[var(--theme-accent,#f5c518)]/40 transition-colors gap-3.5 md:gap-6 lg:gap-8"
+            className="relative flex flex-col md:flex-row md:items-center md:justify-between rounded-2xl border border-transparent bg-white dark:bg-surface-1 p-3.5 sm:p-4 md:px-5 md:py-4 md:pr-16 transition-colors gap-3.5 md:gap-6 lg:gap-8"
           >
             {/* Top right corner: Pencil icon */}
             <button
@@ -127,7 +127,7 @@ export const SellerProductCards = memo(function SellerProductCards({
             </div>
 
             {/* Bottom section on mobile / same row on desktop: Price and Mark as sold out / Mark as available */}
-            <div className="mt-3.5 pt-3 md:mt-0 md:pt-0 border-t md:border-t-0 border-slate-100 dark:border-white/5 flex items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 pr-10 md:pr-0 shrink-0">
+            <div className="mt-3.5 pt-3 md:mt-0 md:pt-0 flex items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 pr-10 md:pr-0 shrink-0">
               <span className="font-semibold text-sm sm:text-base lg:text-lg tabular-nums text-slate-900 dark:text-white shrink-0">
                 {formatCurrency(product.price)}
               </span>
