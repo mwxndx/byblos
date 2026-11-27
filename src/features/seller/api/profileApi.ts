@@ -48,6 +48,7 @@ export const transformSeller = (data: unknown): ApiSeller => {
     tiktokLink: str(seller.tiktokLink || seller.tiktok_link),
     facebookLink: str(seller.facebookLink || seller.facebook_link),
     creatorCommissionRate: Number(seller.creatorCommissionRate ?? seller.creator_commission_rate ?? 0.01),
+    isCreatorMarketplaceEnabled: Boolean(seller.isCreatorMarketplaceEnabled ?? seller.is_creator_marketplace_enabled),
     is_verified: !!(seller.is_verified || seller.isVerified || user?.is_verified),
     products: Array.isArray(seller.products) ? ((seller.products as Array<Record<string, unknown>>).map(transformProduct) as unknown as Array<Record<string, unknown>>) : undefined,
     totalSales: optNum(seller.totalSales || seller.total_sales) ?? 0,

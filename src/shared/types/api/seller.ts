@@ -80,6 +80,8 @@ export interface ApiSeller {
   facebookLink?: string;
   creatorCommissionRate?: number;
   creator_commission_rate?: number;
+  isCreatorMarketplaceEnabled?: boolean;
+  is_creator_marketplace_enabled?: boolean;
   is_verified: boolean;
   products?: Array<Record<string, unknown>>;
 }
