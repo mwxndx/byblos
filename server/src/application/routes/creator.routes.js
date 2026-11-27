@@ -17,6 +17,7 @@ const requireCreatorProfile = (req, res, next) => {
   return next();
 };
 
+router.get('/check-username', creatorController.checkUsernameAvailability);
 router.get('/invites/:token', creatorController.getInvite);
 router.post('/links/:code/click', validate(V.trackClick), creatorController.trackLinkClick);
 router.post('/register', authLimiter, validate(V.register), creatorController.register);

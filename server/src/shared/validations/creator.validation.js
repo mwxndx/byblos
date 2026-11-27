@@ -24,6 +24,7 @@ export const requestWithdrawal = z.object({
 }).passthrough();
 export const requestCollaboration = z.object({ sellerId: id }).passthrough();
 export const updateProfile = z.object({
+  username: z.string().nullable().optional(),
   instagramLink: z.string().nullable().optional(),
   tiktokLink: z.string().nullable().optional(),
   whatsappNumber: z.string().nullable().optional(),

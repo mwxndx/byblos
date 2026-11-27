@@ -4,6 +4,8 @@ import { ArrowLeft, Check, Eye, EyeOff, Loader2, Sparkles, X } from '@/shared/ui
 import { toast } from 'sonner';
 import { useCreatorRegisterMutation } from '@/features/creator/hooks/mutations/useCreatorAuthMutations';
 import { useCreatorInviteQuery } from '@/features/creator/hooks/queries/useCreatorInviteQuery';
+import { checkCreatorUsernameAvailability } from '@/features/creator/api/auth';
+import { validateCreatorUsername } from '@/features/creator/utils/creatorUsernameValidation';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
@@ -50,11 +52,17 @@ export default function CreatorRegister() {
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
+    username: '',
     email: '',
     mpesaNumber: '',
     whatsappNumber: '',
     password: '',
     confirmPassword: ''
+  });
+  const [usernameStatus, setUsernameStatus] = useState<{ checking: boolean; available: boolean | null; message: string | null }>({
+    checking: false,
+    available: null,
+    message: null
   });
 
   const { data: inviteData, error: inviteError, isLoading: inviteLoading } = useCreatorInviteQuery(token, Boolean(token));
@@ -104,8 +112,41 @@ export default function CreatorRegister() {
 
   useModalBackDismiss(existingAccountPrompt, () => setExistingAccountPrompt(false));
 
+  const usernameValidation = validateCreatorUsername(form.username);
+
+  useEffect(() => {
+    if (!usernameValidation.valid) {
+      setUsernameStatus({ checking: false, available: null, message: null });
+      return;
+    }
+    let cancelled = false;
+    setUsernameStatus((s) => ({ ...s, checking: true }));
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await checkCreatorUsernameAvailability(form.username);
+        if (!cancelled) {
+          setUsernameStatus({ checking: false, available: res.available, message: res.message });
+        }
+      } catch {
+        if (!cancelled) setUsernameStatus({ checking: false, available: null, message: null });
+      }
+    }, 300);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [form.username, usernameValidation.valid]);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!usernameValidation.valid) {
+      toast.error(usernameValidation.error || 'Enter a valid username.');
+      return;
+    }
+    if (usernameStatus.available === false) {
+      toast.error('This username is already taken.');
+      return;
+    }
     if (form.password !== form.confirmPassword) {
       toast.error('Passwords do not match.');
       return;
@@ -237,6 +278,30 @@ export default function CreatorRegister() {
           )}
           <Input value={form.firstName} onChange={(e) => updateForm('firstName', e.target.value)} aria-label="First name" placeholder="First name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
           <Input value={form.lastName} onChange={(e) => updateForm('lastName', e.target.value)} aria-label="Last name" placeholder="Last name" className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400" required />
+          <div className="space-y-1 sm:col-span-2">
+            <Input
+              value={form.username}
+              onChange={(e) => updateForm('username', e.target.value)}
+              aria-label="Username"
+              placeholder="Unique username (more than 3 characters)"
+              className="h-12 rounded-2xl border-slate-300 dark:border-separator bg-slate-50 dark:bg-black/45 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 focus:border-yellow-400 focus:ring-yellow-400"
+              required
+            />
+            {form.username.trim().length > 0 && !usernameValidation.valid && (
+              <p className="px-1 text-xs text-red-500">{usernameValidation.error}</p>
+            )}
+            {usernameValidation.valid && (
+              <p className="px-1 text-[11px] text-slate-500 dark:text-white/55">
+                Link preview: <span className="font-medium text-slate-900 dark:text-white">byblosafrica.site/&lt;shop&gt;/{usernameValidation.normalized}</span>
+                {usernameStatus.checking && ' · Checking…'}
+                {!usernameStatus.checking && usernameStatus.message && (
+                  <span className={usernameStatus.available ? ' text-emerald-600 dark:text-emerald-400' : ' text-red-500'}>
+                    {' · '}{usernameStatus.message}
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
           <div className="space-y-1 sm:col-span-2">
             {authUser && !token && (
               <span className="text-[9px] sm:text-xs text-yellow-600 dark:text-yellow-400 font-semibold">Linked to Byblos account</span>

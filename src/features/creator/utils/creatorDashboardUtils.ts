@@ -25,6 +25,8 @@ export type CreatorProfile = {
   balance?: number;
   firstName?: string;
   lastName?: string;
+  username?: string | null;
+  usernameConfirmed?: boolean;
   email?: string;
   mpesaNumber?: string;
   whatsappNumber?: string;

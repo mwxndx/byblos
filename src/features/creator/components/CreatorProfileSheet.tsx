@@ -10,6 +10,7 @@ import { useThemeScope } from '@/shared/hooks/useAppTheme';
 import { CreatorSocialProfiles } from '@/features/creator/components/CreatorSocialProfiles';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import { useUpdateCreatorProfileMutation } from '@/features/creator/hooks/mutations/useUpdateCreatorProfileMutation';
+import { validateCreatorUsername } from '@/features/creator/utils/creatorUsernameValidation';
 import { LegalLinks } from '@/shared/components/LegalLinks';
 import type { CreatorProfile } from '@/features/creator/utils/creatorDashboardUtils';
 
@@ -37,19 +38,32 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
   const updateMutation = useUpdateCreatorProfileMutation();
 
   const [mpesa, setMpesa] = useState(creator.mpesaNumber || '');
+  const [username, setUsername] = useState(creator.username || '');
 
   useEffect(() => {
     setMpesa(creator.mpesaNumber || '');
   }, [creator.mpesaNumber]);
 
-  const contactChanged =
-    (mpesa.trim() || '') !== (creator.mpesaNumber || '');
+  useEffect(() => {
+    setUsername(creator.username || '');
+  }, [creator.username]);
 
+  const usernameChanged =
+    (username.trim() || '') !== (creator.username || '');
+  const contactChanged =
+    (mpesa.trim() || '') !== (creator.mpesaNumber || '') || usernameChanged;
+
+  const usernameValidation = validateCreatorUsername(username);
   const fullName = [creator.firstName, creator.lastName].filter(Boolean).join(' ').trim();
 
   const handleSaveContact = async () => {
+    if (usernameChanged && !usernameValidation.valid) {
+      toast.error(usernameValidation.error || 'Enter a valid username.');
+      return;
+    }
     try {
       await updateMutation.mutateAsync({
+        ...(usernameChanged ? { username: username.trim() } : {}),
         mpesaNumber: mpesa.trim() || undefined
       });
       toast.success('Details saved.');
@@ -86,6 +100,26 @@ export function CreatorProfileSheet({ open, onOpenChange, creator, onLogout }: R
             <h3 className="text-sm font-semibold text-label">Personal details</h3>
             <ReadOnlyDetail icon={UserRound} label="Full name" value={fullName} />
             <ReadOnlyDetail icon={Mail} label="Email" value={creator.email} />
+
+            <div className="rounded-control border border-separator bg-surface-2 p-3">
+              <label className="flex items-center gap-2 text-xs font-medium text-label-2">
+                <UserRound className="h-3.5 w-3.5 text-brand-text" />Username
+              </label>
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                aria-label="Creator username"
+                placeholder="e.g. roynthiga"
+                className="mt-2 h-9"
+              />
+              {usernameChanged && username.trim().length > 0 && !usernameValidation.valid ? (
+                <p className="mt-1 text-[11px] text-sys-red">{usernameValidation.error}</p>
+              ) : (
+                <p className="mt-1 text-[11px] text-label-3">
+                  Used in your creator shop links (more than 3 characters).
+                </p>
+              )}
+            </div>
 
             <div className="rounded-control border border-separator bg-surface-2 p-3">
               <label className="flex items-center gap-2 text-xs font-medium text-label-2">

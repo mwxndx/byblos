@@ -16,6 +16,7 @@ import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { AppHeader } from '@/shared/ui/AppHeader';
 import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
+import { RequiredCreatorUsernameModal } from '@/features/creator/components/RequiredCreatorUsernameModal';
 import { copyLinkedTextToClipboard, resolveShareOrigin } from '@/shared/utils/shopLinks';
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
@@ -381,6 +382,7 @@ export default function CreatorDashboard() {
             creator={creator}
             onLogout={handleLogout}
           />
+          <RequiredCreatorUsernameModal creator={creator} onLogout={handleLogout} />
         </div>
 
       <CreatorDashboardTabs

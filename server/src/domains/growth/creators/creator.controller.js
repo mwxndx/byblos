@@ -12,6 +12,8 @@ const sanitizeCreator = (creator = {}) => ({
   userId: creator.user_id,
   firstName: creator.first_name,
   lastName: creator.last_name,
+  username: creator.username || null,
+  usernameConfirmed: Boolean(creator.username_confirmed),
   email: creator.email,
   mpesaNumber: creator.mpesa_number,
   whatsappNumber: creator.whatsapp_number,
@@ -25,6 +27,15 @@ const sanitizeCreator = (creator = {}) => ({
   status: creator.status,
   createdAt: creator.created_at
 });
+
+export const checkUsernameAvailability = async (req, res, next) => {
+  try {
+    const result = await CreatorService.checkUsernameAvailability(req.query.username, req.user?.creatorId || null);
+    res.status(200).json({ status: 'success', data: result });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const inviteCreator = async (req, res, next) => {
   try {

@@ -66,7 +66,7 @@ const CREATOR_ANALYSIS_PERIODS = {
 };
 
 const CREATOR_BASE_COLUMNS = `
-  id, user_id, first_name, last_name, username, email, mpesa_number,
+  id, user_id, first_name, last_name, username, username_confirmed, email, mpesa_number,
   whatsapp_number, instagram_link, tiktok_link, balance, total_sales,
   total_earnings, referral_code, total_referral_earnings, status,
   terms_accepted, terms_accepted_at, withdrawal_reserved_balance,
@@ -665,17 +665,21 @@ class CreatorService {
         );
       }
 
-      const username = await this.generateUniqueUsername(data.firstName, data.lastName, client);
+      const hasExplicitUsername = Boolean(data.username && String(data.username).trim());
+      const username = hasExplicitUsername
+        ? await this.resolveValidatedUsername(data.username, client)
+        : await this.generateUniqueUsername(data.firstName, data.lastName, client);
       const { rows: creatorRows } = await client.query(
         `INSERT INTO creators
-           (user_id, first_name, last_name, username, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())
+           (user_id, first_name, last_name, username, username_confirmed, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, NOW())
          RETURNING *`,
         [
           user.id,
           String(data.firstName).trim(),
           String(data.lastName).trim(),
           username,
+          hasExplicitUsername,
           email,
           String(data.mpesaNumber).trim(),
           data.whatsappNumber ? String(data.whatsappNumber).trim() : null
@@ -791,16 +795,20 @@ class CreatorService {
         );
       }
 
-      const username = await this.generateUniqueUsername(data.firstName, data.lastName, client);
+      const hasExplicitUsername = Boolean(data.username && String(data.username).trim());
+      const username = hasExplicitUsername
+        ? await this.resolveValidatedUsername(data.username, client)
+        : await this.generateUniqueUsername(data.firstName, data.lastName, client);
       await client.query(
         `INSERT INTO creators
-           (user_id, first_name, last_name, username, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())`,
+           (user_id, first_name, last_name, username, username_confirmed, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, NOW())`,
         [
           user.id,
           String(data.firstName).trim(),
           String(data.lastName).trim(),
           username,
+          hasExplicitUsername,
           email,
           String(data.mpesaNumber).trim(),
           data.whatsappNumber ? String(data.whatsappNumber).trim() : null
@@ -858,6 +866,59 @@ class CreatorService {
       [creatorId, code]
     );
     return rows[0]?.referral_code;
+  }
+
+  static validateUsernameFormat(rawUsername) {
+    const raw = String(rawUsername || '').trim();
+    const usernameRegex = /^[a-zA-Z0-9._\s-]+$/;
+    if (raw.length <= 3) {
+      return { valid: false, message: 'Username must be more than 3 characters (at least 4).' };
+    }
+    if (raw.length > 30) {
+      return { valid: false, message: 'Username must be at most 30 characters.' };
+    }
+    if (!usernameRegex.test(raw)) {
+      return { valid: false, message: 'Username can only contain letters, numbers, spaces, dots, dashes, and underscores.' };
+    }
+    const slug = raw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    if (slug.length <= 3) {
+      return { valid: false, message: 'Username must contain more than 3 letters or numbers.' };
+    }
+    return { valid: true, normalizedUsername: slug };
+  }
+
+  static async checkUsernameAvailability(rawUsername, excludeCreatorId = null, client = pool) {
+    const validation = this.validateUsernameFormat(rawUsername);
+    if (!validation.valid) {
+      return {
+        available: false,
+        allowed: false,
+        normalizedUsername: '',
+        message: validation.message
+      };
+    }
+    const { rows } = await client.query(
+      `SELECT id FROM creators WHERE LOWER(username) = LOWER($1) AND ($2::int IS NULL OR id <> $2) LIMIT 1`,
+      [validation.normalizedUsername, excludeCreatorId]
+    );
+    const available = rows.length === 0;
+    return {
+      available,
+      allowed: true,
+      normalizedUsername: validation.normalizedUsername,
+      message: available ? 'Username is available' : 'This username is already taken'
+    };
+  }
+
+  static async resolveValidatedUsername(rawUsername, client = pool, excludeCreatorId = null) {
+    const check = await this.checkUsernameAvailability(rawUsername, excludeCreatorId, client);
+    if (!check.allowed) {
+      throw new AppError(check.message, 400);
+    }
+    if (!check.available) {
+      throw new AppError(check.message, 409);
+    }
+    return check.normalizedUsername;
   }
 
   static async generateUniqueUsername(firstName, lastName, client = pool, excludeCreatorId = null) {
@@ -2329,6 +2390,12 @@ class CreatorService {
     const values = [creatorId];
     let idx = 2;
 
+    if (updates.username !== undefined) {
+      const validatedUsername = await this.resolveValidatedUsername(updates.username, pool, creatorId);
+      fields.push(`username = $${idx++}`);
+      values.push(validatedUsername);
+      fields.push(`username_confirmed = TRUE`);
+    }
     if (updates.instagramLink !== undefined) {
       fields.push(`instagram_link = $${idx++}`);
       values.push(updates.instagramLink ? String(updates.instagramLink).trim() : null);

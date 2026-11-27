@@ -432,4 +432,38 @@ describe('creator collaboration requests — state guards and duplicate preventi
     });
     assert.equal(attrByUsername?.creator_id, creator.id);
   });
+
+  test('validates creator username (>3 chars, shop-name rules), confirms on updateProfile, and rejects duplicates', async (t) => {
+    let creator1;
+    let creator2;
+
+    t.after(async () => {
+      if (creator1) await cleanupCreator(creator1.id).catch(() => {});
+      if (creator2) await cleanupCreator(creator2.id).catch(() => {});
+    });
+
+    creator1 = await createCreator({});
+    creator2 = await createCreator({});
+
+    const tooShort = await CreatorService.checkUsernameAvailability('roy');
+    assert.equal(tooShort.allowed, false);
+    assert.equal(tooShort.available, false);
+
+    const invalidChars = await CreatorService.checkUsernameAvailability('roy@nthiga');
+    assert.equal(invalidChars.allowed, false);
+
+    const desired = `Roy Nthiga ${creator1.id}`;
+    const validCheck = await CreatorService.checkUsernameAvailability(desired);
+    assert.equal(validCheck.allowed, true);
+    assert.equal(validCheck.available, true);
+
+    const updated = await CreatorService.updateProfile(creator1.id, { username: desired });
+    assert.equal(updated.username, validCheck.normalizedUsername);
+    assert.equal(updated.username_confirmed, true);
+
+    await assert.rejects(
+      () => CreatorService.updateProfile(creator2.id, { username: desired }),
+      /already taken/
+    );
+  });
 });

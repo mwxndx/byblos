@@ -19,6 +19,7 @@ export const getProfile = async () => {
 };
 
 export interface UpdateCreatorProfilePayload {
+  username?: string;
   instagramLink?: string | null;
   tiktokLink?: string | null;
   whatsappNumber?: string | null;

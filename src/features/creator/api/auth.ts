@@ -4,6 +4,7 @@ export interface CreatorRegistrationPayload {
   token: string;
   firstName: string;
   lastName: string;
+  username?: string;
   email: string;
   mpesaNumber: string;
   whatsappNumber: string;
@@ -11,6 +12,15 @@ export interface CreatorRegistrationPayload {
   confirmPassword: string;
   termsAccepted: boolean;
 }
+
+export const checkCreatorUsernameAvailability = async (
+  username: string
+): Promise<{ available: boolean; allowed: boolean; normalizedUsername: string; message: string }> => {
+  const response = await apiClient.get<{
+    data: { available: boolean; allowed: boolean; normalizedUsername: string; message: string };
+  }>(`/creators/check-username?username=${encodeURIComponent(username)}`);
+  return response.data.data;
+};
 
 export const register = async (payload: CreatorRegistrationPayload) => {
   const response = await apiClient.post('/creators/register', payload);
