@@ -198,5 +198,7 @@ describe('SellersGrid defense-in-depth', () => {
     expect(card.className).not.toContain('dark:border-white/20');
     expect(card.className).not.toContain('hover:border-slate-400');
     expect(card.className).not.toContain('dark:hover:border-white/30');
+    expect(card.className).not.toContain('shadow-sm');
+    expect(card.className).not.toContain('hover:shadow-md');
   });
 });

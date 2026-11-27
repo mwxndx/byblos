@@ -22,7 +22,7 @@ const SellerGridSkeleton = ({ isBuyer }: { isBuyer?: boolean }) => (
             <div
                 key={index}
                 aria-hidden="true"
-                className={`flex flex-col justify-between aspect-square w-full rounded-[24px] border ${isBuyer ? 'border-transparent' : 'border-slate-300 dark:border-white/20'} bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200`}
+                className={`flex flex-col justify-between aspect-square w-full rounded-[24px] border ${isBuyer ? 'border-transparent shadow-none' : 'border-slate-300 dark:border-white/20 shadow-sm'} bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 transition-colors duration-200`}
             >
                 <Skeleton className="h-1/2 w-full shrink-0 rounded-xl" />
                 <div className="flex flex-col items-start gap-1.5 w-full pt-1">
