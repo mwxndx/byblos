@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 86;
-  const defaultName = '1.0.86';
+  const defaultCode = 87;
+  const defaultName = '1.0.87';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Added customizable shop banners to the Seller Dashboard and Seller Shop pages with Cloudinary optimization and caching.',
-      'Fixed creator collaboration request and leave flows so re-requests and seller creator lists stay accurately synchronized.',
-      'Improved light-mode visibility for the buyer sign-in button and product list dividers across dashboards.'
+      'Added unique creator usernames with signup, profile editing, and personalized creator shop links (/:shopName/:creatorUsername).',
+      'Fixed creator marketplace activation so paused creator links reactivate and shop caches refresh automatically.',
+      'Resolved an infinite click-tracking loop on creator shop links and preserved creator marketplace status across shop responses.'
     ]
   };
 }
