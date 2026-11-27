@@ -83,10 +83,10 @@ const SellerBrandCard = ({ seller, className, isBuyer, showUnfollow = false, isU
     return (
         <div
             className={cn(
-                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[24px] border bg-white dark:bg-surface-1 p-3 sm:p-3.5 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
+                'group relative flex flex-col justify-between aspect-square w-full cursor-pointer overflow-hidden rounded-[24px] bg-white dark:bg-surface-1 p-3 sm:p-3.5 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:focus-visible:outline-white/70',
                 isBuyer
-                    ? 'border-transparent hover:border-transparent shadow-none hover:shadow-none'
-                    : 'border-slate-300 dark:border-white/20 hover:border-slate-400 dark:hover:border-white/30 shadow-sm hover:shadow-md',
+                    ? 'border-0 border-transparent hover:border-transparent shadow-none hover:shadow-none'
+                    : 'border border-slate-300 dark:border-white/20 hover:border-slate-400 dark:hover:border-white/30 shadow-sm hover:shadow-md',
                 className,
             )}
             role="link"
