@@ -172,4 +172,31 @@ describe('SellersGrid defense-in-depth', () => {
     expect(grid?.className).toContain('md:grid-cols-3');
     expect(grid?.className).toContain('lg:grid-cols-4');
   });
+
+  it('keeps seller shop card boundaries invisible in both light and dark modes in buyer dashboard', () => {
+    const mockSellers: Partial<ApiPublicSeller>[] = [
+      { id: '1', shopName: 'Shop A', fullName: 'Seller A', status: 'active', is_active: true },
+    ];
+
+    vi.mocked(usePublicSellersQuery).mockReturnValue({
+      data: {
+        sellers: mockSellers as ApiPublicSeller[],
+        pagination: { page: 1, pageSize: 24, total: 1, hasMore: false }
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof usePublicSellersQuery>);
+
+    render(
+      <MemoryRouter>
+        <SellersGrid filterCity="" filterArea="" searchQuery="" isBuyer={true} />
+      </MemoryRouter>
+    );
+
+    const card = screen.getByRole('link', { name: 'Open Shop A' });
+    expect(card).toHaveClass('border-transparent');
+    expect(card.className).not.toContain('border-slate-300');
+    expect(card.className).not.toContain('dark:border-white/20');
+    expect(card.className).not.toContain('hover:border-slate-400');
+    expect(card.className).not.toContain('dark:hover:border-white/30');
+  });
 });

@@ -15,14 +15,14 @@ interface SellersGridProps {
 
 const INITIAL_VISIBLE_SELLERS = 24;
 
-const SellerGridSkeleton = () => (
+const SellerGridSkeleton = ({ isBuyer }: { isBuyer?: boolean }) => (
     <div role="status" aria-busy="true" aria-live="polite" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2.5 sm:gap-3.5 md:gap-4.5 w-full max-w-[760px] md:max-w-none mx-auto">
         <span className="sr-only">Loading shops…</span>
         {Array.from({ length: 6 }).map((_, index) => (
             <div
                 key={index}
                 aria-hidden="true"
-                className="flex flex-col justify-between aspect-square w-full rounded-[24px] border border-slate-300 dark:border-white/20 bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200"
+                className={`flex flex-col justify-between aspect-square w-full rounded-[24px] border ${isBuyer ? 'border-transparent' : 'border-slate-300 dark:border-white/20'} bg-white dark:bg-[#0a0a0a] p-3 sm:p-3.5 shadow-sm transition-colors duration-200`}
             >
                 <Skeleton className="h-1/2 w-full shrink-0 rounded-xl" />
                 <div className="flex flex-col items-start gap-1.5 w-full pt-1">
@@ -92,7 +92,7 @@ const SellersGrid = ({ filterCity, filterArea, searchQuery, isBuyer }: SellersGr
     );
 
     if (loading) {
-        return <SellerGridSkeleton />;
+        return <SellerGridSkeleton isBuyer={isBuyer} />;
     }
 
     if (filteredSellers.length === 0) {
