@@ -35,13 +35,14 @@ export const getShopUrl = (slug?: string | null, origin?: string) => {
 
 export const getCreatorShopUrl = (
   slug?: string | null,
-  creatorCode?: string | null,
+  creatorIdentifier?: string | null,
   origin?: string
 ) => {
   const shopUrl = getShopUrl(slug, origin);
   if (!shopUrl) return '';
-  if (!creatorCode) return shopUrl;
-  return `${shopUrl}?creator=${encodeURIComponent(creatorCode)}`;
+  const cleanCreator = String(creatorIdentifier || '').trim();
+  if (!cleanCreator) return shopUrl;
+  return `${shopUrl}/${encodeURIComponent(cleanCreator)}`;
 };
 
 export const copyLinkedTextToClipboard = async (label: string, url: string): Promise<'empty' | 'plain' | 'rich'> => {

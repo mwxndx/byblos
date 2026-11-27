@@ -41,6 +41,8 @@ export type LinkedShop = {
   slug?: string;
   avatar_url?: string | null;
   code?: string;
+  creator_username?: string | null;
+  shopUrl?: string | null;
   commission_rate?: number | string;
   sales_count?: number | string;
   click_count?: number | string;

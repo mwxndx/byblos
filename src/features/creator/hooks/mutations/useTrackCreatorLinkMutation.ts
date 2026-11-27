@@ -3,7 +3,7 @@ import creatorApi from '@/features/creator/api';
 
 export function useTrackCreatorLinkMutation() {
   return useMutation({
-    mutationFn: (code: string) => creatorApi.trackLinkClick(code),
+    mutationFn: (payload: string | { code: string; shopSlug?: string }) => creatorApi.trackLinkClick(payload),
   });
 }
 

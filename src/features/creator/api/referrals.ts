@@ -16,8 +16,15 @@ export const generateReferralCode = async () => {
   return data?.referralCode;
 };
 
-export const trackLinkClick = async (code: string) => {
-  const response = await apiClient.post<unknown>(`/creators/links/${encodeURIComponent(code)}/click`);
+export const trackLinkClick = async (
+  codeOrPayload: string | { code: string; shopSlug?: string }
+) => {
+  const code = typeof codeOrPayload === 'string' ? codeOrPayload : codeOrPayload.code;
+  const shopSlug = typeof codeOrPayload === 'string' ? undefined : codeOrPayload.shopSlug;
+  const response = await apiClient.post<unknown>(
+    `/creators/links/${encodeURIComponent(code)}/click`,
+    shopSlug ? { shopSlug } : undefined
+  );
   return response.data;
 };
 

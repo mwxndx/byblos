@@ -113,7 +113,15 @@ export const routes = [
     path: '/register',
     element: <Navigate to="/buyer/register" replace />,
   },
-  // Standard public seller short link wildcard (must be matched after specific subpaths)
+  // Standard public seller short link wildcards (must be matched after specific subpaths)
+  {
+    path: '/:shopName/:creatorUsername',
+    element: (
+      <Suspense fallback={<RouteFallback />}>
+        <ShopPage />
+      </Suspense>
+    ),
+  },
   {
     path: '/:shopName',
     element: (

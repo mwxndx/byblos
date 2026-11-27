@@ -25,17 +25,17 @@ const uniqueRefCode = () => `CRT${Date.now().toString(36).toUpperCase()}${(refSe
 
 async function cleanupCreatorFinancials(creatorId) {
   if (!creatorId) return;
-  await pool.query('UPDATE sellers SET referred_by_creator_id = NULL WHERE referred_by_creator_id = $1', [creatorId]).catch(() => {});
-  await pool.query('DELETE FROM creator_earnings WHERE creator_id = $1', [creatorId]).catch(() => {});
-  await pool.query('DELETE FROM creator_referral_earnings WHERE referrer_creator_id = $1', [creatorId]).catch(() => {});
-  await pool.query('DELETE FROM creator_shop_requests WHERE creator_id = $1', [creatorId]).catch(() => {});
-  await pool.query('DELETE FROM seller_creator_links WHERE creator_id = $1', [creatorId]).catch(() => {});
+  await pool.query('UPDATE sellers SET referred_by_creator_id = NULL WHERE referred_by_creator_id = $1', [creatorId]).catch(() => { });
+  await pool.query('DELETE FROM creator_earnings WHERE creator_id = $1', [creatorId]).catch(() => { });
+  await pool.query('DELETE FROM creator_referral_earnings WHERE referrer_creator_id = $1', [creatorId]).catch(() => { });
+  await pool.query('DELETE FROM creator_shop_requests WHERE creator_id = $1', [creatorId]).catch(() => { });
+  await pool.query('DELETE FROM seller_creator_links WHERE creator_id = $1', [creatorId]).catch(() => { });
 }
 
 describe('creator profile — M-Pesa number', () => {
   test('normalizes a valid number and rejects an invalid one', async (t) => {
     let creator;
-    t.after(async () => { if (creator) await cleanupCreator(creator.id).catch(() => {}); });
+    t.after(async () => { if (creator) await cleanupCreator(creator.id).catch(() => { }); });
 
     creator = await createCreator({});
 
@@ -54,8 +54,8 @@ describe('creator limits — promotions', () => {
     let creator; const sellers = [];
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      for (const s of sellers) await cleanupSeller(s.id).catch(() => {});
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
+      for (const s of sellers) await cleanupSeller(s.id).catch(() => { });
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
     });
 
     creator = await createCreator({});
@@ -81,8 +81,8 @@ describe('creator limits — invites', () => {
     let creator; const sellers = [];
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      for (const s of sellers) await cleanupSeller(s.id).catch(() => {});
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
+      for (const s of sellers) await cleanupSeller(s.id).catch(() => { });
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
     });
 
     creator = await createCreator({});
@@ -110,11 +110,11 @@ describe('creator leave — promoted shop', () => {
     let creator, seller, buyer, user, order;
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      if (order) await cleanupOrder(order.id).catch(() => {});
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
-      if (buyer) await cleanupBuyer(buyer.id).catch(() => {});
-      if (user) await cleanupUser(user.id).catch(() => {});
+      if (order) await cleanupOrder(order.id).catch(() => { });
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
+      if (buyer) await cleanupBuyer(buyer.id).catch(() => { });
+      if (user) await cleanupUser(user.id).catch(() => { });
     });
 
     user = await createUser({});
@@ -153,11 +153,11 @@ describe('creator leave — invited business', () => {
     let creator, seller, buyer, user, order;
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      if (order) await cleanupOrder(order.id).catch(() => {});
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
-      if (buyer) await cleanupBuyer(buyer.id).catch(() => {});
-      if (user) await cleanupUser(user.id).catch(() => {});
+      if (order) await cleanupOrder(order.id).catch(() => { });
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
+      if (buyer) await cleanupBuyer(buyer.id).catch(() => { });
+      if (user) await cleanupUser(user.id).catch(() => { });
     });
 
     user = await createUser({});
@@ -195,11 +195,11 @@ describe('seller removes a creator', () => {
     let creator, seller, buyer, user, order;
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      if (order) await cleanupOrder(order.id).catch(() => {});
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
-      if (buyer) await cleanupBuyer(buyer.id).catch(() => {});
-      if (user) await cleanupUser(user.id).catch(() => {});
+      if (order) await cleanupOrder(order.id).catch(() => { });
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
+      if (buyer) await cleanupBuyer(buyer.id).catch(() => { });
+      if (user) await cleanupUser(user.id).catch(() => { });
     });
 
     user = await createUser({});
@@ -238,12 +238,12 @@ describe('creator clearance — earnings split', () => {
     let creator, seller, buyer, user, order1, order2;
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      if (order1) await cleanupOrder(order1.id).catch(() => {});
-      if (order2) await cleanupOrder(order2.id).catch(() => {});
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
-      if (buyer) await cleanupBuyer(buyer.id).catch(() => {});
-      if (user) await cleanupUser(user.id).catch(() => {});
+      if (order1) await cleanupOrder(order1.id).catch(() => { });
+      if (order2) await cleanupOrder(order2.id).catch(() => { });
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
+      if (buyer) await cleanupBuyer(buyer.id).catch(() => { });
+      if (user) await cleanupUser(user.id).catch(() => { });
     });
 
     user = await createUser({});
@@ -280,8 +280,8 @@ describe('creator collaboration requests — state guards and duplicate preventi
 
     t.after(async () => {
       if (creator) await cleanupCreatorFinancials(creator.id);
-      if (creator) await cleanupCreator(creator.id).catch(() => {});
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
+      if (creator) await cleanupCreator(creator.id).catch(() => { });
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
     });
 
     seller = await createSeller({ isCreatorMarketplaceEnabled: true });
@@ -320,11 +320,11 @@ describe('creator collaboration requests — state guards and duplicate preventi
 
     t.after(async () => {
       if (creator) {
-        await pool.query('DELETE FROM seller_creator_invites WHERE accepted_creator_id = $1', [creator.id]).catch(() => {});
+        await pool.query('DELETE FROM seller_creator_invites WHERE accepted_creator_id = $1', [creator.id]).catch(() => { });
         await cleanupCreatorFinancials(creator.id);
-        await cleanupCreator(creator.id).catch(() => {});
+        await cleanupCreator(creator.id).catch(() => { });
       }
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
     });
 
     seller = await createSeller({ isCreatorMarketplaceEnabled: true });
@@ -377,9 +377,9 @@ describe('creator collaboration requests — state guards and duplicate preventi
     t.after(async () => {
       if (creator) {
         await cleanupCreatorFinancials(creator.id);
-        await cleanupCreator(creator.id).catch(() => {});
+        await cleanupCreator(creator.id).catch(() => { });
       }
-      if (seller) await cleanupSeller(seller.id).catch(() => {});
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
     });
 
     seller = await createSeller({ isCreatorMarketplaceEnabled: true });
@@ -400,5 +400,36 @@ describe('creator collaboration requests — state guards and duplicate preventi
     const clickAfterLeave = await CreatorService.recordLinkClick({ code: link.code });
     assert.equal(clickAfterLeave?.active, false);
     assert.equal(clickAfterLeave?.sellerCreatorModeOff, false);
+  });
+
+  test('resolves creator link clicks and order attribution by unique creator username', async (t) => {
+    let seller;
+    let creator;
+
+    t.after(async () => {
+      if (creator) {
+        await cleanupCreatorFinancials(creator.id);
+        await cleanupCreator(creator.id).catch(() => { });
+      }
+      if (seller) await cleanupSeller(seller.id).catch(() => { });
+    });
+
+    seller = await createSeller({ shopName: `ErisTest${Date.now()}`, isCreatorMarketplaceEnabled: true });
+    creator = await createCreator({ firstName: 'Roy', lastName: 'Nthiga' });
+    const username = `roynthiga${creator.id}`;
+    await pool.query(`UPDATE creators SET username = $1, status = 'active' WHERE id = $2`, [username, creator.id]);
+    await createSellerCreatorLink({ sellerId: seller.id, creatorId: creator.id });
+
+    const shopSlug = seller.slug || seller.shop_name;
+    const clickByUsername = await CreatorService.recordLinkClick({ code: username, shopSlug });
+    assert.equal(clickByUsername?.active, true);
+    assert.equal(clickByUsername?.creatorId, creator.id);
+
+    const attrByUsername = await CreatorService.resolveAttribution({
+      code: username,
+      sellerId: seller.id,
+      productSubtotal: 1000,
+    });
+    assert.equal(attrByUsername?.creator_id, creator.id);
   });
 });

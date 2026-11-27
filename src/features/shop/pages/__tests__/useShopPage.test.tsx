@@ -68,7 +68,23 @@ describe('useShopPage creator link tracking', () => {
     });
 
     expect(mutateSpy).toHaveBeenCalledTimes(1);
-    expect(mutateSpy).toHaveBeenCalledWith('C11E55E8F64');
+    expect(mutateSpy).toHaveBeenCalledWith({ code: 'C11E55E8F64', shopSlug: 'eris' });
+  });
+
+  it('extracts creator username from /:shopName/:creatorUsername path route', async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={['/eris/roynthiga']}>
+          <Routes>
+            <Route path="/:shopName/:creatorUsername" element={<TestHarness />} />
+          </Routes>
+        </MemoryRouter>
+      );
+    });
+
+    expect(mutateSpy).toHaveBeenCalledTimes(1);
+    expect(mutateSpy).toHaveBeenCalledWith({ code: 'roynthiga', shopSlug: 'eris' });
+    expect(sessionStorage.getItem('byblos_creator_eris')).toBe('roynthiga');
   });
 });
 

@@ -328,6 +328,7 @@ export const trackLinkClick = async (req, res, next) => {
   try {
     const result = await CreatorService.recordLinkClick({
       code: req.params.code,
+      shopSlug: req.body?.shopSlug || req.query?.shop || null,
       ipAddress: req.ip,
       userAgent: req.get('user-agent')
     });

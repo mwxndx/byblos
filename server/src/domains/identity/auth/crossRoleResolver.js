@@ -140,12 +140,14 @@ export const resolveCrossRoleAccess = async ({ user, type, signToken, pool, Buye
             );
             if (roleRes.rows.length > 0) {
                 const firstName = user.email ? user.email.split('@')[0] : 'Creator';
+                const baseUsername = firstName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'creator';
+                const username = `${baseUsername.slice(0, 40)}${user.id}`;
                 const newCreatorRes = await pool.query(
-                    `INSERT INTO creators (user_id, first_name, last_name, email, mpesa_number, whatsapp_number, status)
-                     VALUES ($1, $2, 'Creator', $3, '0700000000', '0700000000', 'active')
+                    `INSERT INTO creators (user_id, first_name, last_name, username, email, mpesa_number, whatsapp_number, status)
+                     VALUES ($1, $2, 'Creator', $3, $4, '0700000000', '0700000000', 'active')
                      ON CONFLICT (user_id) DO UPDATE SET updated_at = NOW()
                      RETURNING *`,
-                    [user.id, firstName, user.email]
+                    [user.id, firstName, username, user.email]
                 );
                 creatorProfile = newCreatorRes.rows[0];
             }

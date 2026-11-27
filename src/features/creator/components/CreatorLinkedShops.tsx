@@ -54,7 +54,7 @@ export function CreatorLinkedShops({
         <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
           {filteredShops.map((shop, i) => {
             const isPaused = Boolean(shop.sellerCreatorModeOff || shop.status === 'paused');
-            const link = isPaused ? '' : getCreatorShopUrl(shop.slug || shop.shop_name, shop.code);
+            const link = isPaused ? '' : getCreatorShopUrl(shop.slug || shop.shop_name, shop.creator_username || shop.code);
             const shopUsername = getShopUsername(shop.shop_name);
             // Read-only preview: the shop opens in creator-preview mode, which
             // hides add-to-bag and wishlist so the creator can't act on their own

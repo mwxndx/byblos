@@ -8,7 +8,7 @@ import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { isAesthetic, getSellerInitials, type ShopProduct, type ShopSeller } from '../utils/shopPage.shared';
 
 export function useShopPage() {
-  const { shopName } = useParams<{ shopName: string }>();
+  const { shopName, creatorUsername: routeCreatorUsername } = useParams<{ shopName: string; creatorUsername?: string }>();
   const location = useLocation();
   const [products, setProducts] = useState<ShopProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +24,7 @@ export function useShopPage() {
   const trackedCreatorVisitRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const creatorCode = new URLSearchParams(location.search).get('creator');
+    const creatorCode = new URLSearchParams(location.search).get('creator') || routeCreatorUsername || '';
     if (!creatorCode) return;
 
     const visitKey = `${shopName || ''}:${creatorCode}`;
@@ -50,7 +50,7 @@ export function useShopPage() {
       sessionStorage.setItem(storageKey, '1');
     }
 
-    trackCreatorClick(creatorCode, {
+    trackCreatorClick({ code: creatorCode, shopSlug: shopName }, {
       onSuccess: (data: unknown) => {
         const resp = data as { status?: string; code?: string; message?: string; data?: { sellerCreatorModeOff?: boolean; message?: string } };
         if (resp?.data?.sellerCreatorModeOff || resp?.code === 'SELLER_CREATOR_MODE_OFF' || resp?.status === 'fail') {
@@ -58,7 +58,7 @@ export function useShopPage() {
         }
       }
     });
-  }, [location.search, shopName, trackCreatorClick]);
+  }, [location.search, routeCreatorUsername, shopName, trackCreatorClick]);
 
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
   const joinedProducts = (seller?.products && seller.products.length > 0) ? (seller.products as unknown as ApiSellerProduct[]) : undefined;
@@ -119,7 +119,7 @@ export function useShopPage() {
     setSellerInfo(sellerData);
     setAvatarLoadFailed(false);
 
-    if (!sellerData.isCreatorMarketplaceEnabled && new URLSearchParams(location.search).get('creator')) {
+    if (!sellerData.isCreatorMarketplaceEnabled && (new URLSearchParams(location.search).get('creator') || routeCreatorUsername)) {
       setCreatorModeNotice(`${sellerData.shopName || 'This seller'} has switched off creator mode.`);
     }
 

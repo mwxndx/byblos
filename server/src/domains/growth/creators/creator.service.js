@@ -66,7 +66,7 @@ const CREATOR_ANALYSIS_PERIODS = {
 };
 
 const CREATOR_BASE_COLUMNS = `
-  id, user_id, first_name, last_name, email, mpesa_number,
+  id, user_id, first_name, last_name, username, email, mpesa_number,
   whatsapp_number, instagram_link, tiktok_link, balance, total_sales,
   total_earnings, referral_code, total_referral_earnings, status,
   terms_accepted, terms_accepted_at, withdrawal_reserved_balance,
@@ -665,15 +665,17 @@ class CreatorService {
         );
       }
 
+      const username = await this.generateUniqueUsername(data.firstName, data.lastName, client);
       const { rows: creatorRows } = await client.query(
         `INSERT INTO creators
-           (user_id, first_name, last_name, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
-         VALUES ($1, $2, $3, $4, $5, $6, true, NOW())
+           (user_id, first_name, last_name, username, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())
          RETURNING *`,
         [
           user.id,
           String(data.firstName).trim(),
           String(data.lastName).trim(),
+          username,
           email,
           String(data.mpesaNumber).trim(),
           data.whatsappNumber ? String(data.whatsappNumber).trim() : null
@@ -789,14 +791,16 @@ class CreatorService {
         );
       }
 
+      const username = await this.generateUniqueUsername(data.firstName, data.lastName, client);
       await client.query(
         `INSERT INTO creators
-           (user_id, first_name, last_name, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
-         VALUES ($1, $2, $3, $4, $5, $6, true, NOW())`,
+           (user_id, first_name, last_name, username, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())`,
         [
           user.id,
           String(data.firstName).trim(),
           String(data.lastName).trim(),
+          username,
           email,
           String(data.mpesaNumber).trim(),
           data.whatsappNumber ? String(data.whatsappNumber).trim() : null
@@ -856,6 +860,20 @@ class CreatorService {
     return rows[0]?.referral_code;
   }
 
+  static async generateUniqueUsername(firstName, lastName, client = pool, excludeCreatorId = null) {
+    const rawBase = `${firstName || ''}${lastName || ''}`.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const base = (rawBase || 'creator').slice(0, 48);
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      const candidate = attempt === 0 ? base : `${base}${attempt + 1}`;
+      const { rows } = await client.query(
+        `SELECT id FROM creators WHERE LOWER(username) = LOWER($1) AND ($2::int IS NULL OR id <> $2) LIMIT 1`,
+        [candidate, excludeCreatorId]
+      );
+      if (!rows.length) return candidate;
+    }
+    return `${base}${Date.now().toString(36).slice(-4)}`;
+  }
+
   static async generateLinkCode(client = pool) {
     for (let i = 0; i < 8; i += 1) {
       const code = `C${crypto.randomBytes(5).toString('hex').toUpperCase()}`;
@@ -881,12 +899,12 @@ class CreatorService {
        FROM seller_creator_links scl
        JOIN sellers s ON s.id = scl.seller_id
        JOIN creators c ON c.id = scl.creator_id
-       WHERE scl.code = $1
+       WHERE (scl.code = $1 OR LOWER(c.username) = LOWER($3))
          AND scl.seller_id = $2
          AND scl.status = 'active'
          AND s.is_creator_marketplace_enabled = TRUE
        LIMIT 1`,
-      [String(code).trim().toUpperCase(), sellerId]
+      [String(code).trim().toUpperCase(), sellerId, String(code).trim()]
     );
     const link = rows[0];
     if (link?.creator_status !== 'active') return null;
@@ -1260,17 +1278,30 @@ class CreatorService {
     return inserted[0];
   }
 
-  static async recordLinkClick({ code, ipAddress, userAgent }) {
-    const normalizedCode = String(code || '').trim().toUpperCase();
-    if (!normalizedCode) return null;
+  static async recordLinkClick({ code, shopSlug = null, ipAddress, userAgent }) {
+    const rawRef = String(code || '').trim();
+    const normalizedCode = rawRef.toUpperCase();
+    const normalizedShopSlug = shopSlug ? String(shopSlug).trim() : null;
+    if (!rawRef) return null;
 
     const { rows: linkRows } = await pool.query(
       `SELECT scl.id, scl.creator_id, scl.seller_id, scl.status, s.is_creator_marketplace_enabled, s.shop_name
        FROM seller_creator_links scl
        JOIN sellers s ON s.id = scl.seller_id
-       WHERE scl.code = $1
+       JOIN creators c ON c.id = scl.creator_id
+       WHERE (
+         scl.code = $1
+         OR (
+           $2::text IS NOT NULL
+           AND LOWER(c.username) = LOWER($3)
+           AND (
+             LOWER(TRIM(s.slug)) = LOWER(TRIM($2))
+             OR LOWER(TRIM(s.shop_name)) = LOWER(TRIM($2))
+           )
+         )
+       )
        LIMIT 1`,
-      [normalizedCode]
+      [normalizedCode, normalizedShopSlug, rawRef]
     );
 
     const link = linkRows[0];
@@ -1647,6 +1678,7 @@ class CreatorService {
               scl.commission_rate,
               scl.status,
               scl.click_count,
+              c.username AS creator_username,
               s.shop_name,
               s.slug,
               s.avatar_url,
@@ -1656,12 +1688,13 @@ class CreatorService {
               COALESCE(SUM(ce.amount), 0) AS earnings
        FROM seller_creator_links scl
        JOIN sellers s ON s.id = scl.seller_id
+       JOIN creators c ON c.id = scl.creator_id
        LEFT JOIN creator_earnings ce ON ce.seller_creator_link_id = scl.id
        WHERE scl.creator_id = $1
          AND scl.status IN ('active', 'paused')
          AND s.user_id IS NOT NULL
          AND (s.status IS NULL OR s.status != 'deleted')
-       GROUP BY scl.id, scl.seller_id, s.shop_name, s.slug, s.avatar_url, s.full_name, s.is_creator_marketplace_enabled
+       GROUP BY scl.id, scl.seller_id, c.username, s.shop_name, s.slug, s.avatar_url, s.full_name, s.is_creator_marketplace_enabled
        ORDER BY scl.created_at DESC`,
       [creatorId]
     );
@@ -1674,7 +1707,8 @@ class CreatorService {
         ...s,
         status: isPaused ? 'paused' : s.status,
         code: isPaused ? null : s.code,
-        shopUrl: isPaused ? null : `${baseUrl}/${slug}?creator=${s.code}`,
+        creator_username: s.creator_username || null,
+        shopUrl: isPaused ? null : (s.creator_username ? `${baseUrl}/${slug}/${s.creator_username}` : `${baseUrl}/${slug}?creator=${s.code}`),
         sellerCreatorModeOff: !s.is_creator_marketplace_enabled
       };
     });
@@ -1946,6 +1980,7 @@ class CreatorService {
               csr.message,
               csr.created_at,
               c.id AS creator_id,
+              c.username AS creator_username,
               c.first_name,
               c.last_name,
               c.email,
@@ -1971,6 +2006,7 @@ class CreatorService {
               scl.created_at,
               scl.click_count,
               c.id AS creator_id,
+              c.username AS creator_username,
               c.first_name,
               c.last_name,
               c.email,
@@ -2017,6 +2053,7 @@ class CreatorService {
         return {
           id: a.id,
           creatorId: a.creator_id,
+          creatorUsername: a.creator_username || null,
           creatorName: `${a.first_name} ${a.last_name || ''}`.trim(),
           email: a.email,
           whatsappNumber: a.whatsapp_number,
@@ -2030,7 +2067,7 @@ class CreatorService {
           earningsPaid: Number(a.earnings_paid || 0),
           createdAt: a.created_at,
           status: isPaused ? 'paused' : a.status,
-          shopUrl: isPaused ? null : `${baseUrl}/${slug}?creator=${a.code}`
+          shopUrl: isPaused ? null : (a.creator_username ? `${baseUrl}/${slug}/${a.creator_username}` : `${baseUrl}/${slug}?creator=${a.code}`)
         };
       }),
       manualInvites
@@ -2194,7 +2231,7 @@ class CreatorService {
       await client.query('BEGIN');
 
       const { rows } = await client.query(
-        `SELECT ${CREATOR_SHOP_REQUEST_COLUMNS}, s.shop_name, s.slug, s.creator_commission_rate, c.user_id AS creator_user_id, c.first_name, c.last_name
+        `SELECT ${CREATOR_SHOP_REQUEST_COLUMNS}, s.shop_name, s.slug, s.creator_commission_rate, c.user_id AS creator_user_id, c.username AS creator_username, c.first_name, c.last_name
          FROM creator_shop_requests csr
          JOIN sellers s ON s.id = csr.seller_id
          JOIN creators c ON c.id = csr.creator_id
@@ -2276,7 +2313,8 @@ class CreatorService {
         status: 'accepted',
         requestId,
         code,
-        shopUrl: `${baseUrl}/${slug}?creator=${code}`
+        creatorUsername: request.creator_username || null,
+        shopUrl: request.creator_username ? `${baseUrl}/${slug}/${request.creator_username}` : `${baseUrl}/${slug}?creator=${code}`
       };
     } catch (error) {
       await client.query('ROLLBACK');
