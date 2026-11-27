@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useSellerByShopNameQuery, usePublicSellerProductsQuery } from '@/features/shop/hooks/useShopQueries';
 import { useTrackCreatorLinkMutation } from '@/features/creator/hooks/mutations/useTrackCreatorLinkMutation';
@@ -20,11 +20,16 @@ export function useShopPage() {
   const { isAuthenticated } = useGlobalAuth();
 
   const [creatorModeNotice, setCreatorModeNotice] = useState<string | null>(null);
-  const trackCreatorLink = useTrackCreatorLinkMutation();
+  const { mutate: trackCreatorClick } = useTrackCreatorLinkMutation();
+  const trackedCreatorVisitRef = useRef<string | null>(null);
 
   useEffect(() => {
     const creatorCode = new URLSearchParams(location.search).get('creator');
     if (!creatorCode) return;
+
+    const visitKey = `${shopName || ''}:${creatorCode}`;
+    if (trackedCreatorVisitRef.current === visitKey) return;
+    trackedCreatorVisitRef.current = visitKey;
 
     if (shopName) {
       try {
@@ -45,7 +50,7 @@ export function useShopPage() {
       sessionStorage.setItem(storageKey, '1');
     }
 
-    trackCreatorLink.mutate(creatorCode, {
+    trackCreatorClick(creatorCode, {
       onSuccess: (data: unknown) => {
         const resp = data as { status?: string; code?: string; message?: string; data?: { sellerCreatorModeOff?: boolean; message?: string } };
         if (resp?.data?.sellerCreatorModeOff || resp?.code === 'SELLER_CREATOR_MODE_OFF' || resp?.status === 'fail') {
@@ -53,7 +58,7 @@ export function useShopPage() {
         }
       }
     });
-  }, [location.search, shopName, trackCreatorLink]);
+  }, [location.search, shopName, trackCreatorClick]);
 
   const { data: seller, isLoading: isSellerLoading, error: sellerError } = useSellerByShopNameQuery(shopName || '', !!shopName);
   const joinedProducts = (seller?.products && seller.products.length > 0) ? (seller.products as unknown as ApiSellerProduct[]) : undefined;
