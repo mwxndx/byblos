@@ -6225,6 +6225,10 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (119, '20261108130000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (120, '20261109153000_shop_products_joined_indexes', '2026-11-09 15:30:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (121, '20261115180000_create_cryptographic_financial_ledger', '2026-11-15 18:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (122, '20261115181000_seed_genesis_financial_ledger_balances', '2026-11-15 18:10:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (123, '20261123110000_add_search_sort_performance_indexes', '2026-11-23 11:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (124, '20261126150000_add_seller_banner_url', '2026-11-26 15:00:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (125, '20261127041500_add_creator_username', '2026-11-27 04:15:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (126, '20261127052000_add_creator_username_confirmed', '2026-11-27 05:20:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
@@ -6311,4 +6315,19 @@ CREATE INDEX IF NOT EXISTS idx_creator_earnings_creator_created ON public.creato
 CREATE INDEX IF NOT EXISTS idx_creator_referral_earnings_referrer_created ON public.creator_referral_earnings (referrer_creator_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_seller_creator_links_seller_status ON public.seller_creator_links (seller_id, status);
 CREATE INDEX IF NOT EXISTS idx_seller_creator_links_creator_status ON public.seller_creator_links (creator_id, status);
+
+-- Seller shop hero banner URL (migration 20261126150000)
+ALTER TABLE public.sellers
+    ADD COLUMN IF NOT EXISTS banner_url TEXT DEFAULT NULL;
+
+-- Creator unique username and confirmation flag (migrations 20261127041500, 20261127052000)
+ALTER TABLE public.creators
+    ADD COLUMN IF NOT EXISTS username VARCHAR(64);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_creators_username_lower
+    ON public.creators (LOWER(username))
+    WHERE username IS NOT NULL;
+
+ALTER TABLE public.creators
+    ADD COLUMN IF NOT EXISTS username_confirmed BOOLEAN NOT NULL DEFAULT FALSE;
 
