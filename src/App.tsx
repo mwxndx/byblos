@@ -34,6 +34,7 @@ function App() {
       <RouterProvider
         router={router}
         fallbackElement={<LoadingScreen />}
+        future={{ v7_startTransition: true }}
       />
       <InstallPrompt />
       <AppUpdateGate />

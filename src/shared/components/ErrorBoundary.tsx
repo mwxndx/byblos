@@ -167,6 +167,30 @@ export class ErrorBoundary extends Component<Props, State> {
  * Previously in a separate RootErrorElement.tsx that awkwardly re-threw
  * into ChunkErrorBoundary.
  */
+function formatRouteErrorDetails(error: unknown): { summary: string; stack?: string } {
+  if (isRouteErrorResponse(error)) {
+    const detail =
+      typeof error.data === 'string'
+        ? error.data
+        : error.data && typeof error.data === 'object' && 'message' in error.data
+          ? String((error.data as { message?: unknown }).message)
+          : '';
+    return {
+      summary: `${error.status} ${error.statusText || 'Route Error'}${detail ? `: ${detail}` : ''}`,
+    };
+  }
+  if (error instanceof Error) {
+    return {
+      summary: `${error.name || 'Error'}: ${error.message || 'Unknown error'}`,
+      stack: error.stack,
+    };
+  }
+  if (error && typeof error === 'object' && 'message' in error) {
+    return { summary: String((error as { message?: unknown }).message) };
+  }
+  return { summary: String(error ?? 'Unknown routing error') };
+}
+
 export function RootErrorElement() {
   const error = useRouteError();
 
@@ -177,6 +201,8 @@ export function RootErrorElement() {
   if (isChunk) {
     return <ChunkUpdateFallback />;
   }
+
+  const { summary, stack } = formatRouteErrorDetails(error);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -193,6 +219,17 @@ export function RootErrorElement() {
         </div>
         <h1 className="text-2xl font-semibold text-white mb-3">Page Error</h1>
         <p className="text-gray-400 mb-6">An unexpected routing error occurred.</p>
+        <details className="mb-6 text-left bg-black/40 rounded-xl p-3 border border-white/10">
+          <summary className="text-xs font-semibold text-gray-300 cursor-pointer select-none">
+            Technical Details
+          </summary>
+          <p className="mt-2 text-xs font-mono text-red-400 break-words">{summary}</p>
+          {stack && (
+            <pre className="mt-2 text-[11px] font-mono text-gray-400 whitespace-pre-wrap break-words max-h-40 overflow-auto">
+              {stack}
+            </pre>
+          )}
+        </details>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button onClick={() => window.location.reload()} variant="outline" size="lg" className="gap-2">
             <RefreshCw className="h-5 w-5" />

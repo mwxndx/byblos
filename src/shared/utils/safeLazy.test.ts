@@ -47,6 +47,46 @@ describe('safeLazy', () => {
     expect(result).toHaveProperty('default');
     expect(result.default).toBe(DummyComponent);
   });
+
+  it('retries transient dynamic import errors before succeeding', async () => {
+    let attempts = 0;
+    const lazyComponent = safeLazy(
+      () => {
+        attempts += 1;
+        if (attempts < 3) {
+          return Promise.reject(new Error('Unable to preload CSS for /assets/ShopPage-abc.css'));
+        }
+        return Promise.resolve({ default: DummyComponent });
+      },
+      { retries: 2, retryDelayMs: 0 }
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const payload = (lazyComponent as any)._payload;
+    const loader = typeof payload === 'function' ? payload : payload?._result;
+
+    const result = await loader();
+    expect(attempts).toBe(3);
+    expect(result.default).toBe(DummyComponent);
+  });
+
+  it('does not retry non-chunk errors', async () => {
+    let attempts = 0;
+    const lazyComponent = safeLazy(
+      () => {
+        attempts += 1;
+        return Promise.reject(new SyntaxError('Unexpected token <'));
+      },
+      { retries: 2, retryDelayMs: 0 }
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const payload = (lazyComponent as any)._payload;
+    const loader = typeof payload === 'function' ? payload : payload?._result;
+
+    await expect(loader()).rejects.toThrow('Unexpected token <');
+    expect(attempts).toBe(1);
+  });
 });
 
 describe('isDynamicImportError', () => {
@@ -63,6 +103,16 @@ describe('isDynamicImportError', () => {
   it('detects Chromium "Failed to fetch dynamically imported module"', () => {
     const error = new TypeError('Failed to fetch dynamically imported module: https://example.com/assets/Page.js');
     expect(isDynamicImportError(error)).toBe(true);
+  });
+
+  it('detects Vite CSS preload errors', () => {
+    const error = new Error('Unable to preload CSS for /assets/ShopPage-1234.css');
+    expect(isDynamicImportError(error)).toBe(true);
+  });
+
+  it('detects NetworkError and generic Failed to fetch errors', () => {
+    expect(isDynamicImportError(new Error('Failed to fetch'))).toBe(true);
+    expect(isDynamicImportError(new Error('NetworkError when attempting to fetch resource.'))).toBe(true);
   });
 
   it('detects generic ChunkLoadError', () => {
