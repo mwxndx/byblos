@@ -1,9 +1,18 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, LogOut, Search, UserRound, X } from '@/shared/ui/icons';
+import { toast } from 'sonner';
+import { Button } from '@/shared/ui/button';
+import { Input } from '@/shared/ui/input';
+import { AppHeader } from '@/shared/ui/AppHeader';
+import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
+import { copyLinkedTextToClipboard, resolveShareOrigin } from '@/shared/utils/shopLinks';
+import { classifyApiError } from '@/shared/utils/errorClassification';
+import { useThemeScope } from '@/shared/hooks/useAppTheme';
+import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
+import { clearRoleSession } from '@/features/auth/services/authSession';
 import { NotificationList } from '@/features/notifications/components/NotificationList';
 import { useNotifications } from '@/features/notifications/hooks/useNotifications';
-import { toast } from 'sonner';
 import { useCreatorDashboardQuery } from '@/features/creator/hooks/queries/useCreatorDashboardQuery';
 import { useCreatorReferralDashboardQuery } from '@/features/creator/hooks/queries/useCreatorReferralDashboardQuery';
 import { useAcceptShopRequestMutation } from '@/features/creator/hooks/mutations/useAcceptShopRequestMutation';
@@ -11,23 +20,7 @@ import { useDenyShopRequestMutation } from '@/features/creator/hooks/mutations/u
 import { useCreatorLogoutMutation } from '@/features/creator/hooks/mutations/useCreatorAuthMutations';
 import { useLeavePromotedShopMutation } from '@/features/creator/hooks/mutations/useLeavePromotedShopMutation';
 import { useLeaveInvitedBusinessMutation } from '@/features/creator/hooks/mutations/useLeaveInvitedBusinessMutation';
-import { clearRoleSession } from '@/features/auth/services/authSession';
-import { Button } from '@/shared/ui/button';
-import { Input } from '@/shared/ui/input';
-import { AppHeader } from '@/shared/ui/AppHeader';
-import { DashboardSkeleton } from '@/shared/ui/DashboardSkeleton';
 import { RequiredCreatorUsernameModal } from '@/features/creator/components/RequiredCreatorUsernameModal';
-import { copyLinkedTextToClipboard, resolveShareOrigin } from '@/shared/utils/shopLinks';
-import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
-import { registerModalDismiss } from '@/shared/utils/modalBackHandler';
-import { useThemeScope } from '@/shared/hooks/useAppTheme';
-import { classifyApiError } from '@/shared/utils/errorClassification';
-import {
-  money,
-  MAX_PROMOTED_SHOPS,
-  MAX_INVITED_BUSINESSES,
-  type AnalysisPeriod
-} from '@/features/creator/utils/creatorDashboardUtils';
 import { CreatorEarningsHero } from '@/features/creator/components/CreatorEarningsHero';
 import { CreatorAnalysisCharts } from '@/features/creator/components/CreatorAnalysisCharts';
 import { CreatorLinkedShops } from '@/features/creator/components/CreatorLinkedShops';
@@ -35,15 +28,145 @@ import { CreatorAvailableShops } from '@/features/creator/components/CreatorAvai
 import { CreatorProfileSheet } from '@/features/creator/components/CreatorProfileSheet';
 import { CreatorWithdrawalPanel } from '@/features/creator/components/CreatorWithdrawalPanel';
 import { CreatorDashboardTabs, type CreatorTabId } from '@/features/creator/components/CreatorDashboardTabs';
+import {
+  money,
+  MAX_PROMOTED_SHOPS,
+  MAX_INVITED_BUSINESSES,
+  type AnalysisPeriod,
+  type InvitedBusiness,
+  type ShopRequest,
+} from '@/features/creator/utils/creatorDashboardUtils';
 
-type DashboardTab = CreatorTabId;
+interface InvitedBusinessesSectionProps {
+  invitedBusinesses: InvitedBusiness[];
+  leavingBusinessSellerId: number | null;
+  onLeaveBusiness: (sellerId: number) => void;
+}
 
+function InvitedBusinessesSection({
+  invitedBusinesses,
+  leavingBusinessSellerId,
+  onLeaveBusiness,
+}: Readonly<InvitedBusinessesSectionProps>) {
+  return (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-base font-semibold text-label">Invited businesses</h2>
+        <span className="rounded-full bg-fill px-2.5 py-1 text-xs font-medium text-label-2">
+          {invitedBusinesses.length} of {MAX_INVITED_BUSINESSES}
+        </span>
+      </div>
+      <p className="px-1 text-xs text-label-3">
+        Businesses you invited earn you KSh 3 per sale. Leaving cancels only pending (still-clearing) earnings.
+      </p>
+      {invitedBusinesses.length === 0 ? (
+        <div className="rounded-card border border-transparent bg-surface-1 p-4 text-sm text-label-2">
+          Share your referral link (in the earnings card above) to invite up to {MAX_INVITED_BUSINESSES} businesses.
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
+          {invitedBusinesses.map((biz, i) => {
+            const sid = Number(biz.id);
+            const isLeaving = leavingBusinessSellerId === sid;
+            return (
+              <div key={biz.id}>
+                {i > 0 && <div className="ml-4 h-px bg-separator" />}
+                <div className="flex items-center justify-between gap-3 p-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-label">{biz.shop_name || `Business ${biz.id}`}</p>
+                    <p className="mt-0.5 text-xs text-label-3">Earned {money(biz.earnings ?? 0)}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => onLeaveBusiness(sid)}
+                    disabled={isLeaving}
+                    className="h-9 shrink-0 text-sys-red"
+                  >
+                    {isLeaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Leave
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+interface ShopRequestsSectionProps {
+  requests: ShopRequest[];
+  respondingRequestId: number | null;
+  onRespond: (inviteId: number, action: 'accept' | 'deny') => void;
+}
+
+function ShopRequestsSection({
+  requests,
+  respondingRequestId,
+  onRespond,
+}: Readonly<ShopRequestsSectionProps>) {
+  if (requests.length === 0) return null;
+
+  return (
+    <section className="space-y-2">
+      <div className="px-1">
+        <h2 className="text-base font-semibold text-label">Shop requests</h2>
+        <p className="mt-0.5 text-xs text-label-3">Accept a seller request to start earning on that shop.</p>
+      </div>
+      <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
+        {requests.map((request, i) => (
+          <div key={request.id}>
+            {i > 0 && <div className="ml-4 h-px bg-separator" />}
+            <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-label">{request.shop_name}</p>
+                <p className="mt-0.5 text-xs text-label-3">Invited by {request.seller_name || 'seller'}</p>
+              </div>
+              <div className="grid shrink-0 grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  onClick={() => onRespond(request.id, 'accept')}
+                  disabled={respondingRequestId === request.id}
+                  className="h-9"
+                >
+                  {respondingRequestId === request.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Accept'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onRespond(request.id, 'deny')}
+                  disabled={respondingRequestId === request.id}
+                  className="h-9"
+                >
+                  Deny
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Creator Dashboard shell: manages shops, performance charts, withdrawals, notifications,
+ * profile sheet, and Android hardware back navigation.
+ */
 export default function CreatorDashboard() {
   const navigate = useNavigate();
   useThemeScope('creator');
 
   const [analysisPeriod, setAnalysisPeriod] = useState<AnalysisPeriod>('monthly');
-  const [tab, setTab] = useState<DashboardTab>('shops');
+  const [tab, setTab] = useState<CreatorTabId>('shops');
   const [respondingRequestId, setRespondingRequestId] = useState<number | null>(null);
   const [leavingShopSellerId, setLeavingShopSellerId] = useState<number | null>(null);
   const [leavingBusinessSellerId, setLeavingBusinessSellerId] = useState<number | null>(null);
@@ -63,22 +186,8 @@ export default function CreatorDashboard() {
   const referral = referralQuery.data || null;
   const loading = dashboardQuery.isLoading || referralQuery.isLoading;
 
-  // Dismiss the shop-request dialog on Android back.
-  useEffect(() => {
-    if (!isNativeApp() || respondingRequestId === null) return;
-    return registerModalDismiss(() => {
-      setRespondingRequestId(null);
-      return true;
-    });
-  }, [respondingRequestId]);
-
-  useEffect(() => {
-    if (!isNativeApp() || !sheetOpen) return;
-    return registerModalDismiss(() => {
-      setSheetOpen(false);
-      return true;
-    });
-  }, [sheetOpen]);
+  useModalBackDismiss(sheetOpen, () => setSheetOpen(false));
+  useModalBackDismiss(respondingRequestId !== null, () => setRespondingRequestId(null));
 
   const copy = async (value: string, label?: string) => {
     if (label) {
@@ -91,15 +200,16 @@ export default function CreatorDashboard() {
   };
 
   const handleLogout = async () => {
-    // Leave the dashboard immediately, then clear the local session and hit the
-    // server logout in the background — so a slow (cold-backend) request never
-    // freezes the logout button on the authed screen.
     navigate('/creator/login', { replace: true });
-    try { await clearRoleSession('creator'); } catch { /* ignore */ }
+    try {
+      await clearRoleSession('creator');
+    } catch {
+      /* ignore */
+    }
     try {
       await logoutMutation.mutateAsync();
     } catch {
-      // Best-effort — the local session is already cleared.
+      /* best-effort — local session is already cleared */
     }
   };
 
@@ -144,7 +254,10 @@ export default function CreatorDashboard() {
     }
   };
 
-  const analysis = useMemo(() => dashboard?.analysis || dashboard?.monthly || [], [dashboard?.analysis, dashboard?.monthly]);
+  const analysis = useMemo(
+    () => dashboard?.analysis || dashboard?.monthly || [],
+    [dashboard?.analysis, dashboard?.monthly]
+  );
   const businessEarnings = useMemo(() => dashboard?.businessEarnings || [], [dashboard?.businessEarnings]);
   const shopRequests = useMemo(() => dashboard?.shopRequests || [], [dashboard?.shopRequests]);
 
@@ -180,27 +293,20 @@ export default function CreatorDashboard() {
   const monthSales = Number(latestPeriod?.sales || 0);
   const monthClicks = Number(latestPeriod?.clicks || 0);
 
-  const openWithdrawals = () => {
-    setTab('withdrawals');
-  };
-  const openProfile = () => {
-    setSheetOpen(true);
-  };
-
   return (
-    <main className="dashboard-layout creator-surface text-label transition-colors duration-200 bg-[var(--bg)]" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
+    <div className="page-enter dashboard-layout creator-surface flex h-[100dvh] min-w-0 flex-col overflow-hidden bg-[var(--bg,#000000)] text-label transition-colors duration-200">
       <AppHeader
         className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-[var(--bg,#000000)]"
         left={<div className="w-8 h-8 sm:w-9 sm:h-9" />}
         center={
-          <span className="text-base sm:text-lg font-bold tracking-tight text-slate-950 dark:text-white">
+          <span className="text-base sm:text-lg font-bold tracking-tight text-label">
             Byblos
           </span>
         }
         right={
           <button
             type="button"
-            onClick={openProfile}
+            onClick={() => setSheetOpen(true)}
             aria-label="Open profile"
             className="relative flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border border-separator bg-fill text-label transition-colors hover:bg-fill-2 before:absolute before:-inset-1.5 before:content-['']"
           >
@@ -210,181 +316,110 @@ export default function CreatorDashboard() {
       />
 
       <div className="relative flex-1 min-h-0 overflow-hidden">
-        <div className="h-full overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-          <div className="space-y-5 px-4 pt-3.5 pb-8 sm:px-6 lg:px-8" style={{ paddingBottom: 'calc(5.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}>
-        {tab === 'performance' ? (
-          <>
-            <CreatorEarningsHero
-              firstName={creator.firstName}
-              totalEarnings={Number(creator.totalEarnings || 0)}
-              balance={totalBalance}
-              availableBalance={availableBalance}
-              clearingBalance={clearingBalance}
-              nextAvailableAt={nextAvailableAt}
-              isClearing={isClearing}
-              monthEarnings={monthEarnings}
-              monthSales={monthSales}
-              monthClicks={monthClicks}
-              referralLink={referralLink}
-              onCopyLink={() => copy(referralLink)}
-              onGoToWithdraw={openWithdrawals}
-            />
+        <main className="h-full overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div
+            className="space-y-5 px-4 pt-3.5 sm:px-6 lg:px-8"
+            style={{ paddingBottom: 'calc(5.75rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
+          >
+            {tab === 'performance' ? (
+              <>
+                <CreatorEarningsHero
+                  firstName={creator.firstName}
+                  totalEarnings={Number(creator.totalEarnings || 0)}
+                  balance={totalBalance}
+                  availableBalance={availableBalance}
+                  clearingBalance={clearingBalance}
+                  nextAvailableAt={nextAvailableAt}
+                  isClearing={isClearing}
+                  monthEarnings={monthEarnings}
+                  monthSales={monthSales}
+                  monthClicks={monthClicks}
+                  referralLink={referralLink}
+                  onCopyLink={() => copy(referralLink)}
+                  onGoToWithdraw={() => setTab('withdrawals')}
+                />
 
-            <CreatorAnalysisCharts
-              analysis={analysis}
-              businessEarnings={businessEarnings}
-              analysisPeriod={analysisPeriod}
-              setAnalysisPeriod={setAnalysisPeriod}
-            />
+                <CreatorAnalysisCharts
+                  analysis={analysis}
+                  businessEarnings={businessEarnings}
+                  analysisPeriod={analysisPeriod}
+                  setAnalysisPeriod={setAnalysisPeriod}
+                />
 
-            <section className="space-y-2">
-              <div className="flex items-center justify-between px-1">
-                <h2 className="text-base font-semibold text-label">Invited businesses</h2>
-                <span className="rounded-full bg-fill px-2.5 py-1 text-xs font-medium text-label-2">
-                  {invitedBusinesses.length} of {MAX_INVITED_BUSINESSES}
-                </span>
-              </div>
-              <p className="px-1 text-xs text-label-3">
-                Businesses you invited earn you KSh 3 per sale. Leaving cancels only pending (still-clearing) earnings.
-              </p>
-              {invitedBusinesses.length === 0 ? (
-                <div className="rounded-card border border-transparent bg-surface-1 p-4 text-sm text-label-2">
-                  Share your referral link (in the earnings card above) to invite up to {MAX_INVITED_BUSINESSES} businesses.
-                </div>
-              ) : (
-                <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
-                  {invitedBusinesses.map((biz, i) => {
-                    const sid = Number(biz.id);
-                    const isLeaving = leavingBusinessSellerId === sid;
-                    return (
-                      <div key={biz.id}>
-                        {i > 0 && <div className="ml-4 h-px bg-separator" />}
-                        <div className="flex items-center justify-between gap-3 p-4">
-                          <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-label">{biz.shop_name || `Business ${biz.id}`}</p>
-                            <p className="mt-0.5 text-xs text-label-3">Earned {money(biz.earnings)}</p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            onClick={() => handleLeaveBusiness(sid)}
-                            disabled={isLeaving}
-                            className="h-9 shrink-0 text-sys-red"
-                          >
-                            {isLeaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <><LogOut className="mr-2 h-4 w-4" />Leave</>}
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          </>
-        ) : tab === 'withdrawals' ? (
-          <CreatorWithdrawalPanel
-            creator={creator}
-            clearance={clearance}
-            withdrawals={dashboard?.withdrawals || []}
-          />
-        ) : tab === 'shops' ? (
-          <div className="space-y-6">
-            {/* Search bar for shops */}
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-white/40 pointer-events-none" />
-              <Input
-                type="search"
-                aria-label="Search shops"
-                value={shopSearchQuery}
-                onChange={(e) => setShopSearchQuery(e.target.value)}
-                placeholder="Search shops by name, slug, or location..."
-                className="bg-white dark:bg-surface-1 border-slate-200 dark:border-white/10 text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-white/40 rounded-xl pl-10 pr-9 h-10 shadow-sm focus-visible:ring-1 focus-visible:ring-slate-400 dark:focus-visible:ring-white/20"
+                <InvitedBusinessesSection
+                  invitedBusinesses={invitedBusinesses}
+                  leavingBusinessSellerId={leavingBusinessSellerId}
+                  onLeaveBusiness={handleLeaveBusiness}
+                />
+              </>
+            ) : tab === 'withdrawals' ? (
+              <CreatorWithdrawalPanel
+                creator={creator}
+                clearance={clearance}
+                withdrawals={dashboard?.withdrawals || []}
               />
-              {shopSearchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setShopSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white p-1"
-                  aria-label="Clear shop search"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
-            </div>
+            ) : tab === 'shops' ? (
+              <div className="space-y-6">
+                <div className="relative w-full max-w-md">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-label-3" />
+                  <Input
+                    type="search"
+                    aria-label="Search shops"
+                    value={shopSearchQuery}
+                    onChange={(e) => setShopSearchQuery(e.target.value)}
+                    placeholder="Search shops by name, slug, or location..."
+                    className="h-10 rounded-xl border-separator bg-surface-1 pl-10 pr-9 text-label placeholder:text-label-3 shadow-sm focus-visible:ring-1 focus-visible:ring-separator-strong"
+                  />
+                  {shopSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setShopSearchQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full text-label-3 hover:text-label"
+                      aria-label="Clear shop search"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
 
-            {filteredShopRequests.length > 0 && (
-              <section className="space-y-2">
-                <div className="px-1">
-                  <h2 className="text-base font-semibold text-label">Shop requests</h2>
-                  <p className="mt-0.5 text-xs text-label-3">Accept a seller request to start earning on that shop.</p>
-                </div>
-                <div className="overflow-hidden rounded-card border border-transparent bg-surface-1">
-                  {filteredShopRequests.map((request, i) => (
-                    <div key={request.id}>
-                      {i > 0 && <div className="ml-4 h-px bg-separator" />}
-                      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-label">{request.shop_name}</p>
-                          <p className="mt-0.5 text-xs text-label-3">Invited by {request.seller_name || 'seller'}</p>
-                        </div>
-                        <div className="grid shrink-0 grid-cols-2 gap-2">
-                          <Button
-                            type="button"
-                            onClick={() => handleShopRequest(request.id, 'accept')}
-                            disabled={respondingRequestId === request.id}
-                            className="h-9"
-                          >
-                            {respondingRequestId === request.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Accept'}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => handleShopRequest(request.id, 'deny')}
-                            disabled={respondingRequestId === request.id}
-                            className="h-9"
-                          >
-                            Deny
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
+                <ShopRequestsSection
+                  requests={filteredShopRequests}
+                  respondingRequestId={respondingRequestId}
+                  onRespond={handleShopRequest}
+                />
+
+                <CreatorLinkedShops
+                  shops={linkedShops}
+                  onCopy={copy}
+                  onLeave={handleLeaveShop}
+                  leavingSellerId={leavingShopSellerId}
+                  maxPromotions={MAX_PROMOTED_SHOPS}
+                  searchQuery={shopSearchQuery}
+                />
+
+                {!isInvitedViaEmail && <CreatorAvailableShops searchQuery={shopSearchQuery} />}
+              </div>
+            ) : (
+              <div className="mx-auto w-full max-w-[760px]">
+                <NotificationList
+                  variant="default"
+                  role="creator"
+                  scrollClassName=""
+                  className="overflow-hidden rounded-card border border-transparent bg-surface-1"
+                />
+              </div>
             )}
-
-            <CreatorLinkedShops
-              shops={linkedShops}
-              onCopy={copy}
-              onLeave={handleLeaveShop}
-              leavingSellerId={leavingShopSellerId}
-              maxPromotions={MAX_PROMOTED_SHOPS}
-              searchQuery={shopSearchQuery}
-            />
-
-            {!isInvitedViaEmail && <CreatorAvailableShops searchQuery={shopSearchQuery} />}
           </div>
-        ) : (
-          <div className="mx-auto w-full max-w-[760px]">
-            <NotificationList
-              variant="default"
-              role="creator"
-              scrollClassName=""
-              className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1"
-            />
-          </div>
-        )}
+        </main>
+
+        <CreatorProfileSheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          creator={creator}
+          onLogout={handleLogout}
+        />
+        <RequiredCreatorUsernameModal creator={creator} onLogout={handleLogout} />
       </div>
-
-          </div>
-
-          <CreatorProfileSheet
-            open={sheetOpen}
-            onOpenChange={setSheetOpen}
-            creator={creator}
-            onLogout={handleLogout}
-          />
-          <RequiredCreatorUsernameModal creator={creator} onLogout={handleLogout} />
-        </div>
 
       <CreatorDashboardTabs
         activeTab={tab}
@@ -393,6 +428,6 @@ export default function CreatorDashboard() {
         onSelectTab={setTab}
         hidden={sheetOpen}
       />
-    </main>
+    </div>
   );
 }

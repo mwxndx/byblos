@@ -123,5 +123,25 @@ describe('CreatorDashboard - invited_via_email brand visibility', () => {
     expect(screen.getByTestId('creator-linked-shops')).toBeInTheDocument();
     expect(screen.getByTestId('creator-available-shops')).toBeInTheDocument();
   });
+
+  it('uses 100dvh, semantic text-label, a <main> content landmark, and semantic search input tokens', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <CreatorDashboard />
+      </MemoryRouter>
+    );
+
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.className).toContain('h-[100dvh]');
+    expect(root.className).toContain('text-label');
+
+    const main = screen.getByRole('main');
+    expect(main).toBeInTheDocument();
+
+    const searchInput = screen.getByRole('searchbox', { name: /search shops/i });
+    expect(searchInput.className).toContain('bg-surface-1');
+    expect(searchInput.className).toContain('border-separator');
+    expect(searchInput.className).not.toContain('bg-white dark:bg-surface-1');
+  });
 });
 
