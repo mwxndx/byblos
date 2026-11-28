@@ -27,6 +27,8 @@ export type CreatorProfile = {
   lastName?: string;
   username?: string | null;
   usernameConfirmed?: boolean;
+  invitedViaEmail?: boolean;
+  invited_via_email?: boolean;
   email?: string;
   mpesaNumber?: string;
   whatsappNumber?: string;

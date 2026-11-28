@@ -66,7 +66,7 @@ const CREATOR_ANALYSIS_PERIODS = {
 };
 
 const CREATOR_BASE_COLUMNS = `
-  id, user_id, first_name, last_name, username, username_confirmed, email, mpesa_number,
+  id, user_id, first_name, last_name, username, username_confirmed, invited_via_email, email, mpesa_number,
   whatsapp_number, instagram_link, tiktok_link, balance, total_sales,
   total_earnings, referral_code, total_referral_earnings, status,
   terms_accepted, terms_accepted_at, withdrawal_reserved_balance,
@@ -675,8 +675,8 @@ class CreatorService {
         : await this.generateUniqueUsername(data.firstName, data.lastName, client);
       const { rows: creatorRows } = await client.query(
         `INSERT INTO creators
-           (user_id, first_name, last_name, username, username_confirmed, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true, NOW())
+           (user_id, first_name, last_name, username, username_confirmed, invited_via_email, email, mpesa_number, whatsapp_number, terms_accepted, terms_accepted_at)
+         VALUES ($1, $2, $3, $4, $5, true, $6, $7, $8, true, NOW())
          RETURNING *`,
         [
           user.id,
@@ -1917,6 +1917,14 @@ class CreatorService {
   }
 
   static async getAvailableShops(creatorId) {
+    const creatorCheck = await pool.query(
+      `SELECT invited_via_email FROM creators WHERE id = $1 LIMIT 1`,
+      [creatorId]
+    );
+    if (creatorCheck.rows[0]?.invited_via_email) {
+      return [];
+    }
+
     const { rows } = await pool.query(
       `SELECT s.id,
               s.shop_name,
@@ -1966,6 +1974,14 @@ class CreatorService {
   }
 
   static async requestCollaboration(creatorId, sellerId, message = '') {
+    const creatorFlags = await pool.query(
+      `SELECT invited_via_email FROM creators WHERE id = $1 LIMIT 1`,
+      [creatorId]
+    );
+    if (creatorFlags.rows[0]?.invited_via_email) {
+      throw new AppError('Invited creators can only collaborate with brands that invite them.', 403);
+    }
+
     const sellerResult = await pool.query(
       `SELECT id, shop_name, user_id, is_creator_marketplace_enabled, creator_commission_rate
        FROM sellers

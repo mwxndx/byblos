@@ -163,6 +163,7 @@ export default function CreatorDashboard() {
   }
 
   const creator = dashboard?.creator || {};
+  const isInvitedViaEmail = Boolean(creator.invited_via_email ?? creator.invitedViaEmail);
   const clearance = dashboard?.clearance;
   const totalBalance = Number(clearance?.totalBalance ?? creator.balance ?? 0);
   const availableBalance = Number(clearance?.availableBalance ?? creator.balance ?? 0);
@@ -360,7 +361,7 @@ export default function CreatorDashboard() {
               searchQuery={shopSearchQuery}
             />
 
-            <CreatorAvailableShops searchQuery={shopSearchQuery} />
+            {!isInvitedViaEmail && <CreatorAvailableShops searchQuery={shopSearchQuery} />}
           </div>
         ) : (
           <div className="mx-auto w-full max-w-[760px]">
