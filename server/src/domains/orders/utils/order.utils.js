@@ -285,6 +285,14 @@ export async function normalizeOrderInput(req) {
         }))
         : undefined;
 
+    const {
+        creator_attribution: _ignoredCreatorAttribution,
+        custom_product: _ignoredCustomProduct,
+        pre_handoff_sla: _ignoredPreHandoffSla,
+        pricing: _ignoredPricing,
+        ...safeMetadata
+    } = metadata;
+
     return {
         buyer,
         service,

@@ -460,7 +460,7 @@ export const AddProductFormSteps = ({
                     <ErrorNote message={errors.production_days} />
                   </div>
                   <div className="space-y-1.5">
-                    <label htmlFor="ap-prompt" className={fieldLabel}>Buyer instruction prompt</label>
+                    <label htmlFor="ap-prompt" className={fieldLabel}>Buyer instruction prompt (optional)</label>
                     <Textarea
                       id="ap-prompt"
                       value={formData.customization_prompt}

@@ -145,19 +145,25 @@ describe('validateStep2', () => {
     expect(ok.digital_file).toBeUndefined();
   });
 
-  it('enforces production days (1-5) and a prompt for custom physical products', () => {
+  it('enforces production days (1-5) and allows optional prompt for custom physical products', () => {
     const bad = validateStep2(make({
       description: 'Custom', price: '500', is_custom_product: true,
       production_days: '9', customization_prompt: '   ',
     }));
     expect(bad.production_days).toBeTruthy();
-    expect(bad.customization_prompt).toBeTruthy();
+    expect(bad.customization_prompt).toBeUndefined();
 
-    const ok = validateStep2(make({
+    const okWithoutPrompt = validateStep2(make({
+      description: 'Custom', price: '500', is_custom_product: true,
+      production_days: '3', customization_prompt: '   ',
+    }));
+    expect(okWithoutPrompt).toEqual({});
+
+    const okWithPrompt = validateStep2(make({
       description: 'Custom', price: '500', is_custom_product: true,
       production_days: '3', customization_prompt: 'What name to engrave?',
     }));
-    expect(ok).toEqual({});
+    expect(okWithPrompt).toEqual({});
   });
 
   it('enforces the allowed import windows for imported physical products', () => {
@@ -230,6 +236,13 @@ describe('buildProductData', () => {
     expect(data.production_days).toBe(4);
     expect(data.customization_prompt).toBe('Text?');
     expect(data.is_imported_product).toBe(false);
+
+    const noPromptData = buildProductData(
+      make({ name: 'Mug', price: '800', description: 'x', product_type: 'physical', is_custom_product: true, production_days: '2', customization_prompt: '   ' }),
+      'seller-1', [], noDigital,
+    );
+    expect(noPromptData.production_days).toBe(2);
+    expect(noPromptData.customization_prompt).toBeNull();
   });
 
   it('carries imported-product fields', () => {

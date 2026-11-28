@@ -110,14 +110,15 @@ export function derivePreHandoffSla(singleLine, metadata) {
         if (!Number.isInteger(productionDays) || productionDays < 1 || productionDays > 5) {
             throw new AppError('Custom product is misconfigured. Please contact the seller.', 400);
         }
-        if (!customInstructions) {
+        const customizationPrompt = String(singleLine.product.customization_prompt || '').trim();
+        if (customizationPrompt && !customInstructions) {
             throw new AppError('Customization instructions are required for this custom product.', 400);
         }
         return {
             type: 'custom_production',
             production_days: productionDays,
-            customization_prompt: singleLine.product.customization_prompt || 'Describe your customization',
-            buyer_instructions: customInstructions,
+            customization_prompt: customizationPrompt || null,
+            buyer_instructions: customInstructions || null,
             delivery_starts_after_seller_handoff: true,
             source_product_id: singleLine.product.id,
         };

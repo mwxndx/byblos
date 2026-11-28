@@ -228,11 +228,16 @@ describe('initiateProductPayment — multi-item bag validation (regression for t
     createdOrderIds.push(result.orderId);
   });
 
-  test('a custom product without customization instructions is a 400 AppError', async () => {
+  test('a custom product without customization instructions is a 400 AppError when customization_prompt is set', async () => {
     const token = checkoutToken('custom-no-instructions');
     await assert.rejects(
       initiateProductPayment(
-        { buyer: await makeBuyerPayload(), metadata: {}, idempotencyKey: token, items: [{ productId: customProduct.id, quantity: 1 }] },
+        {
+          buyer: await makeBuyerPayload(),
+          metadata: {},
+          idempotencyKey: token,
+          items: [{ productId: customProduct.id, quantity: 1 }],
+        },
         { providerClient: fakeProviderClient }
       ),
       (err) => {
@@ -242,6 +247,32 @@ describe('initiateProductPayment — multi-item bag validation (regression for t
         return true;
       }
     );
+  });
+
+  test('a custom product with no customization_prompt succeeds without customization instructions', async () => {
+    const { rows } = await pool.query(
+      `INSERT INTO products (seller_id, name, price, product_type, is_digital, track_inventory, is_custom_product, production_days, customization_prompt)
+       VALUES ($1, 'IT Custom Days Only', 750, 'physical', false, false, true, 2, NULL)
+       RETURNING *`,
+      [sellerA.id]
+    );
+    const daysOnlyProduct = rows[0];
+    const token = checkoutToken('custom-days-only');
+    try {
+      const result = await initiateProductPayment(
+        {
+          buyer: await makeBuyerPayload(),
+          metadata: {},
+          idempotencyKey: token,
+          items: [{ productId: daysOnlyProduct.id, quantity: 1 }],
+        },
+        { providerClient: fakeProviderClient }
+      );
+      assert.equal(result.success, true);
+      createdOrderIds.push(result.orderId);
+    } finally {
+      await cleanupProduct(daysOnlyProduct.id);
+    }
   });
 });
 

@@ -76,7 +76,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
     quoteError,
     customInstructions,
     setCustomInstructions,
-  } = usePhoneCheck({ isOpen, onPhoneSubmit, isPhysicalProduct, isCustomProduct, purchaseDetails });
+  } = usePhoneCheck({ isOpen, onPhoneSubmit, isPhysicalProduct, isCustomProduct, customizationPrompt, purchaseDetails });
   useScreenSecurity(isOpen, 'checkout-phone-check');
 
   return (
@@ -217,7 +217,7 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
                 </div>
               )}
 
-              {isCustomProduct && (
+              {isCustomProduct && Boolean(customizationPrompt?.trim()) && (
                 <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.04] p-4 space-y-2">
                   <Label htmlFor="custom-instructions" className="ml-1 text-xs font-semibold text-slate-700 dark:text-slate-200">Customization details</Label>
                   <p className="text-[11px] font-medium leading-relaxed text-slate-500 dark:text-white/50">

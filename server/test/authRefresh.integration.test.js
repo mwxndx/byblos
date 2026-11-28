@@ -71,6 +71,11 @@ after(async () => {
 async function createTestAccount(role) {
   const email = `refresh-it-${role}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@test.byblos.local`;
   const dbRole = role === 'marketing' ? 'admin' : role;
+  if (dbRole === 'logistics' || dbRole === 'marketing') {
+    await pool.query('DELETE FROM logistics_partners WHERE user_id IN (SELECT id FROM users WHERE role = $1)', [dbRole]);
+    await pool.query('DELETE FROM user_roles WHERE user_id IN (SELECT id FROM users WHERE role = $1)', [dbRole]);
+    await pool.query('DELETE FROM users WHERE role = $1', [dbRole]);
+  }
   const { rows } = await pool.query(
     `INSERT INTO users (email, password_hash, role, is_verified, is_active, created_at, updated_at)
      VALUES ($1, $2, $3, TRUE, TRUE, NOW(), NOW())

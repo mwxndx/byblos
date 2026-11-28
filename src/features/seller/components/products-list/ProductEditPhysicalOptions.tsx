@@ -14,7 +14,7 @@ export function ProductEditPhysicalOptions({ formData, onFormDataChange }: Reado
                   <label htmlFor="pe-custom-product" className="flex items-center justify-between gap-3 cursor-pointer">
                     <span>
                       <span className="block text-slate-900 dark:text-white text-xs font-semibold">Custom product</span>
-                      <span className="block text-[10px] text-slate-500 dark:text-white/60 font-medium">Require buyer instructions and show production time.</span>
+                      <span className="block text-[10px] text-slate-500 dark:text-white/60 font-medium">Show production time and optionally ask buyers for instructions.</span>
                     </span>
                     <input
                       id="pe-custom-product"
@@ -62,7 +62,7 @@ export function ProductEditPhysicalOptions({ formData, onFormDataChange }: Reado
                         </Select>
                       </div>
                       <div>
-                        <Label className="seller-label font-semibold">Buyer instruction prompt</Label>
+                        <Label className="seller-label font-semibold">Buyer instruction prompt (optional)</Label>
                         <Textarea
                           value={formData.customization_prompt}
                           onChange={(event) => onFormDataChange({ ...formData, customization_prompt: event.target.value })}

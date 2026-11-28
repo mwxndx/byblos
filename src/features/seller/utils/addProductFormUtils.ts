@@ -93,7 +93,7 @@ export const formDataDefaults: AddProductFormData = {
   product_type: 'physical',
   is_custom_product: false,
   production_days: '1',
-  customization_prompt: 'Tell the seller exactly what you want customized.',
+  customization_prompt: '',
   is_imported_product: false,
   import_days: '14',
   import_note: 'Imported item. Delivery starts after seller handoff.',
@@ -174,9 +174,6 @@ export const validateStep2 = (formData: AddProductFormData): FormErrors => {
     if (!Number.isInteger(days) || days < 1 || days > 5) {
       errors.production_days = 'Select a production time from 1 to 5 days.';
     }
-    if (!formData.customization_prompt.trim()) {
-      errors.customization_prompt = 'Add the question buyers should answer.';
-    }
   }
 
   if (formData.product_type === 'physical' && formData.is_imported_product) {
@@ -220,7 +217,7 @@ export const buildProductData = (
     product_type: formData.product_type,
     is_custom_product: isPhysical ? formData.is_custom_product : false,
     production_days: isPhysical && formData.is_custom_product ? Number.parseInt(formData.production_days, 10) : null,
-    customization_prompt: isPhysical && formData.is_custom_product ? formData.customization_prompt : null,
+    customization_prompt: isPhysical && formData.is_custom_product ? (formData.customization_prompt.trim() || null) : null,
     is_imported_product: isPhysical ? formData.is_imported_product : false,
     import_days: isPhysical && formData.is_imported_product ? Number.parseInt(formData.import_days, 10) : null,
     import_note: isPhysical && formData.is_imported_product ? formData.import_note : null,

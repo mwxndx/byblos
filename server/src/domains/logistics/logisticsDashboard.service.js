@@ -5,6 +5,7 @@ import logger from '../../shared/utils/logger.js';
 import eventBus, { AppEvents } from '../../application/events/eventBus.js';
 import LogisticsTrackingLinkService from './logisticsTrackingLink.service.js';
 import { generateRefreshToken } from '../../shared/utils/refreshToken.js';
+import { timingSafeEqualString } from '../../shared/utils/crypto.utils.js';
 import {
   MZIGO_EGO_SLUG,
   COMPLETED_PAYMENT_STATUSES,
@@ -65,7 +66,7 @@ class LogisticsDashboardService {
         const configuredPassword = process.env.MZIGO_PASSWORD || '';
 
         if (!configuredEmail || !configuredPassword) return null;
-        if (normalizedEmail !== configuredEmail || password !== configuredPassword) return null;
+        if (normalizedEmail !== configuredEmail || !timingSafeEqualString(password, configuredPassword)) return null;
 
         const client = await pool.connect();
         try {

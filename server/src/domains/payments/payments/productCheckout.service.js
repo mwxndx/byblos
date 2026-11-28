@@ -260,8 +260,16 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
       }
     }
 
+    const {
+      creator_attribution: _ignoredCreatorAttribution,
+      custom_product: _ignoredCustomProduct,
+      pre_handoff_sla: _ignoredPreHandoffSla,
+      pricing: _ignoredPricing,
+      ...safeClientMetadata
+    } = metadata || {};
+
     const orderMetadata = {
-      ...metadata,
+      ...safeClientMetadata,
       product_id: headProduct.id,
       product_type: singleLine ? singleLine.product.product_type : (allDigital ? 'digital' : 'physical'),
       is_digital: singleLine ? singleLine.product.is_digital : allDigital,
@@ -296,7 +304,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
         seller_payout_excludes_delivery_fee: true,
         seller_payout_excludes_collection_fee: true,
       },
-      ...(creatorAttribution ? { creator_attribution: creatorAttribution } : {}),
+      creator_attribution: creatorAttribution || null,
     };
 
     const orderData = {
@@ -362,7 +370,7 @@ export async function initiateProductPayment(normalizedOrder, deps = {}) {
         product_id: headProduct.id,
         seller_id: anyProduct.seller_id,
         pricing: orderMetadata.pricing,
-        ...(creatorAttribution ? { creator_attribution: creatorAttribution } : {}),
+        creator_attribution: creatorAttribution || null,
       },
     });
 

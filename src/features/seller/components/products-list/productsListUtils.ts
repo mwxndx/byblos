@@ -12,7 +12,7 @@ export const createInitialEditFormData = (): ProductEditFormData => ({
   product_type: 'physical',
   is_custom_product: false,
   production_days: '1',
-  customization_prompt: 'Tell the seller exactly what you want customized.',
+  customization_prompt: '',
   is_imported_product: false,
   import_days: '14',
   import_note: 'Imported item. Delivery starts after seller handoff.'

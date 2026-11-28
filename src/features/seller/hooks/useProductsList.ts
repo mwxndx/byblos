@@ -139,7 +139,7 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh,
         product_type: (product.product_type || product.productType || 'physical') as 'physical' | 'digital' | 'service',
         is_custom_product: Boolean(product.is_custom_product || product.isCustomProduct),
         production_days: String(product.production_days || product.productionDays || 1),
-        customization_prompt: product.customization_prompt || product.customizationPrompt || 'Tell the seller exactly what you want customized.',
+        customization_prompt: product.customization_prompt || product.customizationPrompt || '',
         is_imported_product: Boolean(product.is_imported_product || product.isImportedProduct),
         import_days: String(product.import_days || product.importDays || 14),
         import_note: product.import_note || product.importNote || 'Imported item. Delivery starts after seller handoff.'
@@ -189,14 +189,6 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh,
         });
         return;
       }
-      if (!editFormData.customization_prompt.trim()) {
-        toast({
-          title: 'Error',
-          description: 'Add the buyer instruction prompt for this custom product.',
-          variant: 'destructive',
-        });
-        return;
-      }
     }
 
     if (editFormData.product_type === 'physical' && editFormData.is_imported_product) {
@@ -237,7 +229,7 @@ export function useProductsList({ products, onDelete, onStatusUpdate, onRefresh,
         product_type: editFormData.product_type || 'physical',
         is_custom_product: editFormData.product_type === 'physical' ? editFormData.is_custom_product : false,
         production_days: editFormData.product_type === 'physical' && editFormData.is_custom_product ? Number.parseInt(editFormData.production_days, 10) : null,
-        customization_prompt: editFormData.product_type === 'physical' && editFormData.is_custom_product ? editFormData.customization_prompt.trim() : null,
+        customization_prompt: editFormData.product_type === 'physical' && editFormData.is_custom_product ? (editFormData.customization_prompt.trim() || null) : null,
         is_imported_product: editFormData.product_type === 'physical' ? editFormData.is_imported_product : false,
         import_days: editFormData.product_type === 'physical' && editFormData.is_imported_product ? Number.parseInt(editFormData.import_days, 10) : null,
         import_note: editFormData.product_type === 'physical' && editFormData.is_imported_product ? editFormData.import_note.trim() : null

@@ -6229,6 +6229,7 @@ INSERT INTO public.pgmigrations (id, name, run_on) VALUES (123, '20261123110000_
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (124, '20261126150000_add_seller_banner_url', '2026-11-26 15:00:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (125, '20261127041500_add_creator_username', '2026-11-27 04:15:00');
 INSERT INTO public.pgmigrations (id, name, run_on) VALUES (126, '20261127052000_add_creator_username_confirmed', '2026-11-27 05:20:00');
+INSERT INTO public.pgmigrations (id, name, run_on) VALUES (127, '20261127190000_enforce_singleton_privileged_roles', '2026-11-27 19:00:00');
 
 -- Advance the bookkeeping sequence past the explicitly-inserted ids above, so a
 -- NEW migration applied on top of this restored snapshot inserts id 101+ via the
@@ -6330,4 +6331,13 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_creators_username_lower
 
 ALTER TABLE public.creators
     ADD COLUMN IF NOT EXISTS username_confirmed BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Singleton privileged roles (migration 20261127190000)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_singleton_marketing
+    ON public.users (role)
+    WHERE role = 'marketing';
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_singleton_logistics
+    ON public.users (role)
+    WHERE role = 'logistics';
 

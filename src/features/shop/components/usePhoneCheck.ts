@@ -16,6 +16,7 @@ export interface UsePhoneCheckProps {
   ) => void;
   isPhysicalProduct?: boolean;
   isCustomProduct?: boolean;
+  customizationPrompt?: string | null;
   purchaseDetails?: {
     shopName: string;
     productName: string;
@@ -37,6 +38,7 @@ export function usePhoneCheck({
   onPhoneSubmit,
   isPhysicalProduct = false,
   isCustomProduct = false,
+  customizationPrompt = null,
   purchaseDetails,
   initialPhone,
 }: UsePhoneCheckProps) {
@@ -174,7 +176,8 @@ export function usePhoneCheck({
       return;
     }
 
-    if (isCustomProduct && !customInstructions.trim()) {
+    const requiresCustomInstructions = isCustomProduct && Boolean(customizationPrompt?.trim());
+    if (requiresCustomInstructions && !customInstructions.trim()) {
       setError('Please provide customization details');
       return;
     }
@@ -218,12 +221,12 @@ export function usePhoneCheck({
               totalAmount: deliveryQuote.totalAmount ?? deliveryQuote.feeAmount,
             }
           : undefined,
-        ...(isCustomProduct && customInstructions.trim()
+        ...(isCustomProduct && Boolean(customizationPrompt?.trim()) && customInstructions.trim()
           ? { customInstructions: customInstructions.trim() }
           : {}),
       };
     }
-    if (isCustomProduct && customInstructions.trim()) {
+    if (isCustomProduct && Boolean(customizationPrompt?.trim()) && customInstructions.trim()) {
       return {
         doorDelivery: false,
         customInstructions: customInstructions.trim(),

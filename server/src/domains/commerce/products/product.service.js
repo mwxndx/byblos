@@ -116,7 +116,7 @@ class ProductService {
             is_custom_product: finalProductType === 'physical' ? customProduct : false,
             production_days: finalProductType === 'physical' && customProduct ? productionDaysValue : null,
             customization_prompt: finalProductType === 'physical' && customProduct
-                ? String(customization_prompt || 'Tell the seller exactly what you want customized.').trim().slice(0, 240)
+                ? (customization_prompt != null ? String(customization_prompt).trim().slice(0, 240) || null : null)
                 : null,
             is_imported_product: finalProductType === 'physical' ? importedProduct : false,
             import_days: finalProductType === 'physical' && importedProduct ? importDaysValue : null,

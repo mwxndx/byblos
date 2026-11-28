@@ -322,6 +322,7 @@ class CreatorService {
          WHERE sci.id = $1
            AND sci.accepted_creator_id = $2
            AND sci.status = 'pending'
+           AND sci.expires_at > NOW()
          FOR UPDATE`,
         [inviteId, creatorId]
       );
@@ -617,6 +618,9 @@ class CreatorService {
     if (data.password !== data.confirmPassword) {
       throw new Error('Passwords do not match.');
     }
+    if (String(data.password).length < 8) {
+      throw new AppError('Password must be at least 8 characters long.', 400);
+    }
     // Same terms requirement as registerDirect -- an invite from a seller
     // doesn't substitute for the creator's own consent to Byblos's terms.
     if (data.termsAccepted !== true) {
@@ -742,6 +746,9 @@ class CreatorService {
     }
     if (data.password !== data.confirmPassword) {
       throw new Error('Passwords do not match.');
+    }
+    if (String(data.password).length < 8) {
+      throw new AppError('Password must be at least 8 characters long.', 400);
     }
     // Buyers/sellers have always required this (AuthService.register); creators
     // never did -- registerDirect had no concept of terms acceptance at all.
@@ -964,6 +971,7 @@ class CreatorService {
          AND scl.seller_id = $2
          AND scl.status = 'active'
          AND s.is_creator_marketplace_enabled = TRUE
+       ORDER BY (scl.code = $1) DESC, scl.id ASC
        LIMIT 1`,
       [String(code).trim().toUpperCase(), sellerId, String(code).trim()]
     );
@@ -1104,9 +1112,23 @@ class CreatorService {
       ? JSON.parse(order.metadata || '{}')
       : (order.metadata || {});
     const attribution = metadata.creator_attribution;
-    if (!attribution?.creator_id || !attribution?.commission_amount) return null;
+    if (!attribution?.creator_id || !attribution?.commission_amount || !attribution?.seller_creator_link_id) return null;
 
-    const amount = roundMoney(attribution.commission_amount);
+    // Re-verify that the attribution points to a real app-generated link for this seller & creator.
+    const { rows: verifiedLinkRows } = await client.query(
+      `SELECT id FROM seller_creator_links
+       WHERE id = $1 AND seller_id = $2 AND creator_id = $3`,
+      [attribution.seller_creator_link_id, order.seller_id, attribution.creator_id]
+    );
+    if (!verifiedLinkRows.length) return null;
+
+    let amount = roundMoney(attribution.commission_amount);
+    if (metadata.pricing?.creator_commission !== undefined) {
+      amount = Math.min(amount, roundMoney(metadata.pricing.creator_commission));
+    }
+    if (order.total_amount !== undefined && order.total_amount !== null) {
+      amount = Math.min(amount, roundMoney(order.total_amount));
+    }
     if (amount <= 0) return null;
 
     const buyerId = order.buyer_id ?? order.buyerId ?? null;
@@ -1361,6 +1383,7 @@ class CreatorService {
            )
          )
        )
+       ORDER BY (scl.code = $1) DESC, scl.id ASC
        LIMIT 1`,
       [normalizedCode, normalizedShopSlug, rawRef]
     );

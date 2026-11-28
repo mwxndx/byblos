@@ -194,13 +194,18 @@ export const resolveProductUpdateCustomFields = (existing, data) => {
         throw new Error('Imported physical products require an estimated ready time of 7, 14, 21, or 30 days');
     }
 
+    const rawCustomizationPrompt = data.customization_prompt !== undefined
+        ? data.customization_prompt
+        : existing.customization_prompt;
+    const trimmedCustomizationPrompt = rawCustomizationPrompt != null
+        ? String(rawCustomizationPrompt).trim().slice(0, 240)
+        : '';
+
     return {
         nextProductType,
         is_custom_product: nextCustom,
         production_days: nextCustom ? nextProductionDays : null,
-        customization_prompt: nextCustom
-            ? String(data.customization_prompt || existing.customization_prompt || 'Tell the seller exactly what you want customized.').trim().slice(0, 240)
-            : null,
+        customization_prompt: nextCustom ? (trimmedCustomizationPrompt || null) : null,
         is_imported_product: nextImported,
         import_days: nextImported ? nextImportDays : null,
         import_note: nextImported
