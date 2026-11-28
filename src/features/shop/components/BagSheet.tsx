@@ -12,6 +12,7 @@ import { usePhoneCheck } from './usePhoneCheck';
 import type { Theme } from '@/features/shop/utils/productCardUtils';
 import { useBag } from '../bag/BagContext';
 import { useBagCheckout } from '../bag/useBagCheckout';
+import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
 
 const SWIPE_DOWN_DISMISS_PX = 60;
 
@@ -23,6 +24,7 @@ const SWIPE_DOWN_DISMISS_PX = 60;
  */
 export function BagSheet() {
   const bag = useBag();
+  useModalBackDismiss(bag.isOpen, bag.close);
   const checkout = useBagCheckout(bag);
   const startY = useRef<number | null>(null);
   const [showPhoneFallback, setShowPhoneFallback] = useState(false);
@@ -88,7 +90,7 @@ export function BagSheet() {
 
       {/* Expanded inline checkout. */}
       {bagHasItems && bag.isOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col justify-end">
+        <div role="dialog" aria-modal="true" aria-label="Your bag" className="fixed inset-0 z-50 flex flex-col justify-end">
           <button type="button" aria-label="Close bag" onClick={bag.close} className="absolute inset-0 bg-black/50 backdrop-blur-xs" />
           <form
             onSubmit={handlePaymentInitiate}
@@ -100,7 +102,7 @@ export function BagSheet() {
               <span className="mx-auto block h-1.5 w-10 rounded-full bg-black/20 dark:bg-white/25" />
               <div className="mt-2 flex items-center justify-between">
                 <h3 className="flex items-center gap-2 text-base font-semibold"><ShoppingBag className="h-4 w-4 text-yellow-500 dark:text-yellow-400" /> Your bag</h3>
-                <button type="button" onClick={bag.close} aria-label="Collapse bag" className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10"><ChevronDown className="h-5 w-5" /></button>
+                <button type="button" onClick={bag.close} aria-label="Collapse bag" className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10"><ChevronDown className="h-5 w-5" /></button>
               </div>
             </div>
 

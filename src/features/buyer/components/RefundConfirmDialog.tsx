@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
@@ -53,19 +53,19 @@ export function RefundConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[92vw] sm:max-w-[480px] max-h-[90dvh] overflow-y-auto border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+      <DialogContent className="w-[92vw] sm:max-w-[480px] max-h-[90dvh] overflow-y-auto border border-separator bg-surface-1 text-label rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
         <DialogHeader className="space-y-1">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5C518]/20 text-[#F5C518]">
               <Wallet className="h-4 w-4" />
             </div>
-            <DialogTitle className="text-xl font-bold text-slate-950 dark:text-white">
+            <DialogTitle className="text-xl font-bold text-label">
               Withdraw Refund Balance
             </DialogTitle>
           </div>
-          <p className="text-xs text-slate-600 dark:text-white/60">
+          <DialogDescription className="text-xs text-label-2">
             Available cleared balance: <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(availableBalance)}</strong>
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">

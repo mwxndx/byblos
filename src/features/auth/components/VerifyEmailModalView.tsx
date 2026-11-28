@@ -25,29 +25,29 @@ export function VerifyEmailModalView({
 }: VerifyEmailModalViewProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl overflow-hidden shadow-2xl transition-colors duration-200">
+      <DialogContent className="w-[92vw] sm:max-w-[420px] bg-surface-1 border border-separator text-label rounded-3xl overflow-hidden shadow-2xl transition-colors duration-200">
         <div className="absolute top-0 left-0 w-full h-1 bg-yellow-400" />
 
         <DialogHeader className="pt-6">
-          <div className="w-16 h-16 bg-slate-100 dark:bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-white/20">
+          <div className="w-16 h-16 bg-fill rounded-2xl flex items-center justify-center mx-auto mb-4 border border-separator">
             {isSuccess ? (
               <CheckCircle2 className="h-8 w-8 text-green-500" />
             ) : (
-              <Mail className="h-8 w-8 text-slate-900 dark:text-white" />
+              <Mail className="h-8 w-8 text-label" />
             )}
           </div>
-          <DialogTitle className="text-2xl font-bold text-center text-slate-950 dark:text-white">
+          <DialogTitle className="text-2xl font-bold text-center text-label">
             Verify Your Email
           </DialogTitle>
-          <DialogDescription className="text-center text-slate-600 dark:text-white/60 pt-2 text-base">
+          <DialogDescription className="text-center text-label-2 pt-2 text-base">
             Your {role} account is almost ready. We've sent a verification link to:
             <br />
-            <span className="text-slate-950 dark:text-white font-semibold mt-1 block">{email}</span>
+            <span className="text-label font-semibold mt-1 block">{email}</span>
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-6">
-          <p className="text-sm text-slate-600 dark:text-white/60 text-center leading-relaxed">
+          <p className="text-sm text-label-2 text-center leading-relaxed">
             Please click the link in the email to activate your account. If you don't see it, check your spam folder.
           </p>
 

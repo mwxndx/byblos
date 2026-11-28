@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
@@ -81,13 +81,13 @@ const PhoneCheckModal: React.FC<PhoneCheckModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="flex flex-col w-[92vw] max-w-[380px] sm:max-w-[400px] max-h-[85dvh] p-0 gap-0 overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-[#0d0d0d] text-slate-950 dark:text-white transition-colors duration-200">
-        <DialogHeader className="p-5 sm:p-6 pb-2 shrink-0 space-y-3 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a]">
+      <DialogContent className="flex flex-col w-[92vw] max-w-[380px] sm:max-w-[400px] max-h-[85dvh] p-0 gap-0 overflow-hidden rounded-3xl border border-separator shadow-2xl bg-surface-1 text-label transition-colors duration-200">
+        <DialogHeader className="p-5 sm:p-6 pb-2 shrink-0 space-y-3 border-b border-separator bg-fill">
           <div className="mx-auto w-12 h-12 bg-yellow-50 dark:bg-yellow-400/10 border border-yellow-200 dark:border-yellow-400/20 rounded-2xl flex items-center justify-center shadow-inner">
             <Phone className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
           </div>
-          <DialogTitle className="text-lg font-bold text-center text-slate-950 dark:text-white tracking-tight">Complete your order</DialogTitle>
-          <p className="text-center text-xs text-slate-600 dark:text-white/60">Pay safely through Byblos. Your money is protected until you confirm delivery.</p>
+          <DialogTitle className="text-lg font-bold text-center text-label tracking-tight">Complete your order</DialogTitle>
+          <DialogDescription className="text-center text-xs text-label-2">Pay safely through Byblos. Your money is protected until you confirm delivery.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
           <div className="no-scrollbar flex-1 overflow-y-auto p-4 sm:p-6 py-4 space-y-4">

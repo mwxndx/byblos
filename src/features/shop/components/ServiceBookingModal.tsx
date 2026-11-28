@@ -55,14 +55,14 @@ export function ServiceBookingModal({ product, isOpen, onClose, onConfirm, initi
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="flex flex-col w-[95vw] max-w-[400px] max-h-[85dvh] gap-0 p-0 overflow-hidden rounded-[32px] border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-[#0a0a0a] text-slate-950 dark:text-white transition-colors duration-200">
-                <DialogHeader className="p-6 pb-2 shrink-0 space-y-4 pt-8 border-b border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0a0a0a]">
+            <DialogContent className="flex flex-col w-[95vw] max-w-[400px] max-h-[85dvh] gap-0 p-0 overflow-hidden rounded-[32px] border border-separator shadow-2xl bg-surface-1 text-label transition-colors duration-200">
+                <DialogHeader className="p-6 pb-2 shrink-0 space-y-4 pt-8 border-b border-separator bg-fill">
                     <div className="mx-auto w-12 h-12 bg-yellow-50 dark:bg-white/5 rounded-2xl flex items-center justify-center border border-yellow-200 dark:border-white/10">
                         <CalendarIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                     </div>
                     <div className="space-y-1 text-center">
-                        <DialogTitle className="text-xl font-bold text-slate-950 dark:text-white">Book Service</DialogTitle>
-                        <DialogDescription className="text-sm font-medium text-slate-600 dark:text-[#666]">
+                        <DialogTitle className="text-xl font-bold text-label">Book Service</DialogTitle>
+                        <DialogDescription className="text-sm font-medium text-label-2">
                             {product.name}
                         </DialogDescription>
                     </div>

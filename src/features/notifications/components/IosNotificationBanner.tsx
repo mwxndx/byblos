@@ -83,9 +83,9 @@ export function IosNotificationBanner({ className, role, allowAllWeb = true }: R
           type="button"
           onClick={dismissPrompt}
           aria-label="Dismiss banner"
-          className="shrink-0 rounded-md p-1 text-slate-400 hover:text-slate-600 dark:text-white/40 dark:hover:text-white"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-label-2 transition-colors hover:bg-fill hover:text-label"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>

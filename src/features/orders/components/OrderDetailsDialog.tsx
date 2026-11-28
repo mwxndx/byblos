@@ -17,14 +17,14 @@ interface OrderDetailsDialogProps {
 export function OrderDetailsDialog({ order, serviceCharge, onClose, onViewImage, onConfirmReceiptClick }: Readonly<OrderDetailsDialogProps>) {
   return (
       <Dialog open={!!order} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="w-[92vw] sm:max-w-xl bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+        <DialogContent className="w-[92vw] sm:max-w-xl bg-surface-1 border border-separator text-label rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           {order && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-slate-950 dark:text-white">
+                <DialogTitle className="text-2xl font-bold text-label">
                   Order Details
                 </DialogTitle>
-                <DialogDescription className="text-slate-500 dark:text-white/70">
+                <DialogDescription className="text-label-2">
                   {formatOrderDate(order)}
                 </DialogDescription>
               </DialogHeader>
