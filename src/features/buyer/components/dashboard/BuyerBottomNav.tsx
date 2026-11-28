@@ -41,7 +41,7 @@ export function BuyerBottomNav({
         }}
       />
       <nav
-        className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-[48px] sm:rounded-full border border-slate-300 dark:border-white/20 dashboard-floating-nav bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md px-2 py-1.5 transition-colors duration-200"
+        className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-[48px] sm:rounded-full border border-separator dashboard-floating-nav bg-surface-1/95 backdrop-blur-md px-2 py-1.5 transition-colors duration-200"
         style={{ bottom: 'max(1.125rem, calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px))))' }}
         aria-label="Buyer navigation"
       >
@@ -59,13 +59,13 @@ export function BuyerBottomNav({
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
               className={`relative flex flex-1 cursor-pointer items-center justify-center rounded-full py-2 transition-[transform,background-color,border-color,color,box-shadow,opacity] duration-150 active:scale-95 ${isActive
-                  ? 'text-black dark:text-white font-bold'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-white/50 dark:hover:text-white'
+                  ? 'text-label font-bold'
+                  : 'text-label-2 hover:text-label'
                 }`}
             >
               <item.Icon
                 size={22}
-                className={isActive ? 'text-black dark:text-white' : 'text-current transition-colors'}
+                className={isActive ? 'text-label' : 'text-current transition-colors'}
               />
               <span className="sr-only">
                 {item.label}

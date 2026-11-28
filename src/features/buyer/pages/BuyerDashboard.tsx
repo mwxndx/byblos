@@ -1,9 +1,10 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState, Suspense } from 'react';
+import { safeLazy } from '@/shared/utils/safeLazy';
 
 import { Button } from '@/shared/ui/button';
 
 // Lazy load the OrdersSection component
-const OrdersSection = lazy(() => import('@/features/orders/components/OrdersSectionContainer'));
+const OrdersSection = safeLazy(() => import('@/features/orders/components/OrdersSectionContainer'));
 import {
   Heart, WalletCards,
   Store, ShoppingBag, Bell
@@ -150,13 +151,13 @@ function BuyerDashboard() {
                   variant="default"
                   role="buyer"
                   scrollClassName=""
-                  className="overflow-hidden rounded-2xl border border-transparent bg-white dark:bg-surface-1"
+                  className="overflow-hidden rounded-2xl border border-transparent bg-surface-1"
                 />
               ) : (
-                <div className="rounded-2xl border border-transparent bg-white dark:bg-surface-1 p-6 text-center space-y-3">
+                <div className="rounded-2xl border border-transparent bg-surface-1 p-6 text-center space-y-3">
                   <Bell className="mx-auto h-8 w-8 text-yellow-400" />
-                  <h3 className="text-base font-bold text-slate-950 dark:text-white">Alerts & Notifications</h3>
-                  <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
+                  <h3 className="text-base font-bold text-label">Alerts & Notifications</h3>
+                  <p className="text-xs text-label-2 max-w-sm mx-auto leading-relaxed">
                     Sign in to your Byblos account to receive instant order tracking updates, delivery notifications, and messages.
                   </p>
                   <Button onClick={() => navigate('/buyer/login')} className="h-10 px-6 rounded-full bg-[#F5C518] text-black font-bold hover:bg-yellow-300">
@@ -170,8 +171,8 @@ function BuyerDashboard() {
           {activeSection === 'wishlist' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs sm:text-sm font-bold text-slate-950 dark:text-white">Wishlist</span>
-                <span className="text-xs font-semibold text-slate-500 dark:text-white/50">{wishlist.length} items</span>
+                <span className="text-xs sm:text-sm font-bold text-label">Wishlist</span>
+                <span className="text-xs font-semibold text-label-3">{wishlist.length} items</span>
               </div>
               <WishlistSection />
             </div>
@@ -189,10 +190,10 @@ function BuyerDashboard() {
             user ? (
               <BuyerRefundsTab refundAmount={refundAmount} />
             ) : (
-              <div className="rounded-2xl border border-transparent bg-white dark:bg-surface-1 p-6 text-center space-y-3">
+              <div className="rounded-2xl border border-transparent bg-surface-1 p-6 text-center space-y-3">
                 <WalletCards className="mx-auto h-8 w-8 text-yellow-400" />
-                <h3 className="text-base font-bold text-slate-950 dark:text-white">Refunds</h3>
-                <p className="text-xs text-slate-600 dark:text-white/70 max-w-sm mx-auto leading-relaxed">
+                <h3 className="text-base font-bold text-label">Refunds</h3>
+                <p className="text-xs text-label-2 max-w-sm mx-auto leading-relaxed">
                   Sign in to view your refund balance and withdrawal history.
                 </p>
                 <Button onClick={() => navigate('/buyer/login')} className="h-10 px-6 rounded-full bg-[#F5C518] text-black font-bold hover:bg-yellow-300">

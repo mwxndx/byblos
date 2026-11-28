@@ -71,15 +71,15 @@ export function BuyerOrderDialogs({
   return (
     <>
       <Dialog open={showCancelDialog} onOpenChange={onCancelDialogChange}>
-        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-surface-1 border border-separator text-label rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-label">
               <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                 <XCircle className="h-4 w-4 text-label" />
               </div>
               Cancel Order
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
+            <DialogDescription className="text-sm text-label-2 leading-relaxed">
               Are you sure you want to cancel this order? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -120,15 +120,15 @@ export function BuyerOrderDialogs({
       <OrderDetailsDialog order={selectedOrderForDetails} serviceCharge={selectedOrderServiceCharge} onClose={() => onSelectedOrderChange(null)} onViewImage={onViewingImageChange} onConfirmReceiptClick={onConfirmReceiptClick} />
 
       <Dialog open={showReceiptDialog} onOpenChange={onReceiptDialogChange}>
-        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-white dark:bg-surface-1 border border-slate-200 dark:border-separator text-slate-950 dark:text-white rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
+        <DialogContent className="w-[92vw] sm:max-w-[420px] bg-surface-1 border border-separator text-label rounded-3xl p-5 sm:p-6 shadow-2xl transition-colors duration-200">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-slate-950 dark:text-white">
+            <DialogTitle className="flex items-center gap-2 text-lg font-bold text-label">
               <div className={`w-8 h-8 ${currentIsService ? 'bg-yellow-400' : 'bg-green-600'} rounded-full flex items-center justify-center`}>
                 <CheckCircle className="h-4 w-4 text-label" />
               </div>
               {currentIsService ? 'Confirm Service Completion' : 'Confirm Package Receipt'}
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-600 dark:text-white/70 leading-relaxed">
+            <DialogDescription className="text-sm text-label-2 leading-relaxed">
               {confirmationContent}
             </DialogDescription>
           </DialogHeader>
