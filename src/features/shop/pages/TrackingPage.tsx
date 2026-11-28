@@ -91,8 +91,8 @@ export default function TrackingPage() {
 
   if (isLoading) {
     return (
-      <main className="byblos-light-page min-h-screen bg-[#f8f7f2] text-stone-950">
-        <div className="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-4">
+      <main className="byblos-light-page min-h-[100dvh] pt-safe-top pb-safe-bottom bg-[#f8f7f2] text-stone-950">
+        <div className="mx-auto flex min-h-[100dvh] max-w-3xl items-center justify-center px-4">
           <div className="rounded-3xl border border-stone-200 bg-white px-6 py-5 text-center shadow-[0_18px_45px_rgba(17,17,17,0.08)]">
             <Clock className="mx-auto h-6 w-6 animate-pulse text-yellow-500" />
             <p className="mt-3 text-sm font-medium text-stone-600">Loading tracking details...</p>
@@ -104,8 +104,8 @@ export default function TrackingPage() {
 
   if (isError || !data) {
     return (
-      <main className="byblos-light-page min-h-screen bg-[#f8f7f2] text-stone-950">
-        <div className="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-4">
+      <main className="byblos-light-page min-h-[100dvh] pt-safe-top pb-safe-bottom bg-[#f8f7f2] text-stone-950">
+        <div className="mx-auto flex min-h-[100dvh] max-w-3xl items-center justify-center px-4">
           <div className="rounded-3xl border border-stone-200 bg-white p-6 text-center shadow-[0_18px_45px_rgba(17,17,17,0.08)]">
             <ShieldCheck className="mx-auto h-8 w-8 text-yellow-500" />
             <h1 className="mt-4 text-2xl font-semibold text-stone-950">Tracking link unavailable</h1>
@@ -122,7 +122,7 @@ export default function TrackingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-[100dvh] pt-safe-top pb-safe-bottom bg-black text-white">
       <div className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
         <Button
           variant="ghost"

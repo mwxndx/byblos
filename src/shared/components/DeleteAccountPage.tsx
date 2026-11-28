@@ -11,7 +11,7 @@ const SUPPORT_EMAIL = 'bybloshqke@zohomail.com';
  */
 export default function DeleteAccountPage() {
   return (
-    <div className="min-h-[100svh] bg-black text-white">
+    <div className="min-h-[100dvh] pb-safe-bottom bg-black text-white">
       <SEOHead
         title="Delete your Byblos account"
         description="How to request deletion of your Byblos account and associated personal data, what is deleted versus retained, and for how long."

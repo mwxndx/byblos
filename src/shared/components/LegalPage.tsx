@@ -14,7 +14,7 @@ const SITE = 'https://www.byblosafrica.site';
 export default function LegalPage() {
   const { pathname } = useLocation();
   return (
-    <div className="min-h-[100svh] bg-black">
+    <div className="min-h-[100dvh] pb-safe-bottom bg-black">
       <SEOHead
         title="Privacy Policy & Terms"
         description="Byblos Privacy Policy and Terms of Service: how we handle your data and the rules for using the Byblos app and website."

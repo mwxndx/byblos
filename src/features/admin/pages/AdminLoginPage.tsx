@@ -44,9 +44,9 @@ export const AdminLoginPage = () => {
   };
 
   return (
-    <div className="auth-page flex min-h-screen min-h-[100dvh] min-h-[100svh] items-start justify-center overflow-x-hidden bg-[var(--byblos-bg,#000000)] px-4 py-6 pb-safe-bottom text-[var(--byblos-text,#f5f5f5)] sm:items-center sm:p-6 transition-colors duration-200">
+    <div className="auth-page flex min-h-[100dvh] pt-safe-top pb-safe-bottom items-start justify-center overflow-x-hidden bg-[var(--byblos-bg,#000000)] px-4 py-6 text-[var(--byblos-text,#f5f5f5)] sm:items-center sm:p-6 transition-colors duration-200">
       <div className="w-full max-w-md animate-in fade-in zoom-in-95 duration-500">
-        <Card className="overflow-hidden rounded-[2rem] border border-slate-200 dark:border-separator bg-white dark:bg-surface-1 shadow-xl dark:shadow-[0_22px_60px_rgba(0,0,0,0.45)]">
+        <Card className="overflow-hidden rounded-[2rem] border border-separator bg-surface-1 text-label shadow-[var(--shadow-pop)]">
           <CardHeader className="px-6 pb-7 pt-10 text-center md:px-10">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-yellow-500/30 bg-yellow-500/15 text-yellow-500">
               <Shield className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />

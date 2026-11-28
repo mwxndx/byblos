@@ -103,13 +103,13 @@ const VerifyEmail = () => {
     };
 
     return (
-        <div className="auth-page min-h-screen bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-200"
+        <div className="auth-page min-h-[100dvh] pt-safe-top pb-safe-bottom bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-200"
             style={{
                 fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
             }}
         >
             <div
-                className="animate-in fade-in slide-in-from-bottom-5 duration-500 ease-out max-w-md w-full bg-white dark:bg-surface-1 border border-black/[0.08] dark:border-separator p-8 rounded-3xl shadow-[0_18px_45px_rgba(17,17,17,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.38)] relative z-10 text-center transition-colors duration-200"
+                className="animate-in fade-in slide-in-from-bottom-5 duration-500 ease-out max-w-md w-full bg-surface-1 border border-separator text-label p-8 rounded-3xl shadow-[var(--shadow-pop)] relative z-10 text-center transition-colors duration-200"
             >
                 <div className="mb-8 flex justify-center">
                     {status === 'loading' && (
@@ -135,13 +135,13 @@ const VerifyEmail = () => {
                     )}
                 </div>
 
-                <h1 className="text-3xl font-semibold text-slate-900 dark:text-white mb-4 tracking-tight">
+                <h1 className="text-3xl font-semibold text-label mb-4 tracking-tight">
                     {status === 'loading' ? 'Verifying Account' :
                         status === 'success' ? 'Verification Success' :
                             status === 'check-email' ? 'Action Required' : 'Verification Issue'}
                 </h1>
 
-                <p className="text-slate-600 dark:text-white/60 text-lg mb-8 leading-relaxed">
+                <p className="text-label-2 text-lg mb-8 leading-relaxed">
                     {message}
                 </p>
 
@@ -174,8 +174,9 @@ const VerifyEmail = () => {
                     )}
 
                     <button
+                        type="button"
                         onClick={() => navigate('/')}
-                        className="text-slate-500 dark:text-white/50 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-medium"
+                        className="text-label-2 hover:text-label transition-colors text-sm font-medium"
                     >
                         Back to Homepage
                     </button>
