@@ -45,13 +45,13 @@ export const AdminCreatorsTab = ({
           <CardDescription className="text-xs md:text-sm text-label-2 font-medium">Shop links, clicks, and earnings</CardDescription>
         </div>
         <div className="relative group w-full md:w-auto">
-          <div className="absolute -inset-0.5 bg-yellow-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-          <Search className="absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-label-3 group-hover:text-yellow-500 transition-colors" />
+          <div className="pointer-events-none absolute -inset-0.5 bg-yellow-500/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+          <Search className="pointer-events-none absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 z-20 h-4 w-4 text-label-3 group-hover:text-yellow-500 transition-colors" />
           <Input
             type="text"
             aria-label="Search creators"
             placeholder="Search creators..."
-            className="pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-[transform,background-color,border-color,color,box-shadow,opacity] font-medium text-xs sm:text-sm"
+            className="relative z-10 pl-10 sm:pl-12 w-full md:w-[280px] lg:w-[400px] h-10 sm:h-11 md:h-12 bg-fill border-separator text-label placeholder:text-label-3 rounded-2xl focus:border-yellow-500/50 focus:ring-yellow-500/10 transition-[transform,background-color,border-color,color,box-shadow,opacity] font-medium text-xs sm:text-sm"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
           />
