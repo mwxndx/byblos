@@ -10,12 +10,12 @@ export function DashboardSkeleton() {
       role="status"
       aria-busy="true"
       aria-live="polite"
-      className="min-h-[100svh] w-full overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] flex flex-col transition-colors duration-200"
+      className="min-h-[100dvh] w-full overflow-x-hidden bg-[var(--bg,#000000)] text-label flex flex-col transition-colors duration-200"
     >
       <span className="sr-only">Loading dashboard…</span>
 
       {/* Modern Compact Header Skeleton */}
-      <header className="sticky top-0 z-40 w-full border-b border-white dark:border-separator/70 bg-white/95 dark:bg-black/95 backdrop-blur-md px-4 py-2 sm:px-6">
+      <header className="sticky top-0 z-40 w-full border-b border-separator bg-[var(--bg,#000000)]/95 backdrop-blur-md pt-safe-top px-4 py-2 sm:px-6">
         <div className="mx-auto flex h-10 sm:h-11 max-w-[1480px] items-center justify-between">
           <div className="w-8 h-8 sm:w-9 sm:h-9" />
           <Skeleton className="h-5 w-32 sm:w-44 rounded-md" />
@@ -39,7 +39,7 @@ export function DashboardSkeleton() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-zinc-950 p-4 shadow-sm"
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-card border border-separator bg-surface-1 p-4 shadow-[var(--shadow-card)]"
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <Skeleton className="h-14 w-14 shrink-0 rounded-xl" />
@@ -67,7 +67,7 @@ export function DashboardSkeleton() {
         }}
       />
       <div
-        className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-12 sm:h-13 rounded-[48px] sm:rounded-full border border-slate-300 dark:border-white/20 dashboard-floating-nav bg-white/95 dark:bg-[#121212]/95 backdrop-blur-md shadow-xl px-4 flex items-center justify-between"
+        className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-12 sm:h-13 rounded-[48px] sm:rounded-full border border-separator dashboard-floating-nav bg-surface-1/95 backdrop-blur-md shadow-xl px-4 flex items-center justify-between"
         style={{ bottom: 'max(1.125rem, calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px))))' }}
       >
         {Array.from({ length: 5 }).map((_, i) => (

@@ -9,7 +9,7 @@ export function OrdersLoadingState() {
     <div className="space-y-4 sm:space-y-6" role="status" aria-live="polite" aria-busy="true">
       <span className="sr-only">Loading orders…</span>
       {[1, 2, 3].map((item) => (
-        <Card key={item} aria-hidden="true" className="border-slate-200 bg-white dark:border-white/10 dark:bg-[#0a0a0a] shadow-sm">
+        <Card key={item} aria-hidden="true" className="border-separator bg-surface-1 shadow-sm">
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start space-y-4 lg:space-y-0">
               <div className="space-y-3 sm:space-y-4 flex-1">

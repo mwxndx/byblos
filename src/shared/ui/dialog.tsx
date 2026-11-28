@@ -49,8 +49,8 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        // Base Layout (Centered Floating Card on all screens: Web Desktop, Web Mobile, Android)
-        "fixed left-[50%] top-[50%] z-[101] grid w-[92vw] max-w-lg max-h-[85dvh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-sheet border border-separator bg-surface-1 p-6 text-label shadow-[var(--shadow-pop)]",
+        // Base Layout (Centered Floating Card on all screens: Web Desktop, Web Mobile, Android, iOS PWA)
+        "fixed left-[50%] top-[50%] z-[101] grid w-[92vw] max-w-lg max-h-[85dvh] overflow-y-auto translate-x-[-50%] translate-y-[-50%] gap-4 rounded-sheet border border-separator bg-surface-1 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] text-label shadow-[var(--shadow-pop)]",
         !disableAnimation && [
           "duration-200",
           "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
@@ -65,7 +65,7 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {!hideCloseButton && (
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1.5 text-label-2 transition-colors hover:bg-fill hover:text-label focus:outline-none focus:ring-2 focus:ring-black/60 dark:focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-[var(--bg)] disabled:pointer-events-none data-[state=open]:bg-fill">
+        <DialogPrimitive.Close className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-label-2 transition-colors hover:bg-fill hover:text-label focus:outline-none focus:ring-2 focus:ring-black/60 dark:focus:ring-white/60 focus:ring-offset-2 focus:ring-offset-[var(--bg)] disabled:pointer-events-none data-[state=open]:bg-fill">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
