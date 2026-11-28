@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/button';
 import { getImageUrl } from '@/shared/utils/formatting';
 import { useAvailableShopsQuery } from '../hooks/queries/useAvailableShopsQuery';
 import { useRequestCollaborationMutation } from '../hooks/mutations/useRequestCollaborationMutation';
+import { useCancelCollaborationMutation } from '../hooks/mutations/useCancelCollaborationMutation';
 import { classifyApiError } from '@/shared/utils/errorClassification';
 import type { AvailableShop } from '../api/marketplace';
 
@@ -16,7 +17,9 @@ interface CreatorAvailableShopsProps {
 export function CreatorAvailableShops({ searchQuery = '' }: Readonly<CreatorAvailableShopsProps> = {}) {
   const { data: shops = [], isLoading, refetch } = useAvailableShopsQuery();
   const requestMutation = useRequestCollaborationMutation();
+  const cancelMutation = useCancelCollaborationMutation();
   const [requestingShopId, setRequestingShopId] = useState<number | null>(null);
+  const [cancellingShopId, setCancellingShopId] = useState<number | null>(null);
 
   const filteredShops = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -40,6 +43,19 @@ export function CreatorAvailableShops({ searchQuery = '' }: Readonly<CreatorAvai
       toast.error(classifyApiError(err, 'Could not send request.').message);
     } finally {
       setRequestingShopId(null);
+    }
+  };
+
+  const handleCancelRequest = async (shop: AvailableShop) => {
+    setCancellingShopId(shop.id);
+    try {
+      await cancelMutation.mutateAsync(shop.id);
+      toast.success(`Request to ${shop.shopName} cancelled.`);
+      refetch();
+    } catch (err: unknown) {
+      toast.error(classifyApiError(err, 'Could not cancel request.').message);
+    } finally {
+      setCancellingShopId(null);
     }
   };
 
@@ -154,10 +170,26 @@ export function CreatorAvailableShops({ searchQuery = '' }: Readonly<CreatorAvai
                       Promoting
                     </span>
                   ) : shop.collaborationStatus === 'pending' ? (
-                    <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_14%,transparent)] px-3 text-xs font-medium text-sys-orange">
-                      <Clock className="h-3.5 w-3.5" />
-                      Pending
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-[color-mix(in_srgb,var(--sys-orange)_14%,transparent)] px-3 text-xs font-medium text-sys-orange">
+                        <Clock className="h-3.5 w-3.5" />
+                        Pending
+                      </span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        aria-label={`Cancel request to ${shop.shopName}`}
+                        onClick={() => handleCancelRequest(shop)}
+                        disabled={cancellingShopId === shop.id}
+                        className="h-9 px-2.5 text-xs text-label-2 hover:text-sys-red"
+                      >
+                        {cancellingShopId === shop.id ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          'Cancel'
+                        )}
+                      </Button>
+                    </div>
                   ) : shop.collaborationStatus === 'denied' ? (
                     <span className="inline-flex h-9 items-center justify-center gap-1 rounded-control bg-slate-100 dark:bg-white/10 px-3 text-xs font-medium text-slate-500 dark:text-white/50 cursor-not-allowed">
                       <X className="h-3.5 w-3.5" />

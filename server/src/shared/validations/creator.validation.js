@@ -23,6 +23,7 @@ export const requestWithdrawal = z.object({
   mpesaName: s
 }).passthrough();
 export const requestCollaboration = z.object({ sellerId: id }).passthrough();
+export const cancelCollaborationRequest = z.object({ sellerId: id }).passthrough();
 export const updateProfile = z.object({
   username: z.string().nullable().optional(),
   instagramLink: z.string().nullable().optional(),

@@ -45,6 +45,7 @@ router.get('/referral/dashboard', creatorController.getReferralDashboard);
 router.post('/referral/generate-code', validate(V.generateReferralCode), creatorController.generateReferralCode);
 router.get('/available-shops', creatorController.getAvailableShops);
 router.post('/shops/:sellerId/request', validate(V.requestCollaboration), creatorController.requestCollaboration);
+router.delete('/shops/:sellerId/request', validate(V.cancelCollaborationRequest), creatorController.cancelCollaborationRequest);
 router.post('/shops/:sellerId/leave', creatorController.leavePromotedShop);
 router.post('/invited-businesses/:sellerId/leave', creatorController.leaveInvitedBusiness);
 router.post('/withdrawals', withdrawalRateLimiter, validate(V.requestWithdrawal), creatorController.requestWithdrawal);

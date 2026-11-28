@@ -5,13 +5,20 @@ import { CreatorsTab } from '../CreatorsTab';
 
 const mockMutateAsync = vi.fn();
 const mockRefetch = vi.fn();
+const mockCancelInviteMutateAsync = vi.fn();
 
 const mockDashboardData = {
   isCreatorMarketplaceEnabled: false,
   creatorCommissionRate: 0.05,
   incomingRequests: [],
   activeCreators: [],
-  manualInvites: [],
+  manualInvites: [
+    {
+      id: 77,
+      email: 'pending-creator@example.com',
+      status: 'pending',
+    },
+  ],
 };
 
 vi.mock('@/features/seller/hooks/useSellerCreators', () => ({
@@ -29,6 +36,9 @@ vi.mock('@/features/seller/hooks/useSellerCreators', () => ({
   }),
   useRemoveSellerCreatorMutation: () => ({
     mutateAsync: vi.fn(),
+  }),
+  useCancelSellerInviteMutation: () => ({
+    mutateAsync: mockCancelInviteMutateAsync,
   }),
 }));
 
@@ -94,6 +104,20 @@ describe('CreatorsTab - Marketplace Listing Controls', () => {
 
     expect(mockMutateAsync).toHaveBeenCalledWith({
       isCreatorMarketplaceEnabled: true,
+    });
+  });
+
+  it('allows seller to cancel a pending email invite', async () => {
+    mockCancelInviteMutateAsync.mockResolvedValue({ cancelled: true });
+    render(<CreatorsTab />);
+
+    const cancelInviteBtn = screen.getByRole('button', { name: /cancel invite to pending-creator@example\.com/i });
+    expect(cancelInviteBtn).toBeInTheDocument();
+
+    fireEvent.click(cancelInviteBtn);
+
+    await waitFor(() => {
+      expect(mockCancelInviteMutateAsync).toHaveBeenCalledWith(77);
     });
   });
 });

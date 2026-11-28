@@ -8,6 +8,7 @@ import * as orderController from '../../domains/orders/order/order.controller.js
 import {
   inviteCreator,
   listSellerInvites,
+  cancelSellerInvite,
   getSellerCreatorsDashboard,
   updateCreatorListing,
   respondToCreatorRequest,
@@ -165,6 +166,7 @@ router.post('/creators/requests/:requestId/respond', respondToCreatorRequest);
 router.delete('/creators/:creatorId', removeSellerCreator);
 router.get('/creator-invites', listSellerInvites);
 router.post('/creator-invites', inviteCreator);
+router.delete('/creator-invites/:inviteId', cancelSellerInvite);
 
 // Referral routes
 router.use('/referral', referralRoutes);

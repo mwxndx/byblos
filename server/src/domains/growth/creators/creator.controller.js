@@ -392,6 +392,30 @@ export const requestCollaboration = async (req, res, next) => {
   }
 };
 
+export const cancelCollaborationRequest = async (req, res, next) => {
+  try {
+    const result = await CreatorService.cancelCollaborationRequest(
+      req.user.creatorId,
+      Number(req.params.sellerId)
+    );
+    res.status(200).json({ status: 'success', message: 'Collaboration request cancelled.', data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelSellerInvite = async (req, res, next) => {
+  try {
+    const result = await CreatorService.cancelSellerInvite(
+      req.user.sellerId,
+      Number(req.params.inviteId)
+    );
+    res.status(200).json({ status: 'success', message: 'Creator invite cancelled.', data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const removeSellerCreator = async (req, res, next) => {
   try {
     const result = await CreatorService.sellerRemoveCreator(req.user.sellerId, Number(req.params.creatorId));

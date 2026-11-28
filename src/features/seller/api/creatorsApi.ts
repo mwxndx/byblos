@@ -77,3 +77,8 @@ export const removeSellerCreator = async (creatorId: number) => {
   const response = await apiClient.delete(`/sellers/creators/${creatorId}`);
   return response.data;
 };
+
+export const cancelSellerCreatorInvite = async (inviteId: number | string) => {
+  const response = await apiClient.delete(`/sellers/creator-invites/${inviteId}`);
+  return response.data;
+};

@@ -4,6 +4,7 @@ import {
   updateCreatorListing,
   respondToCreatorRequest,
   removeSellerCreator,
+  cancelSellerCreatorInvite,
   type SellerCreatorsDashboardData
 } from '../api/creatorsApi';
 
@@ -46,6 +47,17 @@ export function useRemoveSellerCreatorMutation() {
 
   return useMutation({
     mutationFn: (creatorId: number) => removeSellerCreator(creatorId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['seller', 'creators-dashboard'] });
+    },
+  });
+}
+
+export function useCancelSellerInviteMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (inviteId: number | string) => cancelSellerCreatorInvite(inviteId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['seller', 'creators-dashboard'] });
     },

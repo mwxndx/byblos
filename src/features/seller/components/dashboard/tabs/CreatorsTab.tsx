@@ -26,7 +26,8 @@ import {
   useSellerCreatorsQuery,
   useUpdateCreatorListingMutation,
   useRespondToCreatorRequestMutation,
-  useRemoveSellerCreatorMutation
+  useRemoveSellerCreatorMutation,
+  useCancelSellerInviteMutation
 } from '@/features/seller/hooks/useSellerCreators';
 import { useInviteCreatorMutation } from '@/features/seller/hooks/useSellerProfile';
 
@@ -48,6 +49,7 @@ export function CreatorsTab() {
   const updateListingMutation = useUpdateCreatorListingMutation();
   const respondMutation = useRespondToCreatorRequestMutation();
   const removeCreatorMutation = useRemoveSellerCreatorMutation();
+  const cancelInviteMutation = useCancelSellerInviteMutation();
   const inviteMutation = useInviteCreatorMutation();
 
   const [isMarketplaceEnabled, setIsMarketplaceEnabled] = useState(false);
@@ -58,6 +60,21 @@ export function CreatorsTab() {
   const [invitingDirect, setInvitingDirect] = useState(false);
   const [respondingId, setRespondingId] = useState<number | null>(null);
   const [removingCreatorId, setRemovingCreatorId] = useState<number | null>(null);
+  const [cancellingInviteId, setCancellingInviteId] = useState<number | string | null>(null);
+
+  const handleCancelInvite = async (inviteId: number | string, label: string) => {
+    setCancellingInviteId(inviteId);
+    try {
+      await cancelInviteMutation.mutateAsync(inviteId);
+      toast.success(`Invite to ${label} cancelled.`);
+      refetch();
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      toast.error(error.response?.data?.message || error.message || 'Could not cancel invite.');
+    } finally {
+      setCancellingInviteId(null);
+    }
+  };
 
   const handleRemoveCreator = async (creatorId: number, creatorName: string) => {
     setRemovingCreatorId(creatorId);
@@ -588,11 +605,29 @@ export function CreatorsTab() {
               {manualInvites.slice(0, 5).map((inv) => (
                 <div key={inv.id} className="flex items-center justify-between text-xs py-1.5 px-3 rounded-xl bg-slate-100 dark:bg-white/[0.02] border border-slate-200 dark:border-separator">
                   <span className="text-slate-500 dark:text-white/80 font-medium">{inv.creatorName || inv.email}</span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                     inv.status === 'accepted' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-yellow-500/20 text-yellow-300'
                   }`}>
                     {inv.status}
                   </span>
+                    {inv.status === 'pending' && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        aria-label={`Cancel invite to ${inv.creatorName || inv.email}`}
+                        onClick={() => handleCancelInvite(inv.id, inv.creatorName || inv.email)}
+                        disabled={cancellingInviteId === inv.id}
+                        className="h-7 px-2 text-[11px] border-slate-200 dark:border-separator text-slate-600 dark:text-white/70 hover:text-red-500"
+                      >
+                        {cancellingInviteId === inv.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          'Cancel'
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

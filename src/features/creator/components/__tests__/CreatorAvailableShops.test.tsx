@@ -47,9 +47,17 @@ vi.mock('../../hooks/queries/useAvailableShopsQuery', () => ({
   }),
 }));
 
+const mockCancelMutateAsync = vi.fn();
+
 vi.mock('../../hooks/mutations/useRequestCollaborationMutation', () => ({
   useRequestCollaborationMutation: () => ({
     mutateAsync: vi.fn(),
+  }),
+}));
+
+vi.mock('../../hooks/mutations/useCancelCollaborationMutation', () => ({
+  useCancelCollaborationMutation: () => ({
+    mutateAsync: mockCancelMutateAsync,
   }),
 }));
 
@@ -69,7 +77,7 @@ describe('CreatorAvailableShops', () => {
     expect(screen.getByText('Promoting')).toBeInTheDocument();
     expect(screen.getByText('Pending')).toBeInTheDocument();
     expect(screen.getByText('Declined')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /request/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^request$/i })).toBeInTheDocument();
   });
 
   it('filters available shops by search query', () => {
@@ -95,5 +103,25 @@ describe('CreatorAvailableShops', () => {
 
     expect(screen.getByText(/No available shops matching/i)).toBeInTheDocument();
     expect(screen.queryByText('Active Boutique')).not.toBeInTheDocument();
+  });
+
+  it('allows cancelling a pending collaboration request', async () => {
+    const { fireEvent, waitFor } = await import('@testing-library/react');
+    mockCancelMutateAsync.mockResolvedValue({ cancelled: true, sellerId: 2 });
+
+    render(
+      <MemoryRouter>
+        <CreatorAvailableShops />
+      </MemoryRouter>
+    );
+
+    const cancelButton = screen.getByRole('button', { name: /cancel request to pending store/i });
+    expect(cancelButton).toBeInTheDocument();
+
+    fireEvent.click(cancelButton);
+
+    await waitFor(() => {
+      expect(mockCancelMutateAsync).toHaveBeenCalledWith(2);
+    });
   });
 });

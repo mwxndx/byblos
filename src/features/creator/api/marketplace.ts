@@ -26,6 +26,11 @@ export const requestCollaboration = async (sellerId: number, message?: string) =
   return response.data;
 };
 
+export const cancelCollaborationRequest = async (sellerId: number) => {
+  const response = await apiClient.delete<unknown>(`/creators/shops/${sellerId}/request`);
+  return response.data;
+};
+
 export const leavePromotedShop = async (sellerId: number) => {
   const response = await apiClient.post<unknown>(`/creators/shops/${sellerId}/leave`);
   return response.data;

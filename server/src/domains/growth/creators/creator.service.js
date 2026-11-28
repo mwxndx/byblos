@@ -2048,6 +2048,32 @@ class CreatorService {
     return rows[0];
   }
 
+  static async cancelCollaborationRequest(creatorId, sellerId) {
+    const { rows } = await pool.query(
+      `DELETE FROM creator_shop_requests
+       WHERE creator_id = $1 AND seller_id = $2 AND status = 'pending'
+       RETURNING id`,
+      [creatorId, sellerId]
+    );
+    if (!rows[0]) {
+      throw new AppError('Pending collaboration request not found.', 404);
+    }
+    return { cancelled: true, sellerId };
+  }
+
+  static async cancelSellerInvite(sellerId, inviteId) {
+    const { rows } = await pool.query(
+      `DELETE FROM seller_creator_invites
+       WHERE id = $1 AND seller_id = $2 AND status = 'pending'
+       RETURNING id`,
+      [inviteId, sellerId]
+    );
+    if (!rows[0]) {
+      throw new AppError('Pending creator invite not found.', 404);
+    }
+    return { cancelled: true, inviteId };
+  }
+
   static async getSellerCreatorsDashboard(sellerId) {
     const sellerResult = await pool.query(
       `SELECT id, shop_name, slug, is_creator_marketplace_enabled, creator_commission_rate
