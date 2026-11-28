@@ -66,7 +66,7 @@ export function buildSearchClause(columns, search, params) {
   const term = typeof search === 'string' ? search.trim() : '';
   if (!term || columns.length === 0) return '';
   params.push(`%${term}%`);
-  const placeholder = `${params.length}`;
+  const placeholder = `$${params.length}`;
   const clauses = columns.map((col) => `${col} ILIKE ${placeholder}`).join(' OR ');
   return `(${clauses})`;
 }

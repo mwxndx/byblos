@@ -455,7 +455,7 @@ class AdminService {
 
   async getAllSellers({ limit, offset, search } = {}) {
     const params = [];
-    const searchClause = buildSearchClause(['full_name', 'email'], search, params);
+    const searchClause = buildSearchClause(['full_name', 'shop_name', 'email'], search, params);
 
     let sql = `
             SELECT id, user_id, full_name as name, email, whatsapp_number as phone, status, city, location, created_at, shop_name, balance,
