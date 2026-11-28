@@ -42,13 +42,13 @@ export function CreatorDashboardTabs({
         aria-hidden="true"
         className="pointer-events-none fixed inset-x-0 bottom-0 z-40"
         style={{
-          height: 'calc(5.25rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
-          background: 'linear-gradient(to top, var(--byblos-bg, #000000) 32%, transparent 100%)',
+          height: 'calc(4.25rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+          background: 'linear-gradient(to top, var(--byblos-bg, #000000) 0%, transparent 100%)',
         }}
       />
       <nav
-        className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-[48px] sm:rounded-full border border-separator dashboard-floating-nav bg-surface-1/95 backdrop-blur-md px-2 py-1.5 transition-colors duration-200"
-        style={{ bottom: 'max(1.125rem, calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px))))' }}
+        className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] rounded-[48px] sm:rounded-full border border-separator dashboard-floating-nav bg-surface-1/95 backdrop-blur-md px-2 py-1.5 transition-colors duration-200"
+        style={{ bottom: 'calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
         aria-label="Creator navigation"
       >
       <div className="flex h-12 sm:h-13 items-center justify-between w-full">

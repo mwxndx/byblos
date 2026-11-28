@@ -62,13 +62,13 @@ export function DashboardSkeleton() {
         aria-hidden="true"
         className="pointer-events-none fixed inset-x-0 bottom-0 z-40"
         style={{
-          height: 'calc(5.25rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
-          background: 'linear-gradient(to top, var(--byblos-bg, #000000) 32%, transparent 100%)',
+          height: 'calc(4.25rem + var(--sab, env(safe-area-inset-bottom, 0px)))',
+          background: 'linear-gradient(to top, var(--byblos-bg, #000000) 0%, transparent 100%)',
         }}
       />
       <div
-        className="fixed bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-12 sm:h-13 rounded-[48px] sm:rounded-full border border-separator dashboard-floating-nav bg-surface-1/95 backdrop-blur-md shadow-xl px-4 flex items-center justify-between"
-        style={{ bottom: 'max(1.125rem, calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px))))' }}
+        className="fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[360px] max-w-[calc(100vw-1.5rem)] h-12 sm:h-13 rounded-[48px] sm:rounded-full border border-separator dashboard-floating-nav bg-surface-1/95 backdrop-blur-md shadow-xl px-4 flex items-center justify-between"
+        style={{ bottom: 'calc(0.5rem + var(--sab, env(safe-area-inset-bottom, 0px)))' }}
       >
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton key={i} className="h-6 w-6 rounded-md" />
