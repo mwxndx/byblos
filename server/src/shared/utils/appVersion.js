@@ -103,8 +103,8 @@ export function getAppVersionPolicy() {
   const fileVersion = readVersionJson() || readGradleBuildVersion();
 
   // Baseline fallbacks
-  const defaultCode = 87;
-  const defaultName = '1.0.87';
+  const defaultCode = 88;
+  const defaultName = '1.0.88';
 
   const latestAndroidVersionCode =
     runtimeLatestCode ?? envLatestCode ?? fileVersion?.versionCode ?? defaultCode;
@@ -128,9 +128,9 @@ export function getAppVersionPolicy() {
     storeUrl,
     webStoreUrl,
     releaseNotes: [
-      'Added unique creator usernames with signup, profile editing, and personalized creator shop links (/:shopName/:creatorUsername).',
-      'Fixed creator marketplace activation so paused creator links reactivate and shop caches refresh automatically.',
-      'Resolved an infinite click-tracking loop on creator shop links and preserved creator marketplace status across shop responses.'
+      'Made buyer custom-message prompts optional on custom products so sellers can set production days alone.',
+      'Polished the Buyer Dashboard with borderless shop cards in light and dark modes and added the Mzigo Ego Hub pickup address in the bag summary.',
+      'Hardened creator-link attribution and privileged account security with full end-to-end verification.'
     ]
   };
 }
