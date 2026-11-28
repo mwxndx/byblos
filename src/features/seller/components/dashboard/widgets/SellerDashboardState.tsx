@@ -8,13 +8,13 @@ interface SellerDashboardErrorStateProps {
 
 export function SellerDashboardErrorState({ error, onRetry }: Readonly<SellerDashboardErrorStateProps>) {
   return (
-    <div className="min-h-screen bg-[var(--byblos-bg,#000000)] flex items-center justify-center px-4 transition-colors duration-200">
+    <div className="min-h-[100dvh] pt-safe-top pb-safe-bottom bg-[var(--bg,#000000)] flex items-center justify-center px-4 transition-colors duration-200">
       <div className="text-center space-y-6 p-8">
         <div className="w-24 h-24 mx-auto bg-red-500/10 border border-red-500/20 rounded-3xl flex items-center justify-center">
           <RefreshCw className="h-12 w-12 text-red-500" />
         </div>
-        <h3 className="text-2xl font-semibold text-[var(--byblos-text,#ffffff)] mb-3">Unable to load dashboard</h3>
-        <p className="text-[var(--byblos-muted,#94a3b8)] text-base font-medium max-w-md mx-auto mb-6">
+        <h3 className="text-2xl font-semibold text-label mb-3">Unable to load dashboard</h3>
+        <p className="text-label-2 text-base font-medium max-w-md mx-auto mb-6">
           {error || 'Something went wrong while loading your dashboard data. Please try again.'}
         </p>
         <Button

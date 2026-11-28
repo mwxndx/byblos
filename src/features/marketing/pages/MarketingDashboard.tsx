@@ -33,8 +33,8 @@ interface CustomTooltipProps {
 const CustomTooltip = ({ active, payload, label, prefix = '', suffix = '' }: CustomTooltipProps) => {
     if (!active || !payload?.length) return null;
     return (
-        <div className="bg-white dark:bg-surface-1 border border-black/10 dark:border-separator rounded-lg p-3 text-xs shadow-xl text-slate-900 dark:text-white">
-            <p className="text-slate-500 dark:text-label-2 mb-2 font-medium">{label}</p>
+        <div className="bg-surface-1 border border-separator rounded-lg p-3 text-xs shadow-xl text-label">
+            <p className="text-label-2 mb-2 font-medium">{label}</p>
             {payload.map((entry) => (
                 <p key={entry.name} style={{ color: entry.color }} className="mb-0.5 font-medium">
                     {entry.name}: <span className="font-bold">{prefix}{Number(entry.value).toLocaleString()}{suffix}</span>
@@ -130,7 +130,7 @@ export default function MarketingDashboard() {
     if (loading) return <DashboardSkeleton />;
 
     if (error) return (
-        <div className="marketing-surface flex min-h-[100svh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4">
+        <div className="marketing-surface flex min-h-[100dvh] items-center justify-center overflow-x-hidden bg-[var(--bg)] p-4">
             <div className="text-red-400 text-center rounded-3xl border border-transparent bg-surface-1 p-8 shadow-xl">
                 <p>{error}</p>
                 <button onClick={fetchAll} className="mt-4 text-yellow-500 underline text-sm">Try again</button>
@@ -139,7 +139,7 @@ export default function MarketingDashboard() {
     );
 
     return (
-        <div className="marketing-surface min-h-[100svh] overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
+        <div className="marketing-surface min-h-[100dvh] pb-safe-bottom overflow-x-hidden bg-[var(--bg)] text-label selection:bg-yellow-500/30">
             <AppHeader
                 className="!bg-white border-b border-white"
                 left={
@@ -175,7 +175,7 @@ export default function MarketingDashboard() {
                     </div>
                 }
             />
-            <div className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-6 md:space-y-12 max-w-7xl mx-auto w-full min-w-0">
+            <main className="p-3 sm:p-4 md:p-8 lg:p-12 space-y-6 md:space-y-12 max-w-7xl mx-auto w-full min-w-0">
 
             {/* Overview Stat Cards */}
             {overview && (
@@ -362,7 +362,7 @@ export default function MarketingDashboard() {
                     </div>
                 )}
             </div>
-            </div>
+            </main>
         </div>
     );
 }

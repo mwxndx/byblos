@@ -9,7 +9,7 @@ import { requestStage, type RequestStage } from '../utils/mzigoJourney';
 import { useMzigoDashboard } from '../hooks/useMzigoDashboard';
 import type { LogisticsRequestCard } from '@/features/logistics/api';
 
-const BTN_SECONDARY = 'border border-black/10 dark:border-white/15 bg-black/[0.04] dark:bg-white/[0.05] text-slate-800 dark:text-white hover:bg-black/[0.08] dark:hover:bg-white/10';
+const BTN_SECONDARY = 'border border-separator bg-fill text-label hover:bg-fill/80';
 
 type View = 'todo' | 'late' | 'done';
 
@@ -62,7 +62,7 @@ const MzigoDashboardPage = () => {
   ];
 
   return (
-    <main className="dashboard-layout mzigo-surface mzigo-light-dashboard min-h-full overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#f5f5f5)] transition-colors duration-200" style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, env(safe-area-inset-bottom, 0px)))' } as React.CSSProperties}>
+    <main className="dashboard-layout mzigo-surface mzigo-light-dashboard min-h-full min-h-[100dvh] overflow-x-hidden bg-[var(--byblos-bg,#000000)] text-label transition-colors duration-200" style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 'calc(2rem + var(--sab, env(safe-area-inset-bottom, 0px)))' } as React.CSSProperties}>
       {/* ── Header ─────────────────────────────────────────────── */}
       <AppHeader
         className="[&>div]:py-1 sm:[&>div]:py-1.5 [&_.grid]:min-h-10 sm:[&_.grid]:min-h-11 shadow-none border-b border-[var(--bg,#000000)]"

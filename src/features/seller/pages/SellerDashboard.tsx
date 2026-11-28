@@ -28,7 +28,8 @@ import { normalizeShopName } from '@/features/seller/utils/sellerRegistrationUti
 import { isNativeApp } from '@/infrastructure/navigation/mobileApp';
 import { useSellerProfileQuery } from '@/features/seller/hooks/useSellerProfile';
 import { useThemeScope } from '@/shared/hooks/useAppTheme';
-import { registerSubNavigation, registerModalDismiss } from '@/shared/utils/modalBackHandler';
+import { useModalBackDismiss } from '@/shared/hooks/useModalBackDismiss';
+import { registerSubNavigation } from '@/shared/utils/modalBackHandler';
 import type { SellerDashboardProps, SellerTabId } from '../components/dashboard/types';
 
 // Swipeable nav tabs only — 'settings' is reached via the header profile icon,
@@ -75,24 +76,8 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
     });
   }, [activeTab]);
 
-  // Hook add product modal dismiss into native Android back stack
-  useEffect(() => {
-    if (!isNativeApp() || !isAddProductModalOpen) return;
-
-    return registerModalDismiss(() => {
-      setIsAddProductModalOpen(false);
-      return true;
-    });
-  }, [isAddProductModalOpen]);
-
-  useEffect(() => {
-    if (!isNativeApp() || !isProfileOpen) return;
-
-    return registerModalDismiss(() => {
-      setIsProfileOpen(false);
-      return true;
-    });
-  }, [isProfileOpen]);
+  useModalBackDismiss(isAddProductModalOpen, () => setIsAddProductModalOpen(false));
+  useModalBackDismiss(isProfileOpen, () => setIsProfileOpen(false));
 
   const currentProfile = (liveSellerProfile as unknown as typeof sellerProfile) || sellerProfile;
   const rawShopName = currentProfile?.shopName?.trim();
@@ -244,12 +229,12 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
   }
 
   return (
-    <div className="page-enter dashboard-layout seller-surface min-w-0 overflow-x-hidden flex flex-col bg-[var(--byblos-bg,#000000)] text-[var(--byblos-text,#ffffff)] transition-colors duration-200" style={{ minHeight: '100%', height: '100%', overflow: 'hidden' } as React.CSSProperties}>
+    <div className="page-enter dashboard-layout seller-surface flex h-full h-[100dvh] min-w-0 flex-col overflow-hidden bg-[var(--bg,#000000)] text-label transition-colors duration-200">
       <SellerDashboardHeader shopName={shopName} onOpenProfile={() => setIsProfileOpen(true)} />
 
       {/* Main Content Area */}
       <div className="relative flex-1 min-h-0 overflow-hidden">
-        <div
+        <main
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           onTouchCancel={handleTouchCancel}
@@ -285,7 +270,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
                 variant="default"
                 role="seller"
                 scrollClassName=""
-                className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-surface-1"
+                className="overflow-hidden rounded-card border border-separator bg-surface-1"
               />
             </div>
           )}
@@ -305,7 +290,7 @@ export default function SellerDashboard({ children }: Readonly<SellerDashboardPr
             />
           )}
           </div>
-        </div>
+        </main>
 
         <DashboardProfilePanel
           open={isProfileOpen}
